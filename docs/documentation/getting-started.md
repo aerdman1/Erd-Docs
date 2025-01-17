@@ -1,5 +1,5 @@
 ---
-title: Getting Started with ErdTest123
+title: You can edit this content directly on the page!
 excerpt: >-
   This page will help you get started with ErdTest123. You'll be up and running
   in a jiffy!
@@ -8,6 +8,12 @@ hidden: false
 Welcome to ReadMe! :owlbert:
 
 You're on your way to building an awesome developer hub! Here's some of the things you'll want to check out.
+
+<Accordion title="My Accordion Title" icon="fa-info-circle">
+  Lorem ipsum dolor sit amet, **consectetur adipiscing elit.** Ut enim
+  ad minim veniam, quis nostrud exercitation ullamco. Excepteur sint
+  occaecat cupidatat non proident!
+</Accordion>
 
 # 📝 Customize your docs
 
