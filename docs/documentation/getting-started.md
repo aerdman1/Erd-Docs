@@ -11,6 +11,253 @@ hidden: false
 | Bob                            | `30` | *Designer*            |
 | Charlie                        | 35   | Product *Manager*     |
 
+<HTMLBlock>{`
+<table style="width:100%; border-collapse: collapse;">
+  <tr style="background-color:#ddd;">
+    <th style="border: 1px solid #000; padding: 8px;">Data Type</th>
+    <th style="border: 1px solid #000; padding: 8px;">Structure</th>
+    <th style="border: 1px solid #000; padding: 8px;">Code Snippet</th>
+    <th style="border: 1px solid #000; padding: 8px;">Visual Reference</th>
+    <th style="border: 1px solid #000; padding: 8px;">Description</th>
+    <th style="border: 1px solid #000; padding: 8px;">Notes</th>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://readme.com/static/owlberts/owlejandro-celebrating.png" alt="Owlejandro celebrating" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>First Item</li>
+        <li>Second Item</li>
+        <li>Third Item</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://owlbertsio-resized.s3.amazonaws.com/Scientist.png.png" alt="Scientist Owlbert" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>List Item 1</li>
+        <li>List Item 2</li>
+        <li>List Item 3</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png" alt="Inspector Owlbert" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://readme.com/static/owlberts/owlejandro-celebrating.png" alt="Owlejandro celebrating" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>First Item</li>
+        <li>Second Item</li>
+        <li>Third Item</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://owlbertsio-resized.s3.amazonaws.com/Scientist.png.png" alt="Scientist Owlbert" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>List Item 1</li>
+        <li>List Item 2</li>
+        <li>List Item 3</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png" alt="Inspector Owlbert" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://readme.com/static/owlberts/owlejandro-celebrating.png" alt="Owlejandro celebrating" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>First Item</li>
+        <li>Second Item</li>
+        <li>Third Item</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://owlbertsio-resized.s3.amazonaws.com/Scientist.png.png" alt="Scientist Owlbert" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <a href="http://www.google.com">Link Test 1</a><br>
+      <a href="http://www.google.com">Link Test 2</a><br>
+      <a href="http://www.google.com">Link Test 3</a>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <ul>
+        <li>List Item 1</li>
+        <li>List Item 2</li>
+        <li>List Item 3</li>
+      </ul>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <code><p>This is my table text</p></code>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <img src="https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png" alt="Inspector Owlbert" width="100">
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+    <td style="border: 1px solid #000; padding: 8px;">
+      <p>This is my table text</p>
+    </td>
+  </tr>
+</table>
+`}</HTMLBlock>
+
 <br />
 
 <table style={{ width: "100%", borderCollapse: "collapse" }}>
