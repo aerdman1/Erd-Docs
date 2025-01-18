@@ -32,7 +32,7 @@ HTML BLOCK
     <tr>
       <td style="border: 1px solid #000; padding: 8px;">Text</td>
       <td style="border: 1px solid #000; padding: 8px;">List item 1</td>
-      <td style="border: 1px solid #000; padding: 8px;">&lt;code&gt;&lt;/code&gt;</td>
+      <td style="border: 1px solid #000; padding: 8px;">test</td>
       <td style="border: 1px solid #000; padding: 8px;">Screenshot</td>
       <td style="border: 1px solid #000; padding: 8px;">Explanation</td>
       <td style="border: 1px solid #000; padding: 8px;">Extra</td>
@@ -40,7 +40,7 @@ HTML BLOCK
     <tr>
       <td style="border: 1px solid #000; padding: 8px;">Text</td>
       <td style="border: 1px solid #000; padding: 8px;">List item 2</td>
-      <td style="border: 1px solid #000; padding: 8px;">&lt;code&gt;&lt;/code&gt;</td>
+      <td style="border: 1px solid #000; padding: 8px;">test</td>
       <td style="border: 1px solid #000; padding: 8px;">Screenshot</td>
       <td style="border: 1px solid #000; padding: 8px;">Explanation</td>
       <td style="border: 1px solid #000; padding: 8px;">Extra</td>
