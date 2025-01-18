@@ -32,7 +32,7 @@ HTML BLOCK
     <tr>
       <td style="border: 1px solid #000; padding: 8px;">Text</td>
       <td style="border: 1px solid #000; padding: 8px;">List item 1</td>
-      <td style="border: 1px solid #000; padding: 8px;">test</td>
+      <td style="border: 1px solid #000; padding: 8px;"><code>test</code></td>
       <td style="border: 1px solid #000; padding: 8px;">Screenshot</td>
       <td style="border: 1px solid #000; padding: 8px;">Explanation</td>
       <td style="border: 1px solid #000; padding: 8px;">Extra</td>
@@ -53,35 +53,35 @@ HTML BLOCK
 
 JSX
 
-<table style={{ width: "100%", borderCollapse: "collapse" }}>
-  <thead>
-    <tr style={{ backgroundColor: "#ddd" }}>
-      <th style={{ border: "1px solid #000", padding: "8px" }}>Data Type</th>
-      <th style={{ border: "1px solid #000", padding: "8px" }}>Structure</th>
-      <th style={{ border: "1px solid #000", padding: "8px" }}>Code Snippet</th>
-      <th style={{ border: "1px solid #000", padding: "8px" }}>Visual Reference</th>
-      <th style={{ border: "1px solid #000", padding: "8px" }}>Description</th>
-      <th style={{ border: "1px solid #000", padding: "8px" }}>Notes</th>
-    </tr>
-  </thead>
+\<table style=\{\{ width: "100%", borderCollapse: "collapse" }}>
+&#x20; \<thead>
+&#x20;   \<tr style=\{\{ backgroundColor: "#ddd" }}>
+&#x20;     \<th style=\{\{ border: "1px solid #000", padding: "8px" }}>Data Type\</th>
+&#x20;     \<th style=\{\{ border: "1px solid #000", padding: "8px" }}>Structure\</th>
+&#x20;     \<th style=\{\{ border: "1px solid #000", padding: "8px" }}>Code Snippet\</th>
+&#x20;     \<th style=\{\{ border: "1px solid #000", padding: "8px" }}>Visual Reference\</th>
+&#x20;     \<th style=\{\{ border: "1px solid #000", padding: "8px" }}>Description\</th>
+&#x20;     \<th style=\{\{ border: "1px solid #000", padding: "8px" }}>Notes\</th>
+&#x20;   \</tr>
+&#x20; \</thead>
 
-  <tbody>
-    <tr>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Text</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>List item 1</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>\<code>\</code></td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Screenshot</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Explanation</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Extra</td>
-    </tr>
+&#x20; \<tbody>
+&#x20;   \<tr>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Text\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>List item 1\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>\\\<code>\\\</code>\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Screenshot\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Explanation\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Extra\</td>
+&#x20;   \</tr>
 
-    <tr>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Text</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>List item 2</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>\<code>\</code></td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Screenshot</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Explanation</td>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>Extra</td>
-    </tr>
-  </tbody>
-</table>
+&#x20;   \<tr>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Text\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>List item 2\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>\\\<code>test\</code>\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Screenshot\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Explanation\</td>
+&#x20;     \<td style=\{\{ border: "1px solid #000", padding: "8px" }}>Extra\</td>
+&#x20;   \</tr>
+&#x20; \</tbody>
+\</table>
