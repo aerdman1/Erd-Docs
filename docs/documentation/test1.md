@@ -31,7 +31,7 @@ HTML BLOCK
   <tbody>
     <tr>
       <td style="border: 1px solid #000; padding: 8px;">Text</td>
-      <td style="border: 1px solid #000; padding: 8px;">List item 2</td>
+      <td style="border: 1px solid #000; padding: 8px;">List item 1</td>
       <td style="border: 1px solid #000; padding: 8px;"><code>test</code></td>
       <td style="border: 1px solid #000; padding: 8px;">Screenshot</td>
       <td style="border: 1px solid #000; padding: 8px;">Explanation</td>
