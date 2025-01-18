@@ -7,10 +7,11 @@ metadata:
 ---
 Pure Markdown
 
-| Data Type | Structure   | Code Snippet | Visual Reference | Description | Notes |
-| --------- | ----------- | ------------ | ---------------- | ----------- | ----- |
-| Text      | List item 1 | `test`       | Screenshot       | Explanation | Extra |
-| Text      | List item 2 | `test`       | Screenshot       | Explanation |       |
+| Data Type | Structure   | Code Snippet | Visual Reference | Description | Notes                                     |
+| --------- | ----------- | ------------ | ---------------- | ----------- | ----------------------------------------- |
+| Text      | List item 1 | `test`       | Screenshot       | Explanation | Extra                                    |
+| Text      | List item 2 | `test`       | Screenshot       | Explanation | ![Inspector Owlbert](https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png) |
+
 
 <br />
 
