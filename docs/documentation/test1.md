@@ -5,6 +5,8 @@ hidden: false
 metadata:
   robots: index
 ---
+Pure Markdown
+
 | Data Type | Structure   | Code Snippet | Visual Reference | Description | Notes |
 | --------- | ----------- | ------------ | ---------------- | ----------- | ----- |
 | Text      | List item 1 | `<code>`     | Screenshot       | Explanation | Extra |
@@ -12,7 +14,7 @@ metadata:
 
 <br />
 
-<br />
+HTML BLOCK
 
 <HTMLBlock>{`
 <table style="width:100%; border-collapse: collapse;">
@@ -28,24 +30,28 @@ metadata:
   </thead>
   <tbody>
     <tr>
-      <td style="border: 1px solid #000; padding: 8px;">
-        <a href="http://www.google.com">Link Test 1</a><br>
-        <a href="http://www.google.com">Link Test 2</a><br>
-        <a href="http://www.google.com">Link Test 3</a>
-      </td>
-      <td style="border: 1px solid #000; padding: 8px;">
-        <ul>
-          <li>Item 1</li>
-          <li>Item 2</li>
-          <li>Item 3</li>
-        </ul>
-      </td>
+      <td style="border: 1px solid #000; padding: 8px;">Text</td>
+      <td style="border: 1px solid #000; padding: 8px;">List item 1</td>
+      <td style="border: 1px solid #000; padding: 8px;">&lt;code&gt;&lt;/code&gt;</td>
+      <td style="border: 1px solid #000; padding: 8px;">Screenshot</td>
+      <td style="border: 1px solid #000; padding: 8px;">Explanation</td>
+      <td style="border: 1px solid #000; padding: 8px;">Extra</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #000; padding: 8px;">Text</td>
+      <td style="border: 1px solid #000; padding: 8px;">List item 2</td>
+      <td style="border: 1px solid #000; padding: 8px;">&lt;code&gt;&lt;/code&gt;</td>
+      <td style="border: 1px solid #000; padding: 8px;">Screenshot</td>
+      <td style="border: 1px solid #000; padding: 8px;">Explanation</td>
+      <td style="border: 1px solid #000; padding: 8px;">Extra</td>
     </tr>
   </tbody>
 </table>
 `}</HTMLBlock>
 
 <br />
+
+JSX
 
 <table style={{ width: "100%", borderCollapse: "collapse" }}>
   <thead>
@@ -61,25 +67,21 @@ metadata:
 
   <tbody>
     <tr>
-      <td style={{ border: "1px solid #000", padding: "8px" }}>
-        <a href="http://www.google.com">Link Test 1</a>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Text</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>List item 1</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>\<code>\</code></td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Screenshot</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Explanation</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Extra</td>
+    </tr>
 
-        <br />
-
-        <a href="http://www.google.com">Link Test 2</a>
-
-        <br />
-
-        <a href="http://www.google.com">Link Test 3</a>
-      </td>
-
-      <td style={{ border: "1px solid #000", padding: "8px" }}>
-        <ul>
-          <li>Item 1</li>
-          <li>Item 2</li>
-          <li>Item 3</li>
-        </ul>
-      </td>
+    <tr>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Text</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>List item 2</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>\<code>\</code></td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Screenshot</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Explanation</td>
+      <td style={{ border: "1px solid #000", padding: "8px" }}>Extra</td>
     </tr>
   </tbody>
 </table>
