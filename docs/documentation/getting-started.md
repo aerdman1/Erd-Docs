@@ -5,8 +5,8 @@ excerpt: >-
   in a jiffy!
 hidden: false
 ---
-| Name                               | Age | Occupation        |
-| ---------------------------------- | --- | ----------------- |
-| [Alice](http://www.google.com)test | 25  | Software Engineer |
-| Bob                                | 30  | Designer          |
-| Charlie                            | 35  | Product Manager   |
+| Name                                         | Age | Occupation        |
+| -------------------------------------------- | --- | ----------------- |
+| \[Alice]\(http\://www\.google.com)test \<br> | 25  | Software Engineer |
+| Bob                                          | 30  | Designer          |
+| Charlie                                      | 35  | Product Manager   |
