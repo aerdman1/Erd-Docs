@@ -7,14 +7,6 @@ hidden: false
 ---
 | Name                           | Age  | Occupation            |
 | ------------------------------ | ---- | --------------------- |
-| [Alice](http://www.google.com)<br /> | 25   | Software **Engineer** |
-| Bob                            | `30` | *Designer*            |
-| Charlie                        | 35   | Product *Manager*     |
-
-<br />
-
-| Name                           | Age  | Occupation            |
-| ------------------------------ | ---- | --------------------- |
 | [Alice](http://www.google.com) | 25   | Software **Engineer** |
 | Bob                            | `30` | *Designer*            |
 | Charlie                        | 35   | Product *Manager*     |
