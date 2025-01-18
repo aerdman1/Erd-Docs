@@ -5,41 +5,375 @@ excerpt: >-
   in a jiffy!
 hidden: false
 ---
-Welcome to ReadMe! :owlbert:
+<table style={{ width: "100%", borderCollapse: "collapse" }}>
+  <tbody>
+    <tr style={{ backgroundColor: "#ddd" }}>
+      <th style={{ border: "1px solid #000", padding: 8 }}>Data Type</th>
+      <th style={{ border: "1px solid #000", padding: 8 }}>Structure</th>
+      <th style={{ border: "1px solid #000", padding: 8 }}>Code Snippet</th>
+      <th style={{ border: "1px solid #000", padding: 8 }}>Visual Reference</th>
+      <th style={{ border: "1px solid #000", padding: 8 }}>Description</th>
+      <th style={{ border: "1px solid #000", padding: 8 }}>Notes</th>
+    </tr>
 
-You're on your way to building an awesome developer hub! Here's some of the things you'll want to check out.
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
 
-<Accordion title="My Accordion Title" icon="fa-info-circle">
-  Lorem ipsum dolor sit amet, **consectetur adipiscing elit.** Ut enim
-  ad minim veniam, quis nostrud exercitation ullamco. Excepteur sint
-  occaecat cupidatat non proident!
-</Accordion>
+        <br />
 
-# 📝 Customize your docs
+        <a href="http://www.google.com">Link Test 2</a>
 
-What you're looking at right now is what we call our **Guides**. It's a free-form place to write to your heart's content! And the best part is... you aren't alone! Your users can contribute (with your approval, don't worry!) using the **[Suggested Edits](https://docs.readme.com/main/docs/suggested-edits)** feature on every page. It's like GitHub Pull Requests, but for text!
+        <br />
 
-Want to ease your users into it with some fancy marketing pages? You can enable a **[Landing Page](https://docs.readme.com/main/docs/landing-page)**, and write as much HTML as you want to make it look like your brand.
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
 
-# 🚦 Interactive API Docs
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+          <li>Item 3</li>
+        </ul>
+      </td>
 
-If you don't have an API, then no worries! ReadMe is great for any sort of documentation. But if you have an API, there are a few features to make your experience with ReadMe (and your users' experience with your developer hub!) a magical one:
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
 
-* **Upload your OpenAPI file:** First step is to describe your API to us! If you already have an OpenAPI file, there's lots of ways to upload it in the *API Reference* section. Our favorite is the GitHub Action, but you can use our CLI or you can upload it directly to the UI!
-* **Add API Keys:** Don't make your users hunt around for API keys. You can surface their API key [right in the docs](https://docs.readme.com/main/docs/personalized-docs), so they can play around with your API right inside ReadMe.
-* **Add Logs:** The coolest thing about ReadMe is you can add [real-time API Logs](https://docs.readme.com/main/docs/developer-dashboard) right to your docs, so you and your users can both see what's going on with their API. Trust us, it's magical!
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://readme.com/static/owlberts/owlejandro-celebrating.png" alt="Owlejandro celebrating" width={100} />
+      </td>
 
-# 📈 Know your users
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
 
-One of the best ways to know if you're nailing the dev experience is checking out how your users are interacting with both your docs and API.
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
 
-* **Documentation Metrics** let you see who's using your docs, what your best and worst pages are, what people are searching for and more!
-* **API Metrics** are a bit harder to set up (I promise we do our best to make it painless!), but once you set this up you'll know *everything* that's going on with your users!
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
 
-# 💬 We're here to help!
+        <br />
 
-ReadMe has a *ton* of ways to make your docs the envy of any <Glossary>parliament</Glossary> (like that mouseover!). If you get stuck, [shoot us an email](mailto:support@readme.io) or use the Intercom widget on the bottom right of any page.
+        <a href="http://www.google.com">Link Test 2</a>
 
-We're excited you're here! :blue_heart:
+        <br />
 
-![This won't be fun to clean up...](https://owlbert.io/images/popper.gif)
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>First Item</li>
+          <li>Second Item</li>
+          <li>Third Item</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://owlbertsio-resized.s3.amazonaws.com/Scientist.png.png" alt="Scientist Owlbert" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 2</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>List Item 1</li>
+          <li>List Item 2</li>
+          <li>List Item 3</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png" alt="Inspector Owlbert" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 2</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+          <li>Item 3</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://readme.com/static/owlberts/owlejandro-celebrating.png" alt="Owlejandro celebrating" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 2</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>First Item</li>
+          <li>Second Item</li>
+          <li>Third Item</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://owlbertsio-resized.s3.amazonaws.com/Scientist.png.png" alt="Scientist Owlbert" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 2</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>List Item 1</li>
+          <li>List Item 2</li>
+          <li>List Item 3</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png" alt="Inspector Owlbert" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 2</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>Item 1</li>
+          <li>Item 2</li>
+          <li>Item 3</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://readme.com/static/owlberts/owlejandro-celebrating.png" alt="Owlejandro celebrating" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 2</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>First Item</li>
+          <li>Second Item</li>
+          <li>Third Item</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://owlbertsio-resized.s3.amazonaws.com/Scientist.png.png" alt="Scientist Owlbert" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+
+    <tr>
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <a href="http://www.google.com">Link Test 1</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 2</a>
+
+        <br />
+
+        <a href="http://www.google.com">Link Test 3</a>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <ul>
+          <li>List Item 1</li>
+          <li>List Item 2</li>
+          <li>List Item 3</li>
+        </ul>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <code>
+          <p>This is my table text</p>
+        </code>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <img src="https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png" alt="Inspector Owlbert" width={100} />
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+
+      <td style={{ border: "1px solid #000", padding: 8 }}>
+        <p>This is my table text</p>
+      </td>
+    </tr>
+  </tbody>
+</table>
