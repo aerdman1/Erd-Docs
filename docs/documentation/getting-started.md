@@ -5,4 +5,8 @@ excerpt: >-
   in a jiffy!
 hidden: false
 ---
-A
+| Name    | Age | Occupation        |
+| ------- | --- | ----------------- |
+| Alice   | 25  | Software Engineer |
+| Bob     | 30  | Designer          |
+| Charlie | 35  | Product Manager   |
