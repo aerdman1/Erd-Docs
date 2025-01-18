@@ -10,7 +10,7 @@ Pure Markdown
 | Data Type | Structure   | Code Snippet | Visual Reference | Description | Notes |
 | --------- | ----------- | ------------ | ---------------- | ----------- | ----- |
 | Text      | List item 1 | `test`       | Screenshot       | Explanation | Extra |
-| Text      | List item 2 | `test`       | Screenshot       | Explanation | Extr  |
+| Text      | List item 2 | `test`       | Screenshot       | Explanation |       |
 
 <br />
 
@@ -43,12 +43,8 @@ HTML BLOCK
       <td style="border: 1px solid #000; padding: 8px;"><code>test</code></td>
       <td style="border: 1px solid #000; padding: 8px;">Screenshot</td>
       <td style="border: 1px solid #000; padding: 8px;">Explanation</td>
-      <td style="border: 1px solid #000; padding: 8px;">Extra</td>
+      <td style="border: 1px solid #000; padding: 8px;"> <img src="https://owlbertsio-resized.s3.amazonaws.com/Inspector-Owlbert.png.png" alt="Inspector Owlbert" width="100"></td>
     </tr>
   </tbody>
 </table>
 `}</HTMLBlock>
-
-<br />
-
-JSX
