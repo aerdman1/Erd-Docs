@@ -34,6 +34,37 @@ metadata:
   <td style="border: 1px solid #ddd; padding: 8px;">Info<br><br><img src="https://files.readme.io/608ca9e-info_severity.png" height="24" width="48"><br/></td>
   <td style="border: 1px solid #ddd; padding: 8px;">Non-critical or high-priority concerns that are good to be aware of. Regularly reviewing and addressing informational System Health Issues helps to maintain the overall health of your Wiz system. This category includes System Health Issues that were set to status Ignore by a user.<br/></td>
 </tr>
+</tbody> 
+</table>
+`}</HTMLBlock>
+
+<br />
+
+<HTMLBlock>{`
+<table style="width: 100%; border-collapse: collapse;">
+<thead>
+<tr>
+  <th style="border: 1px solid #ddd; padding: 8px;">Data Type</th>
+  <th style="border: 1px solid #ddd; padding: 8px;">Structure</th>
+  <th style="border: 1px solid #ddd; padding: 8px;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="border: 1px solid #ddd; padding: 8px;">This is some <a href="http://www.google.com" target="_blank">Link</a><br/></td>
+  <td style="border: 1px solid #ddd; padding: 8px;"><ul><li>List Item A<br/>- List Item B<br/>- List Item C</li></ul></td>
+  <td style="border: 1px solid #ddd; padding: 8px;">Some text here<br/></td>
+</tr>
+<tr>
+  <td style="border: 1px solid #ddd; padding: 8px;">Another Link: <a href="https://docs.readme.com" target="_blank">ReadMe Docs</a><br/></td>
+  <td style="border: 1px solid #ddd; padding: 8px;"><ul><li>More Lists<br/>- More Lists<br/>- More Lists</li></ul></td>
+  <td style="border: 1px solid #ddd; padding: 8px;">Random text with <code>inline code</code> and a line break<br/>Next line<br/></td>
+</tr>
+<tr>
+  <td style="border: 1px solid #ddd; padding: 8px;">Basic text row<br/></td>
+  <td style="border: 1px solid #ddd; padding: 8px;">**Bold** and _italics_<br/></td>
+  <td style="border: 1px solid #ddd; padding: 8px;">Finally, a last row!<br/></td>
+</tr>
 </tbody>
 </table>
 `}</HTMLBlock>
