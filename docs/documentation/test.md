@@ -48,7 +48,7 @@ metadata:
             <td style="border: 1px solid #ddd; padding: 8px;"><code>This is my table text</code></td>
             <td style="border: 1px solid #ddd; padding: 8px;"><img src="https://readme.com/static/owlberts/owlejandro-celebrating.png" alt="Owlejandro celebrating" width="100"></td>
             <td style="border: 1px solid #ddd; padding: 8px;">This is my table text</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">This is my table text</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">This is my table text</td> 
         </tr>
         <tr>
             <td style="border: 1px solid #ddd; padding: 8px;"><a href="http://www.google.com" target="_blank">Link Test 1</a><br><a href="http://www.google.com" target="_blank">Link Test 2</a><br><a href="http://www.google.com" target="_blank">Link Test 3</a></td>
