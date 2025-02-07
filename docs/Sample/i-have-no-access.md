@@ -1,5 +1,5 @@
 ---
-title: I have no access {admin}
+title: Only editors can see this! {admin}
 deprecated: false
 hidden: false
 metadata:
