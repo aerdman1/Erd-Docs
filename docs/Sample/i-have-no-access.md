@@ -1,5 +1,5 @@
 ---
-title: I have no access $x$
+title: I have no access {admin}
 deprecated: false
 hidden: false
 metadata:
