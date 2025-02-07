@@ -1,5 +1,5 @@
 ---
-title: I have access
+title: Everyone has access
 deprecated: false
 hidden: false
 metadata:
