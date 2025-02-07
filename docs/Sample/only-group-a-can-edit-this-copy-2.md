@@ -1,5 +1,5 @@
 ---
-title: Only group A can edit this (COPY)
+title: Only group A can edit this
 deprecated: false
 hidden: false
 metadata:
