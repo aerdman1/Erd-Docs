@@ -1,5 +1,5 @@
 ---
-title: 'I have no access! '
+title: 'I have no access '
 deprecated: false
 hidden: false
 metadata:
