@@ -1,5 +1,5 @@
 ---
-title: Everyone has access
+title: Everyone can see this!
 deprecated: false
 hidden: false
 metadata:
