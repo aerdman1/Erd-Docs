@@ -1,5 +1,5 @@
 ---
-title: Only editors can see this! {admin}
+title: Only Super Editors can see this! {admin}
 deprecated: false
 hidden: false
 metadata:
