@@ -1,5 +1,5 @@
 ---
-title: Only Super Editors can see this! {group_A}
+title: Only group A can edit this
 deprecated: false
 hidden: false
 metadata:
