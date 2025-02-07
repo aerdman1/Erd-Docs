@@ -12,8 +12,6 @@ metadata:
 | Block Elements  | <blockquote>This is a blockquote inside a table.</blockquote>                                                                   | <details><summary>Click to expand</summary><p>This is hidden text.</p></details> <Glossary>parliament</Glossary>                                                                                                                                                                          |
 | Code Snippets   | <pre><code>console.log("Hello, World!");</code></pre>                                                                           | ![](https://files.readme.io/751b9a6c7accd626bd5d2aa3a5d20172b4bcd35e78564c9c276860f78731bf58-a29c8744b62ec4b51e366e91a012533f9c6e21638db2c425358cec92a7058d7d-CleanShot_2024-11-08_at_20.10.29.gif)<pre><code>curl -X GET [https://api.example.com](https://api.example.com)</code></pre> |
 
-<br />
-
 # MDX SPECIFIC
 
 <Accordion title="My Accordion Title" icon="fa-info-circle">
