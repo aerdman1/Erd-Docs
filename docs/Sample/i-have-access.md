@@ -1,5 +1,5 @@
 ---
-title: Everyone can see this!
+title: All Editors can see this!
 deprecated: false
 hidden: false
 metadata:
