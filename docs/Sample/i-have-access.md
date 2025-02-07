@@ -1,5 +1,5 @@
 ---
-title: I have access!
+title: I have access
 deprecated: false
 hidden: false
 metadata:
