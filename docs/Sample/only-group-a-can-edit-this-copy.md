@@ -1,9 +1,10 @@
 ---
-title: Only group A can edit this
+title: Only group B can edit this
 deprecated: false
 hidden: false
 metadata:
   keywords:
-    - '{group_A}'
+    - '{group_B}'
   robots: index
 ---
+Test
