@@ -5,4 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-Test
+| Test | Test | Test |
+| :--- | :--- | :--- |
+| 1    | 1    | 1    |
+| 1    | 1    | 1    |
