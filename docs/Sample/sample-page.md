@@ -5,6 +5,19 @@ hidden: false
 metadata:
   robots: index
 ---
+| Column 1 | Column 2                                                   |
+| -------- | ---------------------------------------------------------- |
+| Row 1    | <table><tr><td>Nested 1</td><td>Nested 2</td></tr></table> |
+| Row 2    | Normal content                                             |
+
+| Outer Header 1 | Outer Header 2                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| Row 1, Col 1   | <table><tr><td>Nested Table 1</td><td>Nested Table 2</td></tr></table>                                  |
+| Row 2, Col 1   | Normal Text                                                                                             |
+| Row 3, Col 1   | <table><tr><td>Deep Nested</td><td><table><tr><td>Even Deeper</td></tr></table></td></tr></table>       |
+| Row 4, Col 1   | <ul><li>Nested List Item 1</li><li>Nested List Item 2</li></ul>                                         |
+| Row 5, Col 1   | <table><tr><td>Table Inside</td><td><ul><li>Mixing Lists</li><li>And Tables</li></ul></td></tr></table> |
+
 | Feature         | Description                                                                                                                     | Example Content                                                                                                                                                                                                                                                                           |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Lists in Tables | <ul><li>Supports unordered lists</li><li>Works with nested lists<ul><li>Nested item 1</li><li>Nested item 2</li></ul></li></ul> | <ol><li>Step 1</li><li>Step 2</li></ol> <Glossary>parliament</Glossary>                                                                                                                                                                                                                   |
@@ -19,8 +32,6 @@ metadata:
   ad minim veniam, quis nostrud exercitation ullamco. Excepteur sint
   occaecat cupidatat non proident!
 </Accordion>
-
-<br />
 
 <Cards columns={4}>
   <Card title="First Card" href="https://readme.com" icon="fa-home" target="_blank">
@@ -40,8 +51,6 @@ metadata:
   </Card>
 </Cards>
 
-<br />
-
 <Columns layout="auto">
   <Column>
     Neque porro quisquam est qui dolorem ipsum quia
@@ -56,8 +65,6 @@ metadata:
   </Column>
 </Columns>
 
-<br />
-
 <Tabs>
   <Tab title="First Tab">
     Welcome to the content that you can only see inside the first Tab.
@@ -71,12 +78,3 @@ metadata:
     Here's content that's only inside the third Tab.
   </Tab>
 </Tabs>
-
-<br />
-
-<br />
-
-| Column 1 | Column 2                                                   |
-| -------- | ---------------------------------------------------------- |
-| Row 1    | <table><tr><td>Nested 1</td><td>Nested 2</td></tr></table> |
-| Row 2    | Normal content                                             |
