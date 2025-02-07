@@ -71,3 +71,12 @@ metadata:
     Here's content that's only inside the third Tab.
   </Tab>
 </Tabs>
+
+<br />
+
+<br />
+
+| Column 1 | Column 2                                                   |
+| -------- | ---------------------------------------------------------- |
+| Row 1    | <table><tr><td>Nested 1</td><td>Nested 2</td></tr></table> |
+| Row 2    | Normal content                                             |
