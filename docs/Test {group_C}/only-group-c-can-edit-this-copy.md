@@ -1,6 +1,6 @@
 ---
 title: Only group C can edit this
-excerpt: Here is my description.  {group_C}
+excerpt: Here is my description.
 deprecated: false
 hidden: false
 metadata:
