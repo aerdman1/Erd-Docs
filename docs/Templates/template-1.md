@@ -7,57 +7,57 @@ metadata:
 ---
 # Getting Started
 
-Your toolkit for implementing secure identity verification, whether through hosted solutions or direct API integration.
+Explore the tools and resources you need to streamline your integration process—whether using pre-built solutions or full API access.
 
 <HTMLBlock>{`
 <a href="https://docs.example.com" class="btn-primary">
-  <i class="fas fa-book"></i> Get Started
+  <i class="fas fa-rocket"></i> Get Started
 </a>
 `}</HTMLBlock>
 
-## Integration Options
+## Integration Approaches
 
 <Cards columns={3}>
-  <Card title="No Code" icon="fa-mouse-pointer">
-    Quick integration through our hosted web interface.
+  <Card title="No-Code" icon="fa-mouse-pointer">
+    Implement our hosted solution with minimal setup—no coding required.
   </Card>
 
-  <Card title="Low Code" icon="fa-tools">
-    Simplified SDK integration with pre-built components.
+  <Card title="Low-Code" icon="fa-tools">
+    Utilize our SDKs and pre-configured components for quick integration.
   </Card>
 
-  <Card title="Full Code" icon="fa-code">
-    Complete API control for full customization.
+  <Card title="Full-Code" icon="fa-code">
+    Gain complete control with API endpoints, webhooks, and custom workflows.
   </Card>
 </Cards>
 
-## API Capabilities
+## Key Features
 
 <Cards columns={3}>
-  <Card title="Documents" icon="fa-file-alt">
-    Validate passports, driver's licenses, and identity documents.
+  <Card title="Document Processing" icon="fa-file-alt">
+    Extract and verify data from IDs, passports, and official documents.
   </Card>
 
-  <Card title="Face Identification" icon="fa-user-check">
-    Authenticate users using facial recognition and liveness detection.
+  <Card title="Biometric Authentication" icon="fa-user-check">
+    Securely validate users through facial recognition and liveness detection.
   </Card>
 
-  <Card title="OAuth" icon="fa-lock">
-    Secure authentication and authorization for API access.
+  <Card title="Access Control" icon="fa-lock">
+    Implement OAuth-based authentication and robust security policies.
   </Card>
 </Cards>
 
-## Development Tools
+## Developer Resources
 
 <Columns layout="auto">
   <Column>
-    **Mobile SDKs**\
-    Native SDKs for iOS and Android platforms.
+    **Mobile SDKs**  
+    Ready-to-use SDKs for iOS and Android to accelerate mobile integration.
   </Column>
 
   <Column>
-    **API Reference**\
-    Complete API documentation with examples and best practices.
+    **API Documentation**  
+    Detailed API specs, response formats, and integration best practices.
   </Column>
 </Columns>
 
