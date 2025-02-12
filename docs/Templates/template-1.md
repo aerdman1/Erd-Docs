@@ -7,9 +7,9 @@ metadata:
 ---
 # Getting Started
 
-<Accordion title="Introduction" icon="fa-info-circle">
-  Welcome to our documentation! Choose the best way to integrate our API.
-</Accordion>
+Welcome to our documentation! Choose the best way to integrate our API.
+
+[GET STARTED BUTTON](/docs)
 
 ## Integration Options
 
