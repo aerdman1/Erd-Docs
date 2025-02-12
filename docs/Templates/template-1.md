@@ -9,9 +9,13 @@ metadata:
 
 Welcome to our documentation! Choose the best way to integrate our API.
 
+<HTMLBlock>{`
 <a href="#" class="btn-primary">
   <i class="fas fa-book" />  Get Started
 </a>
+`}</HTMLBlock>
+
+<br />
 
 ## Integration Options
 
