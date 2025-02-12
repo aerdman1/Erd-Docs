@@ -9,6 +9,8 @@ metadata:
 
 Explore the tools and resources you need to streamline your integration processâ€”whether using pre-built solutions or full API access.
 
+<Image align="left" width="300px" src="https://files.readme.io/e0a6918a86cf324138d1d4cea87a8005638575eca8c68a26c284a682e52cbfc9-Nametag.psd.full.png" />
+
 <HTMLBlock>{`
 <a href="https://docs.example.com" class="btn-primary">
   <i class="fas fa-rocket"></i> Get Started
@@ -51,12 +53,12 @@ Explore the tools and resources you need to streamline your integration processâ
 
 <Columns layout="auto">
   <Column>
-    **Mobile SDKs**  
+    **Mobile SDKs**\
     Ready-to-use SDKs for iOS and Android to accelerate mobile integration.
   </Column>
 
   <Column>
-    **API Documentation**  
+    **API Documentation**\
     Detailed API specs, response formats, and integration best practices.
   </Column>
 </Columns>
