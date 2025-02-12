@@ -5,7 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-
 # Getting Started
 
 Welcome to our documentation! Choose the best way to integrate our API.
@@ -48,18 +47,22 @@ Welcome to our documentation! Choose the best way to integrate our API.
 
 <Columns layout="auto">
   <Column>
-    **Mobile SDKs**  
+    **Mobile SDKs**\
     Native SDKs for iOS and Android platforms.
   </Column>
 
   <Column>
-    **API Reference**  
+    **API Reference**\
     Complete API documentation with examples and best practices.
   </Column>
 </Columns>
 
 <HTMLBlock>{`
 <style>
+section.content-toc.grid-25 > nav{
+  display:none;
+  }
+  
 /* Scope styles only inside .content-body */
 .content-body {
     --primary-blue: #0066FF;
