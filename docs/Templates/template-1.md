@@ -7,7 +7,7 @@ metadata:
 ---
 # Getting Started
 
-Welcome to our documentation! Choose the best way to integrate our API.
+Your toolkit for implementing secure identity verification, whether through hosted solutions or direct API integration.
 
 <HTMLBlock>{`
 <a href="https://docs.example.com" class="btn-primary">
@@ -51,12 +51,12 @@ Welcome to our documentation! Choose the best way to integrate our API.
 
 <Columns layout="auto">
   <Column>
-    **Mobile SDKs**  
+    **Mobile SDKs**\
     Native SDKs for iOS and Android platforms.
   </Column>
 
   <Column>
-    **API Reference**  
+    **API Reference**\
     Complete API documentation with examples and best practices.
   </Column>
 </Columns>
