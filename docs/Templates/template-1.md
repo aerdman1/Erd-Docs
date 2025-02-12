@@ -56,3 +56,73 @@ metadata:
     Complete API documentation with examples and best practices.
   </Column>
 </Columns>
+
+<HTMLBlock>{`
+<style>
+:root {
+    --primary-blue: #0066FF;
+    --primary-hover: #0052CC;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-600: #4B5563;
+}
+
+/* Typography */
+h1, h2 {
+    color: #111827;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+p {
+    color: var(--gray-600);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Accordion */
+.accordion {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Cards */
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tabs */
+.tabs {
+    margin-top: 24px;
+}
+
+.tabs .tab {
+    font-weight: bold;
+    padding: 12px 20px;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tabs .tab.active {
+    color: var(--primary-blue);
+    border-bottom: 2px solid var(--primary-blue);
+}
+
+.tabs .tab:hover {
+    color: var(--primary-hover);
+}
+  
+</style>
+`}</HTMLBlock>
