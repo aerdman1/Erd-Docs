@@ -59,10 +59,14 @@ Welcome to our documentation! Choose the best way to integrate our API.
 
 <HTMLBlock>{`
 <style>
-section.content-toc.grid-25 > nav{
+.content-toc {
   display:none;
   }
-  
+  .rm-Guides .content-body {
+
+    max-width: 100%;
+    width: 100%;
+}
 /* Scope styles only inside .content-body */
 .content-body {
     --primary-blue: #0066FF;
