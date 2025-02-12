@@ -15,8 +15,6 @@ Welcome to our documentation! Choose the best way to integrate our API.
 </a>
 `}</HTMLBlock>
 
-<br />
-
 ## Integration Options
 
 <Cards columns={3}>
