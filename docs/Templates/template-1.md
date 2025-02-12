@@ -5,9 +5,12 @@ hidden: false
 metadata:
   robots: index
 ---
+
+# Getting Started
+
 Welcome to our documentation! Choose the best way to integrate our API.
 
-[GET STARTED](https://docs.example.com)
+<a class="btn-primary" href="https://docs.example.com">GET STARTED</a>
 
 ## Integration Options
 
@@ -45,32 +48,34 @@ Welcome to our documentation! Choose the best way to integrate our API.
 
 <Columns layout="auto">
   <Column>
-    **Mobile SDKs**\
+    **Mobile SDKs**  
     Native SDKs for iOS and Android platforms.
   </Column>
 
   <Column>
-    **API Reference**\
+    **API Reference**  
     Complete API documentation with examples and best practices.
   </Column>
 </Columns>
 
 <HTMLBlock>{`
 <style>
+/* Hide Table of Contents */
 .content-toc {
-  display:none;
-  }
-  .rm-Guides .content-body {
+  display: none;
+}
 
+/* Ensure content-body width */
+.rm-Guides .content-body {
     max-width: 100%;
     width: 100%;
 }
-  
+
+/* Remove border under header */
 .rm-Guides #content-head {
     border-bottom: 1px solid var(--color-border-default);
     padding-bottom: 30px;
 }
-  
 
 /* Scope styles only inside .content-body */
 .content-body {
@@ -96,8 +101,8 @@ Welcome to our documentation! Choose the best way to integrate our API.
     line-height: 1.5;
 }
 
-/* Buttons */
-.content-body a {
+/* Primary Button */
+.content-body .btn-primary {
     display: inline-block;
     background-color: var(--red);
     color: white;
@@ -107,11 +112,13 @@ Welcome to our documentation! Choose the best way to integrate our API.
     font-weight: 500;
     text-decoration: none;
     transition: background-color 0.3s;
+    border: none;
+    cursor: pointer;
 }
 
-.content-body a:hover {
+.content-body .btn-primary:hover {
     background-color: #FE0022;
-    color: white;
+    opacity: 0.95;
 }
 
 /* Cards */
