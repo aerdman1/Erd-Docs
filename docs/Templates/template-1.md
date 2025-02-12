@@ -65,6 +65,13 @@ Welcome to our documentation! Choose the best way to integrate our API.
     max-width: 100%;
     width: 100%;
 }
+  
+.rm-Guides #content-head {
+    border-bottom: 1px solid var(--color-border-default);
+    padding-bottom: 30px;
+}
+  
+
 /* Scope styles only inside .content-body */
 .content-body {
     --primary-blue: #0066FF;
