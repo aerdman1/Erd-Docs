@@ -9,7 +9,7 @@ metadata:
 
 Explore the tools and resources you need to streamline your integration process—whether using pre-built solutions or full API access.
 
-<Image align="center" width="300px" src="https://files.readme.io/e0a6918a86cf324138d1d4cea87a8005638575eca8c68a26c284a682e52cbfc9-Nametag.psd.full.png" />
+<Image align="left" width="100px" src="https://files.readme.io/e0a6918a86cf324138d1d4cea87a8005638575eca8c68a26c284a682e52cbfc9-Nametag.psd.full.png" />
 
 <HTMLBlock>{`
 <a href="https://docs.example.com" class="btn-primary">
