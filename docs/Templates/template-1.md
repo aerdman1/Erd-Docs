@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-# Getting Started
+# ReadMe API and SDK Documentation
 
 Explore the tools and resources you need to streamline your integration process—whether using pre-built solutions or full API access.
 
