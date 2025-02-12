@@ -1,12 +1,11 @@
 ---
 title: Getting Started - Template 1
+excerpt: Welcome to our documentation! Choose the best way to integrate our API.
 deprecated: false
 hidden: false
 metadata:
   robots: index
 ---
-Welcome to our documentation! Choose the best way to integrate our API.
-
 [GET STARTED](https://docs.example.com)
 
 ## Integration Options
