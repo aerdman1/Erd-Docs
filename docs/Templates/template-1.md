@@ -1,5 +1,5 @@
 ---
-title: Getting Started - Template 1
+title: Templates
 deprecated: false
 hidden: false
 metadata:
