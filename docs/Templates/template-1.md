@@ -10,8 +10,8 @@ metadata:
 Welcome to our documentation! Choose the best way to integrate our API.
 
 <HTMLBlock>{`
-<a href="#" class="btn-primary">
-  <i class="fas fa-book" />  Get Started
+<a href="https://docs.example.com" class="btn-primary">
+  <i class="fas fa-book"></i> Get Started
 </a>
 `}</HTMLBlock>
 
@@ -51,12 +51,12 @@ Welcome to our documentation! Choose the best way to integrate our API.
 
 <Columns layout="auto">
   <Column>
-    **Mobile SDKs**\
+    **Mobile SDKs**  
     Native SDKs for iOS and Android platforms.
   </Column>
 
   <Column>
-    **API Reference**\
+    **API Reference**  
     Complete API documentation with examples and best practices.
   </Column>
 </Columns>
@@ -108,7 +108,7 @@ Welcome to our documentation! Choose the best way to integrate our API.
 .content-body .btn-primary {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     background-color: var(--red);
     color: white;
     font-size: 18px;
@@ -129,6 +129,7 @@ Welcome to our documentation! Choose the best way to integrate our API.
 /* Font Awesome Icon inside Button */
 .content-body .btn-primary i {
     font-size: 18px;
+    vertical-align: middle;
 }
 
 /* Cards */
