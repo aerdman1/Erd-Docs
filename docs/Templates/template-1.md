@@ -115,7 +115,7 @@ Explore the tools and resources you need to streamline your integration processâ
     padding: 12px 24px;
     border-radius: 8px;
     font-weight: 500;
-    text-decoration: none;
+    text-decoration: none !important;
     transition: background-color 0.3s;
     border: none;
     cursor: pointer;
