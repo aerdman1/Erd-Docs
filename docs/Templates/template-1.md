@@ -1,12 +1,10 @@
 ---
-title: Template 1
+title: Getting Started - Template 1
 deprecated: false
 hidden: false
 metadata:
   robots: index
 ---
-# Getting Started
-
 Welcome to our documentation! Choose the best way to integrate our API.
 
 [GET STARTED](https://docs.example.com)
