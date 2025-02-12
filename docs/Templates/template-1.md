@@ -5,12 +5,13 @@ hidden: false
 metadata:
   robots: index
 ---
-
 # Getting Started
 
 Welcome to our documentation! Choose the best way to integrate our API.
 
-<a class="btn-primary" href="https://docs.example.com">GET STARTED</a>
+<a class="btn-primary" href="https://docs.example.com">
+  <i class="fa fa-book"></i>&nbsp; GET STARTED
+</a>
 
 ## Integration Options
 
@@ -103,7 +104,9 @@ Welcome to our documentation! Choose the best way to integrate our API.
 
 /* Primary Button */
 .content-body .btn-primary {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     background-color: var(--red);
     color: white;
     font-size: 18px;
@@ -119,6 +122,11 @@ Welcome to our documentation! Choose the best way to integrate our API.
 .content-body .btn-primary:hover {
     background-color: #FE0022;
     opacity: 0.95;
+}
+
+/* Font Awesome Icon inside Button */
+.content-body .btn-primary i {
+    font-size: 18px;
 }
 
 /* Cards */
