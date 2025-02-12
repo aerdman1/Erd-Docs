@@ -9,8 +9,8 @@ metadata:
 
 Welcome to our documentation! Choose the best way to integrate our API.
 
-<a class="btn-primary" href="https://docs.example.com">
-  <i class="fa fa-book"></i>&nbsp; GET STARTED
+<a href="#" class="btn-primary">
+  <i class="fas fa-book" />  Get Started
 </a>
 
 ## Integration Options
@@ -49,12 +49,12 @@ Welcome to our documentation! Choose the best way to integrate our API.
 
 <Columns layout="auto">
   <Column>
-    **Mobile SDKs**  
+    **Mobile SDKs**\
     Native SDKs for iOS and Android platforms.
   </Column>
 
   <Column>
-    **API Reference**  
+    **API Reference**\
     Complete API documentation with examples and best practices.
   </Column>
 </Columns>
