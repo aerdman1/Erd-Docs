@@ -103,7 +103,7 @@ Explore the tools and resources you need to streamline your integration processâ
     color: #111827;
     font-weight: bold;
     margin-bottom: 16px;
-    font-size:1.8em;
+    font-size:2em;
 }
 
 .content-body p {
