@@ -17,7 +17,7 @@ Explore the tools and resources you need to streamline your integration processâ
 </a>
 `}</HTMLBlock>
 
-## Integration Approaches
+### Integration Approaches
 
 <Cards columns={3}>
   <Card title="No-Code" icon="fa-mouse-pointer">
@@ -33,7 +33,7 @@ Explore the tools and resources you need to streamline your integration processâ
   </Card>
 </Cards>
 
-## Key Features
+### Key Features
 
 <Cards columns={3}>
   <Card title="Document Processing" icon="fa-file-alt">
@@ -49,7 +49,7 @@ Explore the tools and resources you need to streamline your integration processâ
   </Card>
 </Cards>
 
-## Developer Resources
+#### Developer Resources
 
 <Columns layout="auto">
   <Column>
