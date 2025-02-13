@@ -102,8 +102,15 @@ Explore the tools and resources you need to streamline your integration processâ
 }
 
 /* Typography */ 
-.content-body h1, 
-.content-body h2 {
+  /* Typography */ 
+.content-body h1{
+    color: #111827;
+    font-weight: bold;
+    margin-bottom: 18px;
+    font-size:2.5em;
+}
+  
+.content-body h2{
     color: #111827;
     font-weight: bold;
     margin-bottom: 16px;
