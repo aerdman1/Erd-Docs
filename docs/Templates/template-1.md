@@ -112,6 +112,7 @@ Explore the tools and resources you need to streamline your integration processâ
     color: var(--gray-600);
     font-size: 1rem;
     line-height: 1.5;
+    max-width: 600px;
 }
 
 /* Primary Button */
