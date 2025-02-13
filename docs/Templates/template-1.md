@@ -76,6 +76,10 @@ Explore the tools and resources you need to streamline your integration processâ
   .rm-Guides #content-head {
   display:none;
 }
+  
+  .rm-Guides .content-body {
+    padding-top: 10px;
+}
 
 /* Ensure content-body width */
 .rm-Guides .content-body {
