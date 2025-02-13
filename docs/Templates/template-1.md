@@ -72,8 +72,7 @@ Explore the tools and resources you need to streamline your integration processâ
   
   /* Hide Header */
   .rm-Guides #content-head {
-    border-bottom: 1px solid var(--color-border-default);
-    padding-bottom: 30px;
+  display:none;
 }
 
 /* Ensure content-body width */
