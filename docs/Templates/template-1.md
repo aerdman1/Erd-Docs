@@ -11,8 +11,6 @@ metadata:
 
 Explore the tools and resources you need to streamline your integration process—whether using pre-built solutions or full API access.
 
-<br />
-
 <HTMLBlock>{`
 <a  href="https://docs.example.com" class="btn-primary">
   <i class="fas fa-rocket"></i> Get Started
