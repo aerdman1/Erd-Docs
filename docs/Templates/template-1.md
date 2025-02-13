@@ -7,12 +7,11 @@ metadata:
 ---
 ## Owlbert API and SDK Documentation
 
-<Image align="right" width="250px" src="https://files.readme.io/e0a6918a86cf324138d1d4cea87a8005638575eca8c68a26c284a682e52cbfc9-Nametag.psd.full.png" />
-
 Explore the tools and resources you need to streamline your integration process—whether using pre-built solutions or full API access.
 
+<Image align="right" width="250px" src="https://files.readme.io/e0a6918a86cf324138d1d4cea87a8005638575eca8c68a26c284a682e52cbfc9-Nametag.psd.full.png" />
+
 <HTMLBlock>{`
-<br>
 <a  href="https://docs.example.com" class="btn-primary">
   <i class="fas fa-rocket"></i> Get Started
 </a>
