@@ -19,12 +19,6 @@ metadata:
   </Tab>
 </Tabs>
 
-<br />
-
-<br />
-
-<br />
-
 ## Owlbert API and SDK Documentation
 
 <Image align="right" width="200px" src="https://files.readme.io/e0a6918a86cf324138d1d4cea87a8005638575eca8c68a26c284a682e52cbfc9-Nametag.psd.full.png" />
