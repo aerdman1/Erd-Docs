@@ -107,6 +107,11 @@ Explore the tools and resources you need to streamline your integration processâ
     margin-bottom: 16px;
     font-size:2.5em;
 }
+  
+  .markdown-body .lightbox.closed img {
+    margin-right: 1%;
+    margin-top: -5px;
+}
 
 .content-body p {
     color: var(--gray-600);
