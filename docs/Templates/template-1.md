@@ -97,7 +97,7 @@ Explore the tools and resources you need to streamline your integration processâ
     --red: #EE2C46;
 }
 
-/* Typography */
+/* Typography */ 
 .content-body h1, 
 .content-body h2 {
     color: #111827;
