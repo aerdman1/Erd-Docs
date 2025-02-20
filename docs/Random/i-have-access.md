@@ -14,3 +14,7 @@ metadata:
 <br />
 
 <Movies />
+
+<br />
+
+<Timeline />
