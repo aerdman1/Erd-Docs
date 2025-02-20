@@ -1,4 +1,22 @@
 ---
 name: Timeline
 ---
-312434234
+import { useState } from "react";
+
+export const CosmicTimeline = () => {
+  const timelineData = "13.8 Billion Years Ago|The Big Bang;4.54 Billion Years Ago|Formation of Earth;1969|Moon Landing;2020s|Mars Missions";
+  const events = timelineData.split(";").map(item => item.split("|"));
+
+  return (
+    <div style={{ padding: "1rem", backgroundColor: "#333", color: "#fff", borderRadius: "8px", maxWidth: "600px", margin: "0 auto" }}>
+      <h2 style={{ textAlign: "center", marginBottom: "1rem" }}>Cosmic Timeline</h2>
+      {events.map((event, idx) => (
+        <div key={idx} style={{ marginBottom: "0.5rem" }}>
+          <strong>{event[0]}</strong> - {event[1]}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default CosmicTimeline;
