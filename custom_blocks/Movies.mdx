@@ -1,0 +1,51 @@
+---
+name: Movies
+---
+import { useState } from "react";
+
+export const FunnyQuoteGenerator = () => {
+  // Moved quotes array inside the component to avoid MDX parsing issues.
+  const quotes = [
+    { text: "I'm not superstitious, but I am a little stitious.", movie: "The Office" },
+    { text: "You sit on a throne of lies.", movie: "Elf" },
+    { text: "It's just a flesh wound.", movie: "Monty Python and the Holy Grail" },
+    { text: "That rug really tied the room together.", movie: "The Big Lebowski" },
+    { text: "I'm in a glass case of emotion!", movie: "Anchorman" },
+    { text: "My precious...", movie: "The Lord of the Rings" },
+    { text: "You're killing me, Smalls!", movie: "The Sandlot" },
+    { text: "I feel the need… the need for speed!", movie: "Top Gun" },
+  ];
+
+  const [quote, setQuote] = useState(quotes[0]);
+  const [effect, setEffect] = useState("");
+
+  const getRandomQuote = () => {
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    setQuote(randomQuote);
+
+    // Choose a random CSS effect for fun.
+    const effects = ["rotate-6", "rotate-[-6]", "scale-110", "skew-x-6", "skew-y-6", "translate-x-4"];
+    setEffect(effects[Math.floor(Math.random() * effects.length)]);
+
+    // Reset effect after 500ms.
+    setTimeout(() => setEffect(""), 500);
+  };
+
+  return (
+    <div className="flex flex-col items-center p-6 bg-gray-800 text-white rounded-lg shadow-lg w-80 text-center">
+      <h2 className="text-xl font-bold mb-4">🎬 Random Funny Movie Quote</h2>
+      <p className={`text-lg font-semibold transition-all duration-500 ${effect}`}>
+        "{quote.text}"
+      </p>
+      <span className="text-sm italic text-gray-400">- {quote.movie}</span>
+      <button
+        onClick={getRandomQuote}
+        className="mt-4 px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-black font-semibold rounded-md transition"
+      >
+        Get Another Quote
+      </button>
+    </div>
+  );
+};
+
+export default FunnyQuoteGenerator;
