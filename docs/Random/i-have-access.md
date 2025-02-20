@@ -5,8 +5,4 @@ hidden: false
 metadata:
   robots: index
 ---
-<Testing />
-
-<br />
-
 <Magic8Ball />
