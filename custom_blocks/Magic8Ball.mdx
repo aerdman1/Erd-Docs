@@ -3,23 +3,22 @@ name: Magic 8 Ball!
 ---
 import { useState } from "react";
 
-const responses = [
-  "Yes!",
-  "No.",
-  "Ask again later...",
-  "Definitely!",
-  "Very doubtful.",
-  "Without a doubt!",
-  "Better not tell you now.",
-  "Signs point to yes.",
-];
-
 export const Magic8Ball = () => {
+  const responses = [
+    "Yes!",
+    "No.",
+    "Ask again later...",
+    "Definitely!",
+    "Very doubtful.",
+    "Without a doubt!",
+    "Better not tell you now.",
+    "Signs point to yes.",
+  ];
+
   const [answer, setAnswer] = useState("Click to ask!");
 
   const shakeBall = () => {
-    const randomIndex = Math.floor(Math.random() * responses.length);
-    setAnswer(responses[randomIndex]);
+    setAnswer(responses[Math.floor(Math.random() * responses.length)]);
   };
 
   return (
@@ -38,4 +37,4 @@ export const Magic8Ball = () => {
   );
 };
 
-export default () => <Magic8Ball />;
+export default Magic8Ball;
