@@ -6,3 +6,5 @@ metadata:
   robots: index
 ---
 <Magic8Ball />
+
+&#x20;
