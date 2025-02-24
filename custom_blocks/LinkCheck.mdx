@@ -2,11 +2,6 @@
 name: LinkCheck
 ---
 
-
----
-title: "ReadMe Link Checker"
----
-
 import { useState } from 'react';
 
 export default function LinkChecker() {
@@ -17,7 +12,7 @@ export default function LinkChecker() {
   // Fetch projects using your backend endpoint
   async function fetchProjects() {
     setLoading(true);
-    try {
+    try { 
       const response = await fetch('/api/fetch-metadata', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
