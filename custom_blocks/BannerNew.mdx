@@ -4,46 +4,88 @@ name: BannerNew
 import React from "react";
 
 export const AlertBanner = ({
-  message = "YOUR CONTENT GOES HERE.",
-  bannerColor = "#ffcc00",          // Default bright yellow background
-  bannerTextColor = "#050910"         // Dark text and border color
+  preset = "custom", // Options: "critical", "warning", "standard", or "custom"
+  message,
+  bannerColor,
+  bannerTextColor,
+  fontSize,
+  fontWeight
 }) => {
+  // Define default settings for each preset type.
+  const defaultPresets = {
+    critical: {
+      bannerColor: "#DC3545",    // Red
+      bannerTextColor: "#FFFFFF", // White text
+      fontSize: "16px",
+      fontWeight: "normal",
+      message: "Critical Alert: Please check immediately!"
+    },
+    warning: {
+      bannerColor: "#FFC107",    // Yellow
+      bannerTextColor: "#000000", // Black text
+      fontSize: "16px",
+      fontWeight: "normal",
+      message: "Warning Alert: There might be an issue."
+    },
+    standard: {
+      bannerColor: "#007BFF",    // Blue
+      bannerTextColor: "#FFFFFF", // White text
+      fontSize: "16px",
+      fontWeight: "normal",
+      message: "Standard Alert: Here is some information."
+    },
+    custom: {
+      bannerColor: "#ffcc00",    // Bright yellow (default for custom)
+      bannerTextColor: "#050910", // Dark text and border
+      fontSize: "14px",
+      fontWeight: "bold",
+      message: "YOUR CONTENT GOES HERE."
+    }
+  };
+
+  // Get the default settings for the chosen preset.
+  const defaults = defaultPresets[preset] || defaultPresets.custom;
+
+  // Allow props to override preset defaults.
+  const finalBannerColor = bannerColor || defaults.bannerColor;
+  const finalBannerTextColor = bannerTextColor || defaults.bannerTextColor;
+  const finalFontSize = fontSize || defaults.fontSize;
+  const finalFontWeight = fontWeight || defaults.fontWeight;
+  const finalMessage = message || defaults.message;
+
   return (
     <div>
       <div
         className="alert-banner"
         style={{
-          background: bannerColor,
-          color: bannerTextColor,
+          background: finalBannerColor,
+          color: finalBannerTextColor,
           padding: "10px",
           textAlign: "center",
-          fontSize: "14px",
-          fontWeight: "bold",
-          border: "2px solid " + bannerTextColor,
+          fontSize: finalFontSize,
+          fontWeight: finalFontWeight,
+          border: "2px solid " + finalBannerTextColor,
           borderRadius: "5px",
           marginBottom: "20px"
         }}
       >
-        {message}
+        {finalMessage}
       </div>
-<style>{`
-  @keyframes bounceIn {
-    0% { transform: scale(0.5); opacity: 0; }
-    60% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(1); }
-  }
-  .alert-banner {
-    animation: bounceIn 0.6s ease-in 0.5s; /* 0.5s delay added */
-    animation-fill-mode: forwards;
-  }
-`}</style>
-
+      <style>{`
+        @keyframes bounceIn {
+          0% { transform: scale(0.5); opacity: 0; }
+          60% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+        .alert-banner {
+          animation: bounceIn 0.6s ease-in 0.5s;
+          animation-fill-mode: forwards;
+        }
+      `}</style>
     </div>
   );
 };
 
-<AlertBanner
-  message="YOUR CONTENT GOES HERE."
-  bannerColor="#ffcc00"
-  bannerTextColor="#050910"
-/>
+// Automatically place the banner on the page by rendering it below.
+// Change the preset or pass in overrides as needed.
+<AlertBanner preset="critical" />
