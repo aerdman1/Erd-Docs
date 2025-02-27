@@ -1,14 +1,38 @@
 ---
 name: Banner
 ---
-import React from "react";
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 
-export const AlertBanner = ({
+export const AlertBannerPortal = ({
   message = "YOUR CONTENT GOES HERE.",
   bannerColor = "#ffcc00",          // Default bright yellow background
-  bannerTextColor = "#050910"         // Dark text and border color
+  bannerTextColor = "#050910",        // Dark text and border color
+  targetSelector = ".Header-bottom2eLKOFXMEmh5.rm-Header-bottom" // Change this to your desired target element
 }) => {
-  return (
+  const [container, setContainer] = useState(null);
+
+  useEffect(() => {
+    // Find the target element in the DOM
+    const targetEl = document.querySelector(targetSelector);
+    if (targetEl) {
+      // Create a container div to hold the banner
+      const div = document.createElement("div");
+      // Insert the container right after the target element
+      targetEl.parentNode.insertBefore(div, targetEl.nextSibling);
+      setContainer(div);
+      return () => {
+        // Clean up when unmounting
+        if (div.parentNode) {
+          div.parentNode.removeChild(div);
+        }
+      };
+    }
+  }, [targetSelector]);
+
+  if (!container) return null; // Wait until the container is ready
+
+  return ReactDOM.createPortal(
     <div>
       <div
         className="alert-banner"
@@ -36,12 +60,7 @@ export const AlertBanner = ({
           animation: bounceIn 0.6s ease-out;
         }
       `}</style>
-    </div>
+    </div>,
+    container
   );
 };
-
-<AlertBanner
-  message="YOUR CONTENT GOES HERE."
-  bannerColor="#ffcc00"
-  bannerTextColor="#050910"
-/>
