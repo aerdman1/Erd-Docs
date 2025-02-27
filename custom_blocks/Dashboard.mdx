@@ -1,4 +1,35 @@
 ---
 name: Dashboard
 ---
-Test123
+import React, { useEffect, useState } from 'react';
+
+export const PageCountComponent = ({ header = "Navigation Page Count" }) => {
+  const [pageCount, setPageCount] = useState(0);
+
+  useEffect(() => {
+    // Only run in the browser environment
+    if (typeof document !== "undefined") {
+      // Locate the navigation element by its ID.
+      const navElement = document.getElementById('hub-sidebar');
+      if (navElement) {
+        // Find all anchor tags that start with "/docs/"
+        const pageLinks = navElement.querySelectorAll('a[href^="/docs/"]');
+        setPageCount(pageLinks.length);
+      }
+    }
+  }, []);
+
+  return (
+    <div className="flex justify-center">
+      <div className="rounded-md p-6 m-4 max-w-lg shadow-md border border-gray-300">
+        <p className="text-lg font-bold">{header}</p>
+        <p className="mt-2">
+          <i className="fa-solid fa-folder-open mr-2" />
+          Total Pages: <span className="font-semibold">{pageCount}</span>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+<PageCountComponent header="Navigation Page Count" />
