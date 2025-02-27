@@ -5,16 +5,3 @@ hidden: false
 metadata:
   robots: index
 ---
-<Magic8Ball />
-
-<br />
-
-<Testing />
-
-<br />
-
-<Movies />
-
-<br />
-
-<Timeline />
