@@ -26,16 +26,18 @@ export const AlertBanner = ({
       >
         {message}
       </div>
-      <style>{`
-        @keyframes bounceIn {
-          0% { transform: scale(0.5); opacity: 0; }
-          60% { transform: scale(1.1); opacity: 1; }
-          100% { transform: scale(1); }
-        }
-        .alert-banner {
-          animation: bounceIn 0.6s ease-in;
-        }
-      `}</style>
+<style>{`
+  @keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  .alert-banner {
+    animation: bounceIn 0.6s ease-in 0.5s; /* 0.5s delay added */
+    animation-fill-mode: forwards;
+  }
+`}</style>
+
     </div>
   );
 };
