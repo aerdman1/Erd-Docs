@@ -4,75 +4,76 @@ name: BannerNew
 import React from "react";
 
 export const AlertBanner = ({
-  preset = "a", // Options: "critical", "warning", "standard", or "custom"
+  preset = "custom", // Options: "critical", "warning", "standard", or "custom"
   message,
   bannerColor,
   bannerTextColor,
   fontSize,
   fontWeight
 }) => {
-  // Define default settings for each preset type.
+  // Define default settings for each preset.
+  // For "critical", "warning", and "standard" we use Tailwind classes.
+  // For "custom", we fall back to inline styles with hex values.
   const defaultPresets = {
     critical: {
-      bannerColor: "#DC3545",    // Red
-      bannerTextColor: "#FFFFFF", // White text
-      fontSize: "16px",
-      fontWeight: "normal",
+      bannerColor: "bg-red-600",    // Tailwind: red background
+      bannerTextColor: "text-white", // Tailwind: white text
+      fontSize: "text-base",         // Tailwind: base font size (~16px)
+      fontWeight: "font-normal",
       message: "Critical Alert: Please check immediately!"
     },
     warning: {
-      bannerColor: "#FFC107",    // Yellow
-      bannerTextColor: "#000000", // Black text
-      fontSize: "16px",
-      fontWeight: "normal",
+      bannerColor: "bg-yellow-400",    // Tailwind: yellow background
+      bannerTextColor: "text-black",   // Tailwind: black text
+      fontSize: "text-base",
+      fontWeight: "font-normal",
       message: "Warning Alert: There might be an issue."
     },
     standard: {
-      bannerColor: "#007BFF",    // Blue
-      bannerTextColor: "#FFFFFF", // White text
-      fontSize: "16px",
-      fontWeight: "normal",
+      bannerColor: "bg-blue-600",    // Tailwind: blue background
+      bannerTextColor: "text-white", // Tailwind: white text
+      fontSize: "text-base",
+      fontWeight: "font-normal",
       message: "Standard Alert: Here is some information."
     },
     custom: {
-      bannerColor: "#ffcc00",    // Bright yellow (default for custom)
-      bannerTextColor: "#050910", // Dark text and border
+      // These values are for inline styles since they're custom hex values.
+      bannerColor: "#00BCFF",    
+      bannerTextColor: "#fff",
       fontSize: "14px",
       fontWeight: "bold",
-      message: "YOUR CONTENT GOES HERE."
+      message: "Here is my banner message - hope you enjoy!"
     }
   };
 
-  // Get the default settings for the chosen preset.
+  // Get the default settings for the selected preset.
   const defaults = defaultPresets[preset] || defaultPresets.custom;
-
-  // Allow props to override preset defaults.
-  const finalBannerColor = bannerColor || defaults.bannerColor;
-  const finalBannerTextColor = bannerTextColor || defaults.bannerTextColor;
-  const finalFontSize = fontSize || defaults.fontSize;
-  const finalFontWeight = fontWeight || defaults.fontWeight;
   const finalMessage = message || defaults.message;
+
+  // Base Tailwind classes for layout, padding, border, and margin.
+  let containerClasses = "p-2 text-center rounded-md mb-5";
+  let inlineStyles = {};
+
+  // For custom preset or if any override is provided, use inline styles.
+  if (preset === "custom" || bannerColor || bannerTextColor || fontSize || fontWeight) {
+    inlineStyles.background = bannerColor || (preset === "custom" ? defaults.bannerColor : undefined);
+    inlineStyles.color = bannerTextColor || (preset === "custom" ? defaults.bannerTextColor : undefined);
+    inlineStyles.borderColor = bannerTextColor || (preset === "custom" ? defaults.bannerTextColor : undefined);
+    inlineStyles.fontSize = fontSize || (preset === "custom" ? defaults.fontSize : undefined);
+    inlineStyles.fontWeight = fontWeight || (preset === "custom" ? defaults.fontWeight : undefined);
+  } else {
+    // For preset types that use Tailwind classes, add those classes.
+    containerClasses += ` ${defaults.bannerColor} ${defaults.bannerTextColor} ${defaults.fontSize} ${defaults.fontWeight}`;
+  }
 
   return (
     <div>
-      <div
-        className="alert-banner"
-        style={{
-          background: finalBannerColor,
-          color: finalBannerTextColor,
-          padding: "10px",
-          textAlign: "center",
-          fontSize: finalFontSize,
-          fontWeight: finalFontWeight,
-          border: "2px solid " + finalBannerTextColor,
-          borderRadius: "5px",
-          marginBottom: "20px"
-        }}
-      >
+      <div className={containerClasses} style={inlineStyles}>
         {finalMessage}
       </div>
     </div>
   );
 };
 
-<AlertBanner preset="critical" />
+// Automatically render the banner. Change the preset or add overrides as needed.
+<AlertBanner/>
