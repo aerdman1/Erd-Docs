@@ -4,7 +4,7 @@ name: BannerNew
 import React from "react";
 
 export const AlertBanner = ({
-  preset = "custom", // Options: "critical", "warning", "standard", or "custom"
+  preset = "warning", // Options: "critical", "warning", "standard", or "custom"
   message,
   bannerColor,
   bannerTextColor,
@@ -71,21 +71,8 @@ export const AlertBanner = ({
       >
         {finalMessage}
       </div>
-      <style>{`
-        @keyframes bounceIn {
-          0% { transform: scale(0.5); opacity: 0; }
-          60% { transform: scale(1.1); opacity: 1; }
-          100% { transform: scale(1); }
-        }
-        .alert-banner {
-          animation: bounceIn 0.6s ease-in 0.5s;
-          animation-fill-mode: forwards;
-        }
-      `}</style>
     </div>
   );
 };
 
-// Automatically place the banner on the page by rendering it below.
-// Change the preset or pass in overrides as needed.
 <AlertBanner preset="critical" />
