@@ -12,8 +12,9 @@ export const DashboardComponent = ({ header = "Dashboard" }) => {
       // Select the sidebar using a class selector.
       const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
-        // Query all <a> elements linking to pages (assuming they start with "/docs/")
-        const pageLinks = navElement.querySelectorAll('a[href^="/docs/"]');
+        // Query all <a> elements linking to pages that start with "/reference/"
+        // (If you have pages starting with both "/docs/" and "/reference/", adjust the selector accordingly.)
+        const pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
         setPageCount(pageLinks.length);
       }
 
@@ -21,7 +22,7 @@ export const DashboardComponent = ({ header = "Dashboard" }) => {
       const hubMeElement = document.getElementById("hub-me");
       if (hubMeElement) {
         let dataJson = hubMeElement.getAttribute("data-json");
-        // Convert HTML entities to quotes.
+        // Replace HTML entity &quot; with actual quotes.
         dataJson = dataJson.replace(/&quot;/g, '"');
         try {
           const parsedHubData = JSON.parse(dataJson);
