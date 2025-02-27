@@ -82,12 +82,14 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
         .markdown-body a[href], 
         .markdown-body a:not([href=""]) {
           text-decoration: none;
-          background: #4a4aff;
           padding: 10px;
-          color: white;
           display: inline-block;
           border-radius: 10px;
+          min-height:30px;
         }
+        .field-description li+li, .markdown-body li+li {
+    margin-top: 0;
+}
       `}</style>
 
       {/* Main container with two columns */}
