@@ -74,9 +74,9 @@ export const DashboardComponent = ({ header = "Interactive Dashboard" }) => {
         li {
           list-style: none;
         }
-.readme-tailwind .text-blue-500 {
-    text-decoration: none !important;
-} 
+        .readme-tailwind .text-blue-500 {
+          text-decoration: none !important;
+        } 
         .field-description a[href], 
         .field-description a:not([href=""]), 
         .markdown-body a[href], 
@@ -144,7 +144,8 @@ export const DashboardComponent = ({ header = "Interactive Dashboard" }) => {
                     </button>
                   </div>
                   {expandedCategories[index] && (
-                    <ul className="mt-2 space-y-1">
+                    // This UL now arranges the list items in a grid (2 columns, with gap)
+                    <ul className="mt-2 grid grid-cols-2 gap-2">
                       {cat.links.map((link, idx) => (
                         <li key={idx}>
                           <a 
