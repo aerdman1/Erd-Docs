@@ -6,3 +6,7 @@ metadata:
   robots: index
 ---
 <BannerNew />
+
+<br />
+
+<PageAlert />
