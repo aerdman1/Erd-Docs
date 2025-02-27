@@ -8,11 +8,11 @@ export const DashboardComponent = ({ header = "Dashboard" }) => {
   const [hubData, setHubData] = useState(null);
 
   useEffect(() => {
-    // Only run in a browser environment.
     if (typeof document !== "undefined") {
-      // Count pages in the navigation.
-      const navElement = document.getElementById('rm-Sidebar');
+      // Select the sidebar using a class selector.
+      const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
+        // Query all <a> elements linking to pages (assuming they start with "/docs/")
         const pageLinks = navElement.querySelectorAll('a[href^="/docs/"]');
         setPageCount(pageLinks.length);
       }
@@ -21,7 +21,7 @@ export const DashboardComponent = ({ header = "Dashboard" }) => {
       const hubMeElement = document.getElementById("hub-me");
       if (hubMeElement) {
         let dataJson = hubMeElement.getAttribute("data-json");
-        // Replace HTML entity &quot; with actual quotes.
+        // Convert HTML entities to quotes.
         dataJson = dataJson.replace(/&quot;/g, '"');
         try {
           const parsedHubData = JSON.parse(dataJson);
@@ -44,7 +44,7 @@ export const DashboardComponent = ({ header = "Dashboard" }) => {
         </p>
       </div>
 
-      {/* Hub-Me User Info */}
+      {/* Hub-Me User Information */}
       {hubData && (
         <div className="rounded-md p-6 m-4 max-w-lg shadow-md border border-gray-300 w-full">
           <p className="text-lg font-bold">User Information</p>
