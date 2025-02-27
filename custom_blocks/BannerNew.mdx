@@ -4,16 +4,25 @@ name: BannerNew
 import React from "react";
 
 export const AlertBanner = ({
-  preset = "custom", // Options: "critical", "warning", "standard", or "custom"
+  preset, // optional: if provided, it overrides the booleans below
+  critical = false,
+  warning = false,
+  standard = false,
   message,
   bannerColor,
   bannerTextColor,
   fontSize,
   fontWeight
 }) => {
+  // Determine the preset based on booleans if no explicit preset is provided.
+  if (!preset) {
+    if (critical) preset = "critical";
+    else if (warning) preset = "warning";
+    else if (standard) preset = "standard";
+    else preset = "custom";
+  }
+
   // Define default settings for each preset.
-  // For "critical", "warning", and "standard" we use Tailwind classes.
-  // For "custom", we fall back to inline styles with hex values.
   const defaultPresets = {
     critical: {
       bannerColor: "bg-red-600",    // Tailwind: red background
@@ -54,7 +63,7 @@ export const AlertBanner = ({
   let containerClasses = "p-2 text-center rounded-md mb-5";
   let inlineStyles = {};
 
-  // For custom preset or if any override is provided, use inline styles.
+  // Use inline styles if it's the custom preset or any override is provided.
   if (preset === "custom" || bannerColor || bannerTextColor || fontSize || fontWeight) {
     inlineStyles.background = bannerColor || (preset === "custom" ? defaults.bannerColor : undefined);
     inlineStyles.color = bannerTextColor || (preset === "custom" ? defaults.bannerTextColor : undefined);
@@ -75,4 +84,4 @@ export const AlertBanner = ({
   );
 };
 
-<AlertBanner/>
+<AlertBanner />
