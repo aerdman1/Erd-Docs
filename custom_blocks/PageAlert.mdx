@@ -1,4 +1,41 @@
 ---
 name: PageAlert
 ---
-test
+import { useState } from 'react'
+
+export function SimplePopUpAlert({ text, onClose }) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md text-center relative">
+        <p className="text-lg text-gray-800">{text}</p>
+        <button
+          onClick={onClose}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export function PageWithAlert() {
+  const [showAlert, setShowAlert] = useState(true)
+
+  return (
+    <div className="relative">
+      <h1 className="text-2xl font-bold">My Page Content</h1>
+      <p>Welcome to the page. Here’s some content.</p>
+
+      {showAlert && (
+        <SimplePopUpAlert
+          text="This is an important alert message. Please take note!"
+          onClose={() => setShowAlert(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+# Example Usage in MDX
+<PageWithAlert />
