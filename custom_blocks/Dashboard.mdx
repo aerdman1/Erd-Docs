@@ -88,74 +88,77 @@ export const DashboardComponent = ({ header = "Interactive Dashboard" }) => {
         }
       `}</style>
 
-      {/* Wrapper grid: side-by-side layout on larger screens */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Top Info Box */}
-        <div className="max-w-xl mx-auto rounded-md p-6 shadow-md border border-gray-300">
-          <p className="text-2xl font-bold mb-4 text-center">{header}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Stats Column */}
-            <div className="flex flex-col space-y-4">
-              <div className="p-4 bg-blue-100 rounded shadow text-center">
-                <p className="text-xl font-semibold">Total Pages</p>
-                <p className="text-3xl">{pageCount}</p>
-              </div>
-              <div className="p-4 bg-green-100 rounded shadow text-center">
-                <p className="text-xl font-semibold">Total Categories</p>
-                <p className="text-3xl">{totalCategories}</p>
-              </div>
-            </div>
-            {/* User Info Column */}
-            <div className="p-4 bg-purple-100 rounded shadow">
-              <p className="text-xl font-semibold mb-2">User Information</p>
-              {hubData ? (
-                <div className="space-y-1">
-                  <p><span className="font-semibold">Name:</span> {hubData.user?.name}</p>
-                  <p><span className="font-semibold">Email:</span> {hubData.user?.email}</p>
-                  <p><span className="font-semibold">Logged In:</span> {hubData.loggedIn ? "Yes" : "No"}</p>
-                  {hubData.isAdmin && <p><span className="font-semibold">Admin:</span> Yes</p>}
-                  {hubData.metaData && hubData.metaData.length > 0 && (
-                    <p><span className="font-semibold">Project:</span> {hubData.metaData[0].name}</p>
-                  )}
+      {/* Wrapper container for the entire dashboard */}
+      <div className="max-w-screen-xl mx-auto p-4 space-y-6">
+        {/* Grid for side-by-side layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* First Column: Overview Info */}
+          <div className="rounded-md p-6 shadow-md border border-gray-300">
+            <p className="text-2xl font-bold mb-4 text-center">{header}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Stats */}
+              <div className="flex flex-col space-y-4">
+                <div className="p-4 bg-blue-100 rounded shadow text-center">
+                  <p className="text-xl font-semibold">Total Pages</p>
+                  <p className="text-3xl">{pageCount}</p>
                 </div>
-              ) : (
-                <p>No user data</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Categories Launchpad */}
-        <div className="rounded-md p-6 shadow-md border border-gray-300">
-          <p className="text-2xl font-bold mb-4">Categories Launchpad</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {categories.map((cat, index) => (
-              <div key={index} className="p-4 bg-white rounded border hover:shadow-lg transition-shadow">
-                <div className="flex justify-between items-center">
-                  <p className="text-xl font-semibold">{cat.title}</p>
-                  <button
-                    onClick={() => toggleCategory(index)}
-                    className="text-sm text-blue-500 underline"
-                  >
-                    {expandedCategories[index] ? 'Hide' : 'Show'} ({cat.links.length})
-                  </button>
+                <div className="p-4 bg-green-100 rounded shadow text-center">
+                  <p className="text-xl font-semibold">Total Categories</p>
+                  <p className="text-3xl">{totalCategories}</p>
                 </div>
-                {expandedCategories[index] && (
-                  <ul className="mt-2 space-y-1">
-                    {cat.links.map((link, idx) => (
-                      <li key={idx}>
-                        <a 
-                          href={link.href} 
-                          className="text-gray-800 no-underline hover:text-gray-900"
-                        >
-                          {link.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+              </div>
+              {/* User Information */}
+              <div className="p-4 bg-purple-100 rounded shadow">
+                <p className="text-xl font-semibold mb-2">User Information</p>
+                {hubData ? (
+                  <div className="space-y-1">
+                    <p><span className="font-semibold">Name:</span> {hubData.user?.name}</p>
+                    <p><span className="font-semibold">Email:</span> {hubData.user?.email}</p>
+                    <p><span className="font-semibold">Logged In:</span> {hubData.loggedIn ? "Yes" : "No"}</p>
+                    {hubData.isAdmin && <p><span className="font-semibold">Admin:</span> Yes</p>}
+                    {hubData.metaData && hubData.metaData.length > 0 && (
+                      <p><span className="font-semibold">Project:</span> {hubData.metaData[0].name}</p>
+                    )}
+                  </div>
+                ) : (
+                  <p>No user data</p>
                 )}
               </div>
-            ))}
+            </div>
+          </div>
+
+          {/* Second Column: Categories Launchpad */}
+          <div className="rounded-md p-6 shadow-md border border-gray-300">
+            <p className="text-2xl font-bold mb-4 text-center">Categories Launchpad</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {categories.map((cat, index) => (
+                <div key={index} className="p-4 bg-white rounded border hover:shadow-lg transition-shadow">
+                  <div className="flex justify-between items-center">
+                    <p className="text-xl font-semibold">{cat.title}</p>
+                    <button
+                      onClick={() => toggleCategory(index)}
+                      className="text-sm text-blue-500 underline"
+                    >
+                      {expandedCategories[index] ? 'Hide' : 'Show'} ({cat.links.length})
+                    </button>
+                  </div>
+                  {expandedCategories[index] && (
+                    <ul className="mt-2 space-y-1">
+                      {cat.links.map((link, idx) => (
+                        <li key={idx}>
+                          <a 
+                            href={link.href} 
+                            className="text-gray-800 no-underline hover:text-gray-900"
+                          >
+                            {link.title}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
