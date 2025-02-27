@@ -3,26 +3,47 @@ name: Dashboard
 ---
 import React, { useEffect, useState } from 'react';
 
-export const DashboardComponent = ({ header = "Dashboard" }) => {
+export const DashboardComponent = ({ header = "Interactive Dashboard" }) => {
   const [pageCount, setPageCount] = useState(0);
+  const [totalCategories, setTotalCategories] = useState(0);
+  const [categories, setCategories] = useState([]);
   const [hubData, setHubData] = useState(null);
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   useEffect(() => {
     if (typeof document !== "undefined") {
-      // Select the sidebar using a class selector.
+      // Select the sidebar using its class name.
       const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
-        // Query all <a> elements linking to pages that start with "/reference/"
-        // (If you have pages starting with both "/docs/" and "/reference/", adjust the selector accordingly.)
+        // Count all page links that start with "/reference/"
         const pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
         setPageCount(pageLinks.length);
+
+        // Find categories by looking at sections with an <h2> heading.
+        const sectionElements = navElement.querySelectorAll('section.rm-Sidebar-section');
+        const catArray = [];
+        sectionElements.forEach((section) => {
+          const heading = section.querySelector('h2');
+          if (heading) {
+            const title = heading.textContent.trim();
+            // Grab all links inside this category.
+            const links = section.querySelectorAll('a');
+            const linkArray = Array.from(links).map(link => ({
+              title: link.textContent.trim(),
+              href: link.getAttribute('href')
+            }));
+            catArray.push({ title, links: linkArray });
+          }
+        });
+        setCategories(catArray);
+        setTotalCategories(catArray.length);
       }
 
-      // Parse Hub-Me data from the embedded script.
+      // Parse Hub-Me user data from the embedded script.
       const hubMeElement = document.getElementById("hub-me");
       if (hubMeElement) {
         let dataJson = hubMeElement.getAttribute("data-json");
-        // Replace HTML entity &quot; with actual quotes.
+        // Convert HTML entities back to quotes.
         dataJson = dataJson.replace(/&quot;/g, '"');
         try {
           const parsedHubData = JSON.parse(dataJson);
@@ -34,49 +55,80 @@ export const DashboardComponent = ({ header = "Dashboard" }) => {
     }
   }, []);
 
+  const toggleCategory = (index) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
+
   return (
-    <div className="flex flex-col items-center space-y-6">
-      {/* Navigation Page Count */}
-      <div className="rounded-md p-6 m-4 max-w-lg shadow-md border border-gray-300 w-full">
-        <p className="text-lg font-bold">{header}</p>
-        <p className="mt-2">
-          <i className="fa-solid fa-folder-open mr-2" />
-          Total Pages: <span className="font-semibold">{pageCount}</span>
-        </p>
+    <div className="p-4 space-y-6">
+      {/* Top Stats Card */}
+      <div className="rounded-md p-6 shadow-md border border-gray-300">
+        <p className="text-2xl font-bold mb-4">{header}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="p-4 bg-blue-100 rounded shadow">
+            <p className="text-xl font-semibold">Total Pages</p>
+            <p className="text-3xl">{pageCount}</p>
+          </div>
+          <div className="p-4 bg-green-100 rounded shadow">
+            <p className="text-xl font-semibold">Total Categories</p>
+            <p className="text-3xl">{totalCategories}</p>
+          </div>
+        </div>
       </div>
 
-      {/* Hub-Me User Information */}
+      {/* Categories Launchpad */}
+      <div className="rounded-md p-6 shadow-md border border-gray-300">
+        <p className="text-2xl font-bold mb-4">Categories Launchpad</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {categories.map((cat, index) => (
+            <div key={index} className="p-4 bg-white rounded border hover:shadow-lg transition-shadow">
+              <div className="flex justify-between items-center">
+                <p className="text-xl font-semibold">{cat.title}</p>
+                <button
+                  onClick={() => toggleCategory(index)}
+                  className="text-sm text-blue-500 underline"
+                >
+                  {expandedCategories[index] ? 'Hide' : 'Show'} ({cat.links.length})
+                </button>
+              </div>
+              {expandedCategories[index] && (
+                <ul className="mt-2 space-y-1">
+                  {cat.links.map((link, idx) => (
+                    <li key={idx}>
+                      <a href={link.href} className="text-blue-600 hover:underline">
+                        {link.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* User Information */}
       {hubData && (
-        <div className="rounded-md p-6 m-4 max-w-lg shadow-md border border-gray-300 w-full">
-          <p className="text-lg font-bold">User Information</p>
-          <p className="mt-2">
-            <i className="fa-solid fa-user mr-2" />
-            Name: <span className="font-semibold">{hubData.user?.name}</span>
-          </p>
-          <p className="mt-2">
-            <i className="fa-solid fa-envelope mr-2" />
-            Email: <span className="font-semibold">{hubData.user?.email}</span>
-          </p>
-          <p className="mt-2">
-            <i className="fa-solid fa-check mr-2" />
-            Logged In: <span className="font-semibold">{hubData.loggedIn ? "Yes" : "No"}</span>
-          </p>
-          {hubData.isAdmin && (
-            <p className="mt-2">
-              <i className="fa-solid fa-shield-alt mr-2" />
-              Admin: <span className="font-semibold">Yes</span>
-            </p>
-          )}
-          {hubData.metaData && hubData.metaData.length > 0 && (
-            <p className="mt-2">
-              <i className="fa-solid fa-project-diagram mr-2" />
-              Project: <span className="font-semibold">{hubData.metaData[0].name}</span>
-            </p>
-          )}
+        <div className="rounded-md p-6 shadow-md border border-gray-300">
+          <p className="text-2xl font-bold mb-4">User Information</p>
+          <div className="space-y-2">
+            <p><span className="font-semibold">Name:</span> {hubData.user?.name}</p>
+            <p><span className="font-semibold">Email:</span> {hubData.user?.email}</p>
+            <p><span className="font-semibold">Logged In:</span> {hubData.loggedIn ? "Yes" : "No"}</p>
+            {hubData.isAdmin && <p><span className="font-semibold">Admin:</span> Yes</p>}
+            {hubData.metaData && hubData.metaData.length > 0 && (
+              <p>
+                <span className="font-semibold">Project:</span> {hubData.metaData[0].name}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-<DashboardComponent header="Dashboard" />
+<DashboardComponent header="Interactive Dashboard" />
