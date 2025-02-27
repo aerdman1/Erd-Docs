@@ -1,55 +1,42 @@
 ---
 name: Banner
 ---
-import React, { useEffect, useState } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect, useRef } from "react";
 
-export const AlertBannerPortal = ({
+export const AlertBannerInjected = ({
   message = "YOUR CONTENT GOES HERE.",
   bannerColor = "#ffcc00",          // Default bright yellow background
   bannerTextColor = "#050910",        // Dark text and border color
-  targetSelector = ".Header-bottom2eLKOFXMEmh5.rm-Header-bottom" // Change this to your desired target element
+  targetSelector = ".Header-bottom2eLKOFXMEmh5.rm-Header-bottom" // Adjust as needed
 }) => {
-  const [container, setContainer] = useState(null);
+  const bannerRef = useRef(null);
 
   useEffect(() => {
     // Find the target element in the DOM
-    const targetEl = document.querySelector(targetSelector);
-    if (targetEl) {
-      // Create a container div to hold the banner
-      const div = document.createElement("div");
-      // Insert the container right after the target element
-      targetEl.parentNode.insertBefore(div, targetEl.nextSibling);
-      setContainer(div);
-      return () => {
-        // Clean up when unmounting
-        if (div.parentNode) {
-          div.parentNode.removeChild(div);
-        }
-      };
+    const target = document.querySelector(targetSelector);
+    if (target && bannerRef.current) {
+      // Move the banner node to just after the target element
+      target.parentNode.insertBefore(bannerRef.current, target.nextSibling);
     }
   }, [targetSelector]);
 
-  if (!container) return null; // Wait until the container is ready
-
-  return ReactDOM.createPortal(
-    <div>
-      <div
-        className="alert-banner"
-        style={{
-          background: bannerColor,
-          color: bannerTextColor,
-          padding: "10px",
-          textAlign: "center",
-          fontSize: "14px",
-          fontWeight: "bold",
-          border: "2px solid " + bannerTextColor,
-          borderRadius: "5px",
-          marginBottom: "20px"
-        }}
-      >
-        {message}
-      </div>
+  return (
+    <div
+      ref={bannerRef}
+      className="alert-banner"
+      style={{
+        background: bannerColor,
+        color: bannerTextColor,
+        padding: "10px",
+        textAlign: "center",
+        fontSize: "14px",
+        fontWeight: "bold",
+        border: "2px solid " + bannerTextColor,
+        borderRadius: "5px",
+        marginBottom: "20px"
+      }}
+    >
+      {message}
       <style>{`
         @keyframes bounceIn {
           0% { transform: scale(0.5); opacity: 0; }
@@ -60,7 +47,6 @@ export const AlertBannerPortal = ({
           animation: bounceIn 0.6s ease-out;
         }
       `}</style>
-    </div>,
-    container
+    </div>
   );
 };
