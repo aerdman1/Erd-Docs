@@ -1,139 +1,47 @@
 ---
 name: PopUpAlert
 ---
-import React, { useEffect, useState } from 'react';
+import React from "react";
 
-export const DeprecationNotice = ({
+export const AlertBanner = ({
   message = "YOUR CONTENT GOES HERE.",
-  showPopup = true,
-  showBanner = false,
-  bannerColor = "#ffcc00",          // default bright yellow
-  bannerTextColor = "#050910",        // dark text and border
-  popupOverlayColor = "rgba(0, 0, 0, 0.6)", // semi-transparent overlay
-  popupContentBackground = "#ffffff", // white popup background
-  popupButtonColor = "#ff6600",       // bright orange button
-  oncePerPageLoad = true,             // show popup once per page load
+  bannerColor = "#ffcc00",          // Default bright yellow background
+  bannerTextColor = "#050910"         // Dark text and border color
 }) => {
-  // Compute currentPage only on the client side.
-  const currentPage =
-    typeof window !== 'undefined' && window.location
-      ? window.location.pathname
-      : '';
-  const dismissedKey = `deprecationPopupDismissed_${currentPage}`;
-
-  // Control whether the popup modal should be shown.
-  const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    if (message && showPopup && typeof window !== 'undefined') {
-      if (oncePerPageLoad) {
-        const dismissed = localStorage.getItem(dismissedKey);
-        if (!dismissed) {
-          setShowModal(true);
-        }
-      } else {
-        setShowModal(true);
-      }
-    }
-  }, [message, showPopup, dismissedKey, oncePerPageLoad]);
-
-  const handleCloseModal = () => {
-    if (typeof window !== 'undefined' && oncePerPageLoad) {
-      localStorage.setItem(dismissedKey, 'true');
-    }
-    setShowModal(false);
-  };
-
   return (
     <div>
-      {/* Render the static banner if enabled */}
-      {showBanner && (
-        <div className="deprecation-banner">
-          {message}
-        </div>
-      )}
-
-      {/* Render the popup modal if enabled */}
-      {showPopup && showModal && (
-        <div className="deprecation-modal">
-          <div className="deprecation-modal-content">
-            <p>{message}</p>
-            <button onClick={handleCloseModal}>OK</button>
-          </div>
-        </div>
-      )}
-
+      <div
+        className="alert-banner"
+        style={{
+          background: bannerColor,
+          color: bannerTextColor,
+          padding: "10px",
+          textAlign: "center",
+          fontSize: "14px",
+          fontWeight: "bold",
+          border: "2px solid " + bannerTextColor,
+          borderRadius: "5px",
+          marginBottom: "20px"
+        }}
+      >
+        {message}
+      </div>
       <style>{`
-        .deprecation-banner {
-          background: ${bannerColor};
-          color: ${bannerTextColor};
-          padding: 10px;
-          text-align: center;
-          font-size: 14px;
-          font-weight: bold;
-          border: 2px solid ${bannerTextColor};
-          border-radius: 5px;
-          margin-bottom: 20px;
-          animation: bounceIn 0.6s ease-out;
-        }
-        .deprecation-modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: ${popupOverlayColor};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          animation: fadeIn 0.4s ease-out;
-        }
-        .deprecation-modal-content {
-          background: ${popupContentBackground};
-          padding: 20px;
-          border-radius: 8px;
-          text-align: center;
-          width: 500px;
-          max-width: 90%;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-          animation: slideUp 0.4s ease-out;
-        }
-        .deprecation-modal-content button {
-          padding: 8px 16px;
-          background: ${popupButtonColor};
-          color: #fff;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          margin-top: 10px;
-        }
         @keyframes bounceIn {
           0% { transform: scale(0.5); opacity: 0; }
           60% { transform: scale(1.1); opacity: 1; }
           100% { transform: scale(1); }
         }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUp {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
+        .alert-banner {
+          animation: bounceIn 0.6s ease-out;
         }
       `}</style>
     </div>
   );
 };
 
-<DeprecationNotice
+<AlertBanner
   message="YOUR CONTENT GOES HERE."
-  showPopup={true}
-  showBanner={true}
   bannerColor="#ffcc00"
   bannerTextColor="#050910"
-  popupOverlayColor="rgba(0, 0, 0, 0.6)"
-  popupContentBackground="#ffffff"
-  popupButtonColor="#ff6600"
-  oncePerPageLoad={true}
 />
