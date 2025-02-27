@@ -4,22 +4,30 @@ name: BannerNew
 import React from "react";
 
 export const AlertBanner = ({
-  preset, // optional: if provided, it overrides the booleans below
+  // Select one to be true - defaults to custom if all are false
   critical = false,
   warning = false,
   standard = false,
+  custom = false,
   message,
   bannerColor,
   bannerTextColor,
   fontSize,
   fontWeight
 }) => {
-  // Determine the preset based on booleans if no explicit preset is provided.
-  if (!preset) {
-    if (critical) preset = "critical";
-    else if (warning) preset = "warning";
-    else if (standard) preset = "standard";
-    else preset = "custom";
+  // Determine the preset based on the boolean props.
+  let selectedPreset;
+  if (critical) {
+    selectedPreset = "critical";
+  } else if (warning) {
+    selectedPreset = "warning";
+  } else if (standard) {
+    selectedPreset = "standard";
+  } else if (custom) {
+    selectedPreset = "custom";
+  } else {
+    // Default to custom if no preset is explicitly set.
+    selectedPreset = "custom";
   }
 
   // Define default settings for each preset.
@@ -56,22 +64,22 @@ export const AlertBanner = ({
   };
 
   // Get the default settings for the selected preset.
-  const defaults = defaultPresets[preset] || defaultPresets.custom;
+  const defaults = defaultPresets[selectedPreset];
   const finalMessage = message || defaults.message;
 
   // Base Tailwind classes for layout, padding, border, and margin.
   let containerClasses = "p-2 text-center rounded-md mb-5";
   let inlineStyles = {};
 
-  // Use inline styles if it's the custom preset or any override is provided.
-  if (preset === "custom" || bannerColor || bannerTextColor || fontSize || fontWeight) {
-    inlineStyles.background = bannerColor || (preset === "custom" ? defaults.bannerColor : undefined);
-    inlineStyles.color = bannerTextColor || (preset === "custom" ? defaults.bannerTextColor : undefined);
-    inlineStyles.borderColor = bannerTextColor || (preset === "custom" ? defaults.bannerTextColor : undefined);
-    inlineStyles.fontSize = fontSize || (preset === "custom" ? defaults.fontSize : undefined);
-    inlineStyles.fontWeight = fontWeight || (preset === "custom" ? defaults.fontWeight : undefined);
+  // Use inline styles if it's the custom preset or if any override is provided.
+  if (selectedPreset === "custom" || bannerColor || bannerTextColor || fontSize || fontWeight) {
+    inlineStyles.background = bannerColor || (selectedPreset === "custom" ? defaults.bannerColor : undefined);
+    inlineStyles.color = bannerTextColor || (selectedPreset === "custom" ? defaults.bannerTextColor : undefined);
+    inlineStyles.borderColor = bannerTextColor || (selectedPreset === "custom" ? defaults.bannerTextColor : undefined);
+    inlineStyles.fontSize = fontSize || (selectedPreset === "custom" ? defaults.fontSize : undefined);
+    inlineStyles.fontWeight = fontWeight || (selectedPreset === "custom" ? defaults.fontWeight : undefined);
   } else {
-    // For preset types that use Tailwind classes, add those classes.
+    // For presets that use Tailwind classes, add those classes.
     containerClasses += ` ${defaults.bannerColor} ${defaults.bannerTextColor} ${defaults.fontSize} ${defaults.fontWeight}`;
   }
 
