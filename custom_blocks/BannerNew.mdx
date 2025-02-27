@@ -7,17 +7,24 @@ export const AlertBannerInjected = ({
   message = "YOUR CONTENT GOES HERE.",
   bannerColor = "#ffcc00",          // Default bright yellow background
   bannerTextColor = "#050910",        // Dark text and border color
-  targetSelector = "BasePanel-root3j8_ASvfPJYu" // Adjust as needed
+  targetSelector = ".Header-bottom2eLKOFXMEmh5.rm-Header-bottom" // Update this selector if needed
 }) => {
   const bannerRef = useRef(null);
 
   useEffect(() => {
-    // Find the target element in the DOM
-    const target = document.querySelector(targetSelector);
-    if (target && bannerRef.current) {
-      // Move the banner node to just after the target element
-      target.parentNode.insertBefore(bannerRef.current, target.nextSibling);
-    }
+    // Delay to allow the target element to appear in the DOM.
+    const timer = setTimeout(() => {
+      const target = document.querySelector(targetSelector);
+      console.log("Target found?", target);
+      if (target && bannerRef.current) {
+        // Move the banner node to just after the target element.
+        target.parentNode.insertBefore(bannerRef.current, target.nextSibling);
+      } else {
+        console.warn("Target element not found for selector:", targetSelector);
+      }
+    }, 1000); // 1 second delay; adjust if necessary
+
+    return () => clearTimeout(timer);
   }, [targetSelector]);
 
   return (
