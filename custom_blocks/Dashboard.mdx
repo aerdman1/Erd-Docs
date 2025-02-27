@@ -11,7 +11,7 @@ export const DashboardComponent = ({ header = "Dashboard" }) => {
     // Only run in a browser environment.
     if (typeof document !== "undefined") {
       // Count pages in the navigation.
-      const navElement = document.getElementById('hub-sidebar');
+      const navElement = document.getElementById('rm-Sidebar');
       if (navElement) {
         const pageLinks = navElement.querySelectorAll('a[href^="/docs/"]');
         setPageCount(pageLinks.length);
