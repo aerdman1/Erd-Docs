@@ -72,75 +72,89 @@ export const DashboardComponent = ({ header = "Interactive Dashboard" }) => {
         .rm-ReferenceMain .rm-Article {
           max-width: 100%;
         }
+        li {
+          list-style: none;
+        }
+        .field-description a[href], 
+        .field-description a:not([href=""]), 
+        .markdown-body a[href], 
+        .markdown-body a:not([href=""]) {
+          text-decoration: none;
+          background: #4a4aff;
+          padding: 10px;
+          color: white;
+          display: inline-block;
+          border-radius: 10px;
+        }
       `}</style>
 
-      <div className="p-4 space-y-6">
-        {/* Top Stats Card */}
-        <div className="rounded-md p-6 shadow-md border border-gray-300">
-          <p className="text-2xl font-bold mb-4">{header}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 bg-blue-100 rounded shadow">
+      {/* Top Info Box */}
+      <div className="max-w-xl mx-auto rounded-md p-6 shadow-md border border-gray-300 mb-6">
+        <p className="text-2xl font-bold mb-4 text-center">{header}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Stats Column */}
+          <div className="flex flex-col space-y-4">
+            <div className="p-4 bg-blue-100 rounded shadow text-center">
               <p className="text-xl font-semibold">Total Pages</p>
               <p className="text-3xl">{pageCount}</p>
             </div>
-            <div className="p-4 bg-green-100 rounded shadow">
+            <div className="p-4 bg-green-100 rounded shadow text-center">
               <p className="text-xl font-semibold">Total Categories</p>
               <p className="text-3xl">{totalCategories}</p>
             </div>
           </div>
-        </div>
-
-        {/* Categories Launchpad */}
-        <div className="rounded-md p-6 shadow-md border border-gray-300">
-          <p className="text-2xl font-bold mb-4">Categories Launchpad</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {categories.map((cat, index) => (
-              <div key={index} className="p-4 bg-white rounded border hover:shadow-lg transition-shadow">
-                <div className="flex justify-between items-center">
-                  <p className="text-xl font-semibold">{cat.title}</p>
-                  <button
-                    onClick={() => toggleCategory(index)}
-                    className="text-sm text-blue-500 underline"
-                  >
-                    {expandedCategories[index] ? 'Hide' : 'Show'} ({cat.links.length})
-                  </button>
-                </div>
-                {expandedCategories[index] && (
-                  <ul className="mt-2 space-y-1">
-                    {cat.links.map((link, idx) => (
-                      <li key={idx}>
-                        <a 
-                          href={link.href} 
-                          className="text-gray-800 no-underline hover:text-gray-900"
-                        >
-                          {link.title}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
+          {/* User Info Column */}
+          <div className="p-4 bg-purple-100 rounded shadow">
+            <p className="text-xl font-semibold mb-2">User Information</p>
+            {hubData ? (
+              <div className="space-y-1">
+                <p><span className="font-semibold">Name:</span> {hubData.user?.name}</p>
+                <p><span className="font-semibold">Email:</span> {hubData.user?.email}</p>
+                <p><span className="font-semibold">Logged In:</span> {hubData.loggedIn ? "Yes" : "No"}</p>
+                {hubData.isAdmin && <p><span className="font-semibold">Admin:</span> Yes</p>}
+                {hubData.metaData && hubData.metaData.length > 0 && (
+                  <p><span className="font-semibold">Project:</span> {hubData.metaData[0].name}</p>
                 )}
               </div>
-            ))}
+            ) : (
+              <p>No user data</p>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* User Information */}
-        {hubData && (
-          <div className="rounded-md p-6 shadow-md border border-gray-300">
-            <p className="text-2xl font-bold mb-4">User Information</p>
-            <div className="space-y-2">
-              <p><span className="font-semibold">Name:</span> {hubData.user?.name}</p>
-              <p><span className="font-semibold">Email:</span> {hubData.user?.email}</p>
-              <p><span className="font-semibold">Logged In:</span> {hubData.loggedIn ? "Yes" : "No"}</p>
-              {hubData.isAdmin && <p><span className="font-semibold">Admin:</span> Yes</p>}
-              {hubData.metaData && hubData.metaData.length > 0 && (
-                <p>
-                  <span className="font-semibold">Project:</span> {hubData.metaData[0].name}
-                </p>
+      {/* Categories Launchpad */}
+      <div className="rounded-md p-6 shadow-md border border-gray-300">
+        <p className="text-2xl font-bold mb-4">Categories Launchpad</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {categories.map((cat, index) => (
+            <div key={index} className="p-4 bg-white rounded border hover:shadow-lg transition-shadow">
+              <div className="flex justify-between items-center">
+                <p className="text-xl font-semibold">{cat.title}</p>
+                <button
+                  onClick={() => toggleCategory(index)}
+                  className="text-sm text-blue-500 underline"
+                >
+                  {expandedCategories[index] ? 'Hide' : 'Show'} ({cat.links.length})
+                </button>
+              </div>
+              {expandedCategories[index] && (
+                <ul className="mt-2 space-y-1">
+                  {cat.links.map((link, idx) => (
+                    <li key={idx}>
+                      <a 
+                        href={link.href} 
+                        className="text-gray-800 no-underline hover:text-gray-900"
+                      >
+                        {link.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               )}
             </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
     </>
   );
