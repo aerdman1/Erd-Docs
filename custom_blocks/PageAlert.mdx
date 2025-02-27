@@ -3,31 +3,38 @@ name: PageAlert
 ---
 import { useState } from 'react'
 
-export function PopUpAlert({ title, message, type = 'info' }) {
-  const [isOpen, setIsOpen] = useState(true)
-
-  const typeStyles = {
-    info: 'bg-blue-100 border-blue-500 text-blue-700',
-    success: 'bg-green-100 border-green-500 text-green-700',
-    warning: 'bg-yellow-100 border-yellow-500 text-yellow-700',
-    error: 'bg-red-100 border-red-500 text-red-700',
-  }
-
-  if (!isOpen) return null
-
+export function SimplePopUpAlert({ text, onClose }) {
   return (
-    <div className={`fixed inset-0 flex items-center justify-center z-50`}>
-      <div className={`p-4 border-l-4 rounded shadow-lg max-w-lg ${typeStyles[type]} relative`}>
-        <strong className="font-bold">{title}</strong>
-        <p className="text-sm mt-2">{message}</p>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md text-center relative">
+        <p className="text-lg text-gray-800">{text}</p>
         <button
-          className="absolute top-2 right-2 text-xl leading-none text-gray-500 hover:text-gray-700"
-          onClick={() => setIsOpen(false)}
+          onClick={onClose}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          &times;
+          Close
         </button>
       </div>
     </div>
   )
 }
 
+export function PageWithAlert() {
+  const [showAlert, setShowAlert] = useState(true)
+
+  return (
+    <div className="relative">
+      <h1 className="text-2xl font-bold">My Page Content</h1>
+      <p>Welcome to the page. Here’s some content.</p>
+
+      {showAlert && (
+        <SimplePopUpAlert
+          text="This is an important alert message. Please take note!"
+          onClose={() => setShowAlert(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+<PageWithAlert />
