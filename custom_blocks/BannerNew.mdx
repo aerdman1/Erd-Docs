@@ -1,49 +1,31 @@
 ---
 name: BannerNew
 ---
-import React, { useEffect, useRef } from "react";
+import React from "react";
 
-export const AlertBannerInjected = ({
+export const AlertBanner = ({
   message = "YOUR CONTENT GOES HERE.",
   bannerColor = "#ffcc00",          // Default bright yellow background
-  bannerTextColor = "#050910",        // Dark text and border color
-  targetSelector = ".Header-bottom2eLKOFXMEmh5.rm-Header-bottom" // Update this selector if needed
+  bannerTextColor = "#050910"         // Dark text and border color
 }) => {
-  const bannerRef = useRef(null);
-
-  useEffect(() => {
-    // Delay to allow the target element to appear in the DOM.
-    const timer = setTimeout(() => {
-      const target = document.querySelector(targetSelector);
-      console.log("Target found?", target);
-      if (target && bannerRef.current) {
-        // Move the banner node to just after the target element.
-        target.parentNode.insertBefore(bannerRef.current, target.nextSibling);
-      } else {
-        console.warn("Target element not found for selector:", targetSelector);
-      }
-    }, 1000); // 1 second delay; adjust if necessary
-
-    return () => clearTimeout(timer);
-  }, [targetSelector]);
-
   return (
-    <div
-      ref={bannerRef}
-      className="alert-banner"
-      style={{
-        background: bannerColor,
-        color: bannerTextColor,
-        padding: "10px",
-        textAlign: "center",
-        fontSize: "14px",
-        fontWeight: "bold",
-        border: "2px solid " + bannerTextColor,
-        borderRadius: "5px",
-        marginBottom: "20px"
-      }}
-    >
-      {message}
+    <div>
+      <div
+        className="alert-banner"
+        style={{
+          background: bannerColor,
+          color: bannerTextColor,
+          padding: "10px",
+          textAlign: "center",
+          fontSize: "14px",
+          fontWeight: "bold",
+          border: "2px solid " + bannerTextColor,
+          borderRadius: "5px",
+          marginBottom: "20px"
+        }}
+      >
+        {message}
+      </div>
       <style>{`
         @keyframes bounceIn {
           0% { transform: scale(0.5); opacity: 0; }
@@ -57,3 +39,9 @@ export const AlertBannerInjected = ({
     </div>
   );
 };
+
+<AlertBanner
+  message="YOUR CONTENT GOES HERE."
+  bannerColor="#ffcc00"
+  bannerTextColor="#050910"
+/>
