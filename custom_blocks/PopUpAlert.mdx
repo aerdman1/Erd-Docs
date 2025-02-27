@@ -3,25 +3,28 @@ name: PopUpAlert
 ---
 import React, { useEffect, useState } from 'react';
 
-export const DeprecationNotice = ({ message }) => {
-  // Compute currentPage only on the client side.
-  const currentPage =
-    typeof window !== 'undefined' && window.location
-      ? window.location.pathname
-      : '';
+export const DeprecationNotice = ({ initialMessage = "YOUR CONTENT GOES HERE." }) => {
+  // Interactive state for message and display mode.
+  const [message, setMessage] = useState(initialMessage);
+  // Mode options: "banner", "popup", or "both"
+  const [mode, setMode] = useState("both");
+
+  // Compute a key for local storage using the current page's pathname.
+  const currentPage = typeof window !== 'undefined' && window.location ? window.location.pathname : '';
   const dismissedKey = `deprecationPopupDismissed_${currentPage}`;
 
-  const [showBanner, setShowBanner] = useState(Boolean(message));
+  // Control whether the popup modal should be shown.
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    if (message && typeof window !== 'undefined') {
+    // Only trigger the popup if the mode includes popup functionality.
+    if (message && (mode === "popup" || mode === "both") && typeof window !== 'undefined') {
       const dismissed = localStorage.getItem(dismissedKey);
       if (!dismissed) {
         setShowModal(true);
       }
     }
-  }, [message, dismissedKey]);
+  }, [message, mode, dismissedKey]);
 
   const handleCloseModal = () => {
     if (typeof window !== 'undefined') {
@@ -30,15 +33,68 @@ export const DeprecationNotice = ({ message }) => {
     setShowModal(false);
   };
 
+  // Reset the dismissed state for testing purposes.
+  const handleReset = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(dismissedKey);
+    }
+    // Re-run the popup logic if mode is set to popup or both.
+    if (mode === "popup" || mode === "both") {
+      setShowModal(true);
+    }
+  };
+
   return (
     <div>
-      {showBanner && (
+      {/* Interactive control panel */}
+      <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc' }}>
+        <label>
+          <strong>Message:</strong>
+          <input 
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            style={{ marginLeft: '10px', padding: '5px', width: '60%' }}
+          />
+        </label>
+        <br /><br />
+        <label>
+          <strong>Display Mode:</strong>
+          <select 
+            value={mode} 
+            onChange={(e) => setMode(e.target.value)} 
+            style={{ marginLeft: '10px', padding: '5px' }}
+          >
+            <option value="banner">Banner</option>
+            <option value="popup">Popup</option>
+            <option value="both">Both</option>
+          </select>
+        </label>
+        <br /><br />
+        <button 
+          onClick={handleReset} 
+          style={{
+            padding: '8px 16px',
+            background: '#ff6600',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Reset Popup Dismissal
+        </button>
+      </div>
+
+      {/* Render the banner if mode is banner or both */}
+      { (mode === "banner" || mode === "both") && message && (
         <div className="deprecation-banner">
           {message}
         </div>
       )}
 
-      {showModal && (
+      {/* Render the popup modal if mode is popup or both */}
+      { (mode === "popup" || mode === "both") && showModal && (
         <div className="deprecation-modal">
           <div className="deprecation-modal-content">
             <p>{message}</p>
@@ -55,7 +111,6 @@ export const DeprecationNotice = ({ message }) => {
           text-align: center;
           font-size: 13px;
           font-weight: bold;
-          position: relative;
           margin-bottom: 20px;
           animation: slideDown 0.5s ease-out forwards;
         }
@@ -99,4 +154,4 @@ export const DeprecationNotice = ({ message }) => {
   );
 };
 
-<DeprecationNotice message="This endpoint was deprecated on DATE 1 and will be removed on DATE 2. To avoid disruptions, migrate your resources before DATE 2." />
+<DeprecationNotice initialMessage="YOUR CONTENT GOES HERE." />
