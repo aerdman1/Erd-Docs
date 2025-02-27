@@ -3,33 +3,79 @@ name: Dashboard
 ---
 import React, { useEffect, useState } from 'react';
 
-export const PageCountComponent = ({ header = "Navigation Page Count" }) => {
+export const DashboardComponent = ({ header = "Dashboard" }) => {
   const [pageCount, setPageCount] = useState(0);
+  const [hubData, setHubData] = useState(null);
 
   useEffect(() => {
-    // Only run in the browser environment
+    // Only run in a browser environment.
     if (typeof document !== "undefined") {
-      // Locate the navigation element by its ID.
+      // Count pages in the navigation.
       const navElement = document.getElementById('hub-sidebar');
       if (navElement) {
-        // Find all anchor tags that start with "/docs/"
         const pageLinks = navElement.querySelectorAll('a[href^="/docs/"]');
         setPageCount(pageLinks.length);
+      }
+
+      // Parse Hub-Me data from the embedded script.
+      const hubMeElement = document.getElementById("hub-me");
+      if (hubMeElement) {
+        let dataJson = hubMeElement.getAttribute("data-json");
+        // Replace HTML entity &quot; with actual quotes.
+        dataJson = dataJson.replace(/&quot;/g, '"');
+        try {
+          const parsedHubData = JSON.parse(dataJson);
+          setHubData(parsedHubData);
+        } catch (error) {
+          console.error("Error parsing Hub-Me data:", error);
+        }
       }
     }
   }, []);
 
   return (
-    <div className="flex justify-center">
-      <div className="rounded-md p-6 m-4 max-w-lg shadow-md border border-gray-300">
+    <div className="flex flex-col items-center space-y-6">
+      {/* Navigation Page Count */}
+      <div className="rounded-md p-6 m-4 max-w-lg shadow-md border border-gray-300 w-full">
         <p className="text-lg font-bold">{header}</p>
         <p className="mt-2">
           <i className="fa-solid fa-folder-open mr-2" />
           Total Pages: <span className="font-semibold">{pageCount}</span>
         </p>
       </div>
+
+      {/* Hub-Me User Info */}
+      {hubData && (
+        <div className="rounded-md p-6 m-4 max-w-lg shadow-md border border-gray-300 w-full">
+          <p className="text-lg font-bold">User Information</p>
+          <p className="mt-2">
+            <i className="fa-solid fa-user mr-2" />
+            Name: <span className="font-semibold">{hubData.user?.name}</span>
+          </p>
+          <p className="mt-2">
+            <i className="fa-solid fa-envelope mr-2" />
+            Email: <span className="font-semibold">{hubData.user?.email}</span>
+          </p>
+          <p className="mt-2">
+            <i className="fa-solid fa-check mr-2" />
+            Logged In: <span className="font-semibold">{hubData.loggedIn ? "Yes" : "No"}</span>
+          </p>
+          {hubData.isAdmin && (
+            <p className="mt-2">
+              <i className="fa-solid fa-shield-alt mr-2" />
+              Admin: <span className="font-semibold">Yes</span>
+            </p>
+          )}
+          {hubData.metaData && hubData.metaData.length > 0 && (
+            <p className="mt-2">
+              <i className="fa-solid fa-project-diagram mr-2" />
+              Project: <span className="font-semibold">{hubData.metaData[0].name}</span>
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
-<PageCountComponent header="Navigation Page Count" />
+<DashboardComponent header="Dashboard" />
