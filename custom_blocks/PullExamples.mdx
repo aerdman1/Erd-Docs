@@ -1,0 +1,42 @@
+---
+name: PullExamples
+---
+// components/EndpointExample.jsx
+
+import React from 'react';
+
+export default function EndpointExample({ path, method }) {
+  // `oas` comes from the custom page environment (only works in custom pages)
+  if (typeof oas === 'undefined') {
+    return <p style={{ color: 'red' }}>⚠️ This component only works in custom pages.</p>;
+  }
+
+  const operation = oas.operation(path, method);
+
+  if (!operation) {
+    return <p>⚠️ No operation found for {method.toUpperCase()} {path}</p>;
+  }
+
+  const requestExample = operation?.requestBody?.content?.['application/json']?.example;
+  const responseExample = operation?.responses?.['200']?.content?.['application/json']?.example;
+
+  return (
+    <div style={{ border: '1px solid #ddd', padding: '1em', margin: '1em 0', fontFamily: 'monospace' }}>
+      <h3>{operation.summary || `${method.toUpperCase()} ${path}`}</h3>
+
+      <h4>Request Example</h4>
+      {requestExample ? (
+        <pre>{JSON.stringify(requestExample, null, 2)}</pre>
+      ) : (
+        <p>No request body example available.</p>
+      )}
+
+      <h4>Response Example (200)</h4>
+      {responseExample ? (
+        <pre>{JSON.stringify(responseExample, null, 2)}</pre>
+      ) : (
+        <p>No response example available for 200 status.</p>
+      )}
+    </div>
+  );
+}
