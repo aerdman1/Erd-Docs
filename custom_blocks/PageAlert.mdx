@@ -1,7 +1,7 @@
 ---
 name: PageAlert
 ---
-//import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 
 export function SimplePopUpAlert({ text, onClose }) {
   return (
@@ -23,15 +23,24 @@ export default function AutoPopUpAlert() {
   const [showAlert, setShowAlert] = useState(false)
 
   useEffect(() => {
-    // Automatically show the popup on page load
-    setShowAlert(true)
+    // This must happen inside useEffect to avoid SSR/MDX issues with window
+    const getPageKey = () => {
+      if (typeof window === 'undefined') return null  // Skip on server side
+      return `popup_shown_${window.location.pathname}`
+    }
+
+    const pageKey = getPageKey()
+    if (pageKey && !localStorage.getItem(pageKey)) {
+      setShowAlert(true)
+      localStorage.setItem(pageKey, 'true')
+    }
   }, [])
 
   return (
     <>
       {showAlert && (
         <SimplePopUpAlert
-          text="This is an important alert message and it is totally customizible!"
+          text="This is an important alert message that you can control! Place any text you want here."
           onClose={() => setShowAlert(false)}
         />
       )}
