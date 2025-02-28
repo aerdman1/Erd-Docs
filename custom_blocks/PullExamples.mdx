@@ -1,14 +1,15 @@
 ---
 name: PullExamples
 ---
+// PullExamples.jsx - Upload this to ReadMe Custom Components
+
 import React from 'react';
 
-export default function EndpointExample({ path, method }) {
-  // This only works in environments where `oas` is available (custom pages in ReadMe).
+export default function PullExamples({ path, method }) {
   if (typeof oas === 'undefined') {
     return (
       <div style={{ padding: '1em', backgroundColor: '#ffecec', border: '1px solid #f5aca6', borderRadius: '5px' }}>
-        ⚠️ <strong>EndpointExample</strong> only works in custom pages where the <code>oas</code> object is available.
+        ⚠️ <strong>PullExamples</strong> can only be used on custom pages where the OpenAPI specification (`oas`) is available.
       </div>
     );
   }
@@ -60,7 +61,7 @@ export default function EndpointExample({ path, method }) {
           {JSON.stringify(requestExample, null, 2)}
         </pre>
       ) : (
-        <p>No request example available.</p>
+        <p>No request body example available.</p>
       )}
 
       <h4 style={{ margin: '16px 0 8px 0' }}>Response Examples</h4>
