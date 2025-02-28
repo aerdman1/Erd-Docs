@@ -6,3 +6,4 @@ api:
   operationId: findPetsByStatus
 hidden: false
 ---
+<PullExamples />
