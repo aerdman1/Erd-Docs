@@ -9,4 +9,4 @@ metadata:
 
 To update a pet, use the following request and response examples.
 
-<PullExamples path="/pet" method="put" />
+<PullExamples />
