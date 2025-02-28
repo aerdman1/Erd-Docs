@@ -1,16 +1,14 @@
 ---
 name: PullExamples
 ---
-// EndpointExample.jsx (or whatever you name it in the CMS)
-
 import React from 'react';
 
 export default function EndpointExample({ path, method }) {
-  // Safety check — only works in custom pages where `oas` exists
+  // This only works in environments where `oas` is available (custom pages in ReadMe).
   if (typeof oas === 'undefined') {
     return (
-      <div style={{ padding: '1em', background: '#fee', border: '1px solid #f00' }}>
-        ⚠️ <strong>EndpointExample</strong> only works in custom pages where the `oas` object is available.
+      <div style={{ padding: '1em', backgroundColor: '#ffecec', border: '1px solid #f5aca6', borderRadius: '5px' }}>
+        ⚠️ <strong>EndpointExample</strong> only works in custom pages where the <code>oas</code> object is available.
       </div>
     );
   }
@@ -19,14 +17,14 @@ export default function EndpointExample({ path, method }) {
 
   if (!operation) {
     return (
-      <div style={{ padding: '1em', background: '#fee', border: '1px solid #f00' }}>
+      <div style={{ padding: '1em', backgroundColor: '#ffecec', border: '1px solid #f5aca6', borderRadius: '5px' }}>
         ⚠️ No operation found for <strong>{method.toUpperCase()} {path}</strong>.
       </div>
     );
   }
 
   const requestExample = operation?.requestBody?.content?.['application/json']?.example;
-  
+
   const responses = Object.entries(operation.responses || {}).map(([statusCode, response]) => {
     const responseExample = response?.content?.['application/json']?.example;
     return {
@@ -42,35 +40,41 @@ export default function EndpointExample({ path, method }) {
       padding: '16px',
       borderRadius: '8px',
       backgroundColor: '#f9f9f9',
-      fontFamily: 'monospace',
-      marginBottom: '1em',
+      marginBottom: '16px',
+      fontFamily: 'Arial, sans-serif'
     }}>
-      <h3 style={{ margin: '0 0 8px 0', fontFamily: 'Arial, sans-serif' }}>
+      <h3 style={{ margin: '0 0 12px 0', fontWeight: 'bold' }}>
         {operation.summary || `${method.toUpperCase()} ${path}`}
       </h3>
       <p><strong>Method:</strong> {method.toUpperCase()}</p>
       <p><strong>Path:</strong> {path}</p>
 
-      <hr style={{ margin: '12px 0' }} />
-
-      <h4 style={{ fontFamily: 'Arial, sans-serif' }}>Request Example</h4>
+      <h4 style={{ margin: '16px 0 8px 0' }}>Request Example</h4>
       {requestExample ? (
-        <pre style={{ backgroundColor: '#eee', padding: '8px', borderRadius: '4px' }}>
+        <pre style={{
+          backgroundColor: '#f0f0f0',
+          padding: '12px',
+          borderRadius: '4px',
+          overflowX: 'auto'
+        }}>
           {JSON.stringify(requestExample, null, 2)}
         </pre>
       ) : (
         <p>No request example available.</p>
       )}
 
-      <hr style={{ margin: '12px 0' }} />
-
-      <h4 style={{ fontFamily: 'Arial, sans-serif' }}>Response Examples</h4>
+      <h4 style={{ margin: '16px 0 8px 0' }}>Response Examples</h4>
       {responses.length > 0 ? (
         responses.map(({ statusCode, description, responseExample }) => (
           <div key={statusCode} style={{ marginBottom: '12px' }}>
             <p><strong>Status {statusCode}</strong>: {description}</p>
             {responseExample ? (
-              <pre style={{ backgroundColor: '#eee', padding: '8px', borderRadius: '4px' }}>
+              <pre style={{
+                backgroundColor: '#f0f0f0',
+                padding: '12px',
+                borderRadius: '4px',
+                overflowX: 'auto'
+              }}>
                 {JSON.stringify(responseExample, null, 2)}
               </pre>
             ) : (
