@@ -1,7 +1,7 @@
 ---
 name: PageAlert
 ---
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function SimplePopUpAlert({ text, onClose }) {
   return (
@@ -19,22 +19,22 @@ export function SimplePopUpAlert({ text, onClose }) {
   )
 }
 
-export function PageWithAlert() {
-  const [showAlert, setShowAlert] = useState(true)
+export default function AutoPopUpAlert() {
+  const [showAlert, setShowAlert] = useState(false)
+
+  useEffect(() => {
+    // Automatically show the popup on page load
+    setShowAlert(true)
+  }, [])
 
   return (
-    <div className="relative">
-      <h1 className="text-2xl font-bold">My Page Content</h1>
-      <p>Welcome to the page. Here’s some content.</p>
-
+    <>
       {showAlert && (
         <SimplePopUpAlert
           text="This is an important alert message. Please take note!"
           onClose={() => setShowAlert(false)}
         />
       )}
-    </div>
+    </>
   )
 }
-
-<PageWithAlert />
