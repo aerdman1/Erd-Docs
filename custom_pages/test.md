@@ -3,8 +3,6 @@ title: Test
 fullscreen: false
 hidden: false
 ---
-// PullExamples.jsx - Upload this to ReadMe Custom Components
-
 import React from 'react';
 
 export default function PullExamples({ path, method }) {
