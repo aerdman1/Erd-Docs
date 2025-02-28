@@ -6,4 +6,3 @@ api:
   operationId: addPet
 hidden: false
 ---
-<PullExamples />
