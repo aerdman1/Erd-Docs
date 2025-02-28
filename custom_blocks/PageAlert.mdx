@@ -5,36 +5,15 @@ import { useState } from 'react'
 
 export function SimplePopUpAlert({ text, onClose }) {
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="popup-title"
-    >
-      <div className="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4 relative">
-        {/* Close Button (Unicode X for compatibility) */}
+    <div className="fixed inset-0 bg-white/0 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-xl max-w-md text-center relative">
+        <p className="text-lg text-gray-800">{text}</p>
         <button
           onClick={onClose}
-          aria-label="Close alert"
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl leading-none"
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          &times;
+          Close
         </button>
-
-        <h2 id="popup-title" className="text-lg font-semibold text-gray-900">
-          Important Alert
-        </h2>
-
-        <p className="mt-3 text-gray-700">{text}</p>
-
-        <div className="mt-5 flex justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-blue-600 text-white font-medium rounded hover:bg-blue-700 transition-colors focus:outline-none focus:ring focus:ring-blue-300"
-          >
-            Close
-          </button>
-        </div>
       </div>
     </div>
   )
@@ -44,9 +23,9 @@ export function PageWithAlert() {
   const [showAlert, setShowAlert] = useState(true)
 
   return (
-    <div className="relative p-6 space-y-4">
-      <h1 className="text-3xl font-bold">My Page Content</h1>
-      <p className="text-gray-700">Welcome to the page. Here’s some content.</p>
+    <div className="relative">
+      <h1 className="text-2xl font-bold">My Page Content</h1>
+      <p>Welcome to the page. Here’s some content.</p>
 
       {showAlert && (
         <SimplePopUpAlert
@@ -58,4 +37,5 @@ export function PageWithAlert() {
   )
 }
 
+# Example Usage in MDX
 <PageWithAlert />
