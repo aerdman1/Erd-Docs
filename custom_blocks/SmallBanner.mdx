@@ -1,0 +1,33 @@
+---
+name: SmallBanner
+---
+import React from "react";
+
+export const BannerTest = ({
+  message = "Here is my banner message - hope you enjoy!",
+  bannerColor = "#00BCFF",
+  bannerTextColor = "#ffffff",
+  fontSize = "14px",
+  fontWeight = "bold"
+}) => {
+  const inlineStyles = {
+    background: bannerColor,
+    color: bannerTextColor,
+    fontSize,
+    fontWeight,
+    padding: "8px",
+    textAlign: "center",
+    borderRadius: "6px",
+    marginBottom: "20px"
+  };
+
+  return (
+    <div>
+      <div style={inlineStyles}>
+        {message}
+      </div>
+    </div>
+  );
+};
+
+<BannerTest />
