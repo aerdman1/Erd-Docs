@@ -187,18 +187,22 @@ export const OverviewTemplate = () => {
     );
   }
 
-  // Single-line CSS with all styles (including the new refresh button)
+  // Single-line CSS with all styles (including the unified controls container)
   const styleString =
     'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
     '.container{max-width:1200px;margin:0 auto;padding:16px}'+
     '.hdrTemplate{display:flex;align-items:center;justify-content:space-between;position:relative;margin-bottom:24px}'+
+    '.hdrContent{flex:1}'+
     '.hdrContent h1{font-size:2rem;margin:0 0 8px 0}'+
     '.hdrContent p{margin:0 0 16px 0;color:#4B5563}'+
     '.hdrImage img{width:230px;position: absolute;right: 5%;top: -90px;}'+
-    '.search-container{display:flex;align-items:center;gap:10px;margin-top:8px}'+
-    '.toggle-button{margin-right:10px;background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s}'+
+    '.controls{display:flex;align-items:center;gap:10px;margin-top:8px}'+
+    '.toggle-button{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s}'+
     '.toggle-button:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,0.15)}'+
     '.search-input{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:1rem}'+
+    '.refresh-button{background:#3b82f6;color:#fff;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;transition:background 0.2s}'+
+    '.refresh-button:hover:not(:disabled){background:#2563eb}'+
+    '.refresh-button:disabled{background:#bbb;cursor:not-allowed}'+
     '.category-heading{text-align:center;font-size:1.4rem;font-weight:bold;margin:32px 0 16px 0}'+
     '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}'+
     '@media(min-width:1400px){.grid{grid-template-columns:repeat(4,1fr)}}'+
@@ -217,11 +221,7 @@ export const OverviewTemplate = () => {
     '.slider-card p{margin:0 0 8px 0;color:#4B5563}'+
     '.slider-card .tag-button{position:absolute;bottom:16px;left:16px}'+
     '.loading{font-style:italic;color:#555}'+
-    '.error{color:red;font-weight:bold}'+
-    '.refresh-container{margin-top:16px;text-align:right}'+
-    '.refresh-button{background:#3b82f6;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:background 0.2s}'+
-    '.refresh-button:hover:not(:disabled){background:#2563eb}'+
-    '.refresh-button:disabled{background:#bbb;cursor:not-allowed}';
+    '.error{color:red;font-weight:bold}';
 
   return (
     <div>
@@ -232,7 +232,7 @@ export const OverviewTemplate = () => {
           <div className='hdrContent'>
             <h1>Endpoint Directory</h1>
             <p>Your toolkit for building robust APIs and seamless integrations.</p>
-            <div className='search-container'>
+            <div className='controls'>
               <button className='toggle-button' onClick={() => setSliderView(!sliderView)}>
                 {sliderView ? 'View as Grid' : 'View as Slider'}
               </button>
@@ -243,8 +243,6 @@ export const OverviewTemplate = () => {
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
-            </div>
-            <div className='refresh-container'>
               <button className='refresh-button' onClick={fetchSidebarData} disabled={fetching}>
                 {fetching ? 'Refreshing...' : 'Refresh Endpoints'}
               </button>
@@ -264,13 +262,11 @@ export const OverviewTemplate = () => {
               // Deduplicate and filter links based on search term
               const dedupedLinks = deduplicateDocs(cat.links);
               const filtered = dedupedLinks.filter(link => passesSearch(link));
-
               if (!filtered.length) return null;
 
               return (
                 <div key={'cat-' + catIdx}>
                   <div className='category-heading'>{cat.name}</div>
-
                   {!sliderView && (
                     <div className='grid'>
                       {filtered.map((link, idx) => {
@@ -279,7 +275,6 @@ export const OverviewTemplate = () => {
                       })}
                     </div>
                   )}
-
                   {sliderView && (
                     <div className='slider-row'>
                       {filtered.map((link, idx) => {
