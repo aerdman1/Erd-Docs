@@ -4,15 +4,13 @@ name: PullExamples
 import React, { useState } from "react";
 
 export const SimpleComponent = () => {
-  // State for the URL, fetched content, loading and error status.
   const [url, setUrl] = useState("");
-  const [content, setContent] = useState(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Trigger fetching when the button is clicked.
   const handleFetch = () => {
-    if (!url) return; // Do nothing if URL is empty.
+    if (!url) return;
     setLoading(true);
     setError(null);
     fetch(url)
@@ -22,12 +20,43 @@ export const SimpleComponent = () => {
         }
         return res.text();
       })
-      .then((html) => {
-        setContent(html);
+      .then((htmlString) => {
+        // Parse the HTML string into a document
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
+
+        // Extract the Title from <header id="content-head"><h1>...</h1></header>
+        const titleElement = doc.querySelector("header#content-head h1");
+        const title = titleElement ? titleElement.innerText.trim() : "No Title Found";
+
+        // Extract the Description from the element with role="doc-subtitle"
+        const descElement = doc.querySelector("div[role='doc-subtitle']");
+        const description = descElement ? descElement.innerText.trim() : "No Description Found";
+
+        // Extract the API method (e.g. GET, POST) from the first element with class "rm-APIMethod" within the header
+        const methodElement = doc.querySelector("header#content-head span.rm-APIMethod");
+        const method = methodElement ? methodElement.innerText.trim() : "No Method Found";
+
+        // Extract the endpoint URL from the span with a specific class (adjust the selector as needed)
+        const endpointElement = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
+        const endpointUrl = endpointElement ? endpointElement.innerText.trim() : "No Endpoint URL Found";
+
+        // Optionally, extract the "Last Updated" info from a paragraph with class "DateLine"
+        const updatedElement = doc.querySelector("p.DateLine");
+        const updated = updatedElement ? updatedElement.innerText.trim() : "No Updated Info Found";
+
+        // Set the extracted data in state
+        setData({
+          title,
+          description,
+          method,
+          endpointUrl,
+          updated,
+        });
       })
       .catch((err) => {
-        console.error("Error fetching content:", err);
-        setError("Error fetching content");
+        console.error("Error fetching/parsing content:", err);
+        setError(err.message);
       })
       .finally(() => {
         setLoading(false);
@@ -36,28 +65,38 @@ export const SimpleComponent = () => {
 
   return (
     <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
-      <h3>Simple Component</h3>
-      <p>This component can fetch content from another page on your site.</p>
-      
-      {/* Input for URL and fetch button */}
+      <h3>Fetch Endpoint Information</h3>
+      <p>Enter the URL of your documentation page (e.g., the Find Pets by Status page):</p>
       <div style={{ marginBottom: "1rem" }}>
         <input
           type="text"
-          placeholder="Enter URL to fetch (e.g. https://yoursite.com/page)"
+          placeholder="https://yoursite.com/reference/findpetsbystatus"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           style={{ width: "300px", marginRight: "10px" }}
         />
-        <button onClick={handleFetch}>Fetch Content</button>
+        <button onClick={handleFetch}>Fetch Info</button>
       </div>
-
-      {/* Display loading, error or fetched content */}
       {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {content && (
+      {error && <p style={{ color: "red" }}>Error: {error}</p>}
+      {data && (
         <div>
-          <h4>Fetched Content:</h4>
-          <div dangerouslySetInnerHTML={{ __html: content }} />
+          <h4>Extracted Endpoint Info</h4>
+          <p>
+            <strong>Title:</strong> {data.title}
+          </p>
+          <p>
+            <strong>Description:</strong> {data.description}
+          </p>
+          <p>
+            <strong>Method:</strong> {data.method}
+          </p>
+          <p>
+            <strong>Endpoint URL:</strong> {data.endpointUrl}
+          </p>
+          <p>
+            <strong>Last Updated:</strong> {data.updated}
+          </p>
         </div>
       )}
     </div>
