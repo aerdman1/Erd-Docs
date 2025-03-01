@@ -1,5 +1,5 @@
 ---
-title: API Overview
+title: 'Endpoint Directory '
 deprecated: false
 hidden: false
 metadata:
