@@ -1,0 +1,425 @@
+---
+name: APIOverview
+---
+import React, { useEffect, useState } from 'react';
+
+export const OverviewTemplate = () => {
+  // State for endpoint details
+  const [endpointDetails, setEndpointDetails] = useState([]);
+  const [endpointError, setEndpointError] = useState(null);
+  const [fetching, setFetching] = useState(false);
+  
+  // Also capture sidebar data (categories, page count, etc.) from the DOM
+  const [categories, setCategories] = useState([]);
+  const [pageCount, setPageCount] = useState(0);
+  const [totalCategories, setTotalCategories] = useState(0);
+
+  // On mount, extract sidebar links and fetch endpoints
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const navElement = document.querySelector('.rm-Sidebar');
+      if (navElement) {
+        const pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
+        setPageCount(pageLinks.length);
+        const sectionElements = navElement.querySelectorAll('section.rm-Sidebar-section');
+        const catArray = [];
+        sectionElements.forEach((section) => {
+          const heading = section.querySelector('h2');
+          if (heading) {
+            const title = heading.textContent.trim();
+            const links = section.querySelectorAll('a');
+            const linkArray = Array.from(links).map(link => ({
+              title: link.textContent.trim(),
+              href: link.getAttribute('href')
+            }));
+            catArray.push({ title, links: linkArray });
+          }
+        });
+        setCategories(catArray);
+        setTotalCategories(catArray.length);
+      }
+    }
+  }, []);
+
+  // When categories are available, automatically fetch endpoint details
+  useEffect(() => {
+    const fetchEndpoints = async () => {
+      setFetching(true);
+      setEndpointError(null);
+      // Flatten all links from categories and filter for reference pages
+      const flattenedLinks = categories.flatMap(cat => cat.links);
+      const referenceLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/reference/"));
+      // Build full URL for each (assuming same origin)
+      const fullUrls = referenceLinks.map(link => ({
+        ...link,
+        fullUrl: window.location.origin + link.href
+      }));
+      try {
+        const detailsPromises = fullUrls.map(async (link) => {
+          try {
+            const response = await fetch(link.fullUrl);
+            if (!response.ok) throw new Error("Network response was not ok");
+            const html = await response.text();
+            const info = extractEndpointInfo(html);
+            return { ...link, ...info };
+          } catch (err) {
+            console.error("Error fetching", link.href, err);
+            return { ...link, error: err.message };
+          }
+        });
+        const results = await Promise.all(detailsPromises);
+        setEndpointDetails(results);
+      } catch (err) {
+        setEndpointError(err.message);
+      } finally {
+        setFetching(false);
+      }
+    };
+    if (categories.length > 0) {
+      fetchEndpoints();
+    }
+  }, [categories]);
+
+  // Helper function to extract endpoint info from fetched HTML
+  const extractEndpointInfo = (htmlString) => {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlString, "text/html");
+      // Try to extract the title from <header id="content-head"> or fallback to document title
+      const titleEl = doc.querySelector("header#content-head h1");
+      const endpointTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
+      // Description from element with role "doc-subtitle"
+      const descEl = doc.querySelector("div[role='doc-subtitle']");
+      const description = descEl ? descEl.innerText.trim() : "No Description Found";
+      // HTTP method: look for any element with class "rm-APIMethod"
+      const methodEl = doc.querySelector("span.rm-APIMethod");
+      const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
+      // Endpoint URL from a unique span (adjust selector as needed)
+      const urlEl = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
+      const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
+      // Last updated info from a <p> with class "DateLine"
+      const updatedEl = doc.querySelector("p.DateLine");
+      const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
+      return { endpointTitle, description, method, endpointUrl, updated };
+    } catch (e) {
+      console.error("Error extracting endpoint info:", e);
+      return null;
+    }
+  };
+
+  // Compute a tally of endpoints by HTTP method
+  const methodTally = endpointDetails.reduce((acc, endpoint) => {
+    if (endpoint.method) {
+      acc[endpoint.method] = (acc[endpoint.method] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
+  return (
+    <>
+      {/* Styles to match your provided template */}
+      <style>{`
+:root {
+    --primary-blue: #018ef5;
+    --primary-hover: #0170c7;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-600: #4B5563;
+    --color-border-default: #e5e7eb;
+}
+
+.rm-Guides #content-head {
+    border-bottom: 1px solid var(--color-border-default);
+    padding-bottom: 30px;
+    display: none;
+}
+
+.rm-Guides .content-body {
+    padding-top: 0;
+}
+
+.App .rm-Guides .rm-Article {
+    padding: 10px;
+}
+
+a {
+    text-decoration: none;
+}
+
+a.heading-anchor-icon.fa.fa-anchor {
+    display: none !important;
+}
+
+.field-description a[href],
+.field-description a:not([href=""]),
+.markdown-body a[href],
+.markdown-body a:not([href=""]) {
+    text-decoration: none;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--gray-50);
+    color: #111827;
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.rm-Guides .content-body {
+    flex-shrink: 1;
+    max-width: 100%;
+    width: 100%;
+}
+
+.content-toc {
+    display: none;
+}
+
+/* Header section */
+.header {
+    text-align: left;
+    position: relative;
+    width: 100%;
+}
+
+header h1,
+header p {
+    max-width: 700px;
+}
+
+h3 i {
+    color: #018ef5;
+}
+
+.header::after {
+    content: "";
+    position: absolute;
+    top: -50px;
+    right: 0;
+    background-image: url(https://files.readme.io/371866a031b2882789c159fce6c7d5e3b9088bb6314f991da709793d8cafc683-small-readme-logo_0_white.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 1;
+    width: 325px;
+    height: 300px;
+    filter: invert(1) opacity(0.015);
+    pointer-events: none;
+}
+
+.hdrTemplate {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.hdrContent {
+    flex: 1;
+}
+
+.hdrImage {
+    flex-shrink: 0;
+    margin-left: 20px;
+}
+
+.hdrImage img {
+    width: 80px;
+}
+
+@media (min-width: 768px) {
+    .hdrImage img {
+        width: 220px;
+        margin-right: 80px;
+        position: absolute;
+        top: -5px;
+        right: 20px;
+    }
+}
+
+.hdrTemplate h1 {
+    font-size: 2.5rem;
+    margin-top: 0;
+}
+
+.header p {
+    font-size: 1.25rem;
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--primary-blue);
+    color: white;
+    font-size: 18px;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none !important;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--primary-hover);
+    opacity: 0.95;
+    color: #fff;
+}
+
+.btn-primary::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 120%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+    transform: skewX(-25deg);
+}
+
+.btn-primary:hover::before {
+    left: 150%;
+    transition: left 0.4s ease-out;
+}
+
+.section-title {
+    font-size: 1.875rem;
+    margin-bottom: 1rem;
+}
+
+.section-description {
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+    font-size: 1.125rem;
+}
+
+/* Card grid */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 18px;
+}
+
+/* Card styles */
+.card {
+    background: white;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover,
+.card:focus {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.card h3 {
+    font-size: 1.25rem;
+    margin: 0 0 12px 0;
+}
+
+.card p {
+    color: var(--gray-600);
+    margin: 0 0 16px 0;
+}
+
+.tag {
+    background: var(--gray-100);
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: #39261B;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tag:hover {
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* Section divider */
+.section {
+    padding: 15px 0 20px 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.section:last-child {
+    border-bottom: none;
+}
+        `}</style>
+      <div className="container">
+        {/* Header */}
+        <div className="hdrTemplate">
+          <div className="hdrContent">
+            <h1>ReadMe API and SDK Documentation</h1>
+            <p>Your toolkit for building robust APIs and seamless integrations.</p>
+            <a href="#" className="btn-primary">
+              <i className="fas fa-book"></i>&nbsp; Get Started
+            </a>
+          </div>
+          <div className="hdrImage">
+            <img src="https://owlbertsio-resized.s3.amazonaws.com/Popper.psd.full.png" alt="Header Image" />
+          </div>
+        </div>
+        <hr style={{ marginTop: "40px", marginBottom: "0" }} />
+        <main>
+          {/* Endpoint Overview Section */}
+          <section className="section">
+            <h2 className="section-title">Endpoint Details Overview</h2>
+            <p className="section-description">
+              This automated overview displays all your API endpoints, fetched on page load.
+            </p>
+            {fetching && <p>Loading endpoint details...</p>}
+            {endpointError && <p style={{ color: 'red' }}>{endpointError}</p>}
+            {endpointDetails.length > 0 && (
+              <>
+                {/* Tally Section */}
+                <div className="mb-6">
+                  <h3 className="section-title">Endpoint Method Tally</h3>
+                  <ul className="list-disc list-inside">
+                    {Object.entries(methodTally).map(([method, count]) => (
+                      <li key={method}><strong>{method}:</strong> {count}</li>
+                    ))}
+                  </ul>
+                </div>
+                {/* Endpoint Cards Grid */}
+                <div className="grid">
+                  {endpointDetails.map((endpoint, idx) => (
+                    <div key={idx} className="card" tabIndex="0">
+                      <h3>{endpoint.endpointTitle || "N/A"}</h3>
+                      <p>{endpoint.description || "N/A"}</p>
+                      <p><strong>Method:</strong> {endpoint.method || "N/A"}</p>
+                      <p><strong>Endpoint URL:</strong> {endpoint.endpointUrl || "N/A"}</p>
+                      <p><strong>Last Updated:</strong> {endpoint.updated || "N/A"}</p>
+                      {endpoint.error && <p style={{ color: 'red' }}>Error: {endpoint.error}</p>}
+                      <a href={endpoint.href} target="_blank" rel="noopener noreferrer" className="tag">
+                        View Page
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+        </main>
+      </div>
+    </>
+  );
+};
+
+<OverviewTemplate />
