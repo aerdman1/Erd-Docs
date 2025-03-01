@@ -180,7 +180,36 @@ export const OverviewTemplate = () => {
   }
 
   // Single-line CSS to avoid MDX parse issues
-  const styleString = 'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}.container{max-width:1200px;margin:0 auto;padding:16px}.hdrTemplate{display:flex;align-items:center;justify-content:space-between;position:relative;margin-bottom:24px}.hdrContent h1{font-size:2rem;margin:0 0 8px 0}.hdrContent p{margin:0 0 16px 0;color:#4B5563}.hdrImage img{width:120px}.toggle-button{background:#018ef5;color:#fff;padding:8px 16px;border-radius:6px;border:none;cursor:pointer;margin-top:8px}.toggle-button:hover{background:#0170c7}.category-heading{text-align:center;font-size:1.4rem;font-weight:bold;margin:32px 0 16px 0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}@media(min-width:1400px){.grid{grid-template-columns:repeat(4,1fr)}}@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.grid{grid-template-columns:1fr}}.card{background:#fff;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s}.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}.card h3{margin:0 0 8px 0;font-size:1.1rem}.card p{margin:0 0 8px 0;color:#4B5563}.tag{display:inline-block;margin-top:8px;padding:4px 12px;border-radius:14px;background:#f3f4f6;color:#111;text-decoration:none}.tag:hover{background:#018ef5;color:#fff}.loading{font-style:italic;color:#555}.error{color:red;font-weight:bold}.slider-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px}.slider-card{flex:0 0 auto;min-width:280px;scroll-snap-align:start;background:#fff;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s}.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}.slider-card h3{margin:0 0 8px 0;font-size:1.1rem}.slider-card p{margin:0 0 8px 0;color:#4B5563}';
+  // Updated to:
+  // 1) Pin "View Doc" in bottom-left with absolute positioning in .card and .slider-card
+  // 2) Make the toggle button (toggle-button) more modern with gradient, hover scale, etc.
+  const styleString =
+    'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
+    '.container{max-width:1200px;margin:0 auto;padding:16px}'+
+    '.hdrTemplate{display:flex;align-items:center;justify-content:space-between;position:relative;margin-bottom:24px}'+
+    '.hdrContent h1{font-size:2rem;margin:0 0 8px 0}'+
+    '.hdrContent p{margin:0 0 16px 0;color:#4B5563}'+
+    '.hdrImage img{width:120px}'+
+    '.toggle-button{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;margin-top:8px;font-weight:bold;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s}'+
+    '.toggle-button:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,0.15)}'+
+    '.category-heading{text-align:center;font-size:1.4rem;font-weight:bold;margin:32px 0 16px 0}'+
+    '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}'+
+    '@media(min-width:1400px){.grid{grid-template-columns:repeat(4,1fr)}}'+
+    '@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}'+
+    '@media(max-width:600px){.grid{grid-template-columns:1fr}}'+
+    '.card{position:relative;min-height:220px;padding:16px 16px 60px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s;background:#fff;border-radius:6px;margin-bottom:0}'+
+    '.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,0.15)}'+
+    '.card h3{margin:0 0 8px 0;font-size:1.1rem}'+
+    '.card p{margin:0 0 8px 0;color:#4B5563}'+
+    '.card .tag{position:absolute;bottom:16px;left:16px}'+
+    '.slider-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px}'+
+    '.slider-card{position:relative;min-width:280px;padding:16px 16px 60px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s}'+
+    '.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,0.15)}'+
+    '.slider-card h3{margin:0 0 8px 0;font-size:1.1rem}'+
+    '.slider-card p{margin:0 0 8px 0;color:#4B5563}'+
+    '.slider-card .tag{position:absolute;bottom:16px;left:16px}'+
+    '.loading{font-style:italic;color:#555}'+
+    '.error{color:red;font-weight:bold}';
 
   return (
     <div>
