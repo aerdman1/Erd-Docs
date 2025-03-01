@@ -4,6 +4,6 @@ excerpt: Update an existing pet by Id
 api:
   file: ErdSpec1.json
   operationId: updatePet
-deprecated: true
+deprecated: false
 hidden: false
 ---
