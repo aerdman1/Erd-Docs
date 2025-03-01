@@ -8,7 +8,6 @@ export const OverviewTemplate = () => {
   const [endpointError, setEndpointError] = useState(null);
   const [fetching, setFetching] = useState(true);
 
-  // On mount, gather all /reference/ links from the sidebar, then fetch their content.
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
@@ -19,34 +18,54 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    const pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
-    if (!pageLinks.length) {
-      setEndpointError('No /reference/ links found in sidebar.');
+    // 1. Gather all .rm-Sidebar-section elements, then skip the first two
+    const allSections = navElement.querySelectorAll('section.rm-Sidebar-section');
+    const relevantSections = Array.from(allSections).slice(2); // skip first 2
+
+    if (!relevantSections.length) {
+      setEndpointError('No remaining sidebar sections after skipping the first two.');
       setFetching(false);
       return;
     }
 
-    // Build full URLs for each link (assuming same origin)
-    const fullUrls = Array.from(pageLinks).map(link => ({
-      title: link.textContent.trim(),
-      href: link.getAttribute('href'),
-      fullUrl: window.location.origin + link.getAttribute('href')
-    }));
+    // 2. From these sections, collect all anchor tags that start with /reference/
+    const uniqueLinks = new Map();
 
-    // Fetch each page, parse the HTML, store the results
-    Promise.all(
-      fullUrls.map(async link => {
-        try {
-          const resp = await fetch(link.fullUrl);
-          if (!resp.ok) throw new Error(`Network error fetching ${link.href}`);
-          const html = await resp.text();
-          const info = extractEndpointInfo(html);
-          return { ...link, ...info };
-        } catch (err) {
-          return { ...link, error: err.message };
+    relevantSections.forEach(section => {
+      const pageLinks = section.querySelectorAll('a[href^="/reference/"]');
+      pageLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (!uniqueLinks.has(href)) {
+          uniqueLinks.set(href, {
+            title: link.textContent.trim(),
+            href,
+            fullUrl: window.location.origin + href
+          });
         }
-      })
-    )
+      });
+    });
+
+    // If no links found
+    if (!uniqueLinks.size) {
+      setEndpointError('No /reference/ links found in the remaining sections.');
+      setFetching(false);
+      return;
+    }
+
+    // 3. Fetch each unique link
+    const fetches = Array.from(uniqueLinks.values()).map(async link => {
+      try {
+        const resp = await fetch(link.fullUrl);
+        if (!resp.ok) throw new Error(`Network error fetching ${link.href}`);
+        const html = await resp.text();
+        const info = extractEndpointInfo(html);
+        return { ...link, ...info };
+      } catch (err) {
+        return { ...link, error: err.message };
+      }
+    });
+
+    Promise.all(fetches)
       .then(results => {
         setEndpointDetails(results);
         setFetching(false);
@@ -58,24 +77,24 @@ export const OverviewTemplate = () => {
   }, []);
 
   // Helper: parse HTML to extract endpoint details
-  const extractEndpointInfo = (htmlString) => {
+  const extractEndpointInfo = htmlString => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlString, "text/html");
 
-      // Title: <header id="content-head"><h1>...</h1></header> or fallback to doc.title
+      // Title
       const titleEl = doc.querySelector("header#content-head h1");
       const endpointTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
 
-      // Description: from an element with role="doc-subtitle"
+      // Description
       const descEl = doc.querySelector("div[role='doc-subtitle']");
       const description = descEl ? descEl.innerText.trim() : "No Description Found";
 
-      // Method: any span.rm-APIMethod
+      // Method
       const methodEl = doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
-      // Endpoint URL: from a span with the class "headline-container-article-info-url..."
+      // Endpoint URL
       const urlEl = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
@@ -94,7 +113,6 @@ export const OverviewTemplate = () => {
   return (
     <>
       <style>{`
-        /* Minimal base styles */
         body {
           margin: 0;
           padding: 0;
@@ -134,7 +152,7 @@ export const OverviewTemplate = () => {
           width: 120px;
         }
 
-        /* Cards: 5 columns strictly, 5 rows if enough cards, etc. */
+        /* Strict 5-column layout (wraps on smaller screens) */
         .grid {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
@@ -172,8 +190,6 @@ export const OverviewTemplate = () => {
           background: #018ef5;
           color: #fff;
         }
-
-        /* Loader or error styling */
         .loading {
           font-style: italic;
           color: #555;
@@ -211,34 +227,47 @@ export const OverviewTemplate = () => {
           </div>
         </div>
 
-        {/* If still fetching, show a loader. Otherwise show cards or error. */}
         {fetching && !endpointError && (
           <p className="loading">Analyzing your API...</p>
         )}
         {endpointError && <p className="error">{endpointError}</p>}
 
-        {/* Cards */}
+        {/* Show the 5x5 card grid, skipping lines with “No … Found” */}
         {!fetching && !endpointError && endpointDetails.length > 0 && (
           <div className="grid">
-            {endpointDetails.map((ep, idx) => (
-              <div key={idx} className="card">
-                <h3>{ep.endpointTitle || ep.title || "Untitled"}</h3>
-                <p>{ep.description || "No Description Found."}</p>
-                <p><strong>Method:</strong> {ep.method || "N/A"}</p>
-                <p><strong>Endpoint:</strong> {ep.endpointUrl || "N/A"}</p>
-                {ep.error && <p className="error">Error: {ep.error}</p>}
+            {endpointDetails.map((ep, idx) => {
+              const showDescription = ep.description && ep.description !== "No Description Found";
+              const showMethod = ep.method && ep.method !== "No Method Found";
+              const showEndpoint = ep.endpointUrl && ep.endpointUrl !== "No Endpoint URL Found";
 
-                {/* Link to the actual doc page */}
-                <a
-                  href={ep.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="tag"
-                >
-                  View Doc
-                </a>
-              </div>
-            ))}
+              return (
+                <div key={idx} className="card">
+                  <h3>{ep.endpointTitle || ep.title || "Untitled"}</h3>
+
+                  {showDescription && <p>{ep.description}</p>}
+                  {showMethod && (
+                    <p>
+                      <strong>Method:</strong> {ep.method}
+                    </p>
+                  )}
+                  {showEndpoint && (
+                    <p>
+                      <strong>Endpoint:</strong> {ep.endpointUrl}
+                    </p>
+                  )}
+                  {ep.error && <p className="error">Error: {ep.error}</p>}
+
+                  <a
+                    href={ep.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="tag"
+                  >
+                    View Doc
+                  </a>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
