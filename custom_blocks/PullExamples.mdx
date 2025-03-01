@@ -1,13 +1,67 @@
 ---
 name: PullExamples
 ---
-import React from "react";
+import React, { useState } from "react";
 
 export const SimpleComponent = () => {
+  // State for the URL, fetched content, loading and error status.
+  const [url, setUrl] = useState("");
+  const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Trigger fetching when the button is clicked.
+  const handleFetch = () => {
+    if (!url) return; // Do nothing if URL is empty.
+    setLoading(true);
+    setError(null);
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return res.text();
+      })
+      .then((html) => {
+        setContent(html);
+      })
+      .catch((err) => {
+        console.error("Error fetching content:", err);
+        setError("Error fetching content");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   return (
-    <div>
+    <div style={{ padding: "1rem", border: "1px solid #ccc" }}>
       <h3>Simple Component</h3>
-      <p>This is static content.</p>
+      <p>This component can fetch content from another page on your site.</p>
+      
+      {/* Input for URL and fetch button */}
+      <div style={{ marginBottom: "1rem" }}>
+        <input
+          type="text"
+          placeholder="Enter URL to fetch (e.g. https://yoursite.com/page)"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          style={{ width: "300px", marginRight: "10px" }}
+        />
+        <button onClick={handleFetch}>Fetch Content</button>
+      </div>
+
+      {/* Display loading, error or fetched content */}
+      {loading && <p>Loading...</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {content && (
+        <div>
+          <h4>Fetched Content:</h4>
+          <div dangerouslySetInnerHTML={{ __html: content }} />
+        </div>
+      )}
     </div>
   );
 };
+
+<SimpleComponent />
