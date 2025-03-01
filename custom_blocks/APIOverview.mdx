@@ -7,7 +7,7 @@ export const OverviewTemplate = () => {
   const [categories, setCategories] = useState([]);
   const [fetchedEndpoints, setFetchedEndpoints] = useState(new Map());
   const [endpointError, setEndpointError] = useState(null);
-  const [fetching, setFetching] = useState(true);
+  const [fetching, setFetching] = useState(false);
 
   // Toggle: false => grid, true => slider
   const [sliderView, setSliderView] = useState(false);
@@ -15,8 +15,12 @@ export const OverviewTemplate = () => {
   // NEW: Search term
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
+  // Function to fetch sidebar data once, or on-demand
+  const fetchSidebarData = () => {
     if (typeof document === 'undefined') return;
+
+    setFetching(true);
+    setEndpointError(null);
 
     const navElement = document.querySelector('.rm-Sidebar');
     if (!navElement) {
@@ -92,6 +96,11 @@ export const OverviewTemplate = () => {
         setEndpointError(err.message);
         setFetching(false);
       });
+  };
+
+  // Run fetchSidebarData once on initial load
+  useEffect(() => {
+    fetchSidebarData();
   }, []);
 
   const extractEndpointInfo = (htmlString) => {
@@ -152,7 +161,6 @@ export const OverviewTemplate = () => {
         {showMethod && <p><strong>Method:</strong> {ep.method}</p>}
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
-
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View
         </a>
@@ -172,7 +180,6 @@ export const OverviewTemplate = () => {
         {showMethod && <p><strong>Method:</strong> {ep.method}</p>}
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
-
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View Doc
         </a>
@@ -180,17 +187,14 @@ export const OverviewTemplate = () => {
     );
   }
 
-  // Single-line CSS with:
-  // 1) A .tag-button that looks like a real button
-  // 2) A .search-input for the filter
-  // 3) .search-container to line up the toggle and search side by side
+  // Single-line CSS with all styles (including the new refresh button)
   const styleString =
     'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
     '.container{max-width:1200px;margin:0 auto;padding:16px}'+
     '.hdrTemplate{display:flex;align-items:center;justify-content:space-between;position:relative;margin-bottom:24px}'+
     '.hdrContent h1{font-size:2rem;margin:0 0 8px 0}'+
     '.hdrContent p{margin:0 0 16px 0;color:#4B5563}'+
-    '.hdrImage img{width:230px;position: absolute;right: 5%;top: -90px;}}'+
+    '.hdrImage img{width:230px;position: absolute;right: 5%;top: -90px;}'+
     '.search-container{display:flex;align-items:center;gap:10px;margin-top:8px}'+
     '.toggle-button{margin-right:10px;background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s}'+
     '.toggle-button:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,0.15)}'+
@@ -204,8 +208,8 @@ export const OverviewTemplate = () => {
     '.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}'+
     '.card h3{margin:0 0 8px 0;font-size:1.1rem}'+
     '.card p{margin:0 0 8px 0;color:#4B5563;font-size:13px}'+
-		'.tag-button{position:absolute;bottom:16px;left:16px;right:16px;text-align:center;background:#3b82f6;color:#fff;padding:8px 0;border-radius:6px;text-decoration:none;font-weight:500;transition:background 0.2s;box-sizing:border-box}'+
-		'.tag-button:hover{background:#2563eb;color:#fff}'+
+    '.tag-button{position:absolute;bottom:16px;left:16px;right:16px;text-align:center;background:#3b82f6;color:#fff;padding:8px 0;border-radius:6px;text-decoration:none;font-weight:500;transition:background 0.2s;box-sizing:border-box}'+
+    '.tag-button:hover{background:#2563eb;color:#fff}'+
     '.slider-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px}'+
     '.slider-card{position:relative;min-width:230px;padding:16px 16px 40px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s}'+
     '.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}'+
@@ -213,7 +217,11 @@ export const OverviewTemplate = () => {
     '.slider-card p{margin:0 0 8px 0;color:#4B5563}'+
     '.slider-card .tag-button{position:absolute;bottom:16px;left:16px}'+
     '.loading{font-style:italic;color:#555}'+
-    '.error{color:red;font-weight:bold}';
+    '.error{color:red;font-weight:bold}'+
+    '.refresh-container{margin-top:16px;text-align:right}'+
+    '.refresh-button{background:#3b82f6;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:background 0.2s}'+
+    '.refresh-button:hover:not(:disabled){background:#2563eb}'+
+    '.refresh-button:disabled{background:#bbb;cursor:not-allowed}';
 
   return (
     <div>
@@ -236,6 +244,11 @@ export const OverviewTemplate = () => {
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
+            <div className='refresh-container'>
+              <button className='refresh-button' onClick={fetchSidebarData} disabled={fetching}>
+                {fetching ? 'Refreshing...' : 'Refresh Endpoints'}
+              </button>
+            </div>
           </div>
           <div className='hdrImage'>
             <img src='https://owlbertsio-resized.s3.amazonaws.com/Popper.psd.full.png' alt='Header Owl'/>
@@ -248,12 +261,10 @@ export const OverviewTemplate = () => {
         {!fetching && !endpointError && categories.length > 0 && (
           <div>
             {categories.map((cat, catIdx) => {
-              // Deduplicate
+              // Deduplicate and filter links based on search term
               const dedupedLinks = deduplicateDocs(cat.links);
-              // Filter by searchTerm
               const filtered = dedupedLinks.filter(link => passesSearch(link));
 
-              // If no matches in this category, skip
               if (!filtered.length) return null;
 
               return (
@@ -286,6 +297,5 @@ export const OverviewTemplate = () => {
     </div>
   );
 };
-
 
 <OverviewTemplate />
