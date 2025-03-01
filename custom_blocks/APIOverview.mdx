@@ -4,7 +4,8 @@ name: APIOverview
 import React, { useEffect, useState } from 'react';
 
 export const OverviewTemplate = () => {
-  const [endpointDetails, setEndpointDetails] = useState([]);
+  const [categories, setCategories] = useState([]);          // Each category = { name, links: [ { href, title, fullUrl } ] }
+  const [fetchedEndpoints, setFetchedEndpoints] = useState(new Map()); // href -> { endpointTitle, description, method, endpointUrl, error }
   const [endpointError, setEndpointError] = useState(null);
   const [fetching, setFetching] = useState(true);
 
@@ -18,56 +19,74 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    // 1. Gather all .rm-Sidebar-section elements, then skip the first two
+    // 1. Grab all .rm-Sidebar-section elements, skip first 2
     const allSections = navElement.querySelectorAll('section.rm-Sidebar-section');
-    const relevantSections = Array.from(allSections).slice(2); // skip first 2
-
+    const relevantSections = Array.from(allSections).slice(2);
     if (!relevantSections.length) {
       setEndpointError('No remaining sidebar sections after skipping the first two.');
       setFetching(false);
       return;
     }
 
-    // 2. From these sections, collect all anchor tags that start with /reference/
-    const uniqueLinks = new Map();
+    // 2. Build a categories array: { name, links: [ { href, title, fullUrl } ] }
+    const catArray = relevantSections.map(section => {
+      // Category name from <h2> if present
+      const headingEl = section.querySelector('h2');
+      const name = headingEl ? headingEl.innerText.trim() : 'Untitled Category';
 
-    relevantSections.forEach(section => {
+      // Links in this section
       const pageLinks = section.querySelectorAll('a[href^="/reference/"]');
-      pageLinks.forEach(link => {
+      const links = Array.from(pageLinks).map(link => {
         const href = link.getAttribute('href');
-        if (!uniqueLinks.has(href)) {
-          uniqueLinks.set(href, {
-            title: link.textContent.trim(),
-            href,
-            fullUrl: window.location.origin + href
-          });
+        return {
+          href,
+          title: link.textContent.trim(),
+          fullUrl: window.location.origin + href
+        };
+      });
+
+      return { name, links };
+    });
+
+    // 3. Collect all unique links from all categories (so we only fetch each once)
+    const uniqueLinksMap = new Map();
+    catArray.forEach(cat => {
+      cat.links.forEach(l => {
+        if (!uniqueLinksMap.has(l.href)) {
+          uniqueLinksMap.set(l.href, l);
         }
       });
     });
 
-    // If no links found
-    if (!uniqueLinks.size) {
-      setEndpointError('No /reference/ links found in the remaining sections.');
+    // If no unique links
+    if (!uniqueLinksMap.size) {
+      setEndpointError('No /reference/ links found in these categories.');
       setFetching(false);
       return;
     }
 
-    // 3. Fetch each unique link
-    const fetches = Array.from(uniqueLinks.values()).map(async link => {
+    // 4. Fetch each unique link once, parse the HTML
+    const fetches = Array.from(uniqueLinksMap.values()).map(async link => {
       try {
         const resp = await fetch(link.fullUrl);
         if (!resp.ok) throw new Error(`Network error fetching ${link.href}`);
         const html = await resp.text();
         const info = extractEndpointInfo(html);
-        return { ...link, ...info };
+        return [link.href, info]; // We'll store by href
       } catch (err) {
-        return { ...link, error: err.message };
+        return [link.href, { error: err.message }];
       }
     });
 
     Promise.all(fetches)
-      .then(results => {
-        setEndpointDetails(results);
+      .then(resultsArray => {
+        // Build a Map(href -> { endpointTitle, description, method, endpointUrl, error })
+        const endpointsMap = new Map();
+        resultsArray.forEach(([href, data]) => {
+          endpointsMap.set(href, data);
+        });
+        setFetchedEndpoints(endpointsMap);
+        setCategories(catArray); // Save the categories array
         setFetching(false);
       })
       .catch(err => {
@@ -77,7 +96,7 @@ export const OverviewTemplate = () => {
   }, []);
 
   // Helper: parse HTML to extract endpoint details
-  const extractEndpointInfo = htmlString => {
+  const extractEndpointInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlString, "text/html");
@@ -150,6 +169,14 @@ export const OverviewTemplate = () => {
         }
         .hdrImage img {
           width: 120px;
+        }
+
+        /* Category heading */
+        .category-heading {
+          text-align: center;
+          font-size: 1.4rem;
+          font-weight: bold;
+          margin: 32px 0 16px 0;
         }
 
         /* Strict 5-column layout (wraps on smaller screens) */
@@ -232,48 +259,58 @@ export const OverviewTemplate = () => {
         )}
         {endpointError && <p className="error">{endpointError}</p>}
 
-        {/* Show the 5x5 card grid, skipping lines with “No … Found” */}
-        {!fetching && !endpointError && endpointDetails.length > 0 && (
-          <div className="grid">
-            {endpointDetails.map((ep, idx) => {
-              const showDescription = ep.description && ep.description !== "No Description Found";
-              const showMethod = ep.method && ep.method !== "No Method Found";
-              const showEndpoint = ep.endpointUrl && ep.endpointUrl !== "No Endpoint URL Found";
-
+        {/* 5x5 card grid for each category */}
+        {!fetching && !endpointError && categories.length > 0 && (
+          <>
+            {categories.map((cat, catIdx) => {
+              // We'll show the category heading and a grid of that category's links
               return (
-                <div key={idx} className="card">
-                  <h3>{ep.endpointTitle || ep.title || "Untitled"}</h3>
+                <div key={catIdx}>
+                  {/* Category Title */}
+                  <div className="category-heading">{cat.name}</div>
+                  <div className="grid">
+                    {cat.links.map((link, idx) => {
+                      const ep = fetchedEndpoints.get(link.href) || {};
+                      // Hide lines that say "No ... Found"
+                      const showDescription = ep.description && ep.description !== "No Description Found";
+                      const showMethod = ep.method && ep.method !== "No Method Found";
+                      const showEndpoint = ep.endpointUrl && ep.endpointUrl !== "No Endpoint URL Found";
 
-                  {showDescription && <p>{ep.description}</p>}
-                  {showMethod && (
-                    <p>
-                      <strong>Method:</strong> {ep.method}
-                    </p>
-                  )}
-                  {showEndpoint && (
-                    <p>
-                      <strong>Endpoint:</strong> {ep.endpointUrl}
-                    </p>
-                  )}
-                  {ep.error && <p className="error">Error: {ep.error}</p>}
-
-                  <a
-                    href={ep.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="tag"
-                  >
-                    View Doc
-                  </a>
+                      return (
+                        <div key={idx} className="card">
+                          <h3>{ep.endpointTitle || link.title || "Untitled"}</h3>
+                          {showDescription && <p>{ep.description}</p>}
+                          {showMethod && (
+                            <p>
+                              <strong>Method:</strong> {ep.method}
+                            </p>
+                          )}
+                          {showEndpoint && (
+                            <p>
+                              <strong>Endpoint:</strong> {ep.endpointUrl}
+                            </p>
+                          )}
+                          {ep.error && <p className="error">Error: {ep.error}</p>}
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="tag"
+                          >
+                            View Doc
+                          </a>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               );
             })}
-          </div>
+          </>
         )}
       </div>
     </>
   );
 };
-
 
 <OverviewTemplate />
