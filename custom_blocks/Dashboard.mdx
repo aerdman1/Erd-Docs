@@ -21,15 +21,18 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
     if (typeof document !== "undefined") {
       const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
+        // Count all page links that start with "/reference/"
         const pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
         setPageCount(pageLinks.length);
 
+        // Extract categories from sidebar sections
         const sectionElements = navElement.querySelectorAll('section.rm-Sidebar-section');
         const catArray = [];
         sectionElements.forEach((section) => {
           const heading = section.querySelector('h2');
           if (heading) {
             const title = heading.textContent.trim();
+            // Grab all links inside this category.
             const links = section.querySelectorAll('a');
             const linkArray = Array.from(links).map(link => ({
               title: link.textContent.trim(),
@@ -42,6 +45,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
         setTotalCategories(catArray.length);
       }
 
+      // Parse Hub‑Me user data from the embedded script.
       const hubMeElement = document.getElementById("hub-me");
       if (hubMeElement) {
         let dataJson = hubMeElement.getAttribute("data-json");
@@ -81,7 +85,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       const methodEl = doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
-      // Endpoint URL: from a span with the unique class (adjust as needed)
+      // Endpoint URL: from a span with a unique class (adjust as needed)
       const urlEl = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
@@ -175,12 +179,12 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                 <p className="text-xl font-semibold mb-2">User Information</p>
                 {hubData ? (
                   <div className="space-y-1">
-                    <p><span className="font-semibold">Name:</span> {hubData.user?.name}</p>
-                    <p><span className="font-semibold">Email:</span> {hubData.user?.email}</p>
-                    <p><span className="font-semibold">Logged In:</span> {hubData.loggedIn ? "Yes" : "No"}</p>
-                    {hubData.isAdmin && <p><span className="font-semibold">Admin:</span> Yes</p>}
+                    <p><strong>Name:</strong> {hubData.user?.name}</p>
+                    <p><strong>Email:</strong> {hubData.user?.email}</p>
+                    <p><strong>Logged In:</strong> {hubData.loggedIn ? "Yes" : "No"}</p>
+                    {hubData.isAdmin && <p><strong>Admin:</strong> Yes</p>}
                     {hubData.metaData && hubData.metaData.length > 0 && (
-                      <p><span className="font-semibold">Project:</span> {hubData.metaData[0].name}</p>
+                      <p><strong>Project:</strong> {hubData.metaData[0].name}</p>
                     )}
                   </div>
                 ) : (
@@ -262,8 +266,12 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                   ))}
                 </ul>
               </div>
-              {/* Endpoint Cards: responsive grid up to 5 columns */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {/* Endpoint Cards Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '1rem'
+              }}>
                 {endpointDetails.map((endpoint, idx) => (
                   <div key={idx} className="p-4 border rounded shadow-md">
                     <p><strong>Page Title:</strong> {endpoint.endpointTitle || "N/A"}</p>
@@ -286,4 +294,4 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   );
 };
 
-<DashboardComponent header="Dashboard" />
+<DashboardComponent header="Interactive Dashboard" />
