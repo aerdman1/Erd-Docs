@@ -5,15 +5,17 @@ import React, { useEffect, useState } from 'react';
 
 export const OverviewTemplate = () => {
   const [categories, setCategories] = useState([]);
-  const [fetchedEndpoints, setFetchedEndpoints] = useState(new Map()); // href -> doc info
+  const [fetchedEndpoints, setFetchedEndpoints] = useState(new Map());
   const [endpointError, setEndpointError] = useState(null);
   const [fetching, setFetching] = useState(true);
 
-  // Toggle: false => grid view, true => slider view
+  // Toggle: false => grid, true => slider
   const [sliderView, setSliderView] = useState(false);
 
+  // NEW: Search term
+  const [searchTerm, setSearchTerm] = useState('');
+
   useEffect(() => {
-    // If not in browser, bail out
     if (typeof document === 'undefined') return;
 
     const navElement = document.querySelector('.rm-Sidebar');
@@ -23,7 +25,7 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    // 1) Grab all .rm-Sidebar-section elements, skip first 2
+    // 1) Grab .rm-Sidebar-section, skip first 2
     const allSections = navElement.querySelectorAll('section.rm-Sidebar-section');
     const relevantSections = Array.from(allSections).slice(2);
     if (!relevantSections.length) {
@@ -32,7 +34,7 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    // 2) Build categories array: { name, links: [ { href, title, fullUrl } ] }
+    // 2) Build categories
     const catArray = relevantSections.map(section => {
       const headingEl = section.querySelector('h2');
       const name = headingEl ? headingEl.innerText.trim() : 'UntitledCategory';
@@ -48,7 +50,7 @@ export const OverviewTemplate = () => {
       return { name, links };
     });
 
-    // 3) Collect all unique links by href
+    // 3) Unique links
     const uniqueLinksMap = new Map();
     catArray.forEach(cat => {
       cat.links.forEach(l => {
@@ -63,7 +65,7 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    // 4) Fetch each unique link
+    // 4) Fetch
     const fetches = Array.from(uniqueLinksMap.values()).map(async link => {
       try {
         const resp = await fetch(link.fullUrl);
@@ -92,24 +94,18 @@ export const OverviewTemplate = () => {
       });
   }, []);
 
-  // Parse HTML to extract endpoint details, using placeholders with no spaces
   const extractEndpointInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlString, 'text/html');
-
       const titleEl = doc.querySelector('header#content-head h1');
       const endpointTitle = titleEl ? titleEl.innerText.trim() : doc.title || 'NoTitleFound';
-
       const descEl = doc.querySelector('div[role="doc-subtitle"]');
       const description = descEl ? descEl.innerText.trim() : 'NoDescriptionFound';
-
       const methodEl = doc.querySelector('span.rm-APIMethod');
       const method = methodEl ? methodEl.innerText.trim() : 'NoMethodFound';
-
       const urlEl = doc.querySelector('span.headline-container-article-info-url2nV_XrjpFuVQ');
       const endpointUrl = urlEl ? urlEl.innerText.trim() : 'NoEndpointURLFound';
-
       return { endpointTitle, description, method, endpointUrl };
     } catch (err) {
       return {
@@ -122,7 +118,7 @@ export const OverviewTemplate = () => {
     }
   };
 
-  // Deduplicate final docs by (endpointTitle + endpointUrl + method)
+  // Deduplicate final docs
   const deduplicateDocs = (links) => {
     const seen = new Set();
     const deduped = [];
@@ -137,12 +133,18 @@ export const OverviewTemplate = () => {
     return deduped;
   };
 
+  // Filter by searchTerm
+  function passesSearch(link) {
+    const ep = fetchedEndpoints.get(link.href) || {};
+    const text = (link.title + ' ' + ep.endpointTitle + ' ' + ep.description + ' ' + ep.method + ' ' + ep.endpointUrl).toLowerCase();
+    return text.includes(searchTerm.toLowerCase());
+  }
+
   // Renders a single card for grid
   function renderGridCard(ep, link, idx) {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
     const showEndpoint = ep.endpointUrl && ep.endpointUrl !== 'NoEndpointURLFound';
-
     return (
       <div key={'grid-' + idx} className='card'>
         <h3>{ep.endpointTitle || link.title || 'Untitled'}</h3>
@@ -151,7 +153,7 @@ export const OverviewTemplate = () => {
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
 
-        <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag'>
+        <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View Doc
         </a>
       </div>
@@ -163,7 +165,6 @@ export const OverviewTemplate = () => {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
     const showEndpoint = ep.endpointUrl && ep.endpointUrl !== 'NoEndpointURLFound';
-
     return (
       <div key={'slider-' + idx} className='slider-card'>
         <h3>{ep.endpointTitle || link.title || 'Untitled'}</h3>
@@ -172,17 +173,17 @@ export const OverviewTemplate = () => {
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
 
-        <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag'>
+        <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View Doc
         </a>
       </div>
     );
   }
 
-  // Single-line CSS to avoid MDX parse issues
-  // Updated to:
-  // 1) Pin "View Doc" in bottom-left with absolute positioning in .card and .slider-card
-  // 2) Make the toggle button (toggle-button) more modern with gradient, hover scale, etc.
+  // Single-line CSS with:
+  // 1) A .tag-button that looks like a real button
+  // 2) A .search-input for the filter
+  // 3) .search-container to line up the toggle and search side by side
   const styleString =
     'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
     '.container{max-width:1200px;margin:0 auto;padding:16px}'+
@@ -190,24 +191,27 @@ export const OverviewTemplate = () => {
     '.hdrContent h1{font-size:2rem;margin:0 0 8px 0}'+
     '.hdrContent p{margin:0 0 16px 0;color:#4B5563}'+
     '.hdrImage img{width:120px}'+
-    '.toggle-button{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;margin-top:8px;font-weight:bold;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s}'+
+    '.search-container{display:flex;align-items:center;gap:10px;margin-top:8px}'+
+    '.toggle-button{background:linear-gradient(90deg,#06b6d4,#3b82f6);color:#fff;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:bold;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:transform 0.2s}'+
     '.toggle-button:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,0.15)}'+
+    '.search-input{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:1rem}'+
     '.category-heading{text-align:center;font-size:1.4rem;font-weight:bold;margin:32px 0 16px 0}'+
     '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}'+
     '@media(min-width:1400px){.grid{grid-template-columns:repeat(4,1fr)}}'+
     '@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}'+
     '@media(max-width:600px){.grid{grid-template-columns:1fr}}'+
-    '.card{position:relative;min-height:220px;padding:16px 16px 60px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s;background:#fff;border-radius:6px;margin-bottom:0}'+
-    '.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,0.15)}'+
+    '.card{position:relative;min-height:220px;padding:16px 16px 60px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s;background:#fff;border-radius:6px;margin-bottom:0}'+
+    '.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}'+
     '.card h3{margin:0 0 8px 0;font-size:1.1rem}'+
     '.card p{margin:0 0 8px 0;color:#4B5563}'+
-    '.card .tag{position:absolute;bottom:16px;left:16px}'+
+    '.tag-button{position:absolute;bottom:16px;left:16px;background:#3b82f6;color:#fff;padding:8px 14px;border-radius:6px;text-decoration:none;font-weight:500;transition:background .2s}'+
+    '.tag-button:hover{background:#2563eb}'+
     '.slider-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px}'+
-    '.slider-card{position:relative;min-width:280px;padding:16px 16px 60px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s}'+
-    '.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,0.15)}'+
+    '.slider-card{position:relative;min-width:280px;padding:16px 16px 60px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s}'+
+    '.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}'+
     '.slider-card h3{margin:0 0 8px 0;font-size:1.1rem}'+
     '.slider-card p{margin:0 0 8px 0;color:#4B5563}'+
-    '.slider-card .tag{position:absolute;bottom:16px;left:16px}'+
+    '.slider-card .tag-button{position:absolute;bottom:16px;left:16px}'+
     '.loading{font-style:italic;color:#555}'+
     '.error{color:red;font-weight:bold}';
 
@@ -220,9 +224,18 @@ export const OverviewTemplate = () => {
           <div className='hdrContent'>
             <h1>Endpoint Directory</h1>
             <p>Your toolkit for building robust APIs and seamless integrations.</p>
-            <button className='toggle-button' onClick={() => setSliderView(!sliderView)}>
-              {sliderView ? 'View as Grid' : 'View as Slider'}
-            </button>
+            <div className='search-container'>
+              <button className='toggle-button' onClick={() => setSliderView(!sliderView)}>
+                {sliderView ? 'View as Grid' : 'View as Slider'}
+              </button>
+              <input
+                className='search-input'
+                type='text'
+                placeholder='Search endpoints...'
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
           <div className='hdrImage'>
             <img src='https://owlbertsio-resized.s3.amazonaws.com/Popper.psd.full.png' alt='Header Owl'/>
@@ -235,15 +248,21 @@ export const OverviewTemplate = () => {
         {!fetching && !endpointError && categories.length > 0 && (
           <div>
             {categories.map((cat, catIdx) => {
+              // Deduplicate
               const dedupedLinks = deduplicateDocs(cat.links);
+              // Filter by searchTerm
+              const filtered = dedupedLinks.filter(link => passesSearch(link));
+
+              // If no matches in this category, skip
+              if (!filtered.length) return null;
+
               return (
                 <div key={'cat-' + catIdx}>
                   <div className='category-heading'>{cat.name}</div>
 
-                  {/* If sliderView is false => grid, else => slider */}
                   {!sliderView && (
                     <div className='grid'>
-                      {dedupedLinks.map((link, idx) => {
+                      {filtered.map((link, idx) => {
                         const ep = fetchedEndpoints.get(link.href) || {};
                         return renderGridCard(ep, link, idx);
                       })}
@@ -252,7 +271,7 @@ export const OverviewTemplate = () => {
 
                   {sliderView && (
                     <div className='slider-row'>
-                      {dedupedLinks.map((link, idx) => {
+                      {filtered.map((link, idx) => {
                         const ep = fetchedEndpoints.get(link.href) || {};
                         return renderSliderCard(ep, link, idx);
                       })}
@@ -267,5 +286,6 @@ export const OverviewTemplate = () => {
     </div>
   );
 };
+
 
 <OverviewTemplate />
