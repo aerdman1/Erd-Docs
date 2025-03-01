@@ -4,7 +4,7 @@ name: Dashboard
 import React, { useEffect, useState } from 'react';
 
 export const DashboardComponent = ({ header = "My Dashboard" }) => {
-  // Existing states from your dashboard
+  // Existing states
   const [pageCount, setPageCount] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
   const [categories, setCategories] = useState([]);
@@ -12,7 +12,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
 
   // New states for endpoint details
-  const [endpointDetails, setEndpointDetails] = useState([]); // Array of objects
+  const [endpointDetails, setEndpointDetails] = useState([]);
   const [fetchingEndpoints, setFetchingEndpoints] = useState(false);
   const [endpointError, setEndpointError] = useState(null);
 
@@ -21,18 +21,15 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
     if (typeof document !== "undefined") {
       const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
-        // Count all page links that start with "/reference/"
         const pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
         setPageCount(pageLinks.length);
 
-        // Extract categories from sidebar sections
         const sectionElements = navElement.querySelectorAll('section.rm-Sidebar-section');
         const catArray = [];
         sectionElements.forEach((section) => {
           const heading = section.querySelector('h2');
           if (heading) {
             const title = heading.textContent.trim();
-            // Grab all links inside this category.
             const links = section.querySelectorAll('a');
             const linkArray = Array.from(links).map(link => ({
               title: link.textContent.trim(),
@@ -45,7 +42,6 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
         setTotalCategories(catArray.length);
       }
 
-      // Parse Hub‑Me user data if available
       const hubMeElement = document.getElementById("hub-me");
       if (hubMeElement) {
         let dataJson = hubMeElement.getAttribute("data-json");
@@ -73,23 +69,23 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlString, "text/html");
 
-      // Extract Title: look for header with id "content-head" and an <h1>
+      // Title: try header with id "content-head" then fallback to document title
       const titleEl = doc.querySelector("header#content-head h1");
-      const endpointTitle = titleEl ? titleEl.innerText.trim() : "No Title Found";
+      const endpointTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
 
-      // Extract Description: from an element with role="doc-subtitle"
+      // Description: from element with role "doc-subtitle"
       const descEl = doc.querySelector("div[role='doc-subtitle']");
       const description = descEl ? descEl.innerText.trim() : "No Description Found";
 
-      // Extract HTTP Method: from the first element with class "rm-APIMethod" inside header
-      const methodEl = doc.querySelector("header#content-head span.rm-APIMethod");
+      // HTTP Method: look for any element with class "rm-APIMethod"
+      const methodEl = doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
-      // Extract Endpoint URL: from a span with a unique class (adjust selector if needed)
+      // Endpoint URL: from a span with the unique class (adjust as needed)
       const urlEl = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
-      // Extract Last Updated info: from a <p> with class "DateLine"
+      // Last Updated info: from a <p> with class "DateLine"
       const updatedEl = doc.querySelector("p.DateLine");
       const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
 
@@ -104,11 +100,10 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   const fetchAllEndpointDetails = async () => {
     setFetchingEndpoints(true);
     setEndpointError(null);
-    // Flatten all links from categories
+    // Flatten links from categories and filter for reference pages
     const flattenedLinks = categories.flatMap(cat => cat.links);
-    // Filter to reference pages
     const referenceLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/reference/"));
-    // Build full URL for each link (assumes same origin)
+    // Build full URL for each link (assuming same origin)
     const fullUrls = referenceLinks.map(link => ({
       ...link,
       fullUrl: window.location.origin + link.href
@@ -267,8 +262,8 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                   ))}
                 </ul>
               </div>
-              {/* Endpoint Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Endpoint Cards: responsive grid up to 5 columns */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {endpointDetails.map((endpoint, idx) => (
                   <div key={idx} className="p-4 border rounded shadow-md">
                     <p><strong>Page Title:</strong> {endpoint.endpointTitle || "N/A"}</p>
