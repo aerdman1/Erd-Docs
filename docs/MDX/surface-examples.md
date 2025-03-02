@@ -1,5 +1,5 @@
 ---
-title: Surface Examples - PET
+title: Surface Examples
 deprecated: false
 hidden: false
 metadata:
