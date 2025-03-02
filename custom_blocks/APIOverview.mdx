@@ -69,16 +69,16 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    // 4) Fetch
+    // 4) Fetch endpoints
     const fetches = Array.from(uniqueLinksMap.values()).map(async link => {
       try {
         const resp = await fetch(link.fullUrl);
         if (!resp.ok) throw new Error('Network error fetching ' + link.href);
         const html = await resp.text();
-        // Debug: Log the raw HTML for this endpoint
-        console.log(`Raw HTML for ${link.href}:`, html);
+        // (Optional debug: console.log the raw HTML)
+        // console.log(`Raw HTML for ${link.href}:`, html);
         const info = extractEndpointInfo(html);
-        console.log(`Info for ${link.href}:`, info); // Debug: log extracted info
+        console.log(`Info for ${link.href}:`, info); // Debug log
         return [link.href, info];
       } catch (err) {
         return [link.href, { error: err.message }];
@@ -106,26 +106,95 @@ export const OverviewTemplate = () => {
     fetchSidebarData();
   }, []);
 
+  // Updated extractEndpointInfo that builds an example payload based on form parameters
   const extractEndpointInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlString, 'text/html');
+
       const titleEl = doc.querySelector('header#content-head h1');
       const endpointTitle = titleEl ? titleEl.innerText.trim() : doc.title || 'NoTitleFound';
+
       const descEl = doc.querySelector('div[role="doc-subtitle"]');
       const description = descEl ? descEl.innerText.trim() : 'NoDescriptionFound';
+
       const methodEl = doc.querySelector('span.rm-APIMethod');
       const method = methodEl ? methodEl.innerText.trim() : 'NoMethodFound';
+
       const urlEl = doc.querySelector('span.headline-container-article-info-url2nV_XrjpFuVQ');
       const endpointUrl = urlEl ? urlEl.innerText.trim() : 'NoEndpointURLFound';
-      // NEW: Extract the example code snippet
-      let exampleEl = doc.querySelector('div.APIResponse_asCodeSnippet17b9royy9c6e pre.CodeSnippet');
-      if (!exampleEl) {
-        exampleEl = doc.querySelector('pre.CodeSnippet');
-      }
-      const example = exampleEl ? exampleEl.innerText.trim() : 'NoExampleFound';
 
-      return { endpointTitle, description, method, endpointUrl, example };
+      // Build example payload from the form parameters
+      let examplePayload = 'NoExampleFound';
+      const formEl = doc.querySelector('form.param-type.rm-APISchema');
+      if (formEl) {
+        const exampleObj = {};
+
+        // 1. Extract simple input fields by reading their "label" and "placeholder"
+        const inputs = formEl.querySelectorAll('input');
+        inputs.forEach(input => {
+          const fieldName = input.getAttribute('label'); // e.g., "id", "name"
+          const placeholder = input.getAttribute('placeholder');
+          if (fieldName && placeholder) {
+            const num = parseFloat(placeholder);
+            exampleObj[fieldName] = isNaN(num) ? placeholder : num;
+          }
+        });
+
+        // 2. Extract select value (for example, for "status")
+        const selectEl = formEl.querySelector('select');
+        if (selectEl) {
+          const option = selectEl.querySelector('option[value]:not([value=""])');
+          if (option) {
+            // Try to get field name from the corresponding label
+            const statusLabelEl = formEl.querySelector(`label[for="${selectEl.id}"]`);
+            const fieldName = statusLabelEl ? statusLabelEl.innerText.trim().toLowerCase() : 'status';
+            exampleObj[fieldName] = option.value;
+          }
+        }
+
+        // 3. For the "category" object, try to extract inputs within the subform
+        const categoryEl = formEl.querySelector('#body-updatePet_category');
+        if (categoryEl) {
+          const catObj = {};
+          const catInputs = categoryEl.querySelectorAll('input');
+          catInputs.forEach(input => {
+            const fieldName = input.getAttribute('label');
+            const placeholder = input.getAttribute('placeholder');
+            if (fieldName && placeholder) {
+              const num = parseFloat(placeholder);
+              catObj[fieldName] = isNaN(num) ? placeholder : num;
+            }
+          });
+          // Use extracted values if available; otherwise fallback to default values.
+          exampleObj['category'] = Object.keys(catObj).length > 0 ? catObj : { id: 1, name: "Dogs" };
+        } else {
+          // Fallback default for category
+          exampleObj['category'] = { id: 1, name: "Dogs" };
+        }
+
+        // 4. For photoUrls array, set a default if not provided by inputs.
+        if (!exampleObj['photoUrls']) {
+          exampleObj['photoUrls'] = ["string"];
+        }
+
+        // 5. For tags array, set a default if not provided.
+        if (!exampleObj['tags']) {
+          exampleObj['tags'] = [{ id: 0, name: "string" }];
+        }
+
+        // 6. Fallback for id and name if not already extracted.
+        if (!exampleObj['id']) {
+          exampleObj['id'] = 10;
+        }
+        if (!exampleObj['name']) {
+          exampleObj['name'] = "doggie";
+        }
+
+        examplePayload = JSON.stringify(exampleObj, null, 2);
+      }
+
+      return { endpointTitle, description, method, endpointUrl, example: examplePayload };
     } catch (err) {
       return {
         endpointTitle: 'ErrorParsing',
@@ -176,8 +245,6 @@ export const OverviewTemplate = () => {
           <pre className="example-code">{ep.example}</pre>
         )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
-        {/* Debug: Uncomment the line below to dump the full object */}
-        {/* <pre>{JSON.stringify(ep, null, 2)}</pre> */}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View
         </a>
@@ -201,8 +268,6 @@ export const OverviewTemplate = () => {
           <pre className="example-code">{ep.example}</pre>
         )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
-        {/* Debug: Uncomment the line below to dump the full object */}
-        {/* <pre>{JSON.stringify(ep, null, 2)}</pre> */}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View Doc
         </a>
