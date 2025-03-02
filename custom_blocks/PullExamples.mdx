@@ -24,26 +24,27 @@ export const EndpointExampleResponse = () => {
       }
       const spec = await response.json();
 
-      // 2. Locate the "Example Response" URL from the page.
-      // Try first to find an anchor element with href starting with our reference URL.
+      // 2. Locate the API endpoint URL from the page.
+      // First, try to find an anchor element with a reference URL.
       let fullUrl = "";
-      let linkEl = document.querySelector('a[href^="https://erdtest123.readme.io/reference/"]');
-      if (linkEl) {
-        fullUrl = linkEl.getAttribute('href');
-      } else {
-        // Fallback: search the entire page text for a matching URL pattern.
-        const textMatch = document.body.innerText.match(/Example Response(?: for)?\s*(?:\:|\-)?\s*(https:\/\/erdtest123\.readme\.io\/reference\/\S+)/i);
-        if (textMatch && textMatch[1]) {
-          fullUrl = textMatch[1];
-        }
+      const refLink = document.querySelector('a[href^="https://erdtest123.readme.io/reference/"]');
+      if (refLink) {
+        fullUrl = refLink.getAttribute('href');
       }
-      if (!fullUrl) {
-        throw new Error("Example Response URL not found on page.");
+      // Then try to find an actual API endpoint URL in the page text
+      // (assuming your API endpoints start with "https://example.com/api/").
+      const apiUrlMatch = document.body.innerText.match(/(https:\/\/example\.com\/api\/\S+)/);
+      if (apiUrlMatch && apiUrlMatch[1]) {
+        fullUrl = apiUrlMatch[1];
       }
 
-      // 3. Extract the relative path from the URL.
+      if (!fullUrl) {
+        throw new Error("API endpoint URL not found on page.");
+      }
+
+      // 3. Extract the relative path from the full URL.
       const urlObj = new URL(fullUrl);
-      const relativePath = urlObj.pathname; // e.g., "/reference/updatepet"
+      const relativePath = urlObj.pathname; // e.g. "/api/v3/pet"
 
       // 4. Find the matching endpoint in the spec.
       const operations = spec.paths[relativePath];
@@ -51,7 +52,7 @@ export const EndpointExampleResponse = () => {
         throw new Error(`No endpoint found in spec for path ${relativePath}`);
       }
 
-      // 5. Choose an operation—prefer one that provides an example response.
+      // 5. Choose an operation—prefer one that has an example response.
       let chosenOperation = null;
       let chosenMethod = null;
       for (const [method, operation] of Object.entries(operations)) {
@@ -69,7 +70,6 @@ export const EndpointExampleResponse = () => {
         chosenMethod = method.toUpperCase();
       }
 
-      // 6. Build the endpoint data.
       const summary = chosenOperation.summary || '';
       const description = chosenOperation.description || '';
       const example = extractResponseExample(chosenOperation, spec.components);
@@ -142,12 +142,11 @@ export const EndpointExampleResponse = () => {
     return null;
   };
 
-  // Render the component.
   if (loading) return <div>Loading endpoint example...</div>;
-  if (error) return <div style={{color: 'red'}}>Error: {error}</div>;
+  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
   if (!endpointData) return null;
   return (
-    <div style={{border: '1px solid #ddd', padding: '16px', borderRadius: '8px', marginTop: '16px'}}>
+    <div style={{ border: '1px solid #ddd', padding: '16px', borderRadius: '8px', marginTop: '16px' }}>
       <h3>{endpointData.method} {endpointData.path}</h3>
       {endpointData.summary && <p><strong>Summary:</strong> {endpointData.summary}</p>}
       {endpointData.description && <p><strong>Description:</strong> {endpointData.description}</p>}
