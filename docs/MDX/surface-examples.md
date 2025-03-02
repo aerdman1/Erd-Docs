@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-## Example Response: PETS
+## PET
 
 <EndpointExampleResponse endpoint="/pet" />
 
