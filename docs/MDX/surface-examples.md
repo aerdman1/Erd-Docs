@@ -13,8 +13,10 @@ Example Response PETS
 
 <EndpointExampleResponse endpoint="/pet" />
 
-<br />
+PET ID testing
 
-<br />
+<EndpointExampleResponse endpoint="/pet/{petId}" />
 
-<EndpointExampleResponse endpoint="/store" />
+Find pet by status
+
+<EndpointExampleResponse endpoint="/pet/findByStatus" />
