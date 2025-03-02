@@ -75,8 +75,10 @@ export const OverviewTemplate = () => {
         const resp = await fetch(link.fullUrl);
         if (!resp.ok) throw new Error('Network error fetching ' + link.href);
         const html = await resp.text();
+        // Debug: Log the raw HTML for this endpoint
+        console.log(`Raw HTML for ${link.href}:`, html);
         const info = extractEndpointInfo(html);
-        console.log(`Info for ${link.href}:`, info); // Debug log to test what is pulled
+        console.log(`Info for ${link.href}:`, info); // Debug: log extracted info
         return [link.href, info];
       } catch (err) {
         return [link.href, { error: err.message }];
@@ -116,9 +118,8 @@ export const OverviewTemplate = () => {
       const method = methodEl ? methodEl.innerText.trim() : 'NoMethodFound';
       const urlEl = doc.querySelector('span.headline-container-article-info-url2nV_XrjpFuVQ');
       const endpointUrl = urlEl ? urlEl.innerText.trim() : 'NoEndpointURLFound';
-      // NEW: Extract the example code snippet using its container class and <pre> element.
+      // NEW: Extract the example code snippet
       let exampleEl = doc.querySelector('div.APIResponse_asCodeSnippet17b9royy9c6e pre.CodeSnippet');
-      // Fallback: if not found, try any <pre> with class CodeSnippet.
       if (!exampleEl) {
         exampleEl = doc.querySelector('pre.CodeSnippet');
       }
@@ -175,6 +176,8 @@ export const OverviewTemplate = () => {
           <pre className="example-code">{ep.example}</pre>
         )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
+        {/* Debug: Uncomment the line below to dump the full object */}
+        {/* <pre>{JSON.stringify(ep, null, 2)}</pre> */}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View
         </a>
@@ -198,6 +201,8 @@ export const OverviewTemplate = () => {
           <pre className="example-code">{ep.example}</pre>
         )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
+        {/* Debug: Uncomment the line below to dump the full object */}
+        {/* <pre>{JSON.stringify(ep, null, 2)}</pre> */}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View Doc
         </a>
