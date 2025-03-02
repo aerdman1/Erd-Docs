@@ -27,16 +27,20 @@ export const EndpointExampleResponse = () => {
       const spec = await response.json();
       console.log("Spec fetched:", spec);
 
-      // 2. Locate the API endpoint URL from the page.
+      // 2. Try to locate the API endpoint URL from the page.
       let fullUrl = "";
-      // First, try to find an anchor element with a docs reference URL.
-      const refLink = document.querySelector('a[href^="https://erdtest123.readme.io/reference/"]');
+      // (a) Try to find a docs reference link.
+      const refLink = document.querySelector('a[href^="/reference/"]');
       console.log("Reference link found:", refLink ? refLink.getAttribute('href') : "none");
       if (refLink) {
-        fullUrl = refLink.getAttribute('href');
+        // We note the docs link but won't use it directly since spec.paths doesn't match it.
+        console.log("Found docs reference link, but will try to locate the actual API URL from page text.");
       }
-      // Then, try to match an API endpoint URL from the page text.
-      const apiUrlMatch = document.body.innerText.match(/(https:\/\/example\.com\/api\/\S+)/);
+      // (b) Look for an API endpoint URL in the page text.
+      // Adjust regex to match URLs like "https://example.com/api/v3/pet"
+      const bodyText = document.body.innerText;
+      console.log("Page body text:", bodyText);
+      const apiUrlMatch = bodyText.match(/(https:\/\/example\.com\/api\/[^\s]+)/i);
       console.log("Regex match for API endpoint URL:", apiUrlMatch);
       if (apiUrlMatch && apiUrlMatch[1]) {
         fullUrl = apiUrlMatch[1];
@@ -46,19 +50,36 @@ export const EndpointExampleResponse = () => {
         throw new Error("API endpoint URL not found on page.");
       }
 
-      // 3. Extract the relative path from the full URL.
-      const urlObj = new URL(fullUrl);
-      const relativePath = urlObj.pathname; // e.g., "/api/v3/pet"
-      console.log("Extracted relative path:", relativePath);
+      // 3. Adjust the URL so it matches the spec's keys.
+      // Our spec likely uses relative paths (e.g. "/pet") and the server is defined in spec.servers.
+      let relativePath = "";
+      if (spec.servers && spec.servers.length > 0 && spec.servers[0].url) {
+        const serverUrl = spec.servers[0].url; // e.g. "https://example.com/api/v3"
+        console.log("Spec server URL:", serverUrl);
+        if (fullUrl.startsWith(serverUrl)) {
+          relativePath = fullUrl.substring(serverUrl.length);
+          if (!relativePath.startsWith("/")) {
+            relativePath = "/" + relativePath;
+          }
+          console.log("Derived relativePath from server URL:", relativePath);
+        } else {
+          // If fullUrl doesn't start with the server URL, use fullUrl's pathname.
+          relativePath = new URL(fullUrl).pathname;
+          console.log("Using fullUrl's pathname as relativePath:", relativePath);
+        }
+      } else {
+        relativePath = new URL(fullUrl).pathname;
+        console.log("No server URL in spec; using fullUrl's pathname:", relativePath);
+      }
 
-      // 4. Find the matching endpoint in the spec.
+      // 4. Look up the endpoint in the spec.
       const operations = spec.paths[relativePath];
-      console.log("Operations for relative path:", operations);
+      console.log("Operations found for relativePath:", operations);
       if (!operations) {
         throw new Error(`No endpoint found in spec for path ${relativePath}`);
       }
 
-      // 5. Choose an operation—prefer one that has an example response.
+      // 5. Choose an operation that has an example, or fallback to the first.
       let chosenOperation = null;
       let chosenMethod = null;
       for (const [method, operation] of Object.entries(operations)) {
@@ -69,13 +90,11 @@ export const EndpointExampleResponse = () => {
           break;
         }
       }
-      // If none has an example, choose the first available operation.
       if (!chosenOperation) {
         const [method, operation] = Object.entries(operations)[0];
         chosenOperation = operation;
         chosenMethod = method.toUpperCase();
       }
-
       const summary = chosenOperation.summary || '';
       const description = chosenOperation.description || '';
       const example = extractResponseExample(chosenOperation, spec.components);
@@ -101,14 +120,12 @@ export const EndpointExampleResponse = () => {
     if (schema.example !== undefined) {
       return schema.example;
     }
-    // If schema is a reference, resolve it from components.schemas.
     if (schema.$ref) {
       const refParts = schema.$ref.split('/');
       const schemaName = refParts[refParts.length - 1];
       const resolved = components.schemas[schemaName];
       return resolveExampleFromSchema(resolved, components);
     }
-    // For objects, build an example from each property.
     if (schema.type === 'object' && schema.properties) {
       const obj = {};
       Object.entries(schema.properties).forEach(([prop, propSchema]) => {
@@ -116,7 +133,6 @@ export const EndpointExampleResponse = () => {
       });
       return obj;
     }
-    // For arrays, return an array with a single example item.
     if (schema.type === 'array' && schema.items) {
       return [resolveExampleFromSchema(schema.items, components)];
     }
@@ -126,7 +142,6 @@ export const EndpointExampleResponse = () => {
   // Helper: Extract an example from an operation’s responses.
   const extractResponseExample = (operation, components) => {
     if (!operation.responses) return null;
-    // Prefer a 200 or default response.
     let response = operation.responses['200'] || operation.responses['default'];
     if (!response) {
       response = Object.values(operation.responses)[0];
