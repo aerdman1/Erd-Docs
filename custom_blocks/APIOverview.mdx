@@ -15,7 +15,7 @@ export const OverviewTemplate = () => {
   // NEW: Search term
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Function to fetch sidebar data once, or on-demand
+  // --- NEW: Function to fetch sidebar data ---
   const fetchSidebarData = () => {
     if (typeof document === 'undefined') return;
 
@@ -46,7 +46,7 @@ export const OverviewTemplate = () => {
       const links = Array.from(pageLinks).map(link => {
         const href = link.getAttribute('href');
         return {
-          href: href,
+          href,
           title: link.textContent.trim(),
           fullUrl: window.location.origin + href
         };
@@ -69,16 +69,15 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    // 4) Fetch endpoints
+    // 4) Fetch each endpoint page and extract info
     const fetches = Array.from(uniqueLinksMap.values()).map(async link => {
       try {
         const resp = await fetch(link.fullUrl);
         if (!resp.ok) throw new Error('Network error fetching ' + link.href);
         const html = await resp.text();
-        // (Optional debug: console.log the raw HTML)
-        // console.log(`Raw HTML for ${link.href}:`, html);
+        console.log(`Raw HTML for ${link.href}:`, html); // Debug
         const info = extractEndpointInfo(html);
-        console.log(`Info for ${link.href}:`, info); // Debug log
+        console.log(`Info for ${link.href}:`, info); // Debug
         return [link.href, info];
       } catch (err) {
         return [link.href, { error: err.message }];
@@ -101,100 +100,69 @@ export const OverviewTemplate = () => {
       });
   };
 
-  // Run fetchSidebarData once on initial load
+  // Run fetchSidebarData on initial load
   useEffect(() => {
     fetchSidebarData();
   }, []);
 
-  // Updated extractEndpointInfo that builds an example payload based on form parameters
+  // --- Modified extraction function ---
   const extractEndpointInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlString, 'text/html');
-
       const titleEl = doc.querySelector('header#content-head h1');
       const endpointTitle = titleEl ? titleEl.innerText.trim() : doc.title || 'NoTitleFound';
-
       const descEl = doc.querySelector('div[role="doc-subtitle"]');
       const description = descEl ? descEl.innerText.trim() : 'NoDescriptionFound';
-
       const methodEl = doc.querySelector('span.rm-APIMethod');
       const method = methodEl ? methodEl.innerText.trim() : 'NoMethodFound';
-
       const urlEl = doc.querySelector('span.headline-container-article-info-url2nV_XrjpFuVQ');
       const endpointUrl = urlEl ? urlEl.innerText.trim() : 'NoEndpointURLFound';
+      
+      // First attempt: try to extract example from a known container
+      let exampleEl = doc.querySelector('div.APIResponse_asCodeSnippet17b9royy9c6e pre.CodeSnippet');
+      if (!exampleEl) {
+        exampleEl = doc.querySelector('pre.CodeSnippet');
+      }
+      let example = exampleEl ? exampleEl.innerText.trim() : "NoExampleFound";
 
-      // Build example payload from the form parameters
-      let examplePayload = 'NoExampleFound';
-      const formEl = doc.querySelector('form.param-type.rm-APISchema');
-      if (formEl) {
-        const exampleObj = {};
-
-        // 1. Extract simple input fields by reading their "label" and "placeholder"
-        const inputs = formEl.querySelectorAll('input');
-        inputs.forEach(input => {
-          const fieldName = input.getAttribute('label'); // e.g., "id", "name"
-          const placeholder = input.getAttribute('placeholder');
-          if (fieldName && placeholder) {
-            const num = parseFloat(placeholder);
-            exampleObj[fieldName] = isNaN(num) ? placeholder : num;
-          }
-        });
-
-        // 2. Extract select value (for example, for "status")
-        const selectEl = formEl.querySelector('select');
-        if (selectEl) {
-          const option = selectEl.querySelector('option[value]:not([value=""])');
-          if (option) {
-            // Try to get field name from the corresponding label
-            const statusLabelEl = formEl.querySelector(`label[for="${selectEl.id}"]`);
-            const fieldName = statusLabelEl ? statusLabelEl.innerText.trim().toLowerCase() : 'status';
-            exampleObj[fieldName] = option.value;
-          }
-        }
-
-        // 3. For the "category" object, try to extract inputs within the subform
-        const categoryEl = formEl.querySelector('#body-updatePet_category');
-        if (categoryEl) {
-          const catObj = {};
-          const catInputs = categoryEl.querySelectorAll('input');
-          catInputs.forEach(input => {
-            const fieldName = input.getAttribute('label');
-            const placeholder = input.getAttribute('placeholder');
-            if (fieldName && placeholder) {
-              const num = parseFloat(placeholder);
-              catObj[fieldName] = isNaN(num) ? placeholder : num;
+      // Fallback: if no example found in the DOM, try extracting from SSR props
+      if (example === "NoExampleFound") {
+        const ssrScript = doc.querySelector('#ssr-props');
+        if (ssrScript) {
+          const ssrData = JSON.parse(ssrScript.getAttribute('data-initial-props'));
+          if (
+            ssrData.document &&
+            ssrData.document.api &&
+            ssrData.document.api.schema &&
+            ssrData.document.api.schema.$ref &&
+            ssrData.components &&
+            ssrData.components.schemas
+          ) {
+            const ref = ssrData.document.api.schema.$ref; // e.g., "#/components/schemas/Pet"
+            const schemaKey = ref.replace('#/components/schemas/', '');
+            if (ssrData.components.schemas[schemaKey]) {
+              const schema = ssrData.components.schemas[schemaKey];
+              let exampleFromSchema = {};
+              if (schema.properties) {
+                for (let prop in schema.properties) {
+                  const propDef = schema.properties[prop];
+                  if (propDef.example !== undefined) {
+                    exampleFromSchema[prop] = propDef.example;
+                  } else if (propDef.type === "array") {
+                    exampleFromSchema[prop] = ["string"];
+                  } else {
+                    exampleFromSchema[prop] = "";
+                  }
+                }
+              }
+              example = JSON.stringify(exampleFromSchema, null, 2);
             }
-          });
-          // Use extracted values if available; otherwise fallback to default values.
-          exampleObj['category'] = Object.keys(catObj).length > 0 ? catObj : { id: 1, name: "Dogs" };
-        } else {
-          // Fallback default for category
-          exampleObj['category'] = { id: 1, name: "Dogs" };
+          }
         }
-
-        // 4. For photoUrls array, set a default if not provided by inputs.
-        if (!exampleObj['photoUrls']) {
-          exampleObj['photoUrls'] = ["string"];
-        }
-
-        // 5. For tags array, set a default if not provided.
-        if (!exampleObj['tags']) {
-          exampleObj['tags'] = [{ id: 0, name: "string" }];
-        }
-
-        // 6. Fallback for id and name if not already extracted.
-        if (!exampleObj['id']) {
-          exampleObj['id'] = 10;
-        }
-        if (!exampleObj['name']) {
-          exampleObj['name'] = "doggie";
-        }
-
-        examplePayload = JSON.stringify(exampleObj, null, 2);
       }
 
-      return { endpointTitle, description, method, endpointUrl, example: examplePayload };
+      return { endpointTitle, description, method, endpointUrl, example };
     } catch (err) {
       return {
         endpointTitle: 'ErrorParsing',
@@ -207,7 +175,7 @@ export const OverviewTemplate = () => {
     }
   };
 
-  // Deduplicate final docs
+  // Deduplicate docs based on title, URL, and method
   const deduplicateDocs = (links) => {
     const seen = new Set();
     const deduped = [];
@@ -222,14 +190,24 @@ export const OverviewTemplate = () => {
     return deduped;
   };
 
-  // Filter by searchTerm
+  // Filter links by search term
   function passesSearch(link) {
     const ep = fetchedEndpoints.get(link.href) || {};
-    const text = (link.title + ' ' + ep.endpointTitle + ' ' + ep.description + ' ' + ep.method + ' ' + ep.endpointUrl).toLowerCase();
+    const text = (
+      link.title +
+      ' ' +
+      ep.endpointTitle +
+      ' ' +
+      ep.description +
+      ' ' +
+      ep.method +
+      ' ' +
+      ep.endpointUrl
+    ).toLowerCase();
     return text.includes(searchTerm.toLowerCase());
   }
 
-  // Renders a single card for grid
+  // Renders a single card for grid view
   function renderGridCard(ep, link, idx) {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
@@ -252,7 +230,7 @@ export const OverviewTemplate = () => {
     );
   }
 
-  // Renders a single card for slider
+  // Renders a single card for slider view
   function renderSliderCard(ep, link, idx) {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
@@ -275,7 +253,7 @@ export const OverviewTemplate = () => {
     );
   }
 
-  // Single-line CSS with all styles (including the unified controls container)
+  // Single-line CSS for styling
   const styleString =
     'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
     '.container{max-width:1200px;margin:0 auto;padding:16px}'+
@@ -303,7 +281,7 @@ export const OverviewTemplate = () => {
     '.tag-button{position:absolute;bottom:16px;left:16px;right:16px;text-align:center;background:#3b82f6;color:#fff;padding:8px 0;border-radius:6px;text-decoration:none;font-weight:500;transition:background 0.2s;box-sizing:border-box}'+
     '.tag-button:hover{background:#2563eb;color:#fff}'+
     '.slider-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px}'+
-    '.slider-card{position:relative;min-width:230px;padding:16px 16px 40px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s}'+
+    '.slider-card{position:relative;min-width:230px;padding:16px 16px 40px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s}'+
     '.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}'+
     '.slider-card h3{margin:0 0 8px 0;font-size:1.1rem}'+
     '.slider-card p{margin:0 0 8px 0;color:#4B5563}'+
@@ -314,7 +292,6 @@ export const OverviewTemplate = () => {
   return (
     <div>
       <style>{styleString}</style>
-
       <div className='container'>
         <div className='hdrTemplate'>
           <div className='hdrContent'>
