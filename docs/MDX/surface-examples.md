@@ -9,6 +9,8 @@ Here is information about my PET Endpoints:
 
 Praesent nulla enim, cursus sit amet pellentesque sed, ultrices in felis. Maecenas nec massa euismod, venenatis arcu non, suscipit odio. Suspendisse sollicitudin convallis neque, id fringilla est fringilla varius. Praesent id risus vel velit posuere rutrum. Suspendisse congue vestibulum elit eget varius. Maecenas id velit felis. Sed eu nulla vel erat euismod finibus. Quisque libero ante, pellentesque ultrices finibus vel, ultrices quis ipsum. Pellentesque lorem massa, volutpat at convallis consequat, tincidunt nec urna. Sed ultrices est et justo ornare rutrum.
 
-Example Response:
+Example Response for [https://erdtest123.readme.io/reference/updatepet](https://erdtest123.readme.io/reference/updatepet):
 
-$MY CUSTOM COMPONENT HERE SHOULD REFERENCE THE OPEN API SPEC AND PULL IN THE EXAMPLE JUTS LIKE WE DO NOW BUT FOR THSI SPECIFIC ENDPOINT ONLY$
+<br />
+
+<PullExamples />
