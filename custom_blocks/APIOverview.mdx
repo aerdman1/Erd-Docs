@@ -115,13 +115,18 @@ export const OverviewTemplate = () => {
       const method = methodEl ? methodEl.innerText.trim() : 'NoMethodFound';
       const urlEl = doc.querySelector('span.headline-container-article-info-url2nV_XrjpFuVQ');
       const endpointUrl = urlEl ? urlEl.innerText.trim() : 'NoEndpointURLFound';
-      return { endpointTitle, description, method, endpointUrl };
+      // NEW: Extract the example code snippet using its container class and the <pre> element.
+      const exampleEl = doc.querySelector('div.APIResponse_asCodeSnippet17b9royy9c6e pre.CodeSnippet');
+      const example = exampleEl ? exampleEl.innerText.trim() : 'NoExampleFound';
+      
+      return { endpointTitle, description, method, endpointUrl, example };
     } catch (err) {
       return {
         endpointTitle: 'ErrorParsing',
         description: '',
         method: '',
         endpointUrl: '',
+        example: '',
         error: err.message
       };
     }
@@ -154,12 +159,16 @@ export const OverviewTemplate = () => {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
     const showEndpoint = ep.endpointUrl && ep.endpointUrl !== 'NoEndpointURLFound';
+    const showExample = ep.example && ep.example !== 'NoExampleFound';
     return (
       <div key={'grid-' + idx} className='card'>
         <h3>{ep.endpointTitle || link.title || 'Untitled'}</h3>
         {showDesc && <p>{ep.description}</p>}
         {showMethod && <p><strong>Method:</strong> {ep.method}</p>}
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
+        {showExample && (
+          <pre className="example-code">{ep.example}</pre>
+        )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View
@@ -173,12 +182,16 @@ export const OverviewTemplate = () => {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
     const showEndpoint = ep.endpointUrl && ep.endpointUrl !== 'NoEndpointURLFound';
+    const showExample = ep.example && ep.example !== 'NoExampleFound';
     return (
       <div key={'slider-' + idx} className='slider-card'>
         <h3>{ep.endpointTitle || link.title || 'Untitled'}</h3>
         {showDesc && <p>{ep.description}</p>}
         {showMethod && <p><strong>Method:</strong> {ep.method}</p>}
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
+        {showExample && (
+          <pre className="example-code">{ep.example}</pre>
+        )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View Doc
@@ -215,7 +228,7 @@ export const OverviewTemplate = () => {
     '.tag-button{position:absolute;bottom:16px;left:16px;right:16px;text-align:center;background:#3b82f6;color:#fff;padding:8px 0;border-radius:6px;text-decoration:none;font-weight:500;transition:background 0.2s;box-sizing:border-box}'+
     '.tag-button:hover{background:#2563eb;color:#fff}'+
     '.slider-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px}'+
-    '.slider-card{position:relative;min-width:230px;padding:16px 16px 40px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s}'+
+    '.slider-card{position:relative;min-width:230px;padding:16px 16px 40px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s}'+
     '.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}'+
     '.slider-card h3{margin:0 0 8px 0;font-size:1.1rem}'+
     '.slider-card p{margin:0 0 8px 0;color:#4B5563}'+
