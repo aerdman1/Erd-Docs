@@ -12,3 +12,9 @@ Praesent nulla enim, cursus sit amet pellentesque sed, ultrices in felis. Maecen
 Example Response PETS
 
 <EndpointExampleResponse endpoint="/pet" />
+
+<br />
+
+<br />
+
+<EndpointExampleResponse endpoint="/store" />
