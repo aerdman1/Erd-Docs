@@ -1,40 +1,211 @@
 ---
 name: APISpecTest
 ---
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
-export const OpenApiSpecViewer = () => {
-  const [spec, setSpec] = useState(null);
-  const [error, setError] = useState(null);
+export const OpenApiOverviewTemplate = () => {
+  const [categories, setCategories] = useState([]);
+  const [endpointError, setEndpointError] = useState(null);
+  const [fetching, setFetching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
+  // Fetch and process the OpenAPI spec on initial load
   useEffect(() => {
-    async function fetchSpec() {
-      try {
-        const response = await fetch('https://erdtest123.readme.io/openapi/ErdSpec1.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`);
-        }
-        const data = await response.json();
-        setSpec(data);
-      } catch (err) {
-        setError(err.message);
-      }
-    }
-    fetchSpec();
+    fetchOpenApiSpec();
   }, []);
 
-  if (error) return <div>Error: {error}</div>;
-  if (!spec) return <div>Loading specification...</div>;
+  const fetchOpenApiSpec = async () => {
+    setFetching(true);
+    setEndpointError(null);
 
-  // Example: Render the raw JSON; you can modify this to render just specific parts.
+    try {
+      const response = await fetch('https://erdtest123.readme.io/openapi/ErdSpec1.json');
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
+      const spec = await response.json();
+
+      // Process the spec.paths to build categories by tag
+      const categoriesMap = new Map();
+
+      // spec.paths is an object where each key is a path and its value is an operations object
+      Object.entries(spec.paths).forEach(([path, operations]) => {
+        Object.entries(operations).forEach(([method, operation]) => {
+          // Use the first tag as category, default to "Uncategorized"
+          const tag = (operation.tags && operation.tags.length > 0) ? operation.tags[0] : 'Uncategorized';
+
+          // Build our endpoint object with key details
+          const endpointData = {
+            path,
+            method: method.toUpperCase(),
+            summary: operation.summary || '',
+            description: operation.description || '',
+            examples: extractExamples(operation.responses)
+          };
+
+          // Add the endpoint to the correct category
+          if (!categoriesMap.has(tag)) {
+            categoriesMap.set(tag, []);
+          }
+          categoriesMap.get(tag).push(endpointData);
+        });
+      });
+
+      // Convert categoriesMap to an array for rendering
+      const catArray = Array.from(categoriesMap.entries()).map(([name, endpoints]) => ({
+        name,
+        endpoints
+      }));
+
+      setCategories(catArray);
+      setFetching(false);
+    } catch (err) {
+      setEndpointError(err.message);
+      setFetching(false);
+    }
+  };
+
+  // Helper function to extract example responses from an operation's responses object
+  const extractExamples = (responses) => {
+    const examples = [];
+    if (!responses) return examples;
+
+    // Loop through each response (key is the status code)
+    Object.entries(responses).forEach(([status, response]) => {
+      if (response.content) {
+        Object.entries(response.content).forEach(([mimeType, mediaObj]) => {
+          if (mediaObj.example) {
+            examples.push({
+              status,
+              mimeType,
+              example: mediaObj.example
+            });
+          } else if (mediaObj.examples) {
+            Object.values(mediaObj.examples).forEach(exampleObj => {
+              if (exampleObj.value) {
+                examples.push({
+                  status,
+                  mimeType,
+                  example: exampleObj.value
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+
+    return examples;
+  };
+
+  // Filter endpoints based on search term
+  const passesSearch = (endpoint) => {
+    const text = (
+      endpoint.path +
+      ' ' +
+      endpoint.method +
+      ' ' +
+      endpoint.summary +
+      ' ' +
+      endpoint.description
+    ).toLowerCase();
+    return text.includes(searchTerm.toLowerCase());
+  };
+
+  // Render a card for each endpoint
+  const renderEndpointCard = (endpoint, idx) => {
+    return (
+      <div key={idx} className="card">
+        <h3>{endpoint.method} {endpoint.path}</h3>
+        {endpoint.summary && <p><strong>Summary:</strong> {endpoint.summary}</p>}
+        {endpoint.description && <p><strong>Description:</strong> {endpoint.description}</p>}
+        {endpoint.examples && endpoint.examples.length > 0 && (
+          <div>
+            <strong>Example Responses:</strong>
+            {endpoint.examples.map((ex, exIdx) => (
+              <pre
+                key={exIdx}
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  background: '#f5f5f5',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  marginTop: '8px'
+                }}>
+                {JSON.stringify(ex.example, null, 2)}
+              </pre>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Single-line CSS string for styling (feel free to adjust)
+  const styleString =
+    'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}' +
+    '.container{max-width:1200px;margin:0 auto;padding:16px}' +
+    '.hdrTemplate{display:flex;align-items:center;justify-content:space-between;position:relative;margin-bottom:24px}' +
+    '.hdrContent{flex:1}' +
+    '.hdrContent h1{font-size:2rem;margin:0 0 8px 0}' +
+    '.hdrContent p{margin:0 0 16px 0;color:#4B5563}' +
+    '.controls{display:flex;align-items:center;gap:10px;margin-top:8px}' +
+    '.search-input{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:1rem}' +
+    '.category-heading{text-align:center;font-size:1.4rem;font-weight:bold;margin:32px 0 16px 0}' +
+    '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}' +
+    '@media(min-width:1400px){.grid{grid-template-columns:repeat(4,1fr)}}' +
+    '@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}' +
+    '@media(max-width:600px){.grid{grid-template-columns:1fr}}' +
+    '.card{position:relative;min-height:220px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s;background:#fff;border-radius:6px}' +
+    '.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,0.15)}' +
+    '.card h3{margin:0 0 8px 0;font-size:1.1rem}' +
+    '.card p{margin:0 0 8px 0;color:#4B5563;font-size:13px}' +
+    '.loading{font-style:italic;color:#555}' +
+    '.error{color:red;font-weight:bold}';
+
   return (
     <div>
-      <h1>OpenAPI Specification</h1>
-      <pre style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
-        {JSON.stringify(spec, null, 2)}
-      </pre>
+      <style>{styleString}</style>
+      <div className="container">
+        <div className="hdrTemplate">
+          <div className="hdrContent">
+            <h1>Endpoint Directory</h1>
+            <p>Your API endpoints based on the OpenAPI spec.</p>
+            <div className="controls">
+              <input
+                className="search-input"
+                type="text"
+                placeholder="Search endpoints..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        {fetching && !endpointError && <p className="loading">Loading API specification...</p>}
+        {endpointError && <p className="error">Error: {endpointError}</p>}
+
+        {!fetching && !endpointError && categories.length > 0 && (
+          <div>
+            {categories.map((cat, catIdx) => {
+              const filteredEndpoints = cat.endpoints.filter(passesSearch);
+              if (filteredEndpoints.length === 0) return null;
+
+              return (
+                <div key={catIdx}>
+                  <div className="category-heading">{cat.name}</div>
+                  <div className="grid">
+                    {filteredEndpoints.map((endpoint, idx) => renderEndpointCard(endpoint, idx))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default OpenApiSpecViewer;
+export default OpenApiOverviewTemplate;
