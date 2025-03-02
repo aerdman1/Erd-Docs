@@ -5,18 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-# PET Endpoints Overview
-
-Welcome to the PET Endpoints documentation. Below you'll find a detailed overview of our PET Endpoints, along with example responses for each endpoint.
-
-***
-
-## Overview
-
-Praesent nulla enim, cursus sit amet pellentesque sed, ultrices in felis. Maecenas nec massa euismod, venenatis arcu non, suscipit odio. Suspendisse sollicitudin convallis neque, id fringilla est fringilla varius. Praesent id risus vel velit posuere rutrum. Suspendisse congue vestibulum elit eget varius. Maecenas id velit felis. Sed eu nulla vel erat euismod finibus. Quisque libero ante, pellentesque ultrices finibus vel, ultrices quis ipsum. Pellentesque lorem massa, volutpat at convallis consequat, tincidunt nec urna. Sed ultrices est et justo ornare rutrum.
-
-***
-
 ## Example Response: PETS
 
 <EndpointExampleResponse endpoint="/pet" />
