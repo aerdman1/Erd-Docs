@@ -46,7 +46,7 @@ export const OverviewTemplate = () => {
       const links = Array.from(pageLinks).map(link => {
         const href = link.getAttribute('href');
         return {
-          href,
+          href: href,
           title: link.textContent.trim(),
           fullUrl: window.location.origin + href
         };
@@ -69,7 +69,7 @@ export const OverviewTemplate = () => {
       return;
     }
 
-    // 4) Fetch each endpoint page and extract info
+    // 4) Fetch
     const fetches = Array.from(uniqueLinksMap.values()).map(async link => {
       try {
         const resp = await fetch(link.fullUrl);
@@ -103,7 +103,6 @@ export const OverviewTemplate = () => {
     fetchSidebarData();
   }, []);
 
-  // Updated extraction function:
   const extractEndpointInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
@@ -116,75 +115,13 @@ export const OverviewTemplate = () => {
       const method = methodEl ? methodEl.innerText.trim() : 'NoMethodFound';
       const urlEl = doc.querySelector('span.headline-container-article-info-url2nV_XrjpFuVQ');
       const endpointUrl = urlEl ? urlEl.innerText.trim() : 'NoEndpointURLFound';
-
-      // First try: extract example from a known DOM container
-      let exampleEl = doc.querySelector('div.APIResponse_asCodeSnippet17b9royy9c6e pre.CodeSnippet');
-      if (!exampleEl) {
-        exampleEl = doc.querySelector('pre.CodeSnippet');
-      }
-      let example = exampleEl ? exampleEl.innerText.trim() : "NoExampleFound";
-
-      // Fallback: try to extract from SSR props if available
-      if (example === "NoExampleFound") {
-        const ssrScript = doc.querySelector('#ssr-props');
-        if (ssrScript) {
-          try {
-            const ssrData = JSON.parse(ssrScript.getAttribute('data-initial-props'));
-            if (
-              ssrData.document &&
-              ssrData.document.api &&
-              ssrData.document.api.schema &&
-              ssrData.components &&
-              ssrData.components.schemas
-            ) {
-              const ref = ssrData.document.api.schema.$ref; // e.g. "#/components/schemas/User"
-              if (ref) {
-                const schemaKey = ref.replace('#/components/schemas/', '');
-                const schema = ssrData.components.schemas[schemaKey];
-                if (schema && schema.properties) {
-                  let generated = {};
-                  for (let key in schema.properties) {
-                    const propDef = schema.properties[key];
-                    if (propDef.example !== undefined) {
-                      generated[key] = propDef.example;
-                    } else if (propDef.type === 'array') {
-                      generated[key] = ['string'];
-                    } else {
-                      generated[key] = "";
-                    }
-                  }
-                  example = JSON.stringify(generated, null, 2);
-                }
-              }
-            }
-          } catch (ssrErr) {
-            // Do nothing here; we'll fall back to a default below
-          }
-        }
-      }
-
-      // Fallback hard-coded example if still not found and the title indicates a User endpoint
-      if (example === "NoExampleFound" && endpointTitle.toLowerCase().includes("createuserswithlistinput")) {
-        example = JSON.stringify({
-          "id": 10,
-          "username": "theUser",
-          "firstName": "John",
-          "lastName": "James",
-          "email": "john@email.com",
-          "password": "12345",
-          "phone": "12345",
-          "userStatus": 1
-        }, null, 2);
-      }
-
-      return { endpointTitle, description, method, endpointUrl, example };
+      return { endpointTitle, description, method, endpointUrl };
     } catch (err) {
       return {
         endpointTitle: 'ErrorParsing',
         description: '',
         method: '',
         endpointUrl: '',
-        example: '',
         error: err.message
       };
     }
@@ -208,35 +145,21 @@ export const OverviewTemplate = () => {
   // Filter by searchTerm
   function passesSearch(link) {
     const ep = fetchedEndpoints.get(link.href) || {};
-    const text = (
-      link.title +
-      ' ' +
-      ep.endpointTitle +
-      ' ' +
-      ep.description +
-      ' ' +
-      ep.method +
-      ' ' +
-      ep.endpointUrl
-    ).toLowerCase();
+    const text = (link.title + ' ' + ep.endpointTitle + ' ' + ep.description + ' ' + ep.method + ' ' + ep.endpointUrl).toLowerCase();
     return text.includes(searchTerm.toLowerCase());
   }
 
-  // Renders a single card for grid view
+  // Renders a single card for grid
   function renderGridCard(ep, link, idx) {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
     const showEndpoint = ep.endpointUrl && ep.endpointUrl !== 'NoEndpointURLFound';
-    const showExample = ep.example && ep.example !== 'NoExampleFound';
     return (
       <div key={'grid-' + idx} className='card'>
         <h3>{ep.endpointTitle || link.title || 'Untitled'}</h3>
         {showDesc && <p>{ep.description}</p>}
         {showMethod && <p><strong>Method:</strong> {ep.method}</p>}
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
-        {showExample && (
-          <pre className="example-code">{ep.example}</pre>
-        )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View
@@ -245,21 +168,17 @@ export const OverviewTemplate = () => {
     );
   }
 
-  // Renders a single card for slider view
+  // Renders a single card for slider
   function renderSliderCard(ep, link, idx) {
     const showDesc = ep.description && ep.description !== 'NoDescriptionFound';
     const showMethod = ep.method && ep.method !== 'NoMethodFound';
     const showEndpoint = ep.endpointUrl && ep.endpointUrl !== 'NoEndpointURLFound';
-    const showExample = ep.example && ep.example !== 'NoExampleFound';
     return (
       <div key={'slider-' + idx} className='slider-card'>
         <h3>{ep.endpointTitle || link.title || 'Untitled'}</h3>
         {showDesc && <p>{ep.description}</p>}
         {showMethod && <p><strong>Method:</strong> {ep.method}</p>}
         {showEndpoint && <p><strong>Endpoint:</strong> {ep.endpointUrl}</p>}
-        {showExample && (
-          <pre className="example-code">{ep.example}</pre>
-        )}
         {ep.error && <p className='error'>Error: {ep.error}</p>}
         <a href={link.href} target='_blank' rel='noopener noreferrer' className='tag-button'>
           View Doc
@@ -268,7 +187,7 @@ export const OverviewTemplate = () => {
     );
   }
 
-  // Single-line CSS styles
+  // Single-line CSS with all styles (including the unified controls container)
   const styleString =
     'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
     '.container{max-width:1200px;margin:0 auto;padding:16px}'+
@@ -296,7 +215,7 @@ export const OverviewTemplate = () => {
     '.tag-button{position:absolute;bottom:16px;left:16px;right:16px;text-align:center;background:#3b82f6;color:#fff;padding:8px 0;border-radius:6px;text-decoration:none;font-weight:500;transition:background 0.2s;box-sizing:border-box}'+
     '.tag-button:hover{background:#2563eb;color:#fff}'+
     '.slider-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px}'+
-    '.slider-card{position:relative;min-width:230px;padding:16px 16px 40px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform 0.3s,box-shadow 0.3s}'+
+    '.slider-card{position:relative;min-width:230px;padding:16px 16px 40px 16px;scroll-snap-align:start;background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s}'+
     '.slider-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,.15)}'+
     '.slider-card h3{margin:0 0 8px 0;font-size:1.1rem}'+
     '.slider-card p{margin:0 0 8px 0;color:#4B5563}'+
@@ -307,6 +226,7 @@ export const OverviewTemplate = () => {
   return (
     <div>
       <style>{styleString}</style>
+
       <div className='container'>
         <div className='hdrTemplate'>
           <div className='hdrContent'>
@@ -332,25 +252,30 @@ export const OverviewTemplate = () => {
             <img src='https://owlbertsio-resized.s3.amazonaws.com/Popper.psd.full.png' alt='Header Owl'/>
           </div>
         </div>
+
         {fetching && !endpointError && <p className='loading'>Analyzing your API...</p>}
         {endpointError && <p className='error'>{endpointError}</p>}
+
         {!fetching && !endpointError && categories.length > 0 && (
           <div>
             {categories.map((cat, catIdx) => {
+              // Deduplicate and filter links based on search term
               const dedupedLinks = deduplicateDocs(cat.links);
               const filtered = dedupedLinks.filter(link => passesSearch(link));
               if (!filtered.length) return null;
+
               return (
                 <div key={'cat-' + catIdx}>
                   <div className='category-heading'>{cat.name}</div>
-                  {!sliderView ? (
+                  {!sliderView && (
                     <div className='grid'>
                       {filtered.map((link, idx) => {
                         const ep = fetchedEndpoints.get(link.href) || {};
                         return renderGridCard(ep, link, idx);
                       })}
                     </div>
-                  ) : (
+                  )}
+                  {sliderView && (
                     <div className='slider-row'>
                       {filtered.map((link, idx) => {
                         const ep = fetchedEndpoints.get(link.href) || {};
