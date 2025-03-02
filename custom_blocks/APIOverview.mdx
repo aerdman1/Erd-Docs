@@ -15,7 +15,7 @@ export const OverviewTemplate = () => {
   // NEW: Search term
   const [searchTerm, setSearchTerm] = useState('');
 
-  // --- NEW: Function to fetch sidebar data ---
+  // Function to fetch sidebar data once, or on-demand
   const fetchSidebarData = () => {
     if (typeof document === 'undefined') return;
 
@@ -75,9 +75,9 @@ export const OverviewTemplate = () => {
         const resp = await fetch(link.fullUrl);
         if (!resp.ok) throw new Error('Network error fetching ' + link.href);
         const html = await resp.text();
-        console.log(`Raw HTML for ${link.href}:`, html); // Debug
+        console.log(`Raw HTML for ${link.href}:`, html); // Debug log
         const info = extractEndpointInfo(html);
-        console.log(`Info for ${link.href}:`, info); // Debug
+        console.log(`Info for ${link.href}:`, info); // Debug log
         return [link.href, info];
       } catch (err) {
         return [link.href, { error: err.message }];
@@ -100,12 +100,12 @@ export const OverviewTemplate = () => {
       });
   };
 
-  // Run fetchSidebarData on initial load
+  // Run fetchSidebarData once on initial load
   useEffect(() => {
     fetchSidebarData();
   }, []);
 
-  // --- Modified extraction function ---
+  // Updated extraction function that first tries the DOM and then falls back to SSR props.
   const extractEndpointInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
@@ -119,14 +119,14 @@ export const OverviewTemplate = () => {
       const urlEl = doc.querySelector('span.headline-container-article-info-url2nV_XrjpFuVQ');
       const endpointUrl = urlEl ? urlEl.innerText.trim() : 'NoEndpointURLFound';
       
-      // First attempt: try to extract example from a known container
+      // Try to extract the example snippet from the DOM
       let exampleEl = doc.querySelector('div.APIResponse_asCodeSnippet17b9royy9c6e pre.CodeSnippet');
       if (!exampleEl) {
         exampleEl = doc.querySelector('pre.CodeSnippet');
       }
       let example = exampleEl ? exampleEl.innerText.trim() : "NoExampleFound";
 
-      // Fallback: if no example found in the DOM, try extracting from SSR props
+      // Fallback: if no example was found, try to extract from the SSR props
       if (example === "NoExampleFound") {
         const ssrScript = doc.querySelector('#ssr-props');
         if (ssrScript) {
@@ -135,28 +135,27 @@ export const OverviewTemplate = () => {
             ssrData.document &&
             ssrData.document.api &&
             ssrData.document.api.schema &&
-            ssrData.document.api.schema.$ref &&
             ssrData.components &&
             ssrData.components.schemas
           ) {
-            const ref = ssrData.document.api.schema.$ref; // e.g., "#/components/schemas/Pet"
-            const schemaKey = ref.replace('#/components/schemas/', '');
-            if (ssrData.components.schemas[schemaKey]) {
+            const ref = ssrData.document.api.schema.$ref; // e.g. "#/components/schemas/User"
+            if (ref) {
+              const schemaKey = ref.replace('#/components/schemas/', '');
               const schema = ssrData.components.schemas[schemaKey];
-              let exampleFromSchema = {};
-              if (schema.properties) {
-                for (let prop in schema.properties) {
-                  const propDef = schema.properties[prop];
+              if (schema && schema.properties) {
+                let generated = {};
+                for (let key in schema.properties) {
+                  const propDef = schema.properties[key];
                   if (propDef.example !== undefined) {
-                    exampleFromSchema[prop] = propDef.example;
-                  } else if (propDef.type === "array") {
-                    exampleFromSchema[prop] = ["string"];
+                    generated[key] = propDef.example;
+                  } else if (propDef.type === 'array') {
+                    generated[key] = ['string'];
                   } else {
-                    exampleFromSchema[prop] = "";
+                    generated[key] = "";
                   }
                 }
+                example = JSON.stringify(generated, null, 2);
               }
-              example = JSON.stringify(exampleFromSchema, null, 2);
             }
           }
         }
@@ -175,7 +174,7 @@ export const OverviewTemplate = () => {
     }
   };
 
-  // Deduplicate docs based on title, URL, and method
+  // Deduplicate final docs based on endpointTitle, endpointUrl, and method
   const deduplicateDocs = (links) => {
     const seen = new Set();
     const deduped = [];
@@ -190,20 +189,10 @@ export const OverviewTemplate = () => {
     return deduped;
   };
 
-  // Filter links by search term
+  // Filter by searchTerm
   function passesSearch(link) {
     const ep = fetchedEndpoints.get(link.href) || {};
-    const text = (
-      link.title +
-      ' ' +
-      ep.endpointTitle +
-      ' ' +
-      ep.description +
-      ' ' +
-      ep.method +
-      ' ' +
-      ep.endpointUrl
-    ).toLowerCase();
+    const text = (link.title + ' ' + ep.endpointTitle + ' ' + ep.description + ' ' + ep.method + ' ' + ep.endpointUrl).toLowerCase();
     return text.includes(searchTerm.toLowerCase());
   }
 
@@ -253,7 +242,7 @@ export const OverviewTemplate = () => {
     );
   }
 
-  // Single-line CSS for styling
+  // Single-line CSS styles
   const styleString =
     'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
     '.container{max-width:1200px;margin:0 auto;padding:16px}'+
@@ -317,30 +306,25 @@ export const OverviewTemplate = () => {
             <img src='https://owlbertsio-resized.s3.amazonaws.com/Popper.psd.full.png' alt='Header Owl'/>
           </div>
         </div>
-
         {fetching && !endpointError && <p className='loading'>Analyzing your API...</p>}
         {endpointError && <p className='error'>{endpointError}</p>}
-
         {!fetching && !endpointError && categories.length > 0 && (
           <div>
             {categories.map((cat, catIdx) => {
-              // Deduplicate and filter links based on search term
               const dedupedLinks = deduplicateDocs(cat.links);
               const filtered = dedupedLinks.filter(link => passesSearch(link));
               if (!filtered.length) return null;
-
               return (
                 <div key={'cat-' + catIdx}>
                   <div className='category-heading'>{cat.name}</div>
-                  {!sliderView && (
+                  {!sliderView ? (
                     <div className='grid'>
                       {filtered.map((link, idx) => {
                         const ep = fetchedEndpoints.get(link.href) || {};
                         return renderGridCard(ep, link, idx);
                       })}
                     </div>
-                  )}
-                  {sliderView && (
+                  ) : (
                     <div className='slider-row'>
                       {filtered.map((link, idx) => {
                         const ep = fetchedEndpoints.get(link.href) || {};
