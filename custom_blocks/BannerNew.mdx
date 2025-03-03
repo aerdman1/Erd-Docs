@@ -1,7 +1,7 @@
 ---
 name: BannerNew
 ---
-import React from "react";
+import React, { useEffect } from "react";
 
 export const Banner = ({
   // Select one to be true - defaults to custom if all are false
@@ -33,28 +33,27 @@ export const Banner = ({
   // Define default settings for each preset.
   const defaultPresets = {
     critical: {
-      bannerColor: "bg-red-600",    // Tailwind: red background
-      bannerTextColor: "text-white", // Tailwind: white text
-      fontSize: "text-base",         // Tailwind: base font size (~16px)
+      bannerColor: "bg-red-600",    
+      bannerTextColor: "text-white", 
+      fontSize: "text-base",         
       fontWeight: "font-normal",
       message: "Critical Alert: Please check immediately!"
     },
     warning: {
-      bannerColor: "bg-yellow-400",    // Tailwind: yellow background
-      bannerTextColor: "text-black",   // Tailwind: black text
+      bannerColor: "bg-yellow-400",    
+      bannerTextColor: "text-black",   
       fontSize: "text-base",
       fontWeight: "font-normal",
       message: "Warning Alert: There might be an issue."
     },
     standard: {
-      bannerColor: "bg-blue-600",    // Tailwind: blue background
-      bannerTextColor: "text-white", // Tailwind: white text
+      bannerColor: "bg-blue-600",    
+      bannerTextColor: "text-white", 
       fontSize: "text-base",
       fontWeight: "font-normal",
       message: "Standard Alert: Here is some information."
     },
     custom: {
-      // These values are for inline styles since they're custom hex values.
       bannerColor: "#00BCFF",    
       bannerTextColor: "#fff",
       fontSize: "14px",
@@ -83,8 +82,32 @@ export const Banner = ({
     containerClasses += ` ${defaults.bannerColor} ${defaults.bannerTextColor} ${defaults.fontSize} ${defaults.fontWeight}`;
   }
 
+  // 🔥 UseEffect to move the banner where we want it
+  useEffect(() => {
+    const moveBannerToHeader = () => {
+      const existingBanner = document.getElementById('custom-banner-container');
+      if (existingBanner) existingBanner.remove();
+
+      const bannerWrapper = document.createElement('div');
+      bannerWrapper.id = 'custom-banner-container';
+      bannerWrapper.style.margin = '0.5rem 0';
+
+      const headerBottom = document.querySelector('.rm-Header-bottom');
+      if (headerBottom && headerBottom.parentNode) {
+        headerBottom.parentNode.insertBefore(bannerWrapper, headerBottom.nextSibling);
+        const bannerContent = document.getElementById('custom-banner-content');
+        if (bannerContent) {
+          bannerWrapper.appendChild(bannerContent);
+          bannerContent.style.display = ''; // Make it visible when moved
+        }
+      }
+    };
+
+    moveBannerToHeader();
+  }, []);
+
   return (
-    <div>
+    <div id="custom-banner-content" style={{ display: 'none' }}>
       <div className={containerClasses} style={inlineStyles}>
         {finalMessage}
       </div>
