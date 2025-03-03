@@ -1,7 +1,7 @@
 ---
 name: Dashboard
 ---
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
 export const DashboardComponent = ({ header = "My Dashboard" }) => {
   // Existing states
@@ -17,14 +17,13 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   const [pageError, setPageError] = useState(null);
 
   // Determine current page type (reference vs guides)
-  const currentPath =
-    typeof window !== "undefined" ? window.location.pathname : "";
+  const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
   const isReference = currentPath.includes("/reference/");
 
   // On mount, grab sidebar links and user info
   useEffect(() => {
     if (typeof document !== "undefined") {
-      const navElement = document.querySelector(".rm-Sidebar");
+      const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
         // For reference pages, only count links starting with "/reference/"
         // For guides pages, count all links (or those starting with "/docs/" if needed)
@@ -32,24 +31,22 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
         if (isReference) {
           pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
         } else {
-          pageLinks = navElement.querySelectorAll("a");
+          pageLinks = navElement.querySelectorAll('a');
         }
         setPageCount(pageLinks.length);
 
         // Extract categories from sidebar sections
-        const sectionElements = navElement.querySelectorAll(
-          "section.rm-Sidebar-section"
-        );
+        const sectionElements = navElement.querySelectorAll('section.rm-Sidebar-section');
         const catArray = [];
         sectionElements.forEach((section) => {
-          const heading = section.querySelector("h2");
+          const heading = section.querySelector('h2');
           if (heading) {
             const title = heading.textContent.trim();
             // Grab all links inside this category.
-            const links = section.querySelectorAll("a");
-            const linkArray = Array.from(links).map((link) => ({
+            const links = section.querySelectorAll('a');
+            const linkArray = Array.from(links).map(link => ({
               title: link.textContent.trim(),
-              href: link.getAttribute("href"),
+              href: link.getAttribute('href')
             }));
             catArray.push({ title, links: linkArray });
           }
@@ -74,9 +71,9 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   }, [isReference]);
 
   const toggleCategory = (index) => {
-    setExpandedCategories((prev) => ({
+    setExpandedCategories(prev => ({
       ...prev,
-      [index]: !prev[index],
+      [index]: !prev[index]
     }));
   };
 
@@ -88,17 +85,15 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
 
       // Title: try header with id "content-head" then fallback to document title
       const titleEl = doc.querySelector("header#content-head h1");
-      const pageTitle = titleEl
-        ? titleEl.innerText.trim()
-        : doc.title || "No Title Found";
+      const pageTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
 
       // Description: use meta description if available (truncate to 200 chars), else fallback
       let description = "No Description Found";
       const metaDesc = doc.querySelector('meta[name="description"]');
-      if (metaDesc && metaDesc.getAttribute("content")) {
-        description = metaDesc.getAttribute("content").trim();
+      if (metaDesc && metaDesc.getAttribute('content')) {
+        description = metaDesc.getAttribute('content').trim();
         if (description.length > 200) {
-          description = description.slice(0, 200) + "...";
+          description = description.slice(0, 200) + '...';
         }
       } else {
         const descEl = doc.querySelector("div[role='doc-subtitle']");
@@ -108,84 +103,49 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       }
 
       // HTTP Method: prioritize the one in the headline container if available
-      const methodEl =
-        doc.querySelector(
-          "div.headline-container-article-info2GaOf2jMpV0r span.rm-APIMethod"
-        ) || doc.querySelector("span.rm-APIMethod");
+      const methodEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.rm-APIMethod") ||
+                        doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
       // Endpoint URL: try to grab from the headline container first
-      const urlEl =
-        doc.querySelector(
-          "div.headline-container-article-info2GaOf2jMpV0r span.headline-container-article-info-url2nV_XrjpFuVQ"
-        ) ||
-        doc.querySelector(
-          "span.headline-container-article-info-url2nV_XrjpFuVQ"
-        );
-      const endpointUrl = urlEl
-        ? urlEl.innerText.trim()
-        : "No Endpoint URL Found";
+      const urlEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.headline-container-article-info-url2nV_XrjpFuVQ") ||
+                     doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
+      const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
       // Last Updated: first try the footer container, then fallback
-      let updatedEl =
-        doc.querySelector(
-          "div.Footer-desktop1Hf-2fUBeoe2 div.UpdatedAt p.DateLine"
-        ) || doc.querySelector("div.UpdatedAt p.DateLine");
+      let updatedEl = doc.querySelector("div.Footer-desktop1Hf-2fUBeoe2 div.UpdatedAt p.DateLine") ||
+                      doc.querySelector("div.UpdatedAt p.DateLine");
       if (!updatedEl) {
         // Look for any DateLine element anywhere that includes "Updated"
         const candidates = doc.querySelectorAll("p.DateLine");
-        updatedEl = Array.from(candidates).find((p) =>
-          p.innerText.includes("Updated")
-        );
+        updatedEl = Array.from(candidates).find(p => p.innerText.includes("Updated"));
       }
-      const updated = updatedEl
-        ? updatedEl.innerText.trim()
-        : "No Update Info Found";
+      const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
 
       // Reading Time: estimate based on text content of the article or body
       const estimateReadingTime = (rootElement, wordsPerMinute = 200) => {
         if (!rootElement) return 0;
         const readableTags = new Set([
-          "P",
-          "SPAN",
-          "LI",
-          "DIV",
-          "ARTICLE",
-          "SECTION",
-          "H1",
-          "H2",
-          "H3",
-          "H4",
-          "H5",
-          "H6",
+          'P', 'SPAN', 'LI', 'DIV', 'ARTICLE', 'SECTION', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'
         ]);
         let totalWords = 0;
         const walker = doc.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT, {
           acceptNode: (node) =>
             node.parentElement && readableTags.has(node.parentElement.tagName)
               ? NodeFilter.FILTER_ACCEPT
-              : NodeFilter.FILTER_SKIP,
+              : NodeFilter.FILTER_SKIP
         });
         while (walker.nextNode()) {
           const text = walker.currentNode.textContent.trim();
-          totalWords += text
-            .split(/\s+/)
-            .filter((word) => word.length > 0).length;
+          totalWords += text.split(/\s+/).filter(word => word.length > 0).length;
         }
         return Math.ceil(totalWords / wordsPerMinute);
       };
       // Use the article if available; fallback to document body
-      const rootElement = doc.querySelector(".rm-Article") || doc.body;
+      const rootElement = doc.querySelector('.rm-Article') || doc.body;
       const readingTime = estimateReadingTime(rootElement);
 
-      return {
-        pageTitle,
-        description,
-        method,
-        endpointUrl,
-        updated,
-        readingTime,
-      };
+      return { pageTitle, description, method, endpointUrl, updated, readingTime };
     } catch (e) {
       console.error("Error extracting page info:", e);
       return null;
@@ -197,22 +157,18 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
     setFetchingPages(true);
     setPageError(null);
     // Flatten links from categories
-    const flattenedLinks = categories.flatMap((cat) => cat.links);
+    const flattenedLinks = categories.flatMap(cat => cat.links);
     let targetLinks;
     if (isReference) {
-      targetLinks = flattenedLinks.filter(
-        (link) => link.href && link.href.startsWith("/reference/")
-      );
+      targetLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/reference/"));
     } else {
       // For guides pages, adjust the filter as needed (here we assume guides use "/docs/")
-      targetLinks = flattenedLinks.filter(
-        (link) => link.href && link.href.startsWith("/docs/")
-      );
+      targetLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/docs/"));
     }
     // Build full URL for each link (assuming same origin)
-    const fullUrls = targetLinks.map((link) => ({
+    const fullUrls = targetLinks.map(link => ({
       ...link,
-      fullUrl: window.location.origin + link.href,
+      fullUrl: window.location.origin + link.href
     }));
 
     try {
@@ -249,179 +205,20 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
     <>
       {/* Global Custom CSS */}
       <style>{`
-      section.content-toc.grid-25 { 
-        display: none; 
-      }
-      
-      .rm-Guides .content-body, 
-      .rm-ReferenceMain .rm-Article { 
-        max-width: 100%; 
-        width: 100%; 
-      }
-      
-      li { 
-        list-style: none; 
-      }
-      
-      a.text-white.font-bold.py-2.px-4.rounded.transition { 
-        color: white; 
-      }
-      
-      .readme-tailwind .text-blue-500 { 
-        text-decoration: none !important; 
-      }
-      
-      .field-description a[href], 
-      .field-description a:not([href=""]), 
-      .markdown-body a[href], 
-      .markdown-body a:not([href=""]) {
-        text-decoration: none;
-        padding: 10px;
-        display: inline-block;
-        border-radius: 10px;
-        min-height: 50px;
-      }
-      
-      /* Modern Card Styles */
-      .card {
-        border-radius: 1.25rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        overflow: hidden;
-        background-color: #fff;
-      }
-      
-      .card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-      }
-      
-      .card-header {
-        background: linear-gradient(90deg, #4F46E5, #3B82F6);
-        color: white;
-        font-weight: 600;
-        padding: 1rem;
-        font-size: 1.25rem;
-        border-top-left-radius: 1.25rem;
-        border-top-right-radius: 1.25rem;
-      }
-      
-      .card-content {
-        padding: 1.5rem;
-      }
-      
-      .card-section {
-        border-top: 1px solid rgba(0, 0, 0, 0.1);
-        padding-top: 1rem;
-        margin-top: 1rem;
-      }
-      
-      .card-button {
-        display: inline-block;
-        background-color: #3B82F6;
-        color: white;
-        padding: 0.75rem 1.5rem;
-        border-radius: 9999px;
-        transition: background-color 0.2s ease, transform 0.2s ease;
-        text-align: center;
-        font-weight: bold;
-        text-decoration: none;
-      }
-      
-      .card-button:hover {
-        background-color: #2563EB;
-        transform: translateY(-2px);
-      }
-      
-      /* For grid container holding multiple cards */
-      .fetch-pages-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 1rem;
-      }
-      
-      /* Optional animation on initial appearance */
-      @keyframes fadeIn {
-        from { 
-          opacity: 0; 
-          transform: translateY(10px); 
+        section.content-toc.grid-25 { display: none; }
+        .rm-Guides .content-body { max-width: 100%; width: 100%; }
+        .rm-ReferenceMain .rm-Article { max-width: 100%; width: 100%; }
+        li { list-style: none; }
+        a.text-white.font-bold.py-2.px-4.rounded.transition {color: white;}
+        .readme-tailwind .text-blue-500 { text-decoration: none !important; }
+        .field-description a[href], .field-description a:not([href=""]),
+        .markdown-body a[href], .markdown-body a:not([href=""]) {
+          text-decoration: none;
+          padding: 10px;
+          display: inline-block;
+          border-radius: 10px;
+          min-height: 50px;
         }
-        to { 
-          opacity: 1; 
-          transform: translateY(0); 
-        }
-      }
-      
-      .animate-fade-in {
-        animation: fadeIn 0.5s ease-out;
-      }
-      
-      /* Optional glassmorphism variant */
-      .glass-card {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-      }
-      
-      /* Category and Page List Item (within cards) */
-      .category-card {
-        background-color: white;
-        border-radius: 1.25rem;
-        border: 1px solid #ddd;
-        padding: 1rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-      
-      .category-card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-      }
-      
-      .category-card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-      }
-      
-      .category-card-link {
-        display: block;
-        background-color: #f7f7f7;
-        padding: 0.5rem;
-        border-radius: 0.5rem;
-        text-decoration: none;
-        color: #333;
-        transition: background-color 0.2s ease;
-      }
-      
-      .category-card-link:hover {
-        background-color: #e5e7eb;
-      }
-      
-      /* Statistic boxes */
-      .stat-box {
-        border-radius: 1.25rem;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-        padding: 1rem;
-        background: linear-gradient(135deg, #4F46E5, #3B82F6);
-        color: white;
-        text-align: center;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-      
-      .stat-box:hover {
-        transform: scale(1.05);
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-      }
-      
-      .stat-box-title {
-        font-size: 1rem;
-        font-weight: 600;
-      }
-      
-      .stat-box-number {
-        font-size: 2rem;
-        font-weight: bold;
-      }
-      
       `}</style>
 
       {/* Main Container */}
@@ -438,25 +235,12 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                 <p className="text-xl font-semibold mb-2">User Information</p>
                 {hubData ? (
                   <div className="space-y-1">
-                    <p>
-                      <strong>Name:</strong> {hubData.user?.name}
-                    </p>
-                    <p>
-                      <strong>Email:</strong> {hubData.user?.email}
-                    </p>
-                    <p>
-                      <strong>Logged In:</strong>{" "}
-                      {hubData.loggedIn ? "Yes" : "No"}
-                    </p>
-                    {hubData.isAdmin && (
-                      <p>
-                        <strong>Admin:</strong> Yes
-                      </p>
-                    )}
+                    <p><strong>Name:</strong> {hubData.user?.name}</p>
+                    <p><strong>Email:</strong> {hubData.user?.email}</p>
+                    <p><strong>Logged In:</strong> {hubData.loggedIn ? "Yes" : "No"}</p>
+                    {hubData.isAdmin && <p><strong>Admin:</strong> Yes</p>}
                     {hubData.metaData && hubData.metaData.length > 0 && (
-                      <p>
-                        <strong>Project:</strong> {hubData.metaData[0].name}
-                      </p>
+                      <p><strong>Project:</strong> {hubData.metaData[0].name}</p>
                     )}
                   </div>
                 ) : (
@@ -479,31 +263,25 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
 
           {/* Right Column: Categories Launchpad */}
           <div className="rounded-xl p-6 shadow-xl border border-gray-300">
-            <p className="text-2xl font-bold mb-4 text-center">
-              Categories Launchpad
-            </p>
+            <p className="text-2xl font-bold mb-4 text-center">Categories Launchpad</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {categories.map((cat, index) => (
-                <div
-                  key={index}
-                  className="p-4 bg-white rounded-xl border hover:shadow-2xl transition transform hover:scale-105"
-                >
+                <div key={index} className="p-4 bg-white rounded-xl border hover:shadow-2xl transition transform hover:scale-105">
                   <div className="flex justify-between items-center mb-2">
                     <p className="text-xl font-semibold">{cat.title}</p>
                     <button
                       onClick={() => toggleCategory(index)}
                       className="text-sm text-blue-500 underline"
                     >
-                      {expandedCategories[index] ? "Hide" : "Show"} (
-                      {cat.links.length})
+                      {expandedCategories[index] ? 'Hide' : 'Show'} ({cat.links.length})
                     </button>
                   </div>
                   {expandedCategories[index] && (
                     <ul className="mt-2 grid grid-cols-2 gap-2">
                       {cat.links.map((link, idx) => (
                         <li key={idx}>
-                          <a
-                            href={link.href}
+                          <a 
+                            href={link.href} 
                             className="block w-full text-gray-800 no-underline hover:text-gray-900 bg-gray-100 p-2 rounded transition"
                           >
                             {link.title}
@@ -521,21 +299,19 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
         {/* New Section: Page Details Overview */}
         <div className="mt-10 rounded-xl p-6 shadow-xl border border-gray-300 bg-white">
           <p className="text-2xl font-bold mb-4 text-center">
-            {isReference
-              ? "Endpoint Details Overview"
-              : "Guide Page Details Overview"}
+            {isReference ? "Endpoint Details Overview" : "Guide Page Details Overview"}
           </p>
           <div className="mb-4 flex justify-center">
-            <button
-              onClick={fetchAllPageDetails}
+            <button 
+              onClick={fetchAllPageDetails} 
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
               disabled={fetchingPages}
             >
               {fetchingPages
                 ? "Fetching Data..."
-                : isReference
-                ? "Fetch Endpoint Data"
-                : "Fetch Guide Page Data"}
+                : isReference 
+                  ? "Fetch Endpoint Data" 
+                  : "Fetch Guide Page Data"}
             </button>
           </div>
           {pageError && <p className="text-red-500">{pageError}</p>}
@@ -543,9 +319,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
             <>
               {isReference && (
                 <div className="mb-6">
-                  <h3 className="text-xl font-semibold">
-                    Endpoint Method Tally
-                  </h3>
+                  <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
                   <ul className="list-disc list-inside">
                     {Object.entries(methodTally).map(([method, count]) => (
                       <li key={method}>
@@ -558,43 +332,24 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
               {/* Page Cards Grid (using custom class to avoid inherited grid-cols-1 styles) */}
               <div className="fetch-pages-grid grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 {pageDetails.map((page, idx) => (
-                  <div
-                    key={idx}
-                    className="flex flex-col bg-white border rounded-lg shadow-md p-6 hover:shadow-xl transition-all"
-                  >
+                  <div key={idx} className="flex flex-col bg-white border rounded-lg shadow-md p-6 hover:shadow-xl transition-all">
                     <div>
-                      <p className="font-bold text-lg mb-2">
-                        {page.pageTitle || "N/A"}
-                      </p>
-                      <p className="text-sm text-gray-700 mb-4">
-                        {page.description || "No Description Found"}
-                      </p>
+                      <p className="font-bold text-lg mb-2">{page.pageTitle || "N/A"}</p>
+                      <p className="text-sm text-gray-700 mb-4">{page.description || "No Description Found"}</p>
                       {isReference && (
                         <>
-                          <p className="text-sm mb-1">
-                            <span className="font-semibold">Method:</span>{" "}
-                            {page.method || "N/A"}
-                          </p>
-                          <p className="text-sm mb-1">
-                            <span className="font-semibold">Endpoint URL:</span>{" "}
-                            {page.endpointUrl || "N/A"}
-                          </p>
+                          <p className="text-sm mb-1"><span className="font-semibold">Method:</span> {page.method || "N/A"}</p>
+                          <p className="text-sm mb-1"><span className="font-semibold">Endpoint URL:</span> {page.endpointUrl || "N/A"}</p>
                         </>
                       )}
-                      <p className="text-sm mb-1">
-                        <span className="font-semibold">Last Updated:</span>{" "}
-                        {page.updated || "N/A"}
-                      </p>
-                      <p className="text-sm">
-                        <span className="font-semibold">Reading Time:</span>{" "}
-                        {page.readingTime ?? "--"} minutes
-                      </p>
+                      <p className="text-sm mb-1"><span className="font-semibold">Last Updated:</span> {page.updated || "N/A"}</p>
+                      <p className="text-sm"><span className="font-semibold">Reading Time:</span> {page.readingTime ?? '--'} minutes</p>
                     </div>
                     <div className="mt-auto pt-4">
                       <a
-                        href={page.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href={page.href} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
                         className="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition"
                       >
                         View Page
@@ -611,4 +366,4 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   );
 };
 
-<DashboardComponent header="Interactive Dashboard" />;
+<DashboardComponent header="Interactive Dashboard" />
