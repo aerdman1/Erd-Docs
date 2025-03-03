@@ -1,5 +1,5 @@
 ---
-title: Dashboard Fun!
+title: MDX Dashboard
 deprecated: false
 hidden: false
 metadata:
