@@ -5,10 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-<GuidesExamplePull />
-
-<br />
-
 ## PET
 
 <PullFromExamples endpoint="/pet" />
