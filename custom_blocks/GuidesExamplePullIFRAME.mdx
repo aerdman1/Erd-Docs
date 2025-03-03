@@ -10,7 +10,6 @@ export default function PullFromExamplesIFRAME({ endpoint }) {
 
   useEffect(() => {
     if (!endpoint) {
-      setError('No endpoint provided.');
       setLoading(false);
       return;
     }
