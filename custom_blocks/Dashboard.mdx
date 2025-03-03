@@ -104,16 +104,16 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
 
       // HTTP Method: prioritize the one in the headline container if available
       const methodEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.rm-APIMethod") ||
-                        doc.querySelector("span.rm-APIMethod");
+                       doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
-      // Endpoint URL: try to grab from the headline container first
-      const urlEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.headline-container-article-info-url2nV_XrjpFuVQ") ||
-                     doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
+      // Endpoint URL: try to grab from the headline container first (loosened selectors)
+      const urlEl = doc.querySelector("div[class^='headline-container-article-info'] span[class^='headline-container-article-info-url']") ||
+                    doc.querySelector("span[class^='headline-container-article-info-url']");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
-      // Last Updated: first try the footer container, then fallback
-      let updatedEl = doc.querySelector("div.Footer-desktop1Hf-2fUBeoe2 div.UpdatedAt p.DateLine") ||
+      // Last Updated: first try the footer container, then fallback (loosened selectors)
+      let updatedEl = doc.querySelector("div[class^='Footer-desktop'] div.UpdatedAt p.DateLine") ||
                       doc.querySelector("div.UpdatedAt p.DateLine");
       if (!updatedEl) {
         // Look for any DateLine element anywhere that includes "Updated"
@@ -321,15 +321,15 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
             <>
               {isReference && (
                 <div className="mb-6">
-                <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
-                <ul className="list-disc list-inside pl-4">
-                  {Object.entries(methodTally).map(([method, count]) => (
-                    <li key={method} className="list-item mb-2">
-                      <strong>{method}:</strong> {count}
-                    </li>
-                  ))}
-                </ul>
-              </div>              
+                  <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
+                  <ul className="list-disc list-inside pl-4">
+                    {Object.entries(methodTally).map(([method, count]) => (
+                      <li key={method} className="list-item mb-2">
+                        <strong>{method}:</strong> {count}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
               {/* Page Cards Grid (using custom class to avoid inherited grid-cols-1 styles) */}
               <div className="fetch-pages-grid grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-6">
@@ -368,4 +368,4 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   );
 };
 
-<DashboardComponent header="Interactive Dashboard" />
+<DashboardComponent header="Interactive Dashboard" />;
