@@ -7,7 +7,11 @@ metadata:
 ---
 ## PET
 
-\<\<GuidesExamplePullIFRAME endpoint="/pet" />
+<br />
+
+<GuidesExamplePullIFRAME />
+
+<br />
 
 ***
 
