@@ -19,7 +19,6 @@ export const PageSearching = () => {
 
     if (!searchTerm.trim()) return;
 
-    // Delay to ensure content is rendered before we search it
     const searchAndHighlight = () => {
       const contentArea = document.querySelector('.content-body.grid-75');
       if (!contentArea) {
@@ -35,10 +34,13 @@ export const PageSearching = () => {
           const match = node.nodeValue.match(regex);
           if (match) {
             const wrapper = document.createElement('span');
-            wrapper.innerHTML = node.nodeValue.replace(regex, `<span class="bg-yellow-200 font-bold">$1</span>`);
+            wrapper.innerHTML = node.nodeValue.replace(
+              regex,
+              `<span style="background-color: yellow; font-weight: bold;">$1</span>`
+            );
             const parent = node.parentNode;
             parent.replaceChild(wrapper, node);
-            elementsToHighlight.push(...wrapper.querySelectorAll('span.bg-yellow-200'));
+            elementsToHighlight.push(...wrapper.querySelectorAll('span[style]'));
           }
         } else if (node.nodeType === 1 && node.childNodes && !['SCRIPT', 'STYLE'].includes(node.nodeName)) {
           node.childNodes.forEach(highlightMatches);
@@ -49,9 +51,8 @@ export const PageSearching = () => {
       setHighlightedElements(elementsToHighlight);
     };
 
-    // Small timeout to ensure page loads fully
-    const timer = setTimeout(searchAndHighlight, 200); // Adjust if needed
-    return () => clearTimeout(timer); // Cleanup
+    const timer = setTimeout(searchAndHighlight, 200);
+    return () => clearTimeout(timer);
   }, [searchTerm]);
 
   return (
@@ -66,6 +67,7 @@ export const PageSearching = () => {
     </div>
   );
 };
+
 
 
 <PageSearching />
