@@ -10,7 +10,6 @@ export const PullFromExamples = ({ endpoint }) => {
 
   useEffect(() => {
     if (!endpoint) {
-      setError("No endpoint provided.");
       return;
     }
     fetchEndpointExample();
