@@ -55,7 +55,8 @@ export const BannerGenerator = () => {
     return props;
   };
 
-  const generatedSnippet = `<Banner ${generateBannerProps()} />`;
+  // NOTE: Updated snippet to output the unified component's name
+  const generatedSnippet = `<BannerGenerator ${generateBannerProps()} />`;
 
   const actualBannerColor =
     preset === 'custom' ? bannerColor :
@@ -79,7 +80,7 @@ export const BannerGenerator = () => {
       borderRadius: '10px',
       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
       fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
-      display: isAdmin ? undefined : 'none', // Hide entire generator if not admin
+      display: isAdmin ? undefined : 'none', // Only admins see the generator UI
     },
     heading: {
       textAlign: 'center',
@@ -214,7 +215,7 @@ export const BannerGenerator = () => {
     boxSizing: "border-box"
   };
 
-  // Effect to move the banner into the header (as per your Banner component)
+  // Move the banner into the header (as per your original Banner component)
   useEffect(() => {
     const moveBannerToHeader = () => {
       const existingBanner = document.getElementById('custom-banner-container');
@@ -230,7 +231,7 @@ export const BannerGenerator = () => {
         const bannerContent = document.getElementById('custom-banner-content');
         if (bannerContent) {
           bannerWrapper.appendChild(bannerContent);
-          bannerContent.style.display = ''; // Make visible after moving
+          bannerContent.style.display = ''; // Reveal after moving
         }
       }
     };
@@ -240,6 +241,7 @@ export const BannerGenerator = () => {
 
   return (
     <>
+      {/* Generator UI (only visible to admins) */}
       <div style={styles.container}>
         <h3 style={styles.heading}>Banner Generator</h3>
 
@@ -325,11 +327,11 @@ export const BannerGenerator = () => {
           </div>
         )}
 
-        {/* Banner Preview */}
+        {/* Live Preview within the generator */}
         <h4 style={styles.sectionHeading}>Banner Preview:</h4>
         <div style={styles.preview}>{message}</div>
 
-        {/* Generated Code */}
+        {/* Generated Code Output */}
         <h4 style={styles.sectionHeading}>Generated Code:</h4>
         <pre style={styles.code}>{generatedSnippet}</pre>
 
@@ -341,7 +343,7 @@ export const BannerGenerator = () => {
         </button>
       </div>
 
-      {/* Banner Injection Content */}
+      {/* Banner Injection Content (always used to update the header) */}
       <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
         <div style={containerStyles}>
           {message || defaults.message}
