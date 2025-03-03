@@ -9,7 +9,7 @@ const EndpointExampleResponseIframe = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Create an off-screen iframe (positioned off-screen so it's not visible)
+    // Create an off-screen iframe (positioned off-screen so it's rendered but not visible)
     const iframe = document.createElement('iframe');
     iframe.style.position = 'absolute';
     iframe.style.top = '-9999px';
@@ -21,7 +21,7 @@ const EndpointExampleResponseIframe = () => {
         const iDoc = iframe.contentDocument || iframe.contentWindow.document;
         console.log('Iframe loaded.');
 
-        // Wait for the page's JavaScript to fully initialize.
+        // Wait for the page's JS to fully initialize.
         setTimeout(() => {
           // 1. Find and click the "EXAMPLE" button.
           const exampleButton = Array.from(iDoc.querySelectorAll('button')).find(btn =>
