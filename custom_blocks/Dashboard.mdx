@@ -91,23 +91,23 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       const descEl = doc.querySelector("div[role='doc-subtitle']");
       const description = descEl ? descEl.innerText.trim() : "No Description Found";
 
-      // HTTP Method (likely for endpoints): look for any element with class "rm-APIMethod"
-      const methodEl = doc.querySelector("span.rm-APIMethod");
+      // HTTP Method: prioritize the one in the main headline container if available
+      const methodEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.rm-APIMethod") ||
+                       doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
-      // Endpoint URL (for reference pages): from a span with a unique class (adjust as needed)
-      const urlEl = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
+      // Endpoint URL: similarly, try to grab from the headline container first
+      const urlEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.headline-container-article-info-url2nV_XrjpFuVQ") ||
+                    doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
-      // Last Updated: try several methods to locate the updated info.
-      let updatedEl = doc.querySelector("div.UpdatedAt p.DateLine");
+      // Last Updated: first try the footer container, then fallback
+      let updatedEl = doc.querySelector("div.Footer-desktop1Hf-2fUBeoe2 div.UpdatedAt p.DateLine") ||
+                      doc.querySelector("div.UpdatedAt p.DateLine");
       if (!updatedEl) {
-        // Look for any DateLine within the main article that contains "Updated"
-        const articleEl = doc.querySelector(".rm-Article");
-        if (articleEl) {
-          const candidates = articleEl.querySelectorAll("p.DateLine");
-          updatedEl = Array.from(candidates).find(p => p.innerText.includes("Updated"));
-        }
+        // Look for any DateLine element anywhere that includes "Updated"
+        const candidates = doc.querySelectorAll("p.DateLine");
+        updatedEl = Array.from(candidates).find(p => p.innerText.includes("Updated"));
       }
       const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
 
