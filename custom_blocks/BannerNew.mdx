@@ -27,29 +27,29 @@ export const Banner = ({
 
   const defaultPresets = {
     critical: {
-      bannerColor: "bg-red-600",
-      bannerTextColor: "text-white",
-      fontSize: "text-base",
-      fontWeight: "font-normal",
+      bannerColor: "#dc2626", // red-600
+      bannerTextColor: "#ffffff", // white
+      fontSize: "16px",
+      fontWeight: "normal",
       message: "Critical Alert: Please check immediately!"
     },
     warning: {
-      bannerColor: "bg-yellow-400",
-      bannerTextColor: "text-black",
-      fontSize: "text-base",
-      fontWeight: "font-normal",
+      bannerColor: "#facc15", // yellow-400
+      bannerTextColor: "#000000", // black
+      fontSize: "16px",
+      fontWeight: "normal",
       message: "Warning Alert: There might be an issue."
     },
     standard: {
-      bannerColor: "bg-blue-600",
-      bannerTextColor: "text-white",
-      fontSize: "text-base",
-      fontWeight: "font-normal",
+      bannerColor: "#2563eb", // blue-600
+      bannerTextColor: "#ffffff", // white
+      fontSize: "16px",
+      fontWeight: "normal",
       message: "Standard Alert: Here is some information."
     },
     custom: {
-      bannerColor: "#00BCFF",
-      bannerTextColor: "#fff",
+      bannerColor: "#00BCFF",    
+      bannerTextColor: "#ffffff",
       fontSize: "14px",
       fontWeight: "bold",
       message: "Here is my banner message - hope you enjoy!"
@@ -59,18 +59,22 @@ export const Banner = ({
   const defaults = defaultPresets[selectedPreset];
   const finalMessage = message || defaults.message;
 
-  let containerClasses = "p-2 text-center rounded-md mb-5";
-  let inlineStyles = {};
+  const bannerStyles = {
+    background: bannerColor || defaults.bannerColor,
+    color: bannerTextColor || defaults.bannerTextColor,
+    fontSize: fontSize || defaults.fontSize,
+    fontWeight: fontWeight || defaults.fontWeight,
+    width: "100%",
+    boxSizing: "border-box"
+  };
 
-  if (selectedPreset === "custom" || bannerColor || bannerTextColor || fontSize || fontWeight) {
-    inlineStyles.background = bannerColor || (selectedPreset === "custom" ? defaults.bannerColor : undefined);
-    inlineStyles.color = bannerTextColor || (selectedPreset === "custom" ? defaults.bannerTextColor : undefined);
-    inlineStyles.borderColor = bannerTextColor || (selectedPreset === "custom" ? defaults.bannerTextColor : undefined);
-    inlineStyles.fontSize = fontSize || (selectedPreset === "custom" ? defaults.fontSize : undefined);
-    inlineStyles.fontWeight = fontWeight || (selectedPreset === "custom" ? defaults.fontWeight : undefined);
-  } else {
-    containerClasses += ` ${defaults.bannerColor} ${defaults.bannerTextColor} ${defaults.fontSize} ${defaults.fontWeight}`;
-  }
+  const containerStyles = {
+    maxWidth: "var(--rm-container-width, 1200px)",
+    margin: "0 auto",
+    padding: "0.75rem 1rem",
+    textAlign: "center",
+    boxSizing: "border-box"
+  };
 
   useEffect(() => {
     const moveBannerToHeader = () => {
@@ -81,7 +85,7 @@ export const Banner = ({
 
       const bannerWrapper = document.createElement('div');
       bannerWrapper.id = 'custom-banner-container';
-      bannerWrapper.style.margin = '0.5rem 0';
+      Object.assign(bannerWrapper.style, bannerStyles);
 
       const headerElement = document.querySelector('header.rm-Header');
       if (headerElement) {
@@ -89,7 +93,7 @@ export const Banner = ({
         const bannerContent = document.getElementById('custom-banner-content');
         if (bannerContent) {
           bannerWrapper.appendChild(bannerContent);
-          bannerContent.style.display = ''; // Make visible after being moved
+          bannerContent.style.display = ''; // Make visible after moving
         }
       }
     };
@@ -98,8 +102,8 @@ export const Banner = ({
   }, []);
 
   return (
-    <div id="custom-banner-content" style={{ display: 'none' }}>
-      <div className={containerClasses} style={inlineStyles}>
+    <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
+      <div style={containerStyles}>
         {finalMessage}
       </div>
     </div>
