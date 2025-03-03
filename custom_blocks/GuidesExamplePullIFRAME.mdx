@@ -3,7 +3,7 @@ name: GuidesExamplePullIFRAME
 ---
 import React, { useEffect, useState } from 'react';
 
-export default function PullFromExamplesIFRAME({ endpoint }) {
+export default function GuidesExamplePullIframe({ endpoint }) {
   const [codeText, setCodeText] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -14,118 +14,142 @@ export default function PullFromExamplesIFRAME({ endpoint }) {
       setLoading(false);
       return;
     }
-    // Map the provided endpoint to a docs URL.
-    let docsUrl = '';
-    switch (endpoint) {
-      case '/pet':
-        docsUrl = 'https://erdtest123.readme.io/reference/updatepet';
-        break;
-      case '/pet/{petId}':
-        docsUrl = 'https://erdtest123.readme.io/reference/getpetbyid'; // adjust as needed
-        break;
-      case '/pet/findByStatus':
-        docsUrl = 'https://erdtest123.readme.io/reference/findpetbystatus';
-        break;
-      default:
-        docsUrl = `https://erdtest123.readme.io/reference${endpoint}`;
-        break;
-    }
-    console.log('Iframe mode: Using docs URL:', docsUrl);
 
-    // Create an off-screen iframe (positioned off-screen so it renders but is not visible)
+    let docsUrl = mapEndpointToDocsUrl(endpoint);
+    console.log('Loading endpoint via iframe:', docsUrl);
+
     const iframe = document.createElement('iframe');
     iframe.style.position = 'absolute';
     iframe.style.top = '-9999px';
+    iframe.style.width = '1px'; 
+    iframe.style.height = '1px';
     iframe.src = docsUrl;
     document.body.appendChild(iframe);
 
-    iframe.onload = function () {
+    const cleanup = () => {
+      if (iframe.parentNode) {
+        iframe.parentNode.removeChild(iframe);
+      }
+    };
+
+    iframe.onload = () => {
       try {
         const iDoc = iframe.contentDocument || iframe.contentWindow.document;
-        console.log('Iframe loaded.');
-        // Wait for page JS to run.
+        console.log('Iframe loaded for:', endpoint);
+
         setTimeout(() => {
           const exampleButton = Array.from(iDoc.querySelectorAll('button')).find(btn =>
             btn.innerText.trim().toUpperCase().includes('EXAMPLE')
           );
+
           if (!exampleButton) {
             setError('EXAMPLE button not found in iframe.');
             setLoading(false);
-            document.body.removeChild(iframe);
+            cleanup();
             return;
           }
-          console.log('Clicking the "EXAMPLE" button:', exampleButton);
+
+          console.log('Clicking EXAMPLE button.');
           exampleButton.click();
-          // Wait for the Tippy popup to appear.
+
           setTimeout(() => {
             const popup = iDoc.querySelector('[data-tippy-root]');
             if (!popup) {
-              setError('Popup (data-tippy-root) not found in iframe.');
+              setError('Popup (data-tippy-root) not found.');
               setLoading(false);
-              document.body.removeChild(iframe);
+              cleanup();
               return;
             }
-            console.log('Popup found:', popup);
+
+            console.log('Popup found, looking for "Request Example".');
             const reqExampleOption = Array.from(popup.querySelectorAll('.Menu-Item')).find(el =>
               el.innerText.trim().toUpperCase().includes('REQUEST EXAMPLE')
             );
+
             if (!reqExampleOption) {
-              setError('"Request Example" option not found in popup.');
+              setError('"Request Example" option not found.');
               setLoading(false);
-              document.body.removeChild(iframe);
+              cleanup();
               return;
             }
-            console.log('Clicking the "Request Example" option:', reqExampleOption);
+
+            console.log('Clicking Request Example option.');
             reqExampleOption.click();
-            // Wait for CodeMirror to update.
+
             setTimeout(() => {
               const codeContainer = iDoc.querySelector('.react-codemirror2.CodeEditor');
+
               if (!codeContainer) {
-                setError('CodeMirror container not found in iframe.');
+                setError('CodeMirror container not found.');
                 setLoading(false);
-                document.body.removeChild(iframe);
+                cleanup();
                 return;
               }
+
               const codeLines = codeContainer.querySelectorAll('.CodeMirror-lines pre.CodeMirror-line');
-              if (!codeLines || codeLines.length === 0) {
-                setError('No CodeMirror lines found in iframe.');
+
+              if (codeLines.length === 0) {
+                setError('No content found in CodeMirror.');
                 setLoading(false);
-                document.body.removeChild(iframe);
+                cleanup();
                 return;
               }
-              let extractedCode = '';
-              codeLines.forEach(line => {
-                extractedCode += line.textContent + '\n';
-              });
-              console.log('Extracted CodeMirror text:');
-              console.log(extractedCode);
+
+              const extractedCode = Array.from(codeLines).map(line => line.textContent).join('\n');
+              console.log('Extracted code:', extractedCode);
+
               setCodeText(extractedCode);
               setLoading(false);
-              document.body.removeChild(iframe);
+              cleanup();
             }, 3000);
           }, 2000);
         }, 2000);
       } catch (err) {
-        console.error('Error accessing iframe content:', err);
-        setError(err.message);
+        console.error('Error processing iframe:', err);
+        setError(`Error accessing iframe: ${err.message}`);
         setLoading(false);
-        document.body.removeChild(iframe);
+        cleanup();
       }
     };
-    return () => {
-      if (iframe && iframe.parentNode) {
-        iframe.parentNode.removeChild(iframe);
-      }
-    };
+
+    return cleanup;
   }, [endpoint]);
 
-  if (loading) return <div>Loading endpoint example (iframe mode)...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-  if (!codeText) return null;
+  const mapEndpointToDocsUrl = (path) => {
+    switch (path) {
+      case '/pet':
+        return 'https://erdtest123.readme.io/reference/updatepet';
+      case '/pet/{petId}':
+        return 'https://erdtest123.readme.io/reference/getpetbyid';
+      case '/pet/findByStatus':
+        return 'https://erdtest123.readme.io/reference/findpetbystatus';
+      default:
+        return `https://erdtest123.readme.io/reference${path}`;
+    }
+  };
+
+  if (loading) {
+    return <div>Loading example response (iframe mode)...</div>;
+  }
+
+  if (error) {
+    return <div style={{ color: 'red', whiteSpace: 'pre-wrap' }}>{error}</div>;
+  }
+
+  if (!codeText) {
+    return <div>No example response found.</div>;
+  }
+
   return (
     <div style={{ border: '1px solid #ddd', padding: '16px', borderRadius: '8px', marginTop: '16px' }}>
-      <h3>Response from Iframe Mode for {endpoint}</h3>
-      <pre style={{ whiteSpace: 'pre-wrap', background: '#f5f5f5', padding: '8px', borderRadius: '4px', marginTop: '8px' }}>
+      <h3>Example Response (from iframe) for {endpoint}</h3>
+      <pre style={{
+        whiteSpace: 'pre-wrap',
+        background: '#f5f5f5',
+        padding: '8px',
+        borderRadius: '4px',
+        marginTop: '8px',
+      }}>
         {codeText}
       </pre>
     </div>
