@@ -1,5 +1,5 @@
 ---
-title: Only group A can edit this
+title: Group A
 excerpt: 'Here is my description. '
 deprecated: false
 hidden: false
