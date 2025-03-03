@@ -77,7 +77,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
     }));
   };
 
-  // Helper: Extract key page info from an HTML string
+  // Helper: Extract key page info from an HTML string and estimate reading time
   const extractPageInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
@@ -91,12 +91,12 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       const descEl = doc.querySelector("div[role='doc-subtitle']");
       const description = descEl ? descEl.innerText.trim() : "No Description Found";
 
-      // HTTP Method: prioritize the one in the main headline container if available
+      // HTTP Method: prioritize the one in the headline container if available
       const methodEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.rm-APIMethod") ||
                        doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
-      // Endpoint URL: similarly, try to grab from the headline container first
+      // Endpoint URL: try to grab from the headline container first
       const urlEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.headline-container-article-info-url2nV_XrjpFuVQ") ||
                     doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
@@ -111,7 +111,30 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       }
       const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
 
-      return { pageTitle, description, method, endpointUrl, updated };
+      // Reading Time: estimate based on text content of the article or body
+      const estimateReadingTime = (rootElement, wordsPerMinute = 200) => {
+        if (!rootElement) return 0;
+        const readableTags = new Set([
+          'P', 'SPAN', 'LI', 'DIV', 'ARTICLE', 'SECTION', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'
+        ]);
+        let totalWords = 0;
+        const walker = doc.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT, {
+          acceptNode: (node) =>
+            node.parentElement && readableTags.has(node.parentElement.tagName)
+              ? NodeFilter.FILTER_ACCEPT
+              : NodeFilter.FILTER_SKIP
+        });
+        while (walker.nextNode()) {
+          const text = walker.currentNode.textContent.trim();
+          totalWords += text.split(/\s+/).filter(word => word.length > 0).length;
+        }
+        return Math.ceil(totalWords / wordsPerMinute);
+      };
+      // Use the article if available; fallback to document body
+      const rootElement = doc.querySelector('.rm-Article') || doc.body;
+      const readingTime = estimateReadingTime(rootElement);
+
+      return { pageTitle, description, method, endpointUrl, updated, readingTime };
     } catch (e) {
       console.error("Error extracting page info:", e);
       return null;
@@ -172,7 +195,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       {/* Global Custom CSS */}
       <style>{`
         section.content-toc.grid-25 { display: none; }
-				.rm-Guides .content-body { max-width: 100%; width: 100%; }
+        .rm-Guides .content-body { max-width: 100%; width: 100%; }
         .rm-ReferenceMain .rm-Article { max-width: 100%; width:100%; }
         li { list-style: none; }
         .readme-tailwind .text-blue-500 { text-decoration: none !important; }
@@ -316,6 +339,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                       </>
                     )}
                     <p><strong>Last Updated:</strong> {page.updated || "N/A"}</p>
+                    <p><strong>Reading Time:</strong> {page.readingTime ?? '--'} minutes</p>
                     {page.error && <p className="text-red-500">Error: {page.error}</p>}
                     <a href={page.href} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
                       View Page
