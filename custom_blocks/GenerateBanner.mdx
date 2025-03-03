@@ -43,7 +43,6 @@ export const BannerGenerator = () => {
 
   const generatedSnippet = `<Banner ${generateBannerProps()} />`;
 
-  // Determine actual colors based on the preset for the preview
   const actualBannerColor =
     preset === 'custom' ? bannerColor :
     preset === 'critical' ? '#dc2626' :
@@ -56,23 +55,96 @@ export const BannerGenerator = () => {
     preset === 'warning' ? '#000000' :
     preset === 'standard' ? '#ffffff' : bannerTextColor;
 
-  return (
-    <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', margin: '1rem 0', fontFamily: 'Arial, sans-serif' }}>
-      <h3 style={{ margin: '0 0 1rem' }}>Banner Generator</h3>
+  // Centralized style object for a modern look
+  const styles = {
+    container: {
+      maxWidth: '600px',
+      margin: '2rem auto',
+      padding: '2rem',
+      background: '#fff',
+      borderRadius: '10px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+      fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+    },
+    heading: {
+      textAlign: 'center',
+      marginBottom: '1.5rem',
+      color: '#333',
+    },
+    label: {
+      display: 'block',
+      marginBottom: '1rem',
+      fontWeight: '500',
+      color: '#555',
+    },
+    input: {
+      width: '100%',
+      padding: '0.5rem',
+      marginTop: '0.5rem',
+      borderRadius: '5px',
+      border: '1px solid #ccc',
+    },
+    select: {
+      width: '100%',
+      padding: '0.5rem',
+      marginTop: '0.5rem',
+      borderRadius: '5px',
+      border: '1px solid #ccc',
+    },
+    preview: {
+      backgroundColor: actualBannerColor,
+      color: actualBannerTextColor,
+      fontSize,
+      fontWeight,
+      padding: '1rem',
+      textAlign: 'center',
+      borderRadius: '5px',
+      marginBottom: '1.5rem',
+    },
+    code: {
+      background: '#f0f0f0',
+      padding: '1rem',
+      borderRadius: '5px',
+      overflowX: 'auto',
+      fontFamily: 'monospace',
+      marginBottom: '1.5rem',
+    },
+    button: {
+      padding: '0.75rem 1.5rem',
+      cursor: 'pointer',
+      background: '#4CAF50',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      display: 'block',
+      margin: '0 auto',
+      fontSize: '1rem',
+    },
+    sectionHeading: {
+      fontSize: '1.25rem',
+      marginBottom: '1rem',
+      textAlign: 'center',
+      color: '#333',
+    },
+  };
 
-      <label>
-        Message:{' '}
+  return (
+    <div style={styles.container}>
+      <h3 style={styles.heading}>Banner Generator</h3>
+
+      <label style={styles.label}>
+        Message:
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          style={{ width: '100%' }}
+          style={styles.input}
         />
       </label>
 
-      <label>
+      <label style={styles.label}>
         Preset:
-        <select value={preset} onChange={handlePresetChange} style={{ width: '100%' }}>
+        <select value={preset} onChange={handlePresetChange} style={styles.select}>
           <option value="custom">Custom (you choose colors)</option>
           <option value="critical">Critical (Red)</option>
           <option value="warning">Warning (Yellow)</option>
@@ -82,82 +154,58 @@ export const BannerGenerator = () => {
 
       {preset === 'custom' && (
         <>
-          <label>
-            Banner Background Color:{' '}
+          <label style={styles.label}>
+            Banner Background Color:
             <input
               type="color"
               value={bannerColor}
               onChange={(e) => setBannerColor(e.target.value)}
+              style={{ ...styles.input, padding: '0.2rem' }}
             />
           </label>
-          <label>
-            Banner Text Color:{' '}
+          <label style={styles.label}>
+            Banner Text Color:
             <input
               type="color"
               value={bannerTextColor}
               onChange={(e) => setBannerTextColor(e.target.value)}
+              style={{ ...styles.input, padding: '0.2rem' }}
             />
           </label>
         </>
       )}
 
-      <label>
-        Font Size:{' '}
+      <label style={styles.label}>
+        Font Size:
         <input
           type="text"
           value={fontSize}
           onChange={(e) => setFontSize(e.target.value)}
+          style={styles.input}
         />
       </label>
-      <label>
-        Font Weight:{' '}
+
+      <label style={styles.label}>
+        Font Weight:
         <input
           type="text"
           value={fontWeight}
           onChange={(e) => setFontWeight(e.target.value)}
+          style={styles.input}
         />
       </label>
 
       {/* Banner Preview */}
-      <h4>Banner Preview:</h4>
-      <div
-        style={{
-          backgroundColor: actualBannerColor,
-          color: actualBannerTextColor,
-          fontSize,
-          fontWeight,
-          padding: '1rem',
-          textAlign: 'center',
-          borderRadius: '4px',
-          marginBottom: '1rem'
-        }}
-      >
-        {message}
-      </div>
+      <h4 style={styles.sectionHeading}>Banner Preview:</h4>
+      <div style={styles.preview}>{message}</div>
 
-      <h4>Generated Code:</h4>
-      <pre
-        style={{
-          background: '#f5f5f5',
-          padding: '1rem',
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word',
-          fontFamily: 'monospace'
-        }}
-      >
-        {generatedSnippet}
-      </pre>
+      {/* Generated Code */}
+      <h4 style={styles.sectionHeading}>Generated Code:</h4>
+      <pre style={styles.code}>{generatedSnippet}</pre>
 
       <button
         onClick={() => navigator.clipboard.writeText(generatedSnippet)}
-        style={{
-          padding: '0.5rem 1rem',
-          cursor: 'pointer',
-          background: '#007bff',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px'
-        }}
+        style={styles.button}
       >
         Copy to Clipboard
       </button>
