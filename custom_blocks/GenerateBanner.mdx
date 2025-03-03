@@ -24,13 +24,14 @@ export const BannerGenerator = ({
     }
   }
 
-  // Use the incoming props to initialize state
+  // Use incoming props to initialize state
   const [message, setMessage] = useState(propMessage);
   const [bannerColor, setBannerColor] = useState(propBannerColor);
   const [bannerTextColor, setBannerTextColor] = useState(propBannerTextColor);
   const [fontSize, setFontSize] = useState(propFontSize);
   const [fontWeight, setFontWeight] = useState(propFontWeight);
   const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
+  const [placement, setPlacement] = useState('bottom'); // 'top' or 'bottom'
 
   // Sync state with props if they change externally
   useEffect(() => {
@@ -68,10 +69,11 @@ export const BannerGenerator = ({
       props += ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
     }
     props += ` fontSize="${fontSize}" fontWeight="${fontWeight}"`;
+    props += ` placement="${placement}"`;
     return props;
   };
 
-  // Updated snippet now outputs the unified component's name
+  // The generated snippet now shows the unified component's name
   const generatedSnippet = `<BannerGenerator ${generateBannerProps()} />`;
 
   const actualBannerColor =
@@ -86,7 +88,7 @@ export const BannerGenerator = ({
     preset === 'warning' ? '#000000' :
     preset === 'standard' ? '#ffffff' : bannerTextColor;
 
-  // Centralized style object for the generator UI
+  // Centralized style object for the admin UI
   const styles = {
     container: {
       maxWidth: '600px',
@@ -142,16 +144,6 @@ export const BannerGenerator = ({
       borderRadius: '5px',
       cursor: 'pointer',
       appearance: 'none',
-    },
-    preview: {
-      backgroundColor: actualBannerColor,
-      color: actualBannerTextColor,
-      fontSize,
-      fontWeight,
-      padding: '1rem',
-      textAlign: 'center',
-      borderRadius: '5px',
-      marginBottom: '1.5rem',
     },
     code: {
       background: '#f0f0f0',
@@ -231,7 +223,7 @@ export const BannerGenerator = ({
     boxSizing: "border-box"
   };
 
-  // Update (or create) the banner container without removing it if it exists.
+  // Move (or update) the banner in the header based on placement
   useEffect(() => {
     const moveBannerToHeader = () => {
       const headerElement = document.querySelector('header.rm-Header');
@@ -239,8 +231,14 @@ export const BannerGenerator = ({
       let bannerWrapper = document.getElementById('custom-banner-container');
       const bannerContent = document.getElementById('custom-banner-content');
       if (bannerWrapper) {
-        // Update the existing container's styles
+        // Update styles
         Object.assign(bannerWrapper.style, bannerStyles);
+        // Re-insert based on placement
+        if (placement === 'top') {
+          headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
+        } else {
+          headerElement.appendChild(bannerWrapper);
+        }
         if (bannerContent && bannerContent.parentNode !== bannerWrapper) {
           bannerWrapper.appendChild(bannerContent);
           bannerContent.style.display = '';
@@ -249,7 +247,11 @@ export const BannerGenerator = ({
         bannerWrapper = document.createElement('div');
         bannerWrapper.id = 'custom-banner-container';
         Object.assign(bannerWrapper.style, bannerStyles);
-        headerElement.appendChild(bannerWrapper);
+        if (placement === 'top') {
+          headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
+        } else {
+          headerElement.appendChild(bannerWrapper);
+        }
         if (bannerContent) {
           bannerWrapper.appendChild(bannerContent);
           bannerContent.style.display = '';
@@ -258,11 +260,11 @@ export const BannerGenerator = ({
     };
 
     moveBannerToHeader();
-  }, [bannerColor, bannerTextColor, fontSize, fontWeight, message, preset]);
+  }, [bannerColor, bannerTextColor, fontSize, fontWeight, message, preset, placement]);
 
   return (
     <>
-      {/* Generator UI (visible only to admins) */}
+      {/* Admin Generator UI */}
       <div style={styles.container}>
         <h3 style={styles.heading}>Banner Generator</h3>
 
@@ -348,9 +350,18 @@ export const BannerGenerator = ({
           </div>
         )}
 
-        {/* Live Preview within the generator */}
-        <h4 style={styles.sectionHeading}>Banner Preview:</h4>
-        <div style={styles.preview}>{message}</div>
+        {/* New Toggle for Banner Placement */}
+        <label style={styles.label}>
+          Banner Placement:
+          <select
+            value={placement}
+            onChange={(e) => setPlacement(e.target.value)}
+            style={styles.select}
+          >
+            <option value="top">Top (first in header)</option>
+            <option value="bottom">Bottom (default)</option>
+          </select>
+        </label>
 
         {/* Generated Code Output */}
         <h4 style={styles.sectionHeading}>Generated Code:</h4>
