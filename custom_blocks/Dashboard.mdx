@@ -298,73 +298,73 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
           </div>
         </div>
 
-      {/* New Section: Page Details Overview */}
-<div className="mt-10 rounded-xl p-6 shadow-xl border border-gray-300 bg-white">
-  <p className="text-2xl font-bold mb-4 text-center">
-    {isReference ? "Endpoint Details Overview" : "Guide Page Details Overview"}
-  </p>
-  <div className="mb-4 flex justify-center">
-    <button 
-      onClick={fetchAllPageDetails} 
-      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-      disabled={fetchingPages}
-    >
-      {fetchingPages
-        ? "Fetching Data..."
-        : isReference 
-          ? "Fetch Endpoint Data" 
-          : "Fetch Guide Page Data"}
-    </button>
-  </div>
-  {pageError && <p className="text-red-500">{pageError}</p>}
-  {pageDetails.length > 0 && (
-    <>
-      {isReference && (
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
-          <ul className="list-disc list-inside">
-            {Object.entries(methodTally).map(([method, count]) => (
-              <li key={method}>
-                <strong>{method}:</strong> {count}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {/* Page Cards Grid (using custom class to avoid inherited grid-cols-1 styles) */}
-      <div className="fetch-pages-grid grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {pageDetails.map((page, idx) => (
-          <div key={idx} className="flex-1 p-4 rounded-xl shadow-md bg-gradient-to-br from-green-400 to-green-600 text-white text-center transform transition hover:scale-105">
-            <div>
-              <p className="font-bold text-lg mb-2">{page.pageTitle || "N/A"}</p>
-              <p className="text-sm text-gray-700 mb-4">{page.description || "No Description Found"}</p>
-              {isReference && (
-                <>
-                  <p className="text-sm mb-1"><span className="font-semibold">Method:</span> {page.method || "N/A"}</p>
-                  <p className="text-sm mb-1"><span className="font-semibold">Endpoint URL:</span> {page.endpointUrl || "N/A"}</p>
-                </>
-              )}
-              <p className="text-sm mb-1"><span className="font-semibold">Last Updated:</span> {page.updated || "N/A"}</p>
-              <p className="text-sm"><span className="font-semibold">Reading Time:</span> {page.readingTime ?? '--'} minutes</p>
-            </div>
-            <div className="mt-auto pt-4">
-              <a
-                href={page.href} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition"
-              >
-                View Page
-              </a>
-            </div>
+        {/* New Section: Page Details Overview */}
+        <div className="mt-10 rounded-xl p-6 shadow-xl border border-gray-300 bg-white">
+          <p className="text-2xl font-bold mb-4 text-center">
+            {isReference ? "Endpoint Details Overview" : "Guide Page Details Overview"}
+          </p>
+          <div className="mb-4 flex justify-center">
+            <button 
+              onClick={fetchAllPageDetails} 
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+              disabled={fetchingPages}
+            >
+              {fetchingPages
+                ? "Fetching Data..."
+                : isReference 
+                  ? "Fetch Endpoint Data" 
+                  : "Fetch Guide Page Data"}
+            </button>
           </div>
-        ))}
+          {pageError && <p className="text-red-500">{pageError}</p>}
+          {pageDetails.length > 0 && (
+            <>
+              {isReference && (
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
+                  <ul className="list-disc list-inside">
+                    {Object.entries(methodTally).map(([method, count]) => (
+                      <li key={method}>
+                        <strong>{method}:</strong> {count}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {/* Page Cards Grid (using custom class to avoid inherited grid-cols-1 styles) */}
+              <div className="fetch-pages-grid grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                {pageDetails.map((page, idx) => (
+                  <div key={idx} className="flex flex-col bg-white border rounded-lg shadow-md p-6 hover:shadow-xl transition-all">
+                    <div>
+                      <p className="font-bold text-lg mb-2">{page.pageTitle || "N/A"}</p>
+                      <p className="text-sm text-gray-700 mb-4">{page.description || "No Description Found"}</p>
+                      {isReference && (
+                        <>
+                          <p className="text-sm mb-1"><span className="font-semibold">Method:</span> {page.method || "N/A"}</p>
+                          <p className="text-sm mb-1"><span className="font-semibold">Endpoint URL:</span> {page.endpointUrl || "N/A"}</p>
+                        </>
+                      )}
+                      <p className="text-sm mb-1"><span className="font-semibold">Last Updated:</span> {page.updated || "N/A"}</p>
+                      <p className="text-sm"><span className="font-semibold">Reading Time:</span> {page.readingTime ?? '--'} minutes</p>
+                    </div>
+                    <div className="mt-auto pt-4">
+                      <a
+                        href={page.href} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition"
+                      >
+                        View Page
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
-  )}
-</div>
-</div>
-</>
   );
 };
 
