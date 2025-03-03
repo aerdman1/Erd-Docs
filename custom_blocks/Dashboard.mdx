@@ -323,7 +323,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                 <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
                 <ul className="list-disc list-inside pl-4">
                   {Object.entries(methodTally).map(([method, count]) => (
-                    <li key={method}>
+                    <li key={method} className="list-item mb-2">
                       <strong>{method}:</strong> {count}
                     </li>
                   ))}
