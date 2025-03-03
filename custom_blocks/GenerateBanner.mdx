@@ -1,0 +1,84 @@
+---
+name: GenerateBanner
+---
+import React, { useState } from 'react';
+
+export const BannerGenerator = () => {
+  const [message, setMessage] = useState('This is my banner message!');
+  const [bannerColor, setBannerColor] = useState('#00bcff');
+  const [bannerTextColor, setBannerTextColor] = useState('#ffffff');
+  const [fontSize, setFontSize] = useState('16px');
+  const [fontWeight, setFontWeight] = useState('normal');
+  const [preset, setPreset] = useState('custom');  // 'critical', 'warning', 'standard', 'custom'
+
+  const handlePresetChange = (e) => {
+    const selectedPreset = e.target.value;
+    setPreset(selectedPreset);
+
+    if (selectedPreset === 'critical') {
+      setBannerColor('#dc2626');
+      setBannerTextColor('#ffffff');
+    } else if (selectedPreset === 'warning') {
+      setBannerColor('#facc15');
+      setBannerTextColor('#000000');
+    } else if (selectedPreset === 'standard') {
+      setBannerColor('#2563eb');
+      setBannerTextColor('#ffffff');
+    } else if (selectedPreset === 'custom') {
+      setBannerColor('#00bcff');
+      setBannerTextColor('#ffffff');
+    }
+  };
+
+  const generatedSnippet = `
+<Banner 
+  message="${message}" 
+  ${preset !== 'custom' ? `${preset}={true}` : ''}
+  bannerColor="${preset === 'custom' ? bannerColor : undefined}" 
+  bannerTextColor="${preset === 'custom' ? bannerTextColor : undefined}" 
+  fontSize="${fontSize}" 
+  fontWeight="${fontWeight}" 
+/>
+  `.trim();
+
+  return (
+    <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', margin: '1rem 0', fontFamily: 'Arial, sans-serif' }}>
+      <h3 style={{ margin: '0 0 1rem' }}>Banner Generator</h3>
+
+      <label>Message: <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} style={{ width: '100%' }} /></label>
+
+      <label>Preset:
+        <select value={preset} onChange={handlePresetChange} style={{ width: '100%' }}>
+          <option value="custom">Custom (you choose colors)</option>
+          <option value="critical">Critical (Red)</option>
+          <option value="warning">Warning (Yellow)</option>
+          <option value="standard">Standard (Blue)</option>
+        </select>
+      </label>
+
+      {preset === 'custom' && (
+        <>
+          <label>Banner Background Color: <input type="color" value={bannerColor} onChange={(e) => setBannerColor(e.target.value)} /></label>
+          <label>Banner Text Color: <input type="color" value={bannerTextColor} onChange={(e) => setBannerTextColor(e.target.value)} /></label>
+        </>
+      )}
+
+      <label>Font Size: <input type="text" value={fontSize} onChange={(e) => setFontSize(e.target.value)} /></label>
+      <label>Font Weight: <input type="text" value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} /></label>
+
+      <h4>Generated Code:</h4>
+      <pre style={{ background: '#f5f5f5', padding: '1rem', whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'monospace' }}>
+        {generatedSnippet}
+      </pre>
+
+      <button
+        onClick={() => navigator.clipboard.writeText(generatedSnippet)}
+        style={{ padding: '0.5rem 1rem', cursor: 'pointer', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}
+      >
+        Copy to Clipboard
+      </button>
+    </div>
+  );
+};
+
+<BannerGenerator />
