@@ -41,13 +41,35 @@ export const BannerGenerator = () => {
 />
   `.trim();
 
+  // Determine actual colors based on the preset
+  const actualBannerColor =
+    preset === 'custom' ? bannerColor :
+    preset === 'critical' ? '#dc2626' :
+    preset === 'warning' ? '#facc15' :
+    preset === 'standard' ? '#2563eb' : bannerColor;
+
+  const actualBannerTextColor =
+    preset === 'custom' ? bannerTextColor :
+    preset === 'critical' ? '#ffffff' :
+    preset === 'warning' ? '#000000' :
+    preset === 'standard' ? '#ffffff' : bannerTextColor;
+
   return (
     <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', margin: '1rem 0', fontFamily: 'Arial, sans-serif' }}>
       <h3 style={{ margin: '0 0 1rem' }}>Banner Generator</h3>
 
-      <label>Message: <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} style={{ width: '100%' }} /></label>
+      <label>
+        Message:{' '}
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          style={{ width: '100%' }}
+        />
+      </label>
 
-      <label>Preset:
+      <label>
+        Preset:
         <select value={preset} onChange={handlePresetChange} style={{ width: '100%' }}>
           <option value="custom">Custom (you choose colors)</option>
           <option value="critical">Critical (Red)</option>
@@ -58,22 +80,82 @@ export const BannerGenerator = () => {
 
       {preset === 'custom' && (
         <>
-          <label>Banner Background Color: <input type="color" value={bannerColor} onChange={(e) => setBannerColor(e.target.value)} /></label>
-          <label>Banner Text Color: <input type="color" value={bannerTextColor} onChange={(e) => setBannerTextColor(e.target.value)} /></label>
+          <label>
+            Banner Background Color:{' '}
+            <input
+              type="color"
+              value={bannerColor}
+              onChange={(e) => setBannerColor(e.target.value)}
+            />
+          </label>
+          <label>
+            Banner Text Color:{' '}
+            <input
+              type="color"
+              value={bannerTextColor}
+              onChange={(e) => setBannerTextColor(e.target.value)}
+            />
+          </label>
         </>
       )}
 
-      <label>Font Size: <input type="text" value={fontSize} onChange={(e) => setFontSize(e.target.value)} /></label>
-      <label>Font Weight: <input type="text" value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} /></label>
+      <label>
+        Font Size:{' '}
+        <input
+          type="text"
+          value={fontSize}
+          onChange={(e) => setFontSize(e.target.value)}
+        />
+      </label>
+      <label>
+        Font Weight:{' '}
+        <input
+          type="text"
+          value={fontWeight}
+          onChange={(e) => setFontWeight(e.target.value)}
+        />
+      </label>
+
+      {/* Banner Preview */}
+      <h4>Banner Preview:</h4>
+      <div
+        style={{
+          backgroundColor: actualBannerColor,
+          color: actualBannerTextColor,
+          fontSize,
+          fontWeight,
+          padding: '1rem',
+          textAlign: 'center',
+          borderRadius: '4px',
+          marginBottom: '1rem'
+        }}
+      >
+        {message}
+      </div>
 
       <h4>Generated Code:</h4>
-      <pre style={{ background: '#f5f5f5', padding: '1rem', whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontFamily: 'monospace' }}>
+      <pre
+        style={{
+          background: '#f5f5f5',
+          padding: '1rem',
+          whiteSpace: 'pre-wrap',
+          wordWrap: 'break-word',
+          fontFamily: 'monospace'
+        }}
+      >
         {generatedSnippet}
       </pre>
 
       <button
         onClick={() => navigator.clipboard.writeText(generatedSnippet)}
-        style={{ padding: '0.5rem 1rem', cursor: 'pointer', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}
+        style={{
+          padding: '0.5rem 1rem',
+          cursor: 'pointer',
+          background: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px'
+        }}
       >
         Copy to Clipboard
       </button>
