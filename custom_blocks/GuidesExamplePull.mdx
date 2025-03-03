@@ -10,6 +10,7 @@ export const PullFromExamples = ({ endpoint }) => {
 
   useEffect(() => {
     if (!endpoint) {
+     setError('PULLING DIRECTLY FROM OPEN API URL HARD CODED');
       return;
     }
     fetchEndpointExample();
@@ -143,4 +144,3 @@ export const PullFromExamples = ({ endpoint }) => {
     </div>
   );
 };
-
