@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-<Banner message="This is my banner you can change it or use custom presets!" bannerColor="#ff00ff" bannerTextColor="#fff" />
+<Banner message="Cam is awesome!" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="16px" fontWeight="normal" />
 
 <br />
 
