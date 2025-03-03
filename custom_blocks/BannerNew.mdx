@@ -4,7 +4,6 @@ name: BannerNew
 import React, { useEffect } from "react";
 
 export const Banner = ({
-  // Select one to be true - defaults to custom if all are false
   critical = false,
   warning = false,
   standard = false,
@@ -15,7 +14,6 @@ export const Banner = ({
   fontSize,
   fontWeight
 }) => {
-  // Determine the preset based on the boolean props.
   let selectedPreset;
   if (critical) {
     selectedPreset = "critical";
@@ -23,38 +21,34 @@ export const Banner = ({
     selectedPreset = "warning";
   } else if (standard) {
     selectedPreset = "standard";
-  } else if (custom) {
-    selectedPreset = "custom";
   } else {
-    // Default to custom if no preset is explicitly set.
     selectedPreset = "custom";
   }
 
-  // Define default settings for each preset.
   const defaultPresets = {
     critical: {
-      bannerColor: "bg-red-600",    
-      bannerTextColor: "text-white", 
-      fontSize: "text-base",         
+      bannerColor: "bg-red-600",
+      bannerTextColor: "text-white",
+      fontSize: "text-base",
       fontWeight: "font-normal",
       message: "Critical Alert: Please check immediately!"
     },
     warning: {
-      bannerColor: "bg-yellow-400",    
-      bannerTextColor: "text-black",   
+      bannerColor: "bg-yellow-400",
+      bannerTextColor: "text-black",
       fontSize: "text-base",
       fontWeight: "font-normal",
       message: "Warning Alert: There might be an issue."
     },
     standard: {
-      bannerColor: "bg-blue-600",    
-      bannerTextColor: "text-white", 
+      bannerColor: "bg-blue-600",
+      bannerTextColor: "text-white",
       fontSize: "text-base",
       fontWeight: "font-normal",
       message: "Standard Alert: Here is some information."
     },
     custom: {
-      bannerColor: "#00BCFF",    
+      bannerColor: "#00BCFF",
       bannerTextColor: "#fff",
       fontSize: "14px",
       fontWeight: "bold",
@@ -62,15 +56,12 @@ export const Banner = ({
     }
   };
 
-  // Get the default settings for the selected preset.
   const defaults = defaultPresets[selectedPreset];
   const finalMessage = message || defaults.message;
 
-  // Base Tailwind classes for layout, padding, border, and margin.
   let containerClasses = "p-2 text-center rounded-md mb-5";
   let inlineStyles = {};
 
-  // Use inline styles if it's the custom preset or if any override is provided.
   if (selectedPreset === "custom" || bannerColor || bannerTextColor || fontSize || fontWeight) {
     inlineStyles.background = bannerColor || (selectedPreset === "custom" ? defaults.bannerColor : undefined);
     inlineStyles.color = bannerTextColor || (selectedPreset === "custom" ? defaults.bannerTextColor : undefined);
@@ -78,27 +69,27 @@ export const Banner = ({
     inlineStyles.fontSize = fontSize || (selectedPreset === "custom" ? defaults.fontSize : undefined);
     inlineStyles.fontWeight = fontWeight || (selectedPreset === "custom" ? defaults.fontWeight : undefined);
   } else {
-    // For presets that use Tailwind classes, add those classes.
     containerClasses += ` ${defaults.bannerColor} ${defaults.bannerTextColor} ${defaults.fontSize} ${defaults.fontWeight}`;
   }
 
-  // 🔥 UseEffect to move the banner where we want it
   useEffect(() => {
     const moveBannerToHeader = () => {
       const existingBanner = document.getElementById('custom-banner-container');
-      if (existingBanner) existingBanner.remove();
+      if (existingBanner) {
+        existingBanner.remove();
+      }
 
       const bannerWrapper = document.createElement('div');
       bannerWrapper.id = 'custom-banner-container';
       bannerWrapper.style.margin = '0.5rem 0';
 
-      const headerBottom = document.querySelector('.rm-Header-bottom');
-      if (headerBottom && headerBottom.parentNode) {
-        headerBottom.parentNode.insertBefore(bannerWrapper, headerBottom.nextSibling);
+      const headerElement = document.querySelector('header.rm-Header');
+      if (headerElement) {
+        headerElement.appendChild(bannerWrapper);
         const bannerContent = document.getElementById('custom-banner-content');
         if (bannerContent) {
           bannerWrapper.appendChild(bannerContent);
-          bannerContent.style.display = ''; // Make it visible when moved
+          bannerContent.style.display = ''; // Make visible after being moved
         }
       }
     };
