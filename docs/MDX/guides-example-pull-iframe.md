@@ -9,7 +9,7 @@ metadata:
 
 <br />
 
-<GuidesExamplePullIFRAME />
+<GuidesExamplePullIFRAME endpoint="/pet" />
 
 <br />
 
