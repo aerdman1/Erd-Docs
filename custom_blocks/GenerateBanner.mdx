@@ -3,7 +3,13 @@ name: GenerateBanner
 ---
 import React, { useState, useEffect } from 'react';
 
-export const BannerGenerator = () => {
+export const BannerGenerator = ({
+  message: propMessage = 'This is my banner message!',
+  bannerColor: propBannerColor = '#00bcff',
+  bannerTextColor: propBannerTextColor = '#ffffff',
+  fontSize: propFontSize = '16px',
+  fontWeight: propFontWeight = 'normal',
+}) => {
   // Check if the user is an admin based on the hub-me script data
   let isAdmin = false;
   if (typeof document !== 'undefined') {
@@ -18,12 +24,22 @@ export const BannerGenerator = () => {
     }
   }
 
-  const [message, setMessage] = useState('This is my banner message!');
-  const [bannerColor, setBannerColor] = useState('#00bcff');
-  const [bannerTextColor, setBannerTextColor] = useState('#ffffff');
-  const [fontSize, setFontSize] = useState('16px');
-  const [fontWeight, setFontWeight] = useState('normal');
+  // Use the incoming props to initialize state
+  const [message, setMessage] = useState(propMessage);
+  const [bannerColor, setBannerColor] = useState(propBannerColor);
+  const [bannerTextColor, setBannerTextColor] = useState(propBannerTextColor);
+  const [fontSize, setFontSize] = useState(propFontSize);
+  const [fontWeight, setFontWeight] = useState(propFontWeight);
   const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
+
+  // Sync state with props if they change externally
+  useEffect(() => {
+    setMessage(propMessage);
+    setBannerColor(propBannerColor);
+    setBannerTextColor(propBannerTextColor);
+    setFontSize(propFontSize);
+    setFontWeight(propFontWeight);
+  }, [propMessage, propBannerColor, propBannerTextColor, propFontSize, propFontWeight]);
 
   const handlePresetChange = (e) => {
     const selectedPreset = e.target.value;
@@ -55,7 +71,7 @@ export const BannerGenerator = () => {
     return props;
   };
 
-  // Updated snippet to output the unified component's name
+  // Updated snippet now outputs the unified component's name
   const generatedSnippet = `<BannerGenerator ${generateBannerProps()} />`;
 
   const actualBannerColor =
