@@ -207,7 +207,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       <style>{`
         section.content-toc.grid-25 { display: none; }
         .rm-Guides .content-body { max-width: 100%; width: 100%; }
-        .rm-ReferenceMain .rm-Article { max-width: 100%; width:100%; }
+        .rm-ReferenceMain .rm-Article { max-width: 100%; width: 100%; }
         li { list-style: none; }
         .readme-tailwind .text-blue-500 { text-decoration: none !important; }
         .field-description a[href], .field-description a:not([href=""]),
@@ -216,7 +216,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
           padding: 10px;
           display: inline-block;
           border-radius: 10px;
-          min-height:50px;
+          min-height: 50px;
         }
       `}</style>
 
@@ -328,8 +328,8 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                   </ul>
                 </div>
               )}
-              {/* Page Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Page Cards Grid (using custom class to avoid inherited grid-cols-1 styles) */}
+              <div className="fetch-pages-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 {pageDetails.map((page, idx) => (
                   <div key={idx} className="flex flex-col bg-white border rounded-lg shadow-md p-6 hover:shadow-xl transition-all">
                     <div>
