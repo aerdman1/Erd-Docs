@@ -9,7 +9,7 @@ export const BannerGenerator = () => {
   const [bannerTextColor, setBannerTextColor] = useState('#ffffff');
   const [fontSize, setFontSize] = useState('16px');
   const [fontWeight, setFontWeight] = useState('normal');
-  const [preset, setPreset] = useState('custom');  // 'critical', 'warning', 'standard', 'custom'
+  const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
 
   const handlePresetChange = (e) => {
     const selectedPreset = e.target.value;
@@ -30,18 +30,20 @@ export const BannerGenerator = () => {
     }
   };
 
-  const generatedSnippet = `
-<Banner 
-  message="${message}" 
-  ${preset !== 'custom' ? `${preset}={true}` : ''}
-  bannerColor="${preset === 'custom' ? bannerColor : undefined}" 
-  bannerTextColor="${preset === 'custom' ? bannerTextColor : undefined}" 
-  fontSize="${fontSize}" 
-  fontWeight="${fontWeight}" 
-/>
-  `.trim();
+  const generateBannerProps = () => {
+    let props = `message="${message}"`;
+    if (preset !== 'custom') {
+      props += ` ${preset}={true}`;
+    } else {
+      props += ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
+    }
+    props += ` fontSize="${fontSize}" fontWeight="${fontWeight}"`;
+    return props;
+  };
 
-  // Determine actual colors based on the preset
+  const generatedSnippet = `<Banner ${generateBannerProps()} />`;
+
+  // Determine actual colors based on the preset for the preview
   const actualBannerColor =
     preset === 'custom' ? bannerColor :
     preset === 'critical' ? '#dc2626' :
