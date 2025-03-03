@@ -5,4 +5,4 @@ hidden: false
 metadata:
   robots: index
 ---
-<BannerGenerator message="This is my banner message!!12321321" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="16px" fontWeight="normal" />
+<BannerGenerator message="This is my banner message123" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="16px" fontWeight="normal" />
