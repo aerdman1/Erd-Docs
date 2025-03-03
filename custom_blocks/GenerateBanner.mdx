@@ -55,7 +55,7 @@ export const BannerGenerator = () => {
     return props;
   };
 
-  // NOTE: Updated snippet to output the unified component's name
+  // Updated snippet to output the unified component's name
   const generatedSnippet = `<BannerGenerator ${generateBannerProps()} />`;
 
   const actualBannerColor =
@@ -215,23 +215,28 @@ export const BannerGenerator = () => {
     boxSizing: "border-box"
   };
 
-  // Move the banner into the header (as per your original Banner component)
+  // Update (or create) the banner container without removing it if it exists.
   useEffect(() => {
     const moveBannerToHeader = () => {
-      const existingBanner = document.getElementById('custom-banner-container');
-      if (existingBanner) {
-        existingBanner.remove();
-      }
-      const bannerWrapper = document.createElement('div');
-      bannerWrapper.id = 'custom-banner-container';
-      Object.assign(bannerWrapper.style, bannerStyles);
       const headerElement = document.querySelector('header.rm-Header');
-      if (headerElement) {
+      if (!headerElement) return;
+      let bannerWrapper = document.getElementById('custom-banner-container');
+      const bannerContent = document.getElementById('custom-banner-content');
+      if (bannerWrapper) {
+        // Update the existing container's styles
+        Object.assign(bannerWrapper.style, bannerStyles);
+        if (bannerContent && bannerContent.parentNode !== bannerWrapper) {
+          bannerWrapper.appendChild(bannerContent);
+          bannerContent.style.display = '';
+        }
+      } else {
+        bannerWrapper = document.createElement('div');
+        bannerWrapper.id = 'custom-banner-container';
+        Object.assign(bannerWrapper.style, bannerStyles);
         headerElement.appendChild(bannerWrapper);
-        const bannerContent = document.getElementById('custom-banner-content');
         if (bannerContent) {
           bannerWrapper.appendChild(bannerContent);
-          bannerContent.style.display = ''; // Reveal after moving
+          bannerContent.style.display = '';
         }
       }
     };
@@ -241,7 +246,7 @@ export const BannerGenerator = () => {
 
   return (
     <>
-      {/* Generator UI (only visible to admins) */}
+      {/* Generator UI (visible only to admins) */}
       <div style={styles.container}>
         <h3 style={styles.heading}>Banner Generator</h3>
 
