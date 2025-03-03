@@ -24,12 +24,16 @@ export const BannerGenerator = ({
     }
   }
 
+  // Map incoming fontWeight "normal" to "400" for our select
+  const initialFontWeight =
+    propFontWeight === 'normal' ? '400' : propFontWeight;
+
   // Use incoming props to initialize state
   const [message, setMessage] = useState(propMessage);
   const [bannerColor, setBannerColor] = useState(propBannerColor);
   const [bannerTextColor, setBannerTextColor] = useState(propBannerTextColor);
   const [fontSize, setFontSize] = useState(propFontSize);
-  const [fontWeight, setFontWeight] = useState(propFontWeight);
+  const [fontWeight, setFontWeight] = useState(initialFontWeight);
   const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
   const [placement, setPlacement] = useState('bottom'); // 'top' or 'bottom'
 
@@ -39,7 +43,7 @@ export const BannerGenerator = ({
     setBannerColor(propBannerColor);
     setBannerTextColor(propBannerTextColor);
     setFontSize(propFontSize);
-    setFontWeight(propFontWeight);
+    setFontWeight(propFontWeight === 'normal' ? '400' : propFontWeight);
   }, [propMessage, propBannerColor, propBannerTextColor, propFontSize, propFontWeight]);
 
   const handlePresetChange = (e) => {
@@ -73,7 +77,7 @@ export const BannerGenerator = ({
     return props;
   };
 
-  // The generated snippet now shows the unified component's name
+  // Generated snippet now shows the unified component's name
   const generatedSnippet = `<BannerGenerator ${generateBannerProps()} />`;
 
   const actualBannerColor =
@@ -100,10 +104,16 @@ export const BannerGenerator = ({
       fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
       display: isAdmin ? undefined : 'none', // Only admins see the generator UI
     },
-    heading: {
-      textAlign: 'center',
+    headerRow: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: '1.5rem',
+    },
+    heading: {
+      margin: 0,
       color: '#333',
+      fontSize: '1.5rem',
     },
     label: {
       display: 'block',
@@ -266,7 +276,14 @@ export const BannerGenerator = ({
     <>
       {/* Admin Generator UI */}
       <div style={styles.container}>
-        <h3 style={styles.heading}>Banner Generator</h3>
+        <div style={styles.headerRow}>
+          <h3 style={styles.heading}>Banner Generator</h3>
+          <img 
+            src="https://owlbertsio-resized.s3.amazonaws.com/Barker.psd.png" 
+            alt="Owlbert" 
+            style={{ maxWidth: '300px', height: 'auto' }} 
+          />
+        </div>
 
         <label style={styles.label}>
           Message:
@@ -319,12 +336,15 @@ export const BannerGenerator = ({
             </div>
             <div style={{ flex: 1 }}>
               <label style={styles.label}>Font Weight</label>
-              <input
-                type="text"
+              <select
                 value={fontWeight}
                 onChange={(e) => setFontWeight(e.target.value)}
-                style={styles.input}
-              />
+                style={styles.select}
+              >
+                <option value="300">Light</option>
+                <option value="400">Normal</option>
+                <option value="700">Bold</option>
+              </select>
             </div>
           </div>
         ) : (
@@ -340,17 +360,20 @@ export const BannerGenerator = ({
             </div>
             <div style={{ flex: 1 }}>
               <label style={styles.label}>Font Weight</label>
-              <input
-                type="text"
+              <select
                 value={fontWeight}
                 onChange={(e) => setFontWeight(e.target.value)}
-                style={styles.input}
-              />
+                style={styles.select}
+              >
+                <option value="300">Light</option>
+                <option value="400">Normal</option>
+                <option value="700">Bold</option>
+              </select>
             </div>
           </div>
         )}
 
-        {/* New Toggle for Banner Placement */}
+        {/* Banner Placement Toggle */}
         <label style={styles.label}>
           Banner Placement:
           <select
