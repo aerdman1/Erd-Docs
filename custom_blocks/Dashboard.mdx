@@ -309,10 +309,10 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
               disabled={fetchingPages}
             >
               {fetchingPages
-                ? "Fetching Data..."
+                ? "🔄 Fetching Data..."
                 : isReference 
-                  ? "Fetch Endpoint Data" 
-                  : "Fetch Guide Page Data"}
+                  ? "🔄 Fetch Endpoint Data" 
+                  : "🔄 Fetch Guide Page Data"}
             </button>
           </div>
           {pageError && <p className="text-red-500">{pageError}</p>}
