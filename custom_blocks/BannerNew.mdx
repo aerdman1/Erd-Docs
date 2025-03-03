@@ -1,10 +1,9 @@
 ---
 name: BannerNew
 ---
-import React from "react";
+import React, { useEffect } from "react";
 
 export const Banner = ({
-  // Select one to be true - defaults to custom if all are false
   critical = false,
   warning = false,
   standard = false,
@@ -15,7 +14,6 @@ export const Banner = ({
   fontSize,
   fontWeight
 }) => {
-  // Determine the preset based on the boolean props.
   let selectedPreset;
   if (critical) {
     selectedPreset = "critical";
@@ -23,70 +21,89 @@ export const Banner = ({
     selectedPreset = "warning";
   } else if (standard) {
     selectedPreset = "standard";
-  } else if (custom) {
-    selectedPreset = "custom";
   } else {
-    // Default to custom if no preset is explicitly set.
     selectedPreset = "custom";
   }
 
-  // Define default settings for each preset.
   const defaultPresets = {
     critical: {
-      bannerColor: "bg-red-600",    // Tailwind: red background
-      bannerTextColor: "text-white", // Tailwind: white text
-      fontSize: "text-base",         // Tailwind: base font size (~16px)
-      fontWeight: "font-normal",
+      bannerColor: "#dc2626", // red-600
+      bannerTextColor: "#ffffff", // white
+      fontSize: "16px",
+      fontWeight: "normal",
       message: "Critical Alert: Please check immediately!"
     },
     warning: {
-      bannerColor: "bg-yellow-400",    // Tailwind: yellow background
-      bannerTextColor: "text-black",   // Tailwind: black text
-      fontSize: "text-base",
-      fontWeight: "font-normal",
+      bannerColor: "#facc15", // yellow-400
+      bannerTextColor: "#000000", // black
+      fontSize: "16px",
+      fontWeight: "normal",
       message: "Warning Alert: There might be an issue."
     },
     standard: {
-      bannerColor: "bg-blue-600",    // Tailwind: blue background
-      bannerTextColor: "text-white", // Tailwind: white text
-      fontSize: "text-base",
-      fontWeight: "font-normal",
+      bannerColor: "#2563eb", // blue-600
+      bannerTextColor: "#ffffff", // white
+      fontSize: "16px",
+      fontWeight: "normal",
       message: "Standard Alert: Here is some information."
     },
     custom: {
-      // These values are for inline styles since they're custom hex values.
       bannerColor: "#00BCFF",    
-      bannerTextColor: "#fff",
+      bannerTextColor: "#ffffff",
       fontSize: "14px",
       fontWeight: "bold",
       message: "Here is my banner message - hope you enjoy!"
     }
   };
 
-  // Get the default settings for the selected preset.
   const defaults = defaultPresets[selectedPreset];
-  const finalMessage = message || defaults.message;
 
-  // Base Tailwind classes for layout, padding, border, and margin.
-  let containerClasses = "p-2 text-center rounded-md mb-5";
-  let inlineStyles = {};
+  const bannerStyles = {
+    background: bannerColor || defaults.bannerColor,
+    color: bannerTextColor || defaults.bannerTextColor,
+    fontSize: fontSize || defaults.fontSize,
+    fontWeight: fontWeight || defaults.fontWeight,
+    width: "100%",
+    boxSizing: "border-box"
+  };
 
-  // Use inline styles if it's the custom preset or if any override is provided.
-  if (selectedPreset === "custom" || bannerColor || bannerTextColor || fontSize || fontWeight) {
-    inlineStyles.background = bannerColor || (selectedPreset === "custom" ? defaults.bannerColor : undefined);
-    inlineStyles.color = bannerTextColor || (selectedPreset === "custom" ? defaults.bannerTextColor : undefined);
-    inlineStyles.borderColor = bannerTextColor || (selectedPreset === "custom" ? defaults.bannerTextColor : undefined);
-    inlineStyles.fontSize = fontSize || (selectedPreset === "custom" ? defaults.fontSize : undefined);
-    inlineStyles.fontWeight = fontWeight || (selectedPreset === "custom" ? defaults.fontWeight : undefined);
-  } else {
-    // For presets that use Tailwind classes, add those classes.
-    containerClasses += ` ${defaults.bannerColor} ${defaults.bannerTextColor} ${defaults.fontSize} ${defaults.fontWeight}`;
-  }
+  const containerStyles = {
+    maxWidth: "var(--rm-container-width, 1200px)",
+    margin: "0 auto",
+    padding: "0.75rem 1rem",
+    textAlign: "center",
+    boxSizing: "border-box"
+  };
+
+  useEffect(() => {
+    const moveBannerToHeader = () => {
+      const existingBanner = document.getElementById('custom-banner-container');
+      if (existingBanner) {
+        existingBanner.remove();
+      }
+
+      const bannerWrapper = document.createElement('div');
+      bannerWrapper.id = 'custom-banner-container';
+      Object.assign(bannerWrapper.style, bannerStyles);
+
+      const headerElement = document.querySelector('header.rm-Header');
+      if (headerElement) {
+        headerElement.appendChild(bannerWrapper);
+        const bannerContent = document.getElementById('custom-banner-content');
+        if (bannerContent) {
+          bannerWrapper.appendChild(bannerContent);
+          bannerContent.style.display = ''; // Make visible after moving
+        }
+      }
+    };
+
+    moveBannerToHeader();
+  }, []);
 
   return (
-    <div>
-      <div className={containerClasses} style={inlineStyles}>
-        {finalMessage}
+    <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
+      <div style={containerStyles}>
+        {message || defaults.message}
       </div>
     </div>
   );
