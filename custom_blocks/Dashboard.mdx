@@ -11,24 +11,26 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
   const [hubData, setHubData] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState({});
 
-  // New states for endpoint details
-  const [endpointDetails, setEndpointDetails] = useState([]);
-  const [fetchingEndpoints, setFetchingEndpoints] = useState(false);
-  const [endpointError, setEndpointError] = useState(null);
+  // New states for endpoint/guide details
+  const [pageDetails, setPageDetails] = useState([]);
+  const [fetchingPages, setFetchingPages] = useState(false);
+  const [pageError, setPageError] = useState(null);
+
+  // Determine current page type (reference vs guides)
+  const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+  const isReference = currentPath.includes("/reference/");
 
   // On mount, grab sidebar links and user info
   useEffect(() => {
     if (typeof document !== "undefined") {
       const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
-        // Determine current path and set the pageLinks accordingly
-        const currentPath = window.location.pathname;
+        // For reference pages, only count links starting with "/reference/"
+        // For guides pages, count all links (or those starting with "/docs/" if needed)
         let pageLinks;
-        if (currentPath.includes('/reference/')) {
-          // When in a reference page, only count links that start with "/reference/"
+        if (isReference) {
           pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
         } else {
-          // When in non-reference pages (e.g., GUIDES), count all links
           pageLinks = navElement.querySelectorAll('a');
         }
         setPageCount(pageLinks.length);
@@ -66,7 +68,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
         }
       }
     }
-  }, []);
+  }, [isReference]);
 
   const toggleCategory = (index) => {
     setExpandedCategories(prev => ({
@@ -75,48 +77,54 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
     }));
   };
 
-  // Helper: Extract key endpoint info from an HTML string
-  const extractEndpointInfo = (htmlString) => {
+  // Helper: Extract key page info from an HTML string
+  const extractPageInfo = (htmlString) => {
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(htmlString, "text/html");
 
       // Title: try header with id "content-head" then fallback to document title
       const titleEl = doc.querySelector("header#content-head h1");
-      const endpointTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
+      const pageTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
 
       // Description: from element with role "doc-subtitle"
       const descEl = doc.querySelector("div[role='doc-subtitle']");
       const description = descEl ? descEl.innerText.trim() : "No Description Found";
 
-      // HTTP Method: look for any element with class "rm-APIMethod"
+      // HTTP Method (likely for endpoints): look for any element with class "rm-APIMethod"
       const methodEl = doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
-      // Endpoint URL: from a span with a unique class (adjust as needed)
+      // Endpoint URL (for reference pages): from a span with a unique class (adjust as needed)
       const urlEl = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
-      // Last Updated info: from a <p> with class "DateLine"
-      const updatedEl = doc.querySelector("p.DateLine");
+      // Last Updated info: try looking inside the UpdatedAt container first
+      const updatedEl = doc.querySelector("div.UpdatedAt p.DateLine") || doc.querySelector("p.DateLine");
       const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
 
-      return { endpointTitle, description, method, endpointUrl, updated };
+      return { pageTitle, description, method, endpointUrl, updated };
     } catch (e) {
-      console.error("Error extracting endpoint info:", e);
+      console.error("Error extracting page info:", e);
       return null;
     }
   };
 
-  // Function to fetch endpoint details for all reference links
-  const fetchAllEndpointDetails = async () => {
-    setFetchingEndpoints(true);
-    setEndpointError(null);
-    // Flatten links from categories and filter for reference pages
+  // Function to fetch details for all reference or guide links
+  const fetchAllPageDetails = async () => {
+    setFetchingPages(true);
+    setPageError(null);
+    // Flatten links from categories
     const flattenedLinks = categories.flatMap(cat => cat.links);
-    const referenceLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/reference/"));
+    let targetLinks;
+    if (isReference) {
+      targetLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/reference/"));
+    } else {
+      // For guides pages, adjust the filter as needed (here we assume guides use "/docs/")
+      targetLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/docs/"));
+    }
     // Build full URL for each link (assuming same origin)
-    const fullUrls = referenceLinks.map(link => ({
+    const fullUrls = targetLinks.map(link => ({
       ...link,
       fullUrl: window.location.origin + link.href
     }));
@@ -127,7 +135,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
           const response = await fetch(link.fullUrl);
           if (!response.ok) throw new Error("Network response was not ok");
           const html = await response.text();
-          const info = extractEndpointInfo(html);
+          const info = extractPageInfo(html);
           return { ...link, ...info };
         } catch (err) {
           console.error("Error fetching", link.href, err);
@@ -135,18 +143,18 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
         }
       });
       const results = await Promise.all(detailsPromises);
-      setEndpointDetails(results);
+      setPageDetails(results);
     } catch (err) {
-      setEndpointError(err.message);
+      setPageError(err.message);
     } finally {
-      setFetchingEndpoints(false);
+      setFetchingPages(false);
     }
   };
 
-  // Compute a tally of endpoints by HTTP method
-  const methodTally = endpointDetails.reduce((acc, endpoint) => {
-    if (endpoint.method) {
-      acc[endpoint.method] = (acc[endpoint.method] || 0) + 1;
+  // Compute a tally of pages by HTTP method (useful mostly for reference pages)
+  const methodTally = pageDetails.reduce((acc, page) => {
+    if (page.method) {
+      acc[page.method] = (acc[page.method] || 0) + 1;
     }
     return acc;
   }, {});
@@ -248,47 +256,59 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
           </div>
         </div>
 
-        {/* New Section: Endpoint Details Dashboard */}
+        {/* New Section: Page Details Overview */}
         <div className="mt-10 rounded-xl p-6 shadow-xl border border-gray-300 bg-white">
-          <p className="text-2xl font-bold mb-4 text-center">Endpoint Details Overview</p>
+          <p className="text-2xl font-bold mb-4 text-center">
+            {isReference ? "Endpoint Details Overview" : "Guide Page Details Overview"}
+          </p>
           <div className="mb-4 flex justify-center">
             <button 
-              onClick={fetchAllEndpointDetails} 
+              onClick={fetchAllPageDetails} 
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              disabled={fetchingEndpoints}
+              disabled={fetchingPages}
             >
-              {fetchingEndpoints ? "Fetching Endpoint Data..." : "Fetch All Endpoint Data"}
+              {fetchingPages
+                ? "Fetching Data..."
+                : isReference 
+                  ? "Fetch Endpoint Data" 
+                  : "Fetch Guide Page Data"}
             </button>
           </div>
-          {endpointError && <p className="text-red-500">{endpointError}</p>}
-          {endpointDetails.length > 0 && (
+          {pageError && <p className="text-red-500">{pageError}</p>}
+          {pageDetails.length > 0 && (
             <>
-              {/* Tally Section */}
-              <div className="mb-6">
-                <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
-                <ul className="list-disc list-inside">
-                  {Object.entries(methodTally).map(([method, count]) => (
-                    <li key={method}>
-                      <strong>{method}:</strong> {count}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {/* Endpoint Cards Grid */}
+              {/* Tally Section (only really relevant for endpoints) */}
+              {isReference && (
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
+                  <ul className="list-disc list-inside">
+                    {Object.entries(methodTally).map(([method, count]) => (
+                      <li key={method}>
+                        <strong>{method}:</strong> {count}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {/* Page Cards Grid */}
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
                 gap: '1rem'
               }}>
-                {endpointDetails.map((endpoint, idx) => (
+                {pageDetails.map((page, idx) => (
                   <div key={idx} className="p-4 border rounded shadow-md">
-                    <p><strong>Page Title:</strong> {endpoint.endpointTitle || "N/A"}</p>
-                    <p><strong>Description:</strong> {endpoint.description || "N/A"}</p>
-                    <p><strong>Method:</strong> {endpoint.method || "N/A"}</p>
-                    <p><strong>Endpoint URL:</strong> {endpoint.endpointUrl || "N/A"}</p>
-                    <p><strong>Last Updated:</strong> {endpoint.updated || "N/A"}</p>
-                    {endpoint.error && <p className="text-red-500">Error: {endpoint.error}</p>}
-                    <a href={endpoint.href} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
+                    <p><strong>Page Title:</strong> {page.pageTitle || "N/A"}</p>
+                    <p><strong>Description:</strong> {page.description || "N/A"}</p>
+                    {isReference && (
+                      <>
+                        <p><strong>Method:</strong> {page.method || "N/A"}</p>
+                        <p><strong>Endpoint URL:</strong> {page.endpointUrl || "N/A"}</p>
+                      </>
+                    )}
+                    <p><strong>Last Updated:</strong> {page.updated || "N/A"}</p>
+                    {page.error && <p className="text-red-500">Error: {page.error}</p>}
+                    <a href={page.href} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
                       View Page
                     </a>
                   </div>
