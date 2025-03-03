@@ -6,6 +6,4 @@ hidden: false
 metadata:
   robots: index
 ---
-<PullExampleIframe />
-
 &#x20;
