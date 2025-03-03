@@ -21,8 +21,16 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
     if (typeof document !== "undefined") {
       const navElement = document.querySelector('.rm-Sidebar');
       if (navElement) {
-        // Count all page links that start with "/reference/"
-        const pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
+        // Determine current path and set the pageLinks accordingly
+        const currentPath = window.location.pathname;
+        let pageLinks;
+        if (currentPath.includes('/reference/')) {
+          // When in a reference page, only count links that start with "/reference/"
+          pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
+        } else {
+          // When in non-reference pages (e.g., GUIDES), count all links
+          pageLinks = navElement.querySelectorAll('a');
+        }
         setPageCount(pageLinks.length);
 
         // Extract categories from sidebar sections
