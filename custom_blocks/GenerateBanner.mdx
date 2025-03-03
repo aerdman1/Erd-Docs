@@ -55,10 +55,10 @@ export const BannerGenerator = () => {
     preset === 'warning' ? '#000000' :
     preset === 'standard' ? '#ffffff' : bannerTextColor;
 
-  // Centralized style object for a modern look
+  // Centralized style object for a modern, condensed look
   const styles = {
     container: {
-      maxWidth: '800px',
+      maxWidth: '600px',
       margin: '2rem auto',
       padding: '2rem',
       background: '#fff',
@@ -76,6 +76,7 @@ export const BannerGenerator = () => {
       marginBottom: '0.5rem',
       fontWeight: '500',
       color: '#555',
+      fontSize: '0.9rem',
     },
     input: {
       width: '100%',
@@ -95,6 +96,20 @@ export const BannerGenerator = () => {
       display: 'flex',
       gap: '1rem',
       marginBottom: '1rem',
+    },
+    fourColumnRow: {
+      display: 'flex',
+      gap: '1rem',
+      marginBottom: '1rem',
+    },
+    colorInput: {
+      width: '100%',
+      height: '40px',
+      padding: '0',
+      border: '1px solid #ccc',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      appearance: 'none',
     },
     preview: {
       backgroundColor: actualBannerColor,
@@ -157,49 +172,67 @@ export const BannerGenerator = () => {
         </select>
       </label>
 
-      {preset === 'custom' && (
-        <div style={styles.row}>
-          <label style={{ ...styles.label, flex: 1 }}>
-            Banner Background Color:
+      {preset === 'custom' ? (
+        <div style={styles.fourColumnRow}>
+          <div style={{ flex: 1 }}>
+            <label style={styles.label}>BG Color 🎨</label>
             <input
               type="color"
               value={bannerColor}
               onChange={(e) => setBannerColor(e.target.value)}
-              style={{ ...styles.input, padding: '0.2rem' }}
+              style={styles.colorInput}
             />
-          </label>
-          <label style={{ ...styles.label, flex: 1 }}>
-            Banner Text Color:
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={styles.label}>Text Color 🎨</label>
             <input
               type="color"
               value={bannerTextColor}
               onChange={(e) => setBannerTextColor(e.target.value)}
-              style={{ ...styles.input, padding: '0.2rem' }}
+              style={styles.colorInput}
             />
-          </label>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={styles.label}>Font Size</label>
+            <input
+              type="text"
+              value={fontSize}
+              onChange={(e) => setFontSize(e.target.value)}
+              style={styles.input}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={styles.label}>Font Weight</label>
+            <input
+              type="text"
+              value={fontWeight}
+              onChange={(e) => setFontWeight(e.target.value)}
+              style={styles.input}
+            />
+          </div>
+        </div>
+      ) : (
+        <div style={styles.row}>
+          <div style={{ flex: 1 }}>
+            <label style={styles.label}>Font Size</label>
+            <input
+              type="text"
+              value={fontSize}
+              onChange={(e) => setFontSize(e.target.value)}
+              style={styles.input}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={styles.label}>Font Weight</label>
+            <input
+              type="text"
+              value={fontWeight}
+              onChange={(e) => setFontWeight(e.target.value)}
+              style={styles.input}
+            />
+          </div>
         </div>
       )}
-
-      <div style={styles.row}>
-        <label style={{ ...styles.label, flex: 1 }}>
-          Font Size:
-          <input
-            type="text"
-            value={fontSize}
-            onChange={(e) => setFontSize(e.target.value)}
-            style={styles.input}
-          />
-        </label>
-        <label style={{ ...styles.label, flex: 1 }}>
-          Font Weight:
-          <input
-            type="text"
-            value={fontWeight}
-            onChange={(e) => setFontWeight(e.target.value)}
-            style={styles.input}
-          />
-        </label>
-      </div>
 
       {/* Banner Preview */}
       <h4 style={styles.sectionHeading}>Banner Preview:</h4>
