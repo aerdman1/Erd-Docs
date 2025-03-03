@@ -272,7 +272,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                     <p className="text-xl font-semibold">{cat.title}</p>
                     <button
                       onClick={() => toggleCategory(index)}
-                      className="text-sm text-blue-500 border border-green-500 rounded-md"
+                      className="text-sm text-blue-500 border bg-black border-green-500 rounded-md"
                     >
                       {expandedCategories[index] ? 'Hide' : 'Show'} ({cat.links.length})
                     </button>
