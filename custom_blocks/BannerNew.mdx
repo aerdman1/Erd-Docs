@@ -1,113 +1,160 @@
 ---
 name: BannerNew
 ---
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-export const Banner = ({
-  critical = false,
-  warning = false,
-  standard = false,
-  custom = false,
-  message,
-  bannerColor,
-  bannerTextColor,
-  fontSize,
-  fontWeight
-}) => {
-  let selectedPreset;
-  if (critical) {
-    selectedPreset = "critical";
-  } else if (warning) {
-    selectedPreset = "warning";
-  } else if (standard) {
-    selectedPreset = "standard";
-  } else {
-    selectedPreset = "custom";
-  }
-
-  const defaultPresets = {
-    critical: {
-      bannerColor: "#dc2626", // red-600
-      bannerTextColor: "#ffffff", // white
-      fontSize: "16px",
-      fontWeight: "normal",
-      message: "Critical Alert: Please check immediately!"
-    },
-    warning: {
-      bannerColor: "#facc15", // yellow-400
-      bannerTextColor: "#000000", // black
-      fontSize: "16px",
-      fontWeight: "normal",
-      message: "Warning Alert: There might be an issue."
-    },
-    standard: {
-      bannerColor: "#2563eb", // blue-600
-      bannerTextColor: "#ffffff", // white
-      fontSize: "16px",
-      fontWeight: "normal",
-      message: "Standard Alert: Here is some information."
-    },
-    custom: {
-      bannerColor: "#00BCFF",    
-      bannerTextColor: "#ffffff",
-      fontSize: "14px",
-      fontWeight: "bold",
-      message: "Here is my banner message - hope you enjoy!"
-    }
-  };
-
-  const defaults = defaultPresets[selectedPreset];
-  const finalMessage = message || defaults.message;
-
-  const bannerStyles = {
-    background: bannerColor || defaults.bannerColor,
-    color: bannerTextColor || defaults.bannerTextColor,
-    fontSize: fontSize || defaults.fontSize,
-    fontWeight: fontWeight || defaults.fontWeight,
-    width: "100%",
-    boxSizing: "border-box"
-  };
-
-  const containerStyles = {
-    maxWidth: "var(--rm-container-width, 1200px)",
-    margin: "0 auto",
-    padding: "0.75rem 1rem",
-    textAlign: "center",
-    boxSizing: "border-box"
-  };
+export function BannerGenerator() {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [message, setMessage] = useState('This is my banner message!');
+  const [bannerColor, setBannerColor] = useState('#00bcff');
+  const [bannerTextColor, setBannerTextColor] = useState('#ffffff');
+  const [fontSize, setFontSize] = useState('16px');
+  const [fontWeight, setFontWeight] = useState('normal');
+  const [preset, setPreset] = useState('custom'); // Options: 'critical', 'warning', 'standard', 'custom'
 
   useEffect(() => {
-    const moveBannerToHeader = () => {
-      const existingBanner = document.getElementById('custom-banner-container');
-      if (existingBanner) {
-        existingBanner.remove();
+    let admin = false;
+    const hubMeScript = document.getElementById('hub-me');
+    if (hubMeScript) {
+      // The try/catch is now inside useEffect so MDX doesn't parse it at the top level.
+      try {
+        const hubMeData = JSON.parse(hubMeScript.getAttribute('data-json') || '{}');
+        admin = !!hubMeData.isAdmin;
+      } catch (e) {
+        console.error('Failed to parse hub-me data:', e);
       }
-
-      const bannerWrapper = document.createElement('div');
-      bannerWrapper.id = 'custom-banner-container';
-      Object.assign(bannerWrapper.style, bannerStyles);
-
-      const headerElement = document.querySelector('header.rm-Header');
-      if (headerElement) {
-        headerElement.appendChild(bannerWrapper);
-        const bannerContent = document.getElementById('custom-banner-content');
-        if (bannerContent) {
-          bannerWrapper.appendChild(bannerContent);
-          bannerContent.style.display = ''; // Make visible after moving
-        }
-      }
-    };
-
-    moveBannerToHeader();
+    }
+    setIsAdmin(admin);
   }, []);
 
+  function handlePresetChange(e) {
+    const selectedPreset = e.target.value;
+    setPreset(selectedPreset);
+    if (selectedPreset === 'critical') {
+      setBannerColor('#dc2626');
+      setBannerTextColor('#ffffff');
+    } else if (selectedPreset === 'warning') {
+      setBannerColor('#facc15');
+      setBannerTextColor('#000000');
+    } else if (selectedPreset === 'standard') {
+      setBannerColor('#2563eb');
+      setBannerTextColor('#ffffff');
+    } else if (selectedPreset === 'custom') {
+      setBannerColor('#00bcff');
+      setBannerTextColor('#ffffff');
+    }
+  }
+
+  // Build the snippet string using concatenation.
+  const generatedSnippet =
+    '<Banner \n' +
+    '  message="' + message + '" \n' +
+    (preset !== 'custom' ? (preset + '={true} \n') : '') +
+    (preset === 'custom'
+      ? '  bannerColor="' + bannerColor + '" bannerTextColor="' + bannerTextColor + '" \n'
+      : '') +
+    '  fontSize="' + fontSize + '" \n' +
+    '  fontWeight="' + fontWeight + '" \n' +
+    '/>';
+
+  if (!isAdmin) {
+    // Non-admin users won't see the generator.
+    return null;
+  }
+
   return (
-    <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
-      <div style={containerStyles}>
-        {finalMessage}
-      </div>
+    <div style={{
+      padding: '1rem',
+      border: '1px solid #ddd',
+      borderRadius: '8px',
+      margin: '1rem 0',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <h3 style={{ margin: '0 0 1rem' }}>Banner Generator (Admin Only)</h3>
+
+      <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+        Message:
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          style={{ width: '100%' }}
+        />
+      </label>
+
+      <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+        Preset:
+        <select value={preset} onChange={handlePresetChange} style={{ width: '100%' }}>
+          <option value="custom">Custom (you choose colors)</option>
+          <option value="critical">Critical (Red)</option>
+          <option value="warning">Warning (Yellow)</option>
+          <option value="standard">Standard (Blue)</option>
+        </select>
+      </label>
+
+      {preset === 'custom' && (
+        <>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Banner Background Color:
+            <input
+              type="color"
+              value={bannerColor}
+              onChange={(e) => setBannerColor(e.target.value)}
+            />
+          </label>
+          <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+            Banner Text Color:
+            <input
+              type="color"
+              value={bannerTextColor}
+              onChange={(e) => setBannerTextColor(e.target.value)}
+            />
+          </label>
+        </>
+      )}
+
+      <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+        Font Size:
+        <input
+          type="text"
+          value={fontSize}
+          onChange={(e) => setFontSize(e.target.value)}
+        />
+      </label>
+
+      <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+        Font Weight:
+        <input
+          type="text"
+          value={fontWeight}
+          onChange={(e) => setFontWeight(e.target.value)}
+        />
+      </label>
+
+      <h4>Generated Code:</h4>
+      <pre style={{
+        background: '#f5f5f5',
+        padding: '1rem',
+        whiteSpace: 'pre-wrap',
+        wordWrap: 'break-word',
+        fontFamily: 'monospace'
+      }}>
+        {generatedSnippet}
+      </pre>
+
+      <button
+        onClick={() => navigator.clipboard.writeText(generatedSnippet)}
+        style={{
+          padding: '0.5rem 1rem',
+          cursor: 'pointer',
+          background: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '4px'
+        }}
+      >
+        Copy to Clipboard
+      </button>
     </div>
   );
-};
-
-<Banner />
+}
