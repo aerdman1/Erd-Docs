@@ -87,7 +87,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       const titleEl = doc.querySelector("header#content-head h1");
       const pageTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
 
-      // Description: use meta description if available, truncate to 200 characters, else fallback
+      // Description: use meta description if available (truncate to 200 chars), else fallback
       let description = "No Description Found";
       const metaDesc = doc.querySelector('meta[name="description"]');
       if (metaDesc && metaDesc.getAttribute('content')) {
@@ -218,23 +218,6 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
           border-radius: 10px;
           min-height:50px;
         }
-        .p-4.bg-white.rounded-xl.border.hover\\:shadow-2xl.transition.transform.hover\\:scale-105 {
-          border: 1px solid #e3e3e3;
-        }
-        .field-description li+li, .markdown-body li+li { margin-top: 0; }
-        /* Additional styling for the page cards */
-        .card {
-          background: #fff;
-          border: 1px solid #e3e3e3;
-          padding: 1rem;
-          border-radius: 10px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
       `}</style>
 
       {/* Main Container */}
@@ -333,7 +316,6 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
           {pageError && <p className="text-red-500">{pageError}</p>}
           {pageDetails.length > 0 && (
             <>
-              {/* Tally Section (only really relevant for endpoints) */}
               {isReference && (
                 <div className="mb-6">
                   <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
@@ -347,27 +329,31 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                 </div>
               )}
               {/* Page Cards Grid */}
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '1rem'
-              }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {pageDetails.map((page, idx) => (
-                  <div key={idx} className="card">
-                    <p><strong>Page Title:</strong> {page.pageTitle || "N/A"}</p>
-                    <p><strong>Description:</strong> {page.description || "N/A"}</p>
-                    {isReference && (
-                      <>
-                        <p><strong>Method:</strong> {page.method || "N/A"}</p>
-                        <p><strong>Endpoint URL:</strong> {page.endpointUrl || "N/A"}</p>
-                      </>
-                    )}
-                    <p><strong>Last Updated:</strong> {page.updated || "N/A"}</p>
-                    <p><strong>Reading Time:</strong> {page.readingTime ?? '--'} minutes</p>
-                    {page.error && <p className="text-red-500">Error: {page.error}</p>}
-                    <a href={page.href} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-                      View Page
-                    </a>
+                  <div key={idx} className="flex flex-col card p-6 bg-white border rounded-lg shadow-md hover:shadow-xl transition-all">
+                    <div>
+                      <p className="font-semibold text-lg mb-2">{page.pageTitle || "N/A"}</p>
+                      <p className="text-sm text-gray-700 mb-4">{page.description || "No Description Found"}</p>
+                      {isReference && (
+                        <>
+                          <p className="text-sm"><span className="font-semibold">Method:</span> {page.method || "N/A"}</p>
+                          <p className="text-sm"><span className="font-semibold">Endpoint URL:</span> {page.endpointUrl || "N/A"}</p>
+                        </>
+                      )}
+                      <p className="text-sm"><span className="font-semibold">Last Updated:</span> {page.updated || "N/A"}</p>
+                      <p className="text-sm"><span className="font-semibold">Reading Time:</span> {page.readingTime ?? '--'} minutes</p>
+                    </div>
+                    <div className="mt-auto pt-4">
+                      <a 
+                        href={page.href} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="block text-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+                      >
+                        View Page
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>
