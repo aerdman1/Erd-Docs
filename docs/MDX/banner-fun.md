@@ -9,4 +9,4 @@ metadata:
 
 <br />
 
-<Banner message="Here it is!" bannerColor="#000" bannerTextColor="#fff" />
+<Banner message="Here is another one!" bannerColor="#000" bannerTextColor="#fff" />
