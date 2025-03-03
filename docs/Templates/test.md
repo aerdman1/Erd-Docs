@@ -5,8 +5,3 @@ hidden: false
 metadata:
   robots: index
 ---
-## Update a Pet
-
-To update a pet, use the following request and response examples.
-
-<PullExamples />
