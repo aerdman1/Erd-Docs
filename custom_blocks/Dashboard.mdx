@@ -329,7 +329,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                 </div>
               )}
               {/* Page Cards Grid (using custom class to avoid inherited grid-cols-1 styles) */}
-              <div className="fetch-pages-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+              <div className="fetch-pages-grid grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 {pageDetails.map((page, idx) => (
                   <div key={idx} className="flex flex-col bg-white border rounded-lg shadow-md p-6 hover:shadow-xl transition-all">
                     <div>
