@@ -87,18 +87,29 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       const titleEl = doc.querySelector("header#content-head h1");
       const pageTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
 
-      // Description: from element with role "doc-subtitle"
-      const descEl = doc.querySelector("div[role='doc-subtitle']");
-      const description = descEl ? descEl.innerText.trim() : "No Description Found";
+      // Description: use meta description if available, truncate to 200 characters, else fallback
+      let description = "No Description Found";
+      const metaDesc = doc.querySelector('meta[name="description"]');
+      if (metaDesc && metaDesc.getAttribute('content')) {
+        description = metaDesc.getAttribute('content').trim();
+        if (description.length > 200) {
+          description = description.slice(0, 200) + '...';
+        }
+      } else {
+        const descEl = doc.querySelector("div[role='doc-subtitle']");
+        if (descEl) {
+          description = descEl.innerText.trim();
+        }
+      }
 
       // HTTP Method: prioritize the one in the headline container if available
       const methodEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.rm-APIMethod") ||
-                       doc.querySelector("span.rm-APIMethod");
+                        doc.querySelector("span.rm-APIMethod");
       const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
 
       // Endpoint URL: try to grab from the headline container first
       const urlEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.headline-container-article-info-url2nV_XrjpFuVQ") ||
-                    doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
+                     doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
       // Last Updated: first try the footer container, then fallback
@@ -211,6 +222,19 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
           border: 1px solid #e3e3e3;
         }
         .field-description li+li, .markdown-body li+li { margin-top: 0; }
+        /* Additional styling for the page cards */
+        .card {
+          background: #fff;
+          border: 1px solid #e3e3e3;
+          padding: 1rem;
+          border-radius: 10px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
       `}</style>
 
       {/* Main Container */}
@@ -329,7 +353,7 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
                 gap: '1rem'
               }}>
                 {pageDetails.map((page, idx) => (
-                  <div key={idx} className="p-4 border rounded shadow-md">
+                  <div key={idx} className="card">
                     <p><strong>Page Title:</strong> {page.pageTitle || "N/A"}</p>
                     <p><strong>Description:</strong> {page.description || "N/A"}</p>
                     {isReference && (
