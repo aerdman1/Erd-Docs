@@ -99,8 +99,16 @@ export const DashboardComponent = ({ header = "My Dashboard" }) => {
       const urlEl = doc.querySelector("span.headline-container-article-info-url2nV_XrjpFuVQ");
       const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
 
-      // Last Updated info: try looking inside the UpdatedAt container first
-      const updatedEl = doc.querySelector("div.UpdatedAt p.DateLine") || doc.querySelector("p.DateLine");
+      // Last Updated: try several methods to locate the updated info.
+      let updatedEl = doc.querySelector("div.UpdatedAt p.DateLine");
+      if (!updatedEl) {
+        // Look for any DateLine within the main article that contains "Updated"
+        const articleEl = doc.querySelector(".rm-Article");
+        if (articleEl) {
+          const candidates = articleEl.querySelectorAll("p.DateLine");
+          updatedEl = Array.from(candidates).find(p => p.innerText.includes("Updated"));
+        }
+      }
       const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
 
       return { pageTitle, description, method, endpointUrl, updated };
