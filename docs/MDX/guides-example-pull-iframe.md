@@ -5,6 +5,8 @@ hidden: false
 metadata:
   robots: index
 ---
+<GuidesExamplePullIFRAME />
+
 ## PET
 
 <PullFromExamples endpoint="/pet" />
@@ -20,6 +22,3 @@ metadata:
 ## Find Pet by Status
 
 <PullFromExamples endpoint="/pet/findByStatus" />
-
-<br />
-<GuidesExamplePullIFRAME />
