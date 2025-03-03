@@ -20,3 +20,7 @@ metadata:
 ## Find Pet by Status
 
 <PullFromExamples endpoint="/pet/findByStatus" />
+
+<br />
+
+<GuidesExamplePull />
