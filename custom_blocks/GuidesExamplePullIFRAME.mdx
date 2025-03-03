@@ -10,6 +10,7 @@ export default function PullFromExamplesIFRAME({ endpoint }) {
 
   useEffect(() => {
     if (!endpoint) {
+      setError('IFRAME TESTING');
       setLoading(false);
       return;
     }
