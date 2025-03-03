@@ -8,10 +8,9 @@ export const PageSearching = () => {
   const [highlightedElements, setHighlightedElements] = useState([]);
 
   useEffect(() => {
-    // Function to clear existing highlights
     const clearHighlights = () => {
       highlightedElements.forEach((el) => {
-        el.replaceWith(...el.childNodes); // Remove highlight <span> but keep text
+        el.replaceWith(...el.childNodes);
       });
       setHighlightedElements([]);
     };
@@ -20,32 +19,39 @@ export const PageSearching = () => {
 
     if (!searchTerm.trim()) return;
 
-    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    const elementsToHighlight = [];
-
-    // Function to recursively search for text nodes
-    const highlightMatches = (node) => {
-      if (node.nodeType === 3) { // Text node
-        const match = node.nodeValue.match(regex);
-        if (match) {
-          const wrapper = document.createElement('span');
-          wrapper.innerHTML = node.nodeValue.replace(regex, `<span class="bg-yellow-200 font-bold">$1</span>`);
-
-          const parent = node.parentNode;
-          parent.replaceChild(wrapper, node);
-          elementsToHighlight.push(...wrapper.querySelectorAll('span.bg-yellow-200'));
-        }
-      } else if (node.nodeType === 1 && node.childNodes && !['SCRIPT', 'STYLE'].includes(node.nodeName)) {
-        node.childNodes.forEach(highlightMatches);
+    // Delay to ensure content is rendered before we search it
+    const searchAndHighlight = () => {
+      const contentArea = document.querySelector('.content-body.grid-75');
+      if (!contentArea) {
+        console.warn('No content area found — .content-body.grid-75 missing');
+        return;
       }
+
+      const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      const elementsToHighlight = [];
+
+      const highlightMatches = (node) => {
+        if (node.nodeType === 3) {
+          const match = node.nodeValue.match(regex);
+          if (match) {
+            const wrapper = document.createElement('span');
+            wrapper.innerHTML = node.nodeValue.replace(regex, `<span class="bg-yellow-200 font-bold">$1</span>`);
+            const parent = node.parentNode;
+            parent.replaceChild(wrapper, node);
+            elementsToHighlight.push(...wrapper.querySelectorAll('span.bg-yellow-200'));
+          }
+        } else if (node.nodeType === 1 && node.childNodes && !['SCRIPT', 'STYLE'].includes(node.nodeName)) {
+          node.childNodes.forEach(highlightMatches);
+        }
+      };
+
+      highlightMatches(contentArea);
+      setHighlightedElements(elementsToHighlight);
     };
 
-    const contentArea = document.querySelector('.content-body.grid-75');
-    if (contentArea) {
-      highlightMatches(contentArea);
-    }
-
-    setHighlightedElements(elementsToHighlight);
+    // Small timeout to ensure page loads fully
+    const timer = setTimeout(searchAndHighlight, 200); // Adjust if needed
+    return () => clearTimeout(timer); // Cleanup
   }, [searchTerm]);
 
   return (
