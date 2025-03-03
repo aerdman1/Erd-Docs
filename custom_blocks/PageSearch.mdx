@@ -3,43 +3,49 @@ name: PageSearch
 ---
 import { useState, useEffect } from 'react';
 
-export const PageSearchComponent = () => {
+export const PageSearching = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [highlightedElements, setHighlightedElements] = useState([]);
 
   useEffect(() => {
-    // Clear previous highlights
-    highlightedElements.forEach((el) => {
-      el.outerHTML = el.innerText; // Remove spans
-    });
+    // Function to clear existing highlights
+    const clearHighlights = () => {
+      highlightedElements.forEach((el) => {
+        el.replaceWith(...el.childNodes); // Remove highlight <span> but keep text
+      });
+      setHighlightedElements([]);
+    };
 
-    if (searchTerm.trim() === '') return;
+    clearHighlights();
 
-    const regex = new RegExp(`(${searchTerm})`, 'gi');
-    const elements = [];
-    
-    // Search through the page body
-    const searchInElement = (element) => {
-      if (element.nodeType === 3) { // Text node
-        const matches = element.nodeValue.match(regex);
-        if (matches) {
-          const highlightedHTML = element.nodeValue.replace(regex, '<span class="bg-yellow-200 font-bold">$1</span>');
+    if (!searchTerm.trim()) return;
+
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const elementsToHighlight = [];
+
+    // Function to recursively search for text nodes
+    const highlightMatches = (node) => {
+      if (node.nodeType === 3) { // Text node
+        const match = node.nodeValue.match(regex);
+        if (match) {
           const wrapper = document.createElement('span');
-          wrapper.innerHTML = highlightedHTML;
+          wrapper.innerHTML = node.nodeValue.replace(regex, `<span class="bg-yellow-200 font-bold">$1</span>`);
 
-          const parent = element.parentNode;
-          if (parent) {
-            parent.replaceChild(wrapper, element);
-            elements.push(...wrapper.querySelectorAll('span'));
-          }
+          const parent = node.parentNode;
+          parent.replaceChild(wrapper, node);
+          elementsToHighlight.push(...wrapper.querySelectorAll('span.bg-yellow-200'));
         }
-      } else {
-        element.childNodes.forEach(searchInElement);
+      } else if (node.nodeType === 1 && node.childNodes && !['SCRIPT', 'STYLE'].includes(node.nodeName)) {
+        node.childNodes.forEach(highlightMatches);
       }
     };
 
-    document.querySelectorAll('main').forEach(searchInElement);
-    setHighlightedElements(elements);
+    const contentArea = document.querySelector('.content-body.grid-75');
+    if (contentArea) {
+      highlightMatches(contentArea);
+    }
+
+    setHighlightedElements(elementsToHighlight);
   }, [searchTerm]);
 
   return (
@@ -56,4 +62,4 @@ export const PageSearchComponent = () => {
 };
 
 
-<PageSearchComponent />
+<PageSearching />
