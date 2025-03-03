@@ -1,5 +1,5 @@
 ---
-title: MDX Dashboard
+title: MDX Dashboard (Guides)
 deprecated: false
 hidden: false
 metadata:
