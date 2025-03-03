@@ -5,4 +5,4 @@ hidden: false
 metadata:
   robots: index
 ---
-<BannerNew />
+<Banner message="Here it is!" bannerColor="#ff00ff" bannerTextColor="#fff" />
