@@ -1,32 +1,32 @@
 ---
 name: GenerateBanner
 ---
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 export const BannerGenerator = ({
-  message: propMessage = 'This is my banner message!',
-  bannerColor: propBannerColor = '#00bcff',
-  bannerTextColor: propBannerTextColor = '#ffffff',
-  fontSize: propFontSize = '16px',
-  fontWeight: propFontWeight = 'normal',
+  message: propMessage = "This is my banner message!",
+  bannerColor: propBannerColor = "#00bcff",
+  bannerTextColor: propBannerTextColor = "#ffffff",
+  fontSize: propFontSize = "16px",
+  fontWeight: propFontWeight = "normal",
 }) => {
   // Check if the user is an admin based on the hub-me script data
   let isAdmin = false;
-  if (typeof document !== 'undefined') {
-    const hubElem = document.getElementById('hub-me');
+  if (typeof document !== "undefined") {
+    const hubElem = document.getElementById("hub-me");
     if (hubElem) {
       try {
-        const hubData = JSON.parse(hubElem.getAttribute('data-json'));
+        const hubData = JSON.parse(hubElem.getAttribute("data-json"));
         isAdmin = hubData.isAdmin;
       } catch (e) {
-        console.error('Error parsing hub-me data', e);
+        console.error("Error parsing hub-me data", e);
       }
     }
   }
 
   // Map incoming fontWeight "normal" to "400" for our select
   const initialFontWeight =
-    propFontWeight === 'normal' ? '400' : propFontWeight;
+    propFontWeight === "normal" ? "400" : propFontWeight;
 
   // Use incoming props to initialize state
   const [message, setMessage] = useState(propMessage);
@@ -34,8 +34,8 @@ export const BannerGenerator = ({
   const [bannerTextColor, setBannerTextColor] = useState(propBannerTextColor);
   const [fontSize, setFontSize] = useState(propFontSize);
   const [fontWeight, setFontWeight] = useState(initialFontWeight);
-  const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
-  const [placement, setPlacement] = useState('bottom'); // 'top' or 'bottom'
+  const [preset, setPreset] = useState("custom"); // 'critical', 'warning', 'standard', 'custom'
+  const [placement, setPlacement] = useState("bottom"); // 'top' or 'bottom'
 
   // Sync state with props if they change externally
   useEffect(() => {
@@ -43,31 +43,37 @@ export const BannerGenerator = ({
     setBannerColor(propBannerColor);
     setBannerTextColor(propBannerTextColor);
     setFontSize(propFontSize);
-    setFontWeight(propFontWeight === 'normal' ? '400' : propFontWeight);
-  }, [propMessage, propBannerColor, propBannerTextColor, propFontSize, propFontWeight]);
+    setFontWeight(propFontWeight === "normal" ? "400" : propFontWeight);
+  }, [
+    propMessage,
+    propBannerColor,
+    propBannerTextColor,
+    propFontSize,
+    propFontWeight,
+  ]);
 
   const handlePresetChange = (e) => {
     const selectedPreset = e.target.value;
     setPreset(selectedPreset);
 
-    if (selectedPreset === 'critical') {
-      setBannerColor('#dc2626');
-      setBannerTextColor('#ffffff');
-    } else if (selectedPreset === 'warning') {
-      setBannerColor('#facc15');
-      setBannerTextColor('#000000');
-    } else if (selectedPreset === 'standard') {
-      setBannerColor('#2563eb');
-      setBannerTextColor('#ffffff');
-    } else if (selectedPreset === 'custom') {
-      setBannerColor('#00bcff');
-      setBannerTextColor('#ffffff');
+    if (selectedPreset === "critical") {
+      setBannerColor("#dc2626");
+      setBannerTextColor("#ffffff");
+    } else if (selectedPreset === "warning") {
+      setBannerColor("#facc15");
+      setBannerTextColor("#000000");
+    } else if (selectedPreset === "standard") {
+      setBannerColor("#2563eb");
+      setBannerTextColor("#ffffff");
+    } else if (selectedPreset === "custom") {
+      setBannerColor("#00bcff");
+      setBannerTextColor("#ffffff");
     }
   };
 
   const generateBannerProps = () => {
     let props = `message="${message}"`;
-    if (preset !== 'custom') {
+    if (preset !== "custom") {
       props += ` ${preset}={true}`;
     } else {
       props += ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
@@ -81,104 +87,114 @@ export const BannerGenerator = ({
   const generatedSnippet = `<BannerGenerator ${generateBannerProps()} />`;
 
   const actualBannerColor =
-    preset === 'custom' ? bannerColor :
-    preset === 'critical' ? '#dc2626' :
-    preset === 'warning' ? '#facc15' :
-    preset === 'standard' ? '#2563eb' : bannerColor;
+    preset === "custom"
+      ? bannerColor
+      : preset === "critical"
+      ? "#dc2626"
+      : preset === "warning"
+      ? "#facc15"
+      : preset === "standard"
+      ? "#2563eb"
+      : bannerColor;
 
   const actualBannerTextColor =
-    preset === 'custom' ? bannerTextColor :
-    preset === 'critical' ? '#ffffff' :
-    preset === 'warning' ? '#000000' :
-    preset === 'standard' ? '#ffffff' : bannerTextColor;
+    preset === "custom"
+      ? bannerTextColor
+      : preset === "critical"
+      ? "#ffffff"
+      : preset === "warning"
+      ? "#000000"
+      : preset === "standard"
+      ? "#ffffff"
+      : bannerTextColor;
 
   // Centralized style object for the admin UI
   const styles = {
     container: {
-      maxWidth: '600px',
-      margin: '2rem auto',
-      padding: '2rem',
-      background: '#fff',
-      borderRadius: '10px',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+      maxWidth: "600px",
+      margin: "2rem auto",
+      padding: "2rem",
+      background: "#fff",
+      borderRadius: "10px",
+      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
       fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
-      display: isAdmin ? undefined : 'none', // Only admins see the generator UI
+      display: isAdmin ? undefined : "none", // Only admins see the generator UI
     },
     headerRow: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '1.5rem',
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "1.5rem",
     },
     heading: {
       margin: 0,
-      color: '#333',
-      fontSize: '1.5rem',
+      color: "#333",
+      fontSize: "1.5rem",
     },
     label: {
-      display: 'block',
-      marginBottom: '0.5rem',
-      fontWeight: '500',
-      color: '#555',
-      fontSize: '0.9rem',
+      display: "block",
+      marginBottom: "0.5rem",
+      fontWeight: "500",
+      color: "#555",
+      fontSize: "0.9rem",
     },
     input: {
-      width: '100%',
-      padding: '0.5rem',
-      marginTop: '0.25rem',
-      borderRadius: '5px',
-      border: '1px solid #ccc',
+      width: "100%",
+      padding: "0.5rem",
+      marginTop: "0.25rem",
+      borderRadius: "5px",
+      border: "1px solid #ccc",
     },
     select: {
-      width: '100%',
-      padding: '0.5rem',
-      marginTop: '0.25rem',
-      borderRadius: '5px',
-      border: '1px solid #ccc',
+      width: "100%",
+      padding: "0.5rem",
+      marginTop: "0.25rem",
+      borderRadius: "5px",
+      border: "1px solid #ccc",
     },
     row: {
-      display: 'flex',
-      gap: '1rem',
-      marginBottom: '1rem',
+      display: "flex",
+      gap: "1rem",
+      marginBottom: "1rem",
     },
     fourColumnRow: {
-      display: 'flex',
-      gap: '1rem',
-      marginBottom: '1rem',
+      display: "flex",
+      gap: "1rem",
+      marginBottom: "1rem",
     },
     colorInput: {
-      width: '100%',
-      height: '40px',
-      padding: '0',
-      border: '1px solid #ccc',
-      borderRadius: '5px',
-      cursor: 'pointer',
-      appearance: 'none',
+      width: "100%",
+      height: "40px",
+      padding: "0",
+      border: "1px solid #ccc",
+      borderRadius: "5px",
+      cursor: "pointer",
+      appearance: "none",
     },
     code: {
-      background: '#f0f0f0',
-      padding: '1rem',
-      borderRadius: '5px',
-      overflowX: 'auto',
-      fontFamily: 'monospace',
-      marginBottom: '1.5rem',
+      background: "#f0f0f0",
+      padding: "1rem",
+      borderRadius: "5px",
+      overflowX: "auto",
+      fontFamily: "monospace",
+      marginBottom: "1.5rem",
     },
     button: {
-      padding: '0.75rem 1.5rem',
-      cursor: 'pointer',
-      background: '#4CAF50',
-      color: 'white',
-      border: 'none',
-      borderRadius: '5px',
-      display: 'block',
-      margin: '0 auto',
-      fontSize: '1rem',
+      padding: "0.75rem 1.5rem",
+      cursor: "pointer",
+      background: "#4CAF50",
+      color: "white",
+      border: "none",
+      borderRadius: "5px",
+      display: "block",
+      margin: "0 auto",
+      fontSize: "1rem",
     },
     sectionHeading: {
-      fontSize: '1.25rem',
-      marginBottom: '1rem',
-      textAlign: 'center',
-      color: '#333',
+      fontSize: "1.25rem",
+      marginBottom: "1rem",
+      textAlign: "center",
+      color: "#333",
     },
   };
 
@@ -189,29 +205,29 @@ export const BannerGenerator = ({
       bannerTextColor: "#ffffff", // white
       fontSize: "16px",
       fontWeight: "normal",
-      message: "Critical Alert: Please check immediately!"
+      message: "Critical Alert: Please check immediately!",
     },
     warning: {
       bannerColor: "#facc15", // yellow-400
       bannerTextColor: "#000000", // black
       fontSize: "16px",
       fontWeight: "normal",
-      message: "Warning Alert: There might be an issue."
+      message: "Warning Alert: There might be an issue.",
     },
     standard: {
       bannerColor: "#2563eb", // blue-600
       bannerTextColor: "#ffffff", // white
       fontSize: "16px",
       fontWeight: "normal",
-      message: "Standard Alert: Here is some information."
+      message: "Standard Alert: Here is some information.",
     },
     custom: {
-      bannerColor: "#00BCFF",    
+      bannerColor: "#00BCFF",
       bannerTextColor: "#ffffff",
       fontSize: "14px",
       fontWeight: "bold",
-      message: "Here is my banner message - hope you enjoy!"
-    }
+      message: "Here is my banner message - hope you enjoy!",
+    },
   };
 
   const defaults = defaultPresets[preset];
@@ -222,7 +238,7 @@ export const BannerGenerator = ({
     fontSize: fontSize || defaults.fontSize,
     fontWeight: fontWeight || defaults.fontWeight,
     width: "100%",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   };
 
   const containerStyles = {
@@ -230,47 +246,55 @@ export const BannerGenerator = ({
     margin: "0 auto",
     padding: "0.75rem 1rem",
     textAlign: "center",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   };
 
   // Move (or update) the banner in the header based on placement
   useEffect(() => {
     const moveBannerToHeader = () => {
-      const headerElement = document.querySelector('header.rm-Header');
+      const headerElement = document.querySelector("header.rm-Header");
       if (!headerElement) return;
-      let bannerWrapper = document.getElementById('custom-banner-container');
-      const bannerContent = document.getElementById('custom-banner-content');
+      let bannerWrapper = document.getElementById("custom-banner-container");
+      const bannerContent = document.getElementById("custom-banner-content");
       if (bannerWrapper) {
         // Update styles
         Object.assign(bannerWrapper.style, bannerStyles);
         // Re-insert based on placement
-        if (placement === 'top') {
+        if (placement === "top") {
           headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
         } else {
           headerElement.appendChild(bannerWrapper);
         }
         if (bannerContent && bannerContent.parentNode !== bannerWrapper) {
           bannerWrapper.appendChild(bannerContent);
-          bannerContent.style.display = '';
+          bannerContent.style.display = "";
         }
       } else {
-        bannerWrapper = document.createElement('div');
-        bannerWrapper.id = 'custom-banner-container';
+        bannerWrapper = document.createElement("div");
+        bannerWrapper.id = "custom-banner-container";
         Object.assign(bannerWrapper.style, bannerStyles);
-        if (placement === 'top') {
+        if (placement === "top") {
           headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
         } else {
           headerElement.appendChild(bannerWrapper);
         }
         if (bannerContent) {
           bannerWrapper.appendChild(bannerContent);
-          bannerContent.style.display = '';
+          bannerContent.style.display = "";
         }
       }
     };
 
     moveBannerToHeader();
-  }, [bannerColor, bannerTextColor, fontSize, fontWeight, message, preset, placement]);
+  }, [
+    bannerColor,
+    bannerTextColor,
+    fontSize,
+    fontWeight,
+    message,
+    preset,
+    placement,
+  ]);
 
   return (
     <>
@@ -278,10 +302,15 @@ export const BannerGenerator = ({
       <div style={styles.container}>
         <div style={styles.headerRow}>
           <h3 style={styles.heading}>Banner Generator</h3>
-          <img 
-            src="https://owlbertsio-resized.s3.amazonaws.com/Barker.psd.png" 
-            alt="Owlbert" 
-            style={{ maxWidth: '100px', height: 'auto' }} 
+          <img
+            src="https://owlbertsio-resized.s3.amazonaws.com/Barker.psd.png"
+            alt="Owlbert"
+            style={{
+              position: "absolute",
+              left: "72%",
+              maxWidth: "100px",
+              height: "auto",
+            }}
           />
         </div>
 
@@ -297,7 +326,11 @@ export const BannerGenerator = ({
 
         <label style={styles.label}>
           Preset:
-          <select value={preset} onChange={handlePresetChange} style={styles.select}>
+          <select
+            value={preset}
+            onChange={handlePresetChange}
+            style={styles.select}
+          >
             <option value="custom">Custom (you choose colors)</option>
             <option value="critical">Critical (Red)</option>
             <option value="warning">Warning (Yellow)</option>
@@ -305,7 +338,7 @@ export const BannerGenerator = ({
           </select>
         </label>
 
-        {preset === 'custom' ? (
+        {preset === "custom" ? (
           <div style={styles.fourColumnRow}>
             <div style={{ flex: 1 }}>
               <label style={styles.label}>BG Color 🎨</label>
@@ -399,13 +432,14 @@ export const BannerGenerator = ({
       </div>
 
       {/* Banner Injection Content (always used to update the header) */}
-      <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
-        <div style={containerStyles}>
-          {message || defaults.message}
-        </div>
+      <div
+        id="custom-banner-content"
+        style={{ display: "none", width: "100%" }}
+      >
+        <div style={containerStyles}>{message || defaults.message}</div>
       </div>
     </>
   );
 };
 
-<BannerGenerator />
+<BannerGenerator />;
