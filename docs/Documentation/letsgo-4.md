@@ -1,4 +1,0 @@
----
-title: LetsGo
-deprecated: false
----
