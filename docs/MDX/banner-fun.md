@@ -5,4 +5,4 @@ hidden: false
 metadata:
   robots: index
 ---
-<BannerGenerator message="This is my banner message1244443" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="16px" fontWeight="normal" />
+<BannerGenerator message="Here is a page banner update that you have total control over using this MDX component!" bannerColor="#ee00ff" bannerTextColor="#ffffff" fontSize="16px" fontWeight="400" placement="bottom" />
