@@ -10,4 +10,4 @@ deprecated: false
   occaecat cupidatat non proident!
 </Accordion>
 
-<Image align="center" src="https://files.readme.io/ddb6bd4f70a24849d3144238b23a317d8e20a3ac6bf566d3159f5b1898d61ac4-Screenshot_2025-03-04_at_10.09.54_AM.png" />
+<Image align="center" src="https://files.readme.io/fb6384bab10eb404e4204de5e60f390852137125bc9a3f8dfd1c1cce1ebfd83a-screencapture-erdtest123-readme-io-reference-overview-2025-03-03-12_59_50.png" />
