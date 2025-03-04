@@ -35,6 +35,7 @@ export const BannerGenerator = ({
   const [fontWeight, setFontWeight] = useState(initialFontWeight);
   const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
   const [placement, setPlacement] = useState('bottom'); // 'top' or 'bottom'
+  const [copied, setCopied] = useState(false);
 
   // Sync state with props if they change externally
   useEffect(() => {
@@ -141,7 +142,6 @@ export const BannerGenerator = ({
     } else {
       headerElement.appendChild(bannerWrapper);
     }
-    // Cleanup: remove the container on unmount
     return () => {
       if (bannerWrapper) bannerWrapper.remove();
     };
@@ -154,7 +154,6 @@ export const BannerGenerator = ({
     const bannerWrapper = document.getElementById('custom-banner-container');
     if (!bannerWrapper) return;
     Object.assign(bannerWrapper.style, bannerStyles);
-    // Reposition banner if placement changed
     if (placement === 'top') {
       headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
     } else {
@@ -183,7 +182,7 @@ export const BannerGenerator = ({
     };
   }, []);
 
-  // Admin UI styles
+  // Centralized style object for the admin UI
   const uiStyles = {
     container: {
       maxWidth: '800px',
@@ -395,11 +394,20 @@ export const BannerGenerator = ({
         <h4 style={uiStyles.sectionHeading}>Generated Code:</h4>
         <pre style={uiStyles.code}>{generatedSnippet}</pre>
         <button
-          onClick={() => navigator.clipboard.writeText(generatedSnippet)}
+          onClick={() => {
+            navigator.clipboard.writeText(generatedSnippet);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }}
           style={uiStyles.button}
         >
           Copy to Clipboard
         </button>
+        {copied && (
+          <div style={{ textAlign: 'center', marginTop: '1rem', color: '#4CAF50' }}>
+            Copied!
+          </div>
+        )}
         <div style={uiStyles.note}>
           <span style={{ marginRight: '0.5rem' }}>ℹ️</span>
           <span>
