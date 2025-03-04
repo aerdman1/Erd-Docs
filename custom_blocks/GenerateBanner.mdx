@@ -25,8 +25,7 @@ export const BannerGenerator = ({
   }
 
   // Map incoming fontWeight "normal" to "400" for our select
-  const initialFontWeight =
-    propFontWeight === 'normal' ? '400' : propFontWeight;
+  const initialFontWeight = propFontWeight === 'normal' ? '400' : propFontWeight;
 
   // Use incoming props to initialize state
   const [message, setMessage] = useState(propMessage);
@@ -49,7 +48,6 @@ export const BannerGenerator = ({
   const handlePresetChange = (e) => {
     const selectedPreset = e.target.value;
     setPreset(selectedPreset);
-
     if (selectedPreset === 'critical') {
       setBannerColor('#dc2626');
       setBannerTextColor('#ffffff');
@@ -92,7 +90,7 @@ export const BannerGenerator = ({
     preset === 'warning' ? '#000000' :
     preset === 'standard' ? '#ffffff' : bannerTextColor;
 
-  // Centralized style object for the admin UI
+  // Centralized style objects for admin UI and banner injection
   const styles = {
     container: {
       maxWidth: '800px',
@@ -109,6 +107,7 @@ export const BannerGenerator = ({
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: '1.5rem',
+      position: 'relative',
     },
     heading: {
       margin: 0,
@@ -192,7 +191,6 @@ export const BannerGenerator = ({
     },
   };
 
-  // Banner defaults (from your original Banner component)
   const defaultPresets = {
     critical: {
       bannerColor: "#dc2626", // red-600
@@ -243,7 +241,7 @@ export const BannerGenerator = ({
     boxSizing: "border-box"
   };
 
-  // Move (or update) the banner in the header based on placement
+  // Inject (or update) the banner into the header and clean up on unmount
   useEffect(() => {
     const moveBannerToHeader = () => {
       const headerElement = document.querySelector('header.rm-Header');
@@ -251,9 +249,7 @@ export const BannerGenerator = ({
       let bannerWrapper = document.getElementById('custom-banner-container');
       const bannerContent = document.getElementById('custom-banner-content');
       if (bannerWrapper) {
-        // Update styles
         Object.assign(bannerWrapper.style, bannerStyles);
-        // Re-insert based on placement
         if (placement === 'top') {
           headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
         } else {
@@ -280,6 +276,14 @@ export const BannerGenerator = ({
     };
 
     moveBannerToHeader();
+
+    // Cleanup: Remove the banner when the component unmounts
+    return () => {
+      const bannerWrapper = document.getElementById('custom-banner-container');
+      if (bannerWrapper) {
+        bannerWrapper.remove();
+      }
+    };
   }, [bannerColor, bannerTextColor, fontSize, fontWeight, message, preset, placement]);
 
   return (
@@ -294,7 +298,6 @@ export const BannerGenerator = ({
             style={{ position: 'absolute', right: '10px', maxWidth: '100px', height: 'auto' }} 
           />
         </div>
-
         <label style={styles.label}>
           Message:
           <input
@@ -304,7 +307,6 @@ export const BannerGenerator = ({
             style={styles.input}
           />
         </label>
-
         <label style={styles.label}>
           Preset:
           <select value={preset} onChange={handlePresetChange} style={styles.select}>
@@ -314,7 +316,6 @@ export const BannerGenerator = ({
             <option value="standard">Standard (Blue)</option>
           </select>
         </label>
-
         {preset === 'custom' ? (
           <div style={styles.fourColumnRow}>
             <div style={{ flex: 1 }}>
@@ -382,8 +383,6 @@ export const BannerGenerator = ({
             </div>
           </div>
         )}
-
-        {/* Banner Placement Toggle */}
         <label style={styles.label}>
           Banner Placement:
           <select
@@ -395,19 +394,14 @@ export const BannerGenerator = ({
             <option value="bottom">Bottom (default)</option>
           </select>
         </label>
-
-        {/* Generated Code Output */}
         <h4 style={styles.sectionHeading}>Generated Code:</h4>
         <pre style={styles.code}>{generatedSnippet}</pre>
-
         <button
           onClick={() => navigator.clipboard.writeText(generatedSnippet)}
           style={styles.button}
         >
           Copy to Clipboard
         </button>
-
-        {/* Instructional Callout */}
         <div style={styles.note}>
           <span style={{ marginRight: '0.5rem' }}>ℹ️</span>
           <span>
@@ -415,8 +409,7 @@ export const BannerGenerator = ({
           </span>
         </div>
       </div>
-
-      {/* Banner Injection Content (always used to update the header) */}
+      {/* Banner Injection Content */}
       <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
         <div style={containerStyles}>
           {message || defaults.message}
