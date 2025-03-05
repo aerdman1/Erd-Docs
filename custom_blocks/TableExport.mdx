@@ -42,7 +42,7 @@ export const DownloadableTables = () => {
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
       loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
 
-      // 4) For HTML5 export (csv, excel, pdf):
+      // 4) For HTML5 export (csv, excel, pdf) + print:
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
 
@@ -56,15 +56,86 @@ export const DownloadableTables = () => {
 
     loadDependencies()
       .then(() => {
-        // Optional: Style override for the DataTables search input
+        // ─────────────────────────────────────────────────────────────────────────
+        // Inject a style override for a more modern DataTables look:
+        // Adjust colors, gradients, fonts, etc. to match your branding.
+        // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
+          /* General DataTables wrapper */
+          .dataTables_wrapper {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 0.875rem;
+            color: #333;
+            background-color: #fff;
+            margin: 0 auto;
+            border: none;
+          }
+
+          /* Search box */
+          .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 0.5rem;
+          }
           .dataTables_wrapper .dataTables_filter input {
-            padding: 5px 20px !important;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 8px;
+            outline: none;
+            transition: border-color 0.2s;
+          }
+          .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #018ef5;
+          }
+
+          /* Info text (e.g. "Showing 1 to 10 of 20 entries") */
+          .dataTables_wrapper .dataTables_info {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 8px;
+          }
+
+          /* Pagination buttons */
+          .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background: linear-gradient(180deg, #56b8ff, #018ef5);
+            color: #fff !important;
+            border: none;
+            border-radius: 4px;
+            margin: 2px;
+            padding: 4px 8px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            filter: brightness(1.1);
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: linear-gradient(180deg, #ff9c9c, #e3342f) !important;
+            color: #fff !important;
+          }
+
+          /* DataTables export / print buttons */
+          .dt-button {
+            background: linear-gradient(180deg, #c8a4ee, #9561e2) !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 4px !important;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.2) !important;
+            margin: 2px;
+            padding: 6px 12px !important;
+            font-size: 0.625rem !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            filter: saturate(1.25) !important;
+            outline: none !important;
+          }
+          .dt-button:hover {
+            filter: brightness(1.1) saturate(1.25) !important;
           }
         `;
         document.head.appendChild(styleOverride);
 
+        // Process all tables on the page
         const tables = document.querySelectorAll("table");
 
         tables.forEach((table) => {
@@ -80,7 +151,7 @@ export const DownloadableTables = () => {
           tableWrapper.style.position = "relative";
 
           // ─────────────────────────────────────────────────────────────────────────
-          // 1) Create the top-right "Table Preferences" trigger (the folded-corner)
+          // 1) Create the top-right "Table Preferences" trigger (folded-corner)
           // ─────────────────────────────────────────────────────────────────────────
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
@@ -88,7 +159,7 @@ export const DownloadableTables = () => {
           trigger.style.position = "absolute";
           trigger.style.top = "0px";
           trigger.style.right = "0px";
-          trigger.style.padding = "0px 4px 4px 5px";
+          trigger.style.padding = "4px";
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
           trigger.style.zIndex = "10";
@@ -126,11 +197,11 @@ export const DownloadableTables = () => {
           menu.setAttribute("data-dt-buttons", "true");
 
           // ─────────────────────────────────────────────────────────────────────────
-          // 3) FILTER button (red) - initializes DataTables + Buttons on demand
+          // 3) FILTER / DISABLE button - toggles DataTables on / off
           // ─────────────────────────────────────────────────────────────────────────
           const filterBtn = document.createElement("button");
           filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
-          filterBtn.title = "Enable Sorting / Export / Print, etc.";
+          filterBtn.title = "Enable Sorting / Export / Print";
           filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
           filterBtn.style.border = "none";
           filterBtn.style.color = "#fff";
@@ -146,31 +217,48 @@ export const DownloadableTables = () => {
             "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
           filterBtn.style.filter = "saturate(1.25)";
 
-          // On click, try to enable DataTables with built-in Buttons
+          // Store a flag on the table to track if DataTables is active
+          table.setAttribute("data-filter-enabled", "false");
+
           filterBtn.onclick = () => {
-            if (window.jQuery && window.jQuery.fn.DataTable) {
-              const $table = window.jQuery(table);
-              // Initialize only if not already done
+            const $table = window.jQuery(table);
+            const isEnabled = table.getAttribute("data-filter-enabled") === "true";
+
+            if (!isEnabled) {
+              // 1) Store the table's original HTML so we can revert later
+              table.setAttribute("data-original-html", table.innerHTML);
+
+              // 2) Initialize DataTables with export / print buttons
               if (!$table.hasClass("dataTable")) {
-                // Use "Bfrtip" so the built-in export / print buttons appear
                 $table.DataTable({
                   dom: "Bfrtip",
                   buttons: ["copy", "csv", "excel", "pdf", "print"],
                 });
               }
+              table.setAttribute("data-filter-enabled", "true");
+
+              // 3) Change button to "Disable"
+              filterBtn.innerHTML = '<i class="fa fa-ban" aria-hidden="true"></i>';
+              filterBtn.title = "Disable Sorting / Export / Print";
+              filterBtn.style.background = "linear-gradient(180deg, #999999, #666666)";
             } else {
-              // Fallback: simple text prompt filter if DataTables isn't available
-              const query = prompt("Enter text to filter rows:");
-              if (query !== null) {
-                const rows = table.querySelectorAll("tbody tr");
-                rows.forEach((row) => {
-                  if (row.innerText.toLowerCase().includes(query.toLowerCase())) {
-                    row.style.display = "";
-                  } else {
-                    row.style.display = "none";
-                  }
-                });
+              // Currently enabled -> disable it
+              // 1) Destroy DataTables
+              $table.DataTable().destroy();
+
+              // 2) Revert to the original HTML
+              const originalHTML = table.getAttribute("data-original-html");
+              if (originalHTML) {
+                table.innerHTML = originalHTML;
+                table.removeAttribute("data-original-html");
               }
+
+              table.setAttribute("data-filter-enabled", "false");
+
+              // 3) Change button back to "Enable"
+              filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
+              filterBtn.title = "Enable Sorting / Export / Print";
+              filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
             }
           };
 
