@@ -18,9 +18,10 @@ export const DownloadableTables = () => {
       container.style.display = "flex";
       container.style.gap = "8px";
 
-      // Button: Download
+      // Button: Download (icon only)
       const csvButton = document.createElement("button");
-      csvButton.innerHTML = '<i class="fa fa-download" aria-hidden="true"></i> Download';
+      csvButton.innerHTML = '<i class="fa fa-download" aria-hidden="true"></i>';
+      csvButton.title = "Download as CSV";
       csvButton.style.backgroundColor = "#3490dc"; // blue
       csvButton.style.border = "none";
       csvButton.style.color = "#fff";
@@ -28,7 +29,7 @@ export const DownloadableTables = () => {
       csvButton.style.padding = "6px 12px";
       csvButton.style.borderRadius = "4px";
       csvButton.style.cursor = "pointer";
-      csvButton.style.fontSize = "0.875rem";
+      csvButton.style.fontSize = "1.25rem"; // larger icon size
       csvButton.style.display = "inline-flex";
       csvButton.style.alignItems = "center";
       csvButton.onclick = () => {
@@ -59,9 +60,10 @@ export const DownloadableTables = () => {
         document.body.removeChild(link);
       };
 
-      // Button: Print
+      // Button: Print (icon only)
       const printButton = document.createElement("button");
-      printButton.innerHTML = '<i class="fa fa-print" aria-hidden="true"></i> Print';
+      printButton.innerHTML = '<i class="fa fa-print" aria-hidden="true"></i>';
+      printButton.title = "Print Table";
       printButton.style.backgroundColor = "#38c172"; // green
       printButton.style.border = "none";
       printButton.style.color = "#fff";
@@ -69,14 +71,14 @@ export const DownloadableTables = () => {
       printButton.style.padding = "6px 12px";
       printButton.style.borderRadius = "4px";
       printButton.style.cursor = "pointer";
-      printButton.style.fontSize = "0.875rem";
+      printButton.style.fontSize = "1.25rem"; // larger icon size
       printButton.style.display = "inline-flex";
       printButton.style.alignItems = "center";
       printButton.onclick = () => {
         const printWindow = window.open("", "", "width=800,height=600");
         if (printWindow) {
           printWindow.document.write("<html><head><title>Print Table</title>");
-          // Include Font Awesome CSS for icons in the print window
+          // Include Font Awesome CSS in the print window for icons
           printWindow.document.write(
             '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
           );
@@ -92,9 +94,10 @@ export const DownloadableTables = () => {
         }
       };
 
-      // Button: Copy
+      // Button: Copy (icon only)
       const copyButton = document.createElement("button");
-      copyButton.innerHTML = '<i class="fa fa-clipboard" aria-hidden="true"></i> Copy';
+      copyButton.innerHTML = '<i class="fa fa-clipboard" aria-hidden="true"></i>';
+      copyButton.title = "Copy Table HTML";
       copyButton.style.backgroundColor = "#9561e2"; // purple
       copyButton.style.border = "none";
       copyButton.style.color = "#fff";
@@ -102,7 +105,7 @@ export const DownloadableTables = () => {
       copyButton.style.padding = "6px 12px";
       copyButton.style.borderRadius = "4px";
       copyButton.style.cursor = "pointer";
-      copyButton.style.fontSize = "0.875rem";
+      copyButton.style.fontSize = "1.25rem"; // larger icon size
       copyButton.style.display = "inline-flex";
       copyButton.style.alignItems = "center";
       copyButton.onclick = async () => {
