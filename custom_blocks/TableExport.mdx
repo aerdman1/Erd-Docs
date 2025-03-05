@@ -6,17 +6,22 @@ import React, { useEffect } from "react";
 export const DownloadableTables = () => {
   useEffect(() => {
     const tables = document.querySelectorAll("table");
+
     tables.forEach((table, index) => {
       // Skip if already processed
       if (table.getAttribute("data-csv-processed")) return;
       table.setAttribute("data-csv-processed", "true");
 
-      const button = document.createElement("button");
-      button.textContent = "Download to CSV";
-      button.style.marginBottom = "0.5rem";
-      button.style.cursor = "pointer";
+      // Create a container for the buttons with Tailwind spacing
+      const container = document.createElement("div");
+      container.className = "mb-2 flex space-x-2";
 
-      button.onclick = () => {
+      // Button: Download to CSV
+      const csvButton = document.createElement("button");
+      csvButton.textContent = "Download to CSV";
+      csvButton.className =
+        "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded";
+      csvButton.onclick = () => {
         const rows = Array.from(table.querySelectorAll("tr"));
         let csvData = "";
         rows.forEach(row => {
@@ -24,9 +29,9 @@ export const DownloadableTables = () => {
           let rowData = [];
           cells.forEach(cell => {
             let text = cell.innerText.trim();
-            // Replace any double quotes with two double quotes
+            // Escape any double quotes
             text = text.split('"').join('""');
-            // Wrap the text in quotes if it contains a comma or a double quote
+            // Wrap the text in quotes if it contains commas or quotes
             if (text.indexOf(",") !== -1 || text.indexOf('"') !== -1) {
               text = '"' + text + '"';
             }
@@ -34,7 +39,6 @@ export const DownloadableTables = () => {
           });
           csvData += rowData.join(",") + "\n";
         });
-
         const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
@@ -45,7 +49,50 @@ export const DownloadableTables = () => {
         document.body.removeChild(link);
       };
 
-      table.parentNode.insertBefore(button, table);
+      // Button: Print Table (opens new window with table HTML)
+      const printButton = document.createElement("button");
+      printButton.textContent = "Print Table";
+      printButton.className =
+        "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded";
+      printButton.onclick = () => {
+        const printWindow = window.open("", "", "width=800,height=600");
+        if (printWindow) {
+          printWindow.document.write("<html><head><title>Print Table</title>");
+          // Optional: include Tailwind CSS in the new window for similar styling
+          printWindow.document.write(
+            '<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">'
+          );
+          printWindow.document.write("</head><body>");
+          printWindow.document.write(table.outerHTML);
+          printWindow.document.write("</body></html>");
+          printWindow.document.close();
+          printWindow.focus();
+          setTimeout(() => {
+            printWindow.print();
+            printWindow.close();
+          }, 500);
+        }
+      };
+
+      // Button: Copy Table HTML to clipboard
+      const copyButton = document.createElement("button");
+      copyButton.textContent = "Copy Table HTML";
+      copyButton.className =
+        "bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded";
+      copyButton.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(table.outerHTML);
+          alert("Table HTML copied to clipboard!");
+        } catch (err) {
+          alert("Failed to copy: " + err);
+        }
+      };
+
+      // Append the buttons to the container and then the container before the table
+      container.appendChild(csvButton);
+      container.appendChild(printButton);
+      container.appendChild(copyButton);
+      table.parentNode.insertBefore(container, table);
     });
   }, []);
 
