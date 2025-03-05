@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 export const DownloadableTables = () => {
   useEffect(() => {
     const tables = document.querySelectorAll("table");
+
     tables.forEach((table, index) => {
       if (table.getAttribute("data-csv-processed")) return;
       table.setAttribute("data-csv-processed", "true");
@@ -13,7 +14,7 @@ export const DownloadableTables = () => {
       // Look for the outer wrapper with class "rdmd-table"
       const tableWrapper = table.closest(".rdmd-table");
       if (tableWrapper) {
-        // Ensure the wrapper is relative for absolute positioning of our trigger
+        // Ensure the wrapper is relative so that our absolute positioning works.
         tableWrapper.style.position = "relative";
 
         // Create the folded-corner trigger element.
@@ -26,17 +27,21 @@ export const DownloadableTables = () => {
         trigger.style.backgroundColor = "rgba(0,0,0,0.6)";
         trigger.style.color = "#fff";
         trigger.style.padding = "4px";
-        // Rounded bottom‑left corner to mimic a page fold
+        // Rounded bottom‑left corner to mimic a page fold:
         trigger.style.borderRadius = "0 0 0 8px";
         trigger.style.cursor = "pointer";
         trigger.style.fontSize = "0.75rem";
         trigger.style.zIndex = "10";
 
-        // Create the fly‑out menu container (hidden by default)
+        // Insert the trigger as the first child so it sits on top.
+        tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
+
+        // Create the fly‑out menu container.
         const menu = document.createElement("div");
-        menu.style.position = "relative";
-        menu.style.top = "100%";
-        menu.style.right = "0";
+        menu.style.position = "absolute";
+        // Position it below the trigger.
+        menu.style.top = "28px";
+        menu.style.right = "4px";
         menu.style.backgroundColor = "#fff";
         menu.style.border = "1px solid #ccc";
         menu.style.borderRadius = "4px";
@@ -47,7 +52,7 @@ export const DownloadableTables = () => {
         menu.style.zIndex = "10000";
         menu.style.padding = "4px";
 
-        // Helper: Build CSV string from table rows
+        // Helper: Build CSV string from table rows.
         const buildCSV = () => {
           const rows = Array.from(table.querySelectorAll("tr"));
           let csvData = "";
@@ -67,7 +72,7 @@ export const DownloadableTables = () => {
           return csvData;
         };
 
-        // Helper: create an action button (icon only)
+        // Helper: create an action button (icon only).
         const createActionButton = (iconHTML, title, bgColor, onClick) => {
           const btn = document.createElement("button");
           btn.innerHTML = iconHTML;
@@ -86,7 +91,7 @@ export const DownloadableTables = () => {
           return btn;
         };
 
-        // Create the four action buttons.
+        // Action buttons:
         const downloadBtn = createActionButton(
           '<i class="fa fa-download" aria-hidden="true"></i>',
           "Download as CSV",
@@ -113,7 +118,9 @@ export const DownloadableTables = () => {
           () => {
             const printWindow = window.open("", "", "width=800,height=600");
             if (printWindow) {
-              printWindow.document.write("<html><head><title>Print Table</title>");
+              printWindow.document.write(
+                "<html><head><title>Print Table</title>"
+              );
               printWindow.document.write(
                 '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
               );
@@ -150,7 +157,7 @@ export const DownloadableTables = () => {
           "View Table in Popup",
           "#f6993f",
           () => {
-            // Clone the full wrapper to preserve all classes and styles.
+            // Clone the full wrapper so that all classes and styles are preserved.
             const wrapper =
               table.closest(".rdmd-table") ||
               table.closest(".rdmd-table-inner");
@@ -165,7 +172,7 @@ export const DownloadableTables = () => {
             } else {
               clone = table.cloneNode(true);
             }
-            // Wrap the clone in a div with class "markdown-body" so that the Markdown styles apply.
+            // Wrap the clone in a div with class "markdown-body" so the CSS rules apply.
             const markdownWrapper = document.createElement("div");
             markdownWrapper.className = "markdown-body";
             markdownWrapper.appendChild(clone);
@@ -182,10 +189,9 @@ export const DownloadableTables = () => {
             modalOverlay.style.justifyContent = "center";
             modalOverlay.style.alignItems = "center";
             modalOverlay.style.zIndex = "9999";
-            // Allow scrolling if content is too tall.
             modalOverlay.style.overflow = "auto";
 
-            // Create modal content container with a min-width of 800px and extra margin.
+            // Create modal content container with a min-width of 800px.
             const modalContent = document.createElement("div");
             modalContent.style.backgroundColor = "#fff";
             modalContent.style.padding = "20px";
@@ -199,9 +205,10 @@ export const DownloadableTables = () => {
 
             modalContent.appendChild(markdownWrapper);
 
-            // Create close button using a Font Awesome "times" icon.
+            // Create close button using Font Awesome "times" icon.
             const closeButton = document.createElement("button");
-            closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
+            closeButton.innerHTML =
+              '<i class="fa fa-times" aria-hidden="true"></i>';
             closeButton.title = "Close";
             closeButton.style.position = "absolute";
             closeButton.style.top = "10px";
@@ -218,7 +225,7 @@ export const DownloadableTables = () => {
             modalOverlay.appendChild(modalContent);
             document.body.appendChild(modalOverlay);
 
-            // Close modal when clicking outside the modal content.
+            // Close modal when clicking outside modal content.
             modalOverlay.onclick = (e) => {
               if (e.target === modalOverlay) {
                 document.body.removeChild(modalOverlay);
@@ -227,13 +234,13 @@ export const DownloadableTables = () => {
           }
         );
 
-        // Append the action buttons to the fly-out menu (vertical layout).
+        // Append the action buttons to the fly‑out menu (vertical layout).
         menu.appendChild(downloadBtn);
         menu.appendChild(printBtn);
         menu.appendChild(copyBtn);
         menu.appendChild(popupBtn);
 
-        // Show fly-out menu on hover.
+        // Show the fly‑out menu when hovering over the trigger or the menu itself.
         trigger.addEventListener("mouseenter", () => {
           menu.style.display = "flex";
           menu.style.flexDirection = "column";
@@ -248,8 +255,7 @@ export const DownloadableTables = () => {
           menu.style.display = "none";
         });
 
-        // Append the trigger and menu to the table wrapper.
-        tableWrapper.appendChild(trigger);
+        // Append the fly‑out menu to the table wrapper.
         tableWrapper.appendChild(menu);
       }
     });
@@ -258,4 +264,4 @@ export const DownloadableTables = () => {
   return null;
 };
 
-<DownloadableTables /> 
+<DownloadableTables />
