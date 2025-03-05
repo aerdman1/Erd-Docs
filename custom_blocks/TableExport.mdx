@@ -44,14 +44,14 @@ export const DownloadableTables = () => {
       const csvButton = document.createElement("button");
       csvButton.innerHTML = '<i class="fa fa-download" aria-hidden="true"></i>';
       csvButton.title = "Download as CSV";
-      csvButton.style.backgroundColor = "#3490dc"; // blue
+      csvButton.style.backgroundColor = "#3490dc";
       csvButton.style.border = "none";
       csvButton.style.color = "#fff";
       csvButton.style.fontWeight = "bold";
       csvButton.style.padding = "6px 12px";
       csvButton.style.borderRadius = "4px";
       csvButton.style.cursor = "pointer";
-      csvButton.style.fontSize = "0.625rem"; // half the original icon size
+      csvButton.style.fontSize = "0.625rem";
       csvButton.style.display = "inline-flex";
       csvButton.style.alignItems = "center";
       csvButton.onclick = () => {
@@ -70,14 +70,14 @@ export const DownloadableTables = () => {
       const printButton = document.createElement("button");
       printButton.innerHTML = '<i class="fa fa-print" aria-hidden="true"></i>';
       printButton.title = "Print Table";
-      printButton.style.backgroundColor = "#38c172"; // green
+      printButton.style.backgroundColor = "#38c172";
       printButton.style.border = "none";
       printButton.style.color = "#fff";
       printButton.style.fontWeight = "bold";
       printButton.style.padding = "6px 12px";
       printButton.style.borderRadius = "4px";
       printButton.style.cursor = "pointer";
-      printButton.style.fontSize = "0.625rem"; // half the original icon size
+      printButton.style.fontSize = "0.625rem";
       printButton.style.display = "inline-flex";
       printButton.style.alignItems = "center";
       printButton.onclick = () => {
@@ -103,14 +103,14 @@ export const DownloadableTables = () => {
       const copyButton = document.createElement("button");
       copyButton.innerHTML = '<i class="fa fa-clipboard" aria-hidden="true"></i>';
       copyButton.title = "Copy Table Data";
-      copyButton.style.backgroundColor = "#9561e2"; // purple
+      copyButton.style.backgroundColor = "#9561e2";
       copyButton.style.border = "none";
       copyButton.style.color = "#fff";
       copyButton.style.fontWeight = "bold";
       copyButton.style.padding = "6px 12px";
       copyButton.style.borderRadius = "4px";
       copyButton.style.cursor = "pointer";
-      copyButton.style.fontSize = "0.625rem"; // half the original icon size
+      copyButton.style.fontSize = "0.625rem";
       copyButton.style.display = "inline-flex";
       copyButton.style.alignItems = "center";
       copyButton.onclick = async () => {
@@ -123,18 +123,18 @@ export const DownloadableTables = () => {
         }
       };
 
-      // Button: Popup (icon only) – Opens a modal showing the full table
+      // Button: Popup (icon only) – Opens a modal displaying the full table
       const popupButton = document.createElement("button");
       popupButton.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
       popupButton.title = "View Table in Popup";
-      popupButton.style.backgroundColor = "#f6993f"; // orange
+      popupButton.style.backgroundColor = "#f6993f";
       popupButton.style.border = "none";
       popupButton.style.color = "#fff";
       popupButton.style.fontWeight = "bold";
       popupButton.style.padding = "6px 12px";
       popupButton.style.borderRadius = "4px";
       popupButton.style.cursor = "pointer";
-      popupButton.style.fontSize = "0.625rem"; // half the original icon size
+      popupButton.style.fontSize = "0.625rem";
       popupButton.style.display = "inline-flex";
       popupButton.style.alignItems = "center";
       popupButton.onclick = () => {
@@ -151,10 +151,11 @@ export const DownloadableTables = () => {
         modalOverlay.style.alignItems = "center";
         modalOverlay.style.zIndex = "9999";
 
-        // Create modal content container
+        // Create modal content container with extra top padding
         const modalContent = document.createElement("div");
         modalContent.style.backgroundColor = "#fff";
         modalContent.style.padding = "20px";
+        modalContent.style.paddingTop = "40px"; // extra top padding for close button
         modalContent.style.borderRadius = "4px";
         modalContent.style.maxHeight = "90%";
         modalContent.style.overflow = "auto";
@@ -181,7 +182,7 @@ export const DownloadableTables = () => {
         modalOverlay.appendChild(modalContent);
         document.body.appendChild(modalOverlay);
 
-        // Optionally, close modal when clicking outside content
+        // Close modal when clicking outside the modal content
         modalOverlay.onclick = (e) => {
           if (e.target === modalOverlay) {
             document.body.removeChild(modalOverlay);
