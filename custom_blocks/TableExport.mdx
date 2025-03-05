@@ -62,36 +62,6 @@ export const DownloadableTables = () => {
         // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-  /* General DataTables wrapper */
-.dataTables_wrapper {
-  font-size: 0.875rem;
-  color: #333;
-  background: #fff;
-  margin: 0 auto;
-  border: none;
-}
-
-/* Search box */
-.dataTables_wrapper .dataTables_filter {
-  margin-bottom: 0.5rem;
-  font-size:12px;
-}
-.dataTables_wrapper .dataTables_filter input {
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 4px 10px !important;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-
-/* Info text (e.g., "Showing 1 to 10 of 20 entries") */
-.dataTables_wrapper .dataTables_info {
-  font-size: 0.75rem;
-  color: #666;
-  margin-top: 8px;
-}
-
 /* Pagination buttons */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
   background: #007bff;  /* Light blue */
@@ -103,43 +73,34 @@ export const DownloadableTables = () => {
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1;               /* Ensure no weird height changes */
+  height: 32px;                  /* Optional: lock height */
+  box-sizing: border-box;        /* Prevent padding from changing size */
   box-shadow: none;
   transition: background 0.2s ease;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #0056b3; /* Slightly darker blue on hover */
+  transform: none !important;    /* Kill any external scaling */
+  outline: none !important;      /* Kill external focus styles */
 }
 
-/* Current page button - darker blue */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #0056b3;
+}
+
+/* Current page button */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: #003f7f !important; /* Darker blue for active page */
-  color: #fff !important;
+  background: #003f7f !important; 
+  color: #fff !important;          /* Explicit to prevent external overrides */
   font-weight: bold;
   cursor: default;
   box-shadow: none;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: #003f7f !important; /* No hover change for current */
-  color: #fff;
+  transform: none !important;      /* Prevent hover growing */
 }
 
-/* DataTables export / print buttons */
-.dt-button {
-  background: #007bff !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 20px !important;
-  padding: 4px 16px !important;
-  font-size: 0.65rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  transition: background 0.2s ease;
-  box-shadow: none !important;
-  margin: 2px;
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: #003f7f !important; 
+  color: #fff !important;          /* Ensure no text color change */
 }
-.dt-button:hover {
-  background: #0056b3 !important; /* Consistent hover behavior */
-}
+
         `;
         document.head.appendChild(styleOverride);
 
