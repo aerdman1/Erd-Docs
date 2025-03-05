@@ -25,36 +25,22 @@ export const DownloadableTables = () => {
       document.head.appendChild(link);
     };
 
-    // Load jQuery, DataTables, and Buttons extensions
+    // Load jQuery + DataTables
     const loadDependencies = async () => {
-      // Base jQuery + DataTables
+      // 1) jQuery
       if (!window.jQuery) {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
+      // 2) DataTables core
       if (!window.jQuery.fn.DataTable) {
         await loadScript("https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js");
         loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
-
-      // DataTables Buttons + CSS
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
-      loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
-
-      // Buttons: HTML5 export, print, etc.
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
-
-      // For Excel export, need JSZip
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
-
-      // For PDF export, need pdfmake + vfs_fonts
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js");
     };
 
     loadDependencies()
       .then(() => {
-        // Inject a style override for the DataTables search box.
+        // Optional: Style override for the DataTables search input
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
           .dataTables_wrapper .dataTables_filter input {
@@ -63,19 +49,23 @@ export const DownloadableTables = () => {
         `;
         document.head.appendChild(styleOverride);
 
-        // Process all tables
         const tables = document.querySelectorAll("table");
 
         tables.forEach((table) => {
+          // Prevent double-processing
           if (table.getAttribute("data-csv-processed")) return;
           table.setAttribute("data-csv-processed", "true");
 
-          // Only proceed if we have the .rdmd-table wrapper
+          // Find the .rdmd-table wrapper
           const tableWrapper = table.closest(".rdmd-table");
           if (!tableWrapper) return;
+
+          // Ensure the wrapper is relative so the absolute-positioned menu can appear
           tableWrapper.style.position = "relative";
 
-          // (1) Create your Table Preferences trigger (for the popup, filter, etc.)
+          // ─────────────────────────────────────────────────────────────────────────
+          // 1) Create the top-right "Table Preferences" trigger (the folded-corner)
+          // ─────────────────────────────────────────────────────────────────────────
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
           trigger.title = "Table Preferences";
@@ -94,10 +84,14 @@ export const DownloadableTables = () => {
             "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.15), " +
             "inset 0 1px 0 0 hsla(0, 0%, 100%, 0.35)";
           trigger.style.filter = "saturate(1.25)";
+          // Mark so we can remove it in the popup clone
           trigger.setAttribute("data-dt-buttons", "true");
+
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
-          // (2) Create the fly‑out menu container
+          // ─────────────────────────────────────────────────────────────────────────
+          // 2) Create the fly‑out menu container (hidden by default)
+          // ─────────────────────────────────────────────────────────────────────────
           const menu = document.createElement("div");
           menu.style.position = "absolute";
           menu.style.top = "21px";
@@ -112,10 +106,63 @@ export const DownloadableTables = () => {
           menu.style.gap = "6px";
           menu.style.zIndex = "10000";
           menu.style.padding = "8px";
+          // Mark so we can remove it in the popup clone
           menu.setAttribute("data-dt-buttons", "true");
 
-          // (3) If you still want a custom "popup" button, do it here:
-          // For example, "View Table in Popup" (optional).
+          // ─────────────────────────────────────────────────────────────────────────
+          // 3) FILTER button (red) - initializes DataTables on demand
+          // ─────────────────────────────────────────────────────────────────────────
+          const filterBtn = document.createElement("button");
+          filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
+          filterBtn.title = "Filter Table";
+          // Red gradient styling
+          filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
+          filterBtn.style.border = "none";
+          filterBtn.style.color = "#fff";
+          filterBtn.style.fontWeight = "bold";
+          filterBtn.style.padding = "6px 12px";
+          filterBtn.style.borderRadius = "4px";
+          filterBtn.style.cursor = "pointer";
+          filterBtn.style.fontSize = "0.625rem";
+          filterBtn.style.display = "inline-flex";
+          filterBtn.style.alignItems = "center";
+          filterBtn.style.justifyContent = "center";
+          filterBtn.style.boxShadow =
+            "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+          filterBtn.style.filter = "saturate(1.25)";
+
+          // On click, try to enable DataTables (sorting/pagination/search).
+          filterBtn.onclick = () => {
+            if (window.jQuery && window.jQuery.fn.DataTable) {
+              const $table = window.jQuery(table);
+              // Initialize only if not already done
+              if (!$table.hasClass("dataTable")) {
+                $table.DataTable({
+                  // standard "frtip" - no built-in Buttons extension
+                  dom: "frtip",
+                });
+              }
+            } else {
+              // Fallback: simple text prompt filter if DataTables is not available
+              const query = prompt("Enter text to filter rows:");
+              if (query !== null) {
+                const rows = table.querySelectorAll("tbody tr");
+                rows.forEach((row) => {
+                  if (row.innerText.toLowerCase().includes(query.toLowerCase())) {
+                    row.style.display = "";
+                  } else {
+                    row.style.display = "none";
+                  }
+                });
+              }
+            }
+          };
+
+          menu.appendChild(filterBtn);
+
+          // ─────────────────────────────────────────────────────────────────────────
+          // 4) POP‑UP button (orange) - shows table in a modal
+          // ─────────────────────────────────────────────────────────────────────────
           const popupBtn = document.createElement("button");
           popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
           popupBtn.title = "View Table in Popup";
@@ -130,7 +177,8 @@ export const DownloadableTables = () => {
           popupBtn.style.display = "inline-flex";
           popupBtn.style.alignItems = "center";
           popupBtn.style.justifyContent = "center";
-          popupBtn.style.boxShadow = "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+          popupBtn.style.boxShadow =
+            "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
           popupBtn.style.filter = "saturate(1.25)";
           popupBtn.onclick = () => {
             const wrapper =
@@ -138,6 +186,7 @@ export const DownloadableTables = () => {
             let clone;
             if (wrapper) {
               clone = wrapper.cloneNode(true);
+              // Remove any triggers/menus from the clone
               const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
               injected.forEach((el) => el.remove());
               clone.style.margin = "0";
@@ -145,10 +194,12 @@ export const DownloadableTables = () => {
               clone = table.cloneNode(true);
             }
 
+            // Put the clone in a markdown-body wrapper
             const markdownWrapper = document.createElement("div");
             markdownWrapper.className = "markdown-body";
             markdownWrapper.appendChild(clone);
 
+            // Modal overlay
             const modalOverlay = document.createElement("div");
             modalOverlay.style.position = "fixed";
             modalOverlay.style.top = "0";
@@ -165,7 +216,7 @@ export const DownloadableTables = () => {
             const modalContent = document.createElement("div");
             modalContent.style.backgroundColor = "#fff";
             modalContent.style.padding = "20px";
-            modalContent.style.paddingTop = "40px"; // extra top padding for close button.
+            modalContent.style.paddingTop = "40px";
             modalContent.style.borderRadius = "4px";
             modalContent.style.maxHeight = "90%";
             modalContent.style.overflow = "auto";
@@ -174,7 +225,10 @@ export const DownloadableTables = () => {
             modalContent.style.margin = "20px";
 
             modalContent.appendChild(markdownWrapper);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
 
+            // Close button in top-right corner
             const closeButton = document.createElement("button");
             closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
             closeButton.title = "Close";
@@ -188,20 +242,21 @@ export const DownloadableTables = () => {
             closeButton.onclick = () => {
               document.body.removeChild(modalOverlay);
             };
-
             modalContent.appendChild(closeButton);
-            modalOverlay.appendChild(modalContent);
-            document.body.appendChild(modalOverlay);
 
+            // Close modal if user clicks outside the modal content
             modalOverlay.onclick = (e) => {
               if (e.target === modalOverlay) {
                 document.body.removeChild(modalOverlay);
               }
             };
           };
+
           menu.appendChild(popupBtn);
 
-          // (4) Show/hide the fly‑out menu on hover.
+          // ─────────────────────────────────────────────────────────────────────────
+          // 5) Show/hide the fly‑out menu on hover
+          // ─────────────────────────────────────────────────────────────────────────
           trigger.addEventListener("mouseenter", () => {
             menu.style.display = "flex";
           });
@@ -215,18 +270,8 @@ export const DownloadableTables = () => {
             menu.style.display = "none";
           });
 
+          // Attach the menu to the table wrapper
           tableWrapper.appendChild(menu);
-
-          // (5) Initialize DataTable with Buttons for export/print:
-          //     This replaces your custom CSV/print/copy logic.
-          const $table = window.jQuery(table);
-          if (!$table.hasClass("dataTable")) {
-            $table.DataTable({
-              dom: "Bfrtip",
-              buttons: ["copy", "csv", "excel", "pdf", "print"],
-              // You can add other DT config here if you want
-            });
-          }
         });
       })
       .catch((err) => {
