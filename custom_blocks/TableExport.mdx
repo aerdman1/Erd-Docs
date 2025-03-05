@@ -72,7 +72,7 @@ export const DownloadableTables = () => {
           trigger.style.position = "absolute";
           trigger.style.top = "0px";
           trigger.style.right = "0px";
-          trigger.style.padding = "4px";
+          trigger.style.padding = "4px 6px";
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
           trigger.style.zIndex = "10";
@@ -94,8 +94,8 @@ export const DownloadableTables = () => {
           // ─────────────────────────────────────────────────────────────────────────
           const menu = document.createElement("div");
           menu.style.position = "absolute";
-          menu.style.top = "1px";
-          menu.style.right = "1px";
+          menu.style.top = "0px";
+          menu.style.right = "0px";
           menu.style.backgroundColor = "#fff";
           menu.style.border = "1px solid #ccc";
           menu.style.borderRadius = "4px";
@@ -105,7 +105,7 @@ export const DownloadableTables = () => {
           menu.style.alignItems = "center";
           menu.style.gap = "6px";
           menu.style.zIndex = "10000";
-          menu.style.padding = "8px";
+          menu.style.padding = "10px";
           // Mark so we can remove it in the popup clone
           menu.setAttribute("data-dt-buttons", "true");
 
