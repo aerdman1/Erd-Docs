@@ -6,243 +6,242 @@ import React, { useEffect } from "react";
 export const DownloadableTables = () => {
   useEffect(() => {
     const tables = document.querySelectorAll("table");
-
     tables.forEach((table, index) => {
-      // Skip if already processed
       if (table.getAttribute("data-csv-processed")) return;
       table.setAttribute("data-csv-processed", "true");
 
-      // Create a container for the options (fly-out menu)
-      const optionsContainer = document.createElement("div");
-      optionsContainer.style.marginBottom = "8px";
-      optionsContainer.style.display = "flex";
-      optionsContainer.style.justifyContent = "flex-end";
-      optionsContainer.style.position = "relative"; // for absolute positioning of menu
+      // Look for the outer wrapper with class "rdmd-table"
+      const tableWrapper = table.closest(".rdmd-table");
+      if (tableWrapper) {
+        // Ensure the wrapper is position: relative so our trigger can be absolutely positioned.
+        tableWrapper.style.position = "relative";
 
-      // Create the trigger button (vertical ellipsis)
-      const triggerButton = document.createElement("button");
-      triggerButton.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
-      triggerButton.title = "Table Preferences";
-      triggerButton.style.backgroundColor = "#aaa";
-      triggerButton.style.border = "none";
-      triggerButton.style.color = "#fff";
-      triggerButton.style.padding = "6px 12px";
-      triggerButton.style.borderRadius = "4px";
-      triggerButton.style.cursor = "pointer";
-      triggerButton.style.fontSize = "0.625rem";
-      triggerButton.style.display = "inline-flex";
-      triggerButton.style.alignItems = "center";
-      
-      // Create the fly-out menu container (initially hidden)
-      const menuContainer = document.createElement("div");
-      menuContainer.style.position = "absolute";
-      menuContainer.style.top = "100%";
-      menuContainer.style.right = "0";
-      menuContainer.style.backgroundColor = "#fff";
-      menuContainer.style.border = "1px solid #ccc";
-      menuContainer.style.borderRadius = "4px";
-      menuContainer.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
-      menuContainer.style.display = "none";
-      menuContainer.style.flexDirection = "column";
-      menuContainer.style.gap = "4px";
-      menuContainer.style.zIndex = "10000";
-      menuContainer.style.padding = "4px";
+        // Create the folded-corner trigger element.
+        const trigger = document.createElement("div");
+        trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+        trigger.title = "Table Preferences";
+        trigger.style.position = "absolute";
+        trigger.style.top = "4px";
+        trigger.style.right = "4px";
+        trigger.style.backgroundColor = "rgba(0,0,0,0.6)";
+        trigger.style.color = "#fff";
+        trigger.style.padding = "4px";
+        // A rounded bottom‑left corner gives a folded look:
+        trigger.style.borderRadius = "0 0 0 8px";
+        trigger.style.cursor = "pointer";
+        trigger.style.fontSize = "0.75rem";
+        trigger.style.zIndex = "10";
 
-      // Helper: Build CSV string from table rows
-      const buildCSV = () => {
-        const rows = Array.from(table.querySelectorAll("tr"));
-        let csvData = "";
-        rows.forEach((row) => {
-          const cells = Array.from(row.querySelectorAll("th, td"));
-          let rowData = [];
-          cells.forEach((cell) => {
-            let text = cell.innerText.trim();
-            text = text.split('"').join('""');
-            if (text.indexOf(",") !== -1 || text.indexOf('"') !== -1) {
-              text = '"' + text + '"';
-            }
-            rowData.push(text);
+        // Create the fly‑out menu container (hidden by default)
+        const menu = document.createElement("div");
+        menu.style.position = "absolute";
+        menu.style.top = "100%";
+        menu.style.right = "0";
+        menu.style.backgroundColor = "#fff";
+        menu.style.border = "1px solid #ccc";
+        menu.style.borderRadius = "4px";
+        menu.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
+        menu.style.display = "none";
+        menu.style.flexDirection = "column";
+        menu.style.zIndex = "10000";
+        menu.style.padding = "4px";
+
+        // Helper: Build CSV string from table rows
+        const buildCSV = () => {
+          const rows = Array.from(table.querySelectorAll("tr"));
+          let csvData = "";
+          rows.forEach((row) => {
+            const cells = Array.from(row.querySelectorAll("th, td"));
+            let rowData = [];
+            cells.forEach((cell) => {
+              let text = cell.innerText.trim();
+              text = text.split('"').join('""');
+              if (text.indexOf(",") !== -1 || text.indexOf('"') !== -1) {
+                text = '"' + text + '"';
+              }
+              rowData.push(text);
+            });
+            csvData += rowData.join(",") + "\n";
           });
-          csvData += rowData.join(",") + "\n";
-        });
-        return csvData;
-      };
+          return csvData;
+        };
 
-      // Create individual action buttons (same style, arranged vertically)
-      const createActionButton = (iconHTML, title, bgColor, onClick) => {
-        const btn = document.createElement("button");
-        btn.innerHTML = iconHTML;
-        btn.title = title;
-        btn.style.backgroundColor = bgColor;
-        btn.style.border = "none";
-        btn.style.color = "#fff";
-        btn.style.fontWeight = "bold";
-        btn.style.padding = "6px 12px";
-        btn.style.borderRadius = "4px";
-        btn.style.cursor = "pointer";
-        btn.style.fontSize = "0.625rem";
-        btn.style.display = "inline-flex";
-        btn.style.alignItems = "center";
-        btn.onclick = onClick;
-        return btn;
-      };
+        // Helper: create an action button (icon only)
+        const createActionButton = (iconHTML, title, bgColor, onClick) => {
+          const btn = document.createElement("button");
+          btn.innerHTML = iconHTML;
+          btn.title = title;
+          btn.style.backgroundColor = bgColor;
+          btn.style.border = "none";
+          btn.style.color = "#fff";
+          btn.style.fontWeight = "bold";
+          btn.style.padding = "6px 12px";
+          btn.style.borderRadius = "4px";
+          btn.style.cursor = "pointer";
+          btn.style.fontSize = "0.625rem";
+          btn.style.display = "inline-flex";
+          btn.style.alignItems = "center";
+          btn.onclick = onClick;
+          return btn;
+        };
 
-      // Action: Download as CSV
-      const downloadBtn = createActionButton(
-        '<i class="fa fa-download" aria-hidden="true"></i>',
-        "Download as CSV",
-        "#3490dc",
-        () => {
-          const csvData = buildCSV();
-          const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = "table-" + (index + 1) + ".csv";
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      );
-
-      // Action: Print Table
-      const printBtn = createActionButton(
-        '<i class="fa fa-print" aria-hidden="true"></i>',
-        "Print Table",
-        "#38c172",
-        () => {
-          const printWindow = window.open("", "", "width=800,height=600");
-          if (printWindow) {
-            printWindow.document.write("<html><head><title>Print Table</title>");
-            printWindow.document.write(
-              '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
-            );
-            printWindow.document.write("</head><body>");
-            printWindow.document.write(table.outerHTML);
-            printWindow.document.write("</body></html>");
-            printWindow.document.close();
-            printWindow.focus();
-            setTimeout(() => {
-              printWindow.print();
-              printWindow.close();
-            }, 500);
+        // Create the four action buttons
+        const downloadBtn = createActionButton(
+          '<i class="fa fa-download" aria-hidden="true"></i>',
+          "Download as CSV",
+          "#3490dc",
+          () => {
+            const csvData = buildCSV();
+            const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "table-" + (index + 1) + ".csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
           }
-        }
-      );
+        );
 
-      // Action: Copy Table Data (CSV)
-      const copyBtn = createActionButton(
-        '<i class="fa fa-clipboard" aria-hidden="true"></i>',
-        "Copy Table Data",
-        "#9561e2",
-        async () => {
-          const csvData = buildCSV();
-          try {
-            await navigator.clipboard.writeText(csvData);
-            alert("Table data copied!");
-          } catch (err) {
-            alert("Copy failed: " + err);
-          }
-        }
-      );
-
-      // Action: Popup (show full table in modal)
-      const popupBtn = createActionButton(
-        '<i class="fa fa-arrows-alt" aria-hidden="true"></i>',
-        "View Table in Popup",
-        "#f6993f",
-        () => {
-          // Look for an outer wrapper with class "rdmd-table" first, then "rdmd-table-inner"
-          const wrapper =
-            table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
-          let clone;
-          if (wrapper) {
-            clone = wrapper.cloneNode(true);
-            // Remove any injected buttons container from the clone
-            const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
-            injected.forEach((el) => el.remove());
-          } else {
-            clone = table.cloneNode(true);
-          }
-          // Wrap the clone in a div with class "markdown-body" so CSS rules apply
-          const markdownWrapper = document.createElement("div");
-          markdownWrapper.className = "markdown-body";
-          markdownWrapper.appendChild(clone);
-
-          // Create modal overlay
-          const modalOverlay = document.createElement("div");
-          modalOverlay.style.position = "fixed";
-          modalOverlay.style.top = "0";
-          modalOverlay.style.left = "0";
-          modalOverlay.style.width = "100%";
-          modalOverlay.style.height = "100%";
-          modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-          modalOverlay.style.display = "flex";
-          modalOverlay.style.justifyContent = "center";
-          modalOverlay.style.alignItems = "center";
-          modalOverlay.style.zIndex = "9999";
-
-          // Create modal content container with a min-width of 800px
-          const modalContent = document.createElement("div");
-          modalContent.style.backgroundColor = "#fff";
-          modalContent.style.padding = "20px";
-          modalContent.style.paddingTop = "40px"; // extra top padding for close button
-          modalContent.style.borderRadius = "4px";
-          modalContent.style.maxHeight = "90%";
-          modalContent.style.overflow = "auto";
-          modalContent.style.position = "relative";
-          modalContent.style.minWidth = "800px";
-
-          modalContent.appendChild(markdownWrapper);
-
-          // Create close button using Font Awesome "times" icon
-          const closeButton = document.createElement("button");
-          closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
-          closeButton.title = "Close";
-          closeButton.style.position = "absolute";
-          closeButton.style.top = "10px";
-          closeButton.style.right = "10px";
-          closeButton.style.background = "transparent";
-          closeButton.style.border = "none";
-          closeButton.style.fontSize = "1.5rem";
-          closeButton.style.cursor = "pointer";
-          closeButton.onclick = () => {
-            document.body.removeChild(modalOverlay);
-          };
-
-          modalContent.appendChild(closeButton);
-          modalOverlay.appendChild(modalContent);
-          document.body.appendChild(modalOverlay);
-
-          // Close modal if clicking outside the content
-          modalOverlay.onclick = (e) => {
-            if (e.target === modalOverlay) {
-              document.body.removeChild(modalOverlay);
+        const printBtn = createActionButton(
+          '<i class="fa fa-print" aria-hidden="true"></i>',
+          "Print Table",
+          "#38c172",
+          () => {
+            const printWindow = window.open("", "", "width=800,height=600");
+            if (printWindow) {
+              printWindow.document.write("<html><head><title>Print Table</title>");
+              printWindow.document.write(
+                '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
+              );
+              printWindow.document.write("</head><body>");
+              printWindow.document.write(table.outerHTML);
+              printWindow.document.write("</body></html>");
+              printWindow.document.close();
+              printWindow.focus();
+              setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+              }, 500);
             }
-          };
-        }
-      );
+          }
+        );
 
-      // Append each action button to the fly-out menu container
-      menuContainer.appendChild(downloadBtn);
-      menuContainer.appendChild(printBtn);
-      menuContainer.appendChild(copyBtn);
-      menuContainer.appendChild(popupBtn);
+        const copyBtn = createActionButton(
+          '<i class="fa fa-clipboard" aria-hidden="true"></i>',
+          "Copy Table Data",
+          "#9561e2",
+          async () => {
+            const csvData = buildCSV();
+            try {
+              await navigator.clipboard.writeText(csvData);
+              alert("Table data copied!");
+            } catch (err) {
+              alert("Copy failed: " + err);
+            }
+          }
+        );
 
-      // Show menu on hover over the options container
-      optionsContainer.addEventListener("mouseenter", () => {
-        menuContainer.style.display = "flex";
-      });
-      optionsContainer.addEventListener("mouseleave", () => {
-        menuContainer.style.display = "none";
-      });
+        const popupBtn = createActionButton(
+          '<i class="fa fa-arrows-alt" aria-hidden="true"></i>',
+          "View Table in Popup",
+          "#f6993f",
+          () => {
+            // Clone the entire outer wrapper so the original classes and styles are preserved.
+            const wrapper =
+              table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
+            let clone;
+            if (wrapper) {
+              clone = wrapper.cloneNode(true);
+              // Remove any injected button containers from the clone
+              const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
+              injected.forEach((el) => el.remove());
+            } else {
+              clone = table.cloneNode(true);
+            }
+            // Wrap the clone in a div with class "markdown-body" so the Markdown CSS applies.
+            const markdownWrapper = document.createElement("div");
+            markdownWrapper.className = "markdown-body";
+            markdownWrapper.appendChild(clone);
 
-      // Append the trigger button and menu container into the options container
-      optionsContainer.appendChild(triggerButton);
-      optionsContainer.appendChild(menuContainer);
+            // Create modal overlay
+            const modalOverlay = document.createElement("div");
+            modalOverlay.style.position = "fixed";
+            modalOverlay.style.top = "0";
+            modalOverlay.style.left = "0";
+            modalOverlay.style.width = "100%";
+            modalOverlay.style.height = "100%";
+            modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            modalOverlay.style.display = "flex";
+            modalOverlay.style.justifyContent = "center";
+            modalOverlay.style.alignItems = "center";
+            modalOverlay.style.zIndex = "9999";
 
-      // Insert the options container above the table
-      table.parentNode.insertBefore(optionsContainer, table);
+            // Create modal content container with a min-width of 800px
+            const modalContent = document.createElement("div");
+            modalContent.style.backgroundColor = "#fff";
+            modalContent.style.padding = "20px";
+            modalContent.style.paddingTop = "40px";
+            modalContent.style.borderRadius = "4px";
+            modalContent.style.maxHeight = "90%";
+            modalContent.style.overflow = "auto";
+            modalContent.style.position = "relative";
+            modalContent.style.minWidth = "800px";
+
+            modalContent.appendChild(markdownWrapper);
+
+            // Create close button using Font Awesome "times" icon
+            const closeButton = document.createElement("button");
+            closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
+            closeButton.title = "Close";
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "10px";
+            closeButton.style.right = "10px";
+            closeButton.style.background = "transparent";
+            closeButton.style.border = "none";
+            closeButton.style.fontSize = "1.5rem";
+            closeButton.style.cursor = "pointer";
+            closeButton.onclick = () => {
+              document.body.removeChild(modalOverlay);
+            };
+
+            modalContent.appendChild(closeButton);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+            modalOverlay.onclick = (e) => {
+              if (e.target === modalOverlay) {
+                document.body.removeChild(modalOverlay);
+              }
+            };
+          }
+        );
+
+        // Append the action buttons to the fly-out menu (vertical layout)
+        menu.appendChild(downloadBtn);
+        menu.appendChild(printBtn);
+        menu.appendChild(copyBtn);
+        menu.appendChild(popupBtn);
+
+        // Show the fly-out menu on hover over trigger (or menu)
+        trigger.addEventListener("mouseenter", () => {
+          menu.style.display = "flex";
+        });
+        trigger.addEventListener("mouseleave", () => {
+          menu.style.display = "none";
+        });
+        menu.addEventListener("mouseenter", () => {
+          menu.style.display = "flex";
+        });
+        menu.addEventListener("mouseleave", () => {
+          menu.style.display = "none";
+        });
+
+        // Append the trigger and menu to the outer wrapper.
+        tableWrapper.appendChild(trigger);
+        tableWrapper.appendChild(menu);
+      } else {
+        // If not inside a .rdmd-table wrapper, you can fall back to your previous method.
+      }
     });
   }, []);
 
