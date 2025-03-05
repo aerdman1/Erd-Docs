@@ -1,0 +1,55 @@
+---
+name: TableExport
+---
+import React, { useEffect } from "react";
+
+export const DownloadableTables = () => {
+  useEffect(() => {
+    const tables = document.querySelectorAll("table");
+    tables.forEach((table, index) => {
+      // Skip if already processed
+      if (table.getAttribute("data-csv-processed")) return;
+      table.setAttribute("data-csv-processed", "true");
+
+      const button = document.createElement("button");
+      button.textContent = "Download to CSV";
+      button.style.marginBottom = "0.5rem";
+      button.style.cursor = "pointer";
+
+      button.onclick = () => {
+        const rows = Array.from(table.querySelectorAll("tr"));
+        let csvData = "";
+        rows.forEach(row => {
+          const cells = Array.from(row.querySelectorAll("th, td"));
+          let rowData = [];
+          cells.forEach(cell => {
+            let text = cell.innerText.trim();
+            // Replace any double quotes with two double quotes
+            text = text.split('"').join('""');
+            // Wrap the text in quotes if it contains a comma or a double quote
+            if (text.indexOf(",") !== -1 || text.indexOf('"') !== -1) {
+              text = '"' + text + '"';
+            }
+            rowData.push(text);
+          });
+          csvData += rowData.join(",") + "\n";
+        });
+
+        const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "table-" + (index + 1) + ".csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      table.parentNode.insertBefore(button, table);
+    });
+  }, []);
+
+  return null;
+};
+
+<DownloadableTables />
