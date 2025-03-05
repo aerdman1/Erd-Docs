@@ -62,8 +62,9 @@ export const DownloadableTables = () => {
         // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-  /* General DataTables wrapper */
+/* General DataTables wrapper */
 .dataTables_wrapper {
+  font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 0.875rem;
   color: #333;
   background: #fff;
@@ -74,7 +75,7 @@ export const DownloadableTables = () => {
 /* Search box */
 .dataTables_wrapper .dataTables_filter {
   margin-bottom: 0.5rem;
-  font-size:12px;
+  font-size: 12px;
 }
 .dataTables_wrapper .dataTables_filter input {
   border: 1px solid #ccc;
@@ -83,7 +84,10 @@ export const DownloadableTables = () => {
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
 
 /* Info text (e.g., "Showing 1 to 10 of 20 entries") */
 .dataTables_wrapper .dataTables_info {
@@ -92,9 +96,9 @@ export const DownloadableTables = () => {
   margin-top: 8px;
 }
 
-/* Pagination buttons */
+/* Pagination buttons - all pages */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
-  background: #007bff;  /* Light blue */
+  background: #007bff; /* Light blue */
   color: #fff !important;
   border: none;
   border-radius: 6px;
@@ -103,27 +107,46 @@ export const DownloadableTables = () => {
   cursor: pointer;
   font-size: 0.875rem;
   font-weight: 500;
+  line-height: 1;
+  height: 32px; /* Explicit height to prevent shifting */
+  box-sizing: border-box;
   box-shadow: none;
   transition: background 0.2s ease;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #0056b3; /* Slightly darker blue on hover */
+  transform: none !important;
+  outline: none !important;
 }
 
-/* Current page button - darker blue */
+/* Hover for regular page buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #0056b3; /* Slightly darker blue on hover */
+  color: #fff !important;
+}
+
+/* Current page button - darker blue and no hover weirdness */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: #003f7f !important; /* Darker blue for active page */
+  background: #003f7f !important; /* Darker blue */
   color: #fff !important;
   font-weight: bold;
   cursor: default;
   box-shadow: none;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: #003f7f !important; /* No hover change for current */
-  color: #fff;
+  transform: none !important;
+  outline: none !important;
 }
 
-/* DataTables export / print buttons */
+/* Current page button hover - no change */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: #003f7f !important;
+  color: #fff !important;
+}
+
+/* Disabled pagination button */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: #e9ecef;
+  color: #6c757d !important;
+  cursor: not-allowed;
+}
+
+/* DataTables export/print buttons */
 .dt-button {
   background: #007bff !important;
   color: #fff !important;
@@ -136,10 +159,25 @@ export const DownloadableTables = () => {
   transition: background 0.2s ease;
   box-shadow: none !important;
   margin: 2px;
+  height: 30px;
+  line-height: 1.4;
+  box-sizing: border-box;
+  transform: none !important;
+  outline: none !important;
 }
+
+/* Hover for export/print buttons */
 .dt-button:hover {
-  background: #0056b3 !important; /* Consistent hover behavior */
+  background: #0056b3 !important; /* Slightly darker on hover */
+  color: #fff !important;
 }
+
+/* Optional - Clear all transform scaling site-wide (in case of conflicting global styles) */
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dt-button {
+  transform: none !important;
+}
+
         `;
         document.head.appendChild(styleOverride);
 
