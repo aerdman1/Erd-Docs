@@ -1,7 +1,7 @@
 ---
-title: Tables
+title: Tables (caching?)
 deprecated: false
-hidden: false
+hidden: true
 metadata:
   robots: index
 ---
