@@ -25,17 +25,33 @@ export const DownloadableTables = () => {
       document.head.appendChild(link);
     };
 
-    // Load jQuery + DataTables
+    // Load jQuery + DataTables + Buttons
     const loadDependencies = async () => {
       // 1) jQuery
       if (!window.jQuery) {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
+
       // 2) DataTables core
       if (!window.jQuery.fn.DataTable) {
         await loadScript("https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js");
         loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
+
+      // 3) DataTables Buttons + CSS
+      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
+      loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
+
+      // 4) For HTML5 export (csv, excel, pdf):
+      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
+      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
+
+      // For Excel export, need JSZip:
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+
+      // For PDF export, need pdfmake + vfs_fonts:
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js");
     };
 
     loadDependencies()
@@ -72,7 +88,7 @@ export const DownloadableTables = () => {
           trigger.style.position = "absolute";
           trigger.style.top = "0px";
           trigger.style.right = "0px";
-          trigger.style.padding = "4px 6px";
+          trigger.style.padding = "4px";
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
           trigger.style.zIndex = "10";
@@ -94,8 +110,8 @@ export const DownloadableTables = () => {
           // ─────────────────────────────────────────────────────────────────────────
           const menu = document.createElement("div");
           menu.style.position = "absolute";
-          menu.style.top = "26px";
-          menu.style.right = "0px";
+          menu.style.top = "21px";
+          menu.style.right = "1px";
           menu.style.backgroundColor = "#fff";
           menu.style.border = "1px solid #ccc";
           menu.style.borderRadius = "4px";
@@ -105,17 +121,16 @@ export const DownloadableTables = () => {
           menu.style.alignItems = "center";
           menu.style.gap = "6px";
           menu.style.zIndex = "10000";
-          menu.style.padding = "10px";
+          menu.style.padding = "8px";
           // Mark so we can remove it in the popup clone
           menu.setAttribute("data-dt-buttons", "true");
 
           // ─────────────────────────────────────────────────────────────────────────
-          // 3) FILTER button (red) - initializes DataTables on demand
+          // 3) FILTER button (red) - initializes DataTables + Buttons on demand
           // ─────────────────────────────────────────────────────────────────────────
           const filterBtn = document.createElement("button");
           filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
-          filterBtn.title = "Filter Table";
-          // Red gradient styling
+          filterBtn.title = "Enable Sorting / Export / Print, etc.";
           filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
           filterBtn.style.border = "none";
           filterBtn.style.color = "#fff";
@@ -131,19 +146,20 @@ export const DownloadableTables = () => {
             "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
           filterBtn.style.filter = "saturate(1.25)";
 
-          // On click, try to enable DataTables (sorting/pagination/search).
+          // On click, try to enable DataTables with built-in Buttons
           filterBtn.onclick = () => {
             if (window.jQuery && window.jQuery.fn.DataTable) {
               const $table = window.jQuery(table);
               // Initialize only if not already done
               if (!$table.hasClass("dataTable")) {
+                // Use "Bfrtip" so the built-in export / print buttons appear
                 $table.DataTable({
-                  // standard "frtip" - no built-in Buttons extension
-                  dom: "frtip",
+                  dom: "Bfrtip",
+                  buttons: ["copy", "csv", "excel", "pdf", "print"],
                 });
               }
             } else {
-              // Fallback: simple text prompt filter if DataTables is not available
+              // Fallback: simple text prompt filter if DataTables isn't available
               const query = prompt("Enter text to filter rows:");
               if (query !== null) {
                 const rows = table.querySelectorAll("tbody tr");
@@ -180,13 +196,14 @@ export const DownloadableTables = () => {
           popupBtn.style.boxShadow =
             "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
           popupBtn.style.filter = "saturate(1.25)";
+
           popupBtn.onclick = () => {
             const wrapper =
               table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
             let clone;
             if (wrapper) {
               clone = wrapper.cloneNode(true);
-              // Remove any triggers/menus from the clone
+              // Remove triggers/menus from the clone
               const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
               injected.forEach((el) => el.remove());
               clone.style.margin = "0";
