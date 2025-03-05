@@ -62,12 +62,12 @@ export const DownloadableTables = () => {
         // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-        /* General DataTables wrapper */
+  /* General DataTables wrapper */
 .dataTables_wrapper {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 0.875rem;
   color: #333;
-  background-color: #fff;
+  background: #fff;
   margin: 0 auto;
   border: none;
 }
@@ -88,7 +88,7 @@ export const DownloadableTables = () => {
   box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
 }
 
-/* Info text (e.g. "Showing 1 to 10 of 20 entries") */
+/* Info text (e.g., "Showing 1 to 10 of 20 entries") */
 .dataTables_wrapper .dataTables_info {
   font-size: 0.75rem;
   color: #666;
@@ -97,41 +97,37 @@ export const DownloadableTables = () => {
 
 /* Pagination buttons */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
-  background: #007bff;
+  background: #007bff;  /* Light blue */
   color: #fff !important;
   border: none;
   border-radius: 6px;
   margin: 2px;
   padding: 6px 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-size: 0.875rem;
   font-weight: 500;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: none;
+  transition: background 0.2s ease;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #0056b3;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  background: #0056b3; /* Slightly darker blue on hover */
 }
 
-/* Current page button - highlighted (green) */
+/* Current page button - darker blue */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: #28a745 !important;
+  background: #003f7f !important; /* Darker blue for active page */
   color: #fff !important;
   font-weight: bold;
-  border: none !important;
   cursor: default;
   box-shadow: none;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: #28a745 !important;
-  transform: none;
+  background: #003f7f !important; /* No hover change for current */
 }
 
 /* DataTables export / print buttons */
 .dt-button {
-  background-color: #007bff !important;
+  background: #007bff !important;
   color: #fff !important;
   border: none !important;
   border-radius: 6px !important;
@@ -139,15 +135,13 @@ export const DownloadableTables = () => {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  transition: background 0.2s ease;
+  box-shadow: none !important;
   margin: 2px;
 }
 .dt-button:hover {
-  background: #0056b3 !important;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.15) !important;
+  background: #0056b3 !important; /* Consistent hover behavior */
 }
-
         `;
         document.head.appendChild(styleOverride);
 
