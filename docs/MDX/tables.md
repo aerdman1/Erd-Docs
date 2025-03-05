@@ -32,7 +32,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor 
 | 19 | MFAEnabled         | Boolean   | Indicates if multi-factor authentication is on | Active |
 | 20 | Notes              | Text      | Internal notes about the user                  | Active |
 
-<br />
+test
 
 | test | test | test |
 | :--- | :--- | :--- |
