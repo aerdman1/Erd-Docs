@@ -62,77 +62,93 @@ export const DownloadableTables = () => {
         // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-          /* General DataTables wrapper */
-          .dataTables_wrapper {
-            font-family: "Helvetica Neue", Arial, sans-serif;
-            font-size: 0.875rem;
-            color: #333;
-            background-color: #fff;
-            margin: 0 auto;
-            border: none;
-          }
+        /* General DataTables wrapper */
+.dataTables_wrapper {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.875rem;
+  color: #333;
+  background-color: #fff;
+  margin: 0 auto;
+  border: none;
+}
 
-          /* Search box */
-          .dataTables_wrapper .dataTables_filter {
-            margin-bottom: 0.5rem;
-          }
-          .dataTables_wrapper .dataTables_filter input {
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 4px 8px;
-            outline: none;
-            transition: border-color 0.2s;
-          }
-          .dataTables_wrapper .dataTables_filter input:focus {
-            border-color: #018ef5;
-          }
+/* Search box */
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 0.5rem;
+}
+.dataTables_wrapper .dataTables_filter input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
 
-          /* Info text (e.g. "Showing 1 to 10 of 20 entries") */
-          .dataTables_wrapper .dataTables_info {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 8px;
-          }
+/* Info text (e.g. "Showing 1 to 10 of 20 entries") */
+.dataTables_wrapper .dataTables_info {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 8px;
+}
 
-          /* Pagination buttons */
-          .dataTables_wrapper .dataTables_paginate .paginate_button {
-            background: linear-gradient(180deg, #56b8ff, #018ef5);
-            color: #fff !important;
-            border: none;
-            border-radius: 4px;
-            margin: 2px;
-           
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-          }
-          .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-            filter: brightness(1.1);
-          }
-          .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-            background: linear-gradient(180deg, #ff9c9c, #e3342f) !important;
-            color: #fff !important;
-            border: none !important;
-          }
+/* Pagination buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  background-color: #007bff;
+  color: #fff !important;
+  border: none;
+  border-radius: 6px;
+  margin: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
 
-          /* DataTables export / print buttons */
-          .dt-button {
-            background: linear-gradient(180deg, #006dbd, #9561e2) !important;
-            color: #fff !important;
-            border: none !important;
-            border-radius: 4px !important;
-            box-shadow: 0 1px 6px rgba(0,0,0,0.2) !important;
-            margin: 2px;
-            padding: 6px 12px !important;
-            font-size: 0.625rem !important;
-            font-weight: bold !important;
-            cursor: pointer !important;
-            filter: saturate(1.25) !important;
-            outline: none !important;
-          }
-          .dt-button:hover {
-            filter: brightness(1.1) saturate(1.25) !important;
-          }
+/* Current page button - highlighted (green) */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background-color: #28a745 !important;
+  color: #fff !important;
+  font-weight: bold;
+  border: none !important;
+  cursor: default;
+  box-shadow: none;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background-color: #28a745 !important;
+  transform: none;
+}
+
+/* DataTables export / print buttons */
+.dt-button {
+  background-color: #007bff !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 8px 14px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  margin: 2px;
+}
+.dt-button:hover {
+  background-color: #0056b3 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.15) !important;
+}
+
         `;
         document.head.appendChild(styleOverride);
 
