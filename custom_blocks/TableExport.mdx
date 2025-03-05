@@ -20,7 +20,7 @@ export const DownloadableTables = () => {
       container.style.justifyContent = "flex-end";
       container.style.width = "100%";
 
-      // Function to build CSV string from table rows
+      // Helper: Build CSV string from table
       const buildCSV = () => {
         const rows = Array.from(table.querySelectorAll("tr"));
         let csvData = "";
@@ -29,9 +29,7 @@ export const DownloadableTables = () => {
           let rowData = [];
           cells.forEach(cell => {
             let text = cell.innerText.trim();
-            // Escape double quotes
             text = text.split('"').join('""');
-            // Wrap in quotes if necessary
             if (text.indexOf(",") !== -1 || text.indexOf('"') !== -1) {
               text = '"' + text + '"';
             }
@@ -53,7 +51,7 @@ export const DownloadableTables = () => {
       csvButton.style.padding = "6px 12px";
       csvButton.style.borderRadius = "4px";
       csvButton.style.cursor = "pointer";
-      csvButton.style.fontSize = "0.625rem"; // half the original size
+      csvButton.style.fontSize = "0.625rem"; // half the original icon size
       csvButton.style.display = "inline-flex";
       csvButton.style.alignItems = "center";
       csvButton.onclick = () => {
@@ -79,14 +77,13 @@ export const DownloadableTables = () => {
       printButton.style.padding = "6px 12px";
       printButton.style.borderRadius = "4px";
       printButton.style.cursor = "pointer";
-      printButton.style.fontSize = "0.625rem"; // half the original size
+      printButton.style.fontSize = "0.625rem"; // half the original icon size
       printButton.style.display = "inline-flex";
       printButton.style.alignItems = "center";
       printButton.onclick = () => {
         const printWindow = window.open("", "", "width=800,height=600");
         if (printWindow) {
           printWindow.document.write("<html><head><title>Print Table</title>");
-          // Include Font Awesome CSS in the print window for icons
           printWindow.document.write(
             '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
           );
@@ -113,7 +110,7 @@ export const DownloadableTables = () => {
       copyButton.style.padding = "6px 12px";
       copyButton.style.borderRadius = "4px";
       copyButton.style.cursor = "pointer";
-      copyButton.style.fontSize = "0.625rem"; // half the original size
+      copyButton.style.fontSize = "0.625rem"; // half the original icon size
       copyButton.style.display = "inline-flex";
       copyButton.style.alignItems = "center";
       copyButton.onclick = async () => {
@@ -126,10 +123,79 @@ export const DownloadableTables = () => {
         }
       };
 
-      // Append buttons to container, then insert container before the table
+      // Button: Popup (icon only) – Opens a modal showing the full table
+      const popupButton = document.createElement("button");
+      popupButton.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
+      popupButton.title = "View Table in Popup";
+      popupButton.style.backgroundColor = "#f6993f"; // orange
+      popupButton.style.border = "none";
+      popupButton.style.color = "#fff";
+      popupButton.style.fontWeight = "bold";
+      popupButton.style.padding = "6px 12px";
+      popupButton.style.borderRadius = "4px";
+      popupButton.style.cursor = "pointer";
+      popupButton.style.fontSize = "0.625rem"; // half the original icon size
+      popupButton.style.display = "inline-flex";
+      popupButton.style.alignItems = "center";
+      popupButton.onclick = () => {
+        // Create overlay
+        const modalOverlay = document.createElement("div");
+        modalOverlay.style.position = "fixed";
+        modalOverlay.style.top = "0";
+        modalOverlay.style.left = "0";
+        modalOverlay.style.width = "100%";
+        modalOverlay.style.height = "100%";
+        modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+        modalOverlay.style.display = "flex";
+        modalOverlay.style.justifyContent = "center";
+        modalOverlay.style.alignItems = "center";
+        modalOverlay.style.zIndex = "9999";
+
+        // Create modal content container
+        const modalContent = document.createElement("div");
+        modalContent.style.backgroundColor = "#fff";
+        modalContent.style.padding = "20px";
+        modalContent.style.borderRadius = "4px";
+        modalContent.style.maxHeight = "90%";
+        modalContent.style.overflow = "auto";
+        modalContent.style.position = "relative";
+
+        // Insert table HTML into modal content
+        modalContent.innerHTML = table.outerHTML;
+
+        // Create close button
+        const closeButton = document.createElement("button");
+        closeButton.textContent = "X";
+        closeButton.style.position = "absolute";
+        closeButton.style.top = "10px";
+        closeButton.style.right = "10px";
+        closeButton.style.background = "transparent";
+        closeButton.style.border = "none";
+        closeButton.style.fontSize = "1.5rem";
+        closeButton.style.cursor = "pointer";
+        closeButton.onclick = () => {
+          document.body.removeChild(modalOverlay);
+        };
+
+        modalContent.appendChild(closeButton);
+        modalOverlay.appendChild(modalContent);
+        document.body.appendChild(modalOverlay);
+
+        // Optionally, close modal when clicking outside content
+        modalOverlay.onclick = (e) => {
+          if (e.target === modalOverlay) {
+            document.body.removeChild(modalOverlay);
+          }
+        };
+      };
+
+      // Append all buttons to container
       container.appendChild(csvButton);
       container.appendChild(printButton);
       container.appendChild(copyButton);
+      container.appendChild(popupButton);
+
+      // Insert the container above the table
       table.parentNode.insertBefore(container, table);
     });
   }, []);
