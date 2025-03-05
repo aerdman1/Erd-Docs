@@ -12,8 +12,9 @@ export const DownloadableTables = () => {
       if (table.getAttribute("data-csv-processed")) return;
       table.setAttribute("data-csv-processed", "true");
 
-      // Create a container for the buttons (inserted above the table)
+      // Create a container for the buttons and mark it for later removal in the modal clone
       const container = document.createElement("div");
+      container.setAttribute("data-dt-buttons", "true");
       container.style.marginBottom = "8px";
       container.style.display = "flex";
       container.style.gap = "8px";
@@ -88,7 +89,6 @@ export const DownloadableTables = () => {
             '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
           );
           printWindow.document.write("</head><body>");
-          // Use the table's outerHTML (or its wrapper if available)
           printWindow.document.write(table.outerHTML);
           printWindow.document.write("</body></html>");
           printWindow.document.close();
@@ -139,19 +139,18 @@ export const DownloadableTables = () => {
       popupButton.style.display = "inline-flex";
       popupButton.style.alignItems = "center";
       popupButton.onclick = () => {
-        // Check if the table is wrapped in an element with class "rdmd-table-inner"
-        const wrapper = table.closest(".rdmd-table-inner");
+        // First try to find the outer wrapper with the class "rdmd-table"
+        const wrapper =
+          table.closest(".rdmd-table") ||
+          table.closest(".rdmd-table-inner");
         let clone;
         if (wrapper) {
-          // Clone the entire wrapper so we keep all classes and styles
           clone = wrapper.cloneNode(true);
-          // Remove the first child if it is our injected button container (assumes it's a div)
-          if (
-            clone.firstElementChild &&
-            clone.firstElementChild.tagName.toLowerCase() === "div"
-          ) {
-            clone.removeChild(clone.firstElementChild);
-          }
+          // Remove our injected buttons container from the clone (if present)
+          const injectedContainers = clone.querySelectorAll(
+            '[data-dt-buttons="true"]'
+          );
+          injectedContainers.forEach((el) => el.parentNode.removeChild(el));
         } else {
           clone = table.cloneNode(true);
         }
@@ -169,20 +168,20 @@ export const DownloadableTables = () => {
         modalOverlay.style.alignItems = "center";
         modalOverlay.style.zIndex = "9999";
 
-        // Create modal content container with extra padding so the close button doesn't overlap the table
+        // Create modal content container with extra padding
         const modalContent = document.createElement("div");
         modalContent.style.backgroundColor = "#fff";
         modalContent.style.padding = "20px";
-        modalContent.style.paddingTop = "40px"; // extra top padding for close button
+        modalContent.style.paddingTop = "40px";
         modalContent.style.borderRadius = "4px";
         modalContent.style.maxHeight = "90%";
         modalContent.style.overflow = "auto";
         modalContent.style.position = "relative";
 
-        // Append the cloned table (or wrapper) to modal content
+        // Append the cloned wrapper (or table) into modal content
         modalContent.appendChild(clone);
 
-        // Create close button (no icons inside the modal)
+        // Create close button
         const closeButton = document.createElement("button");
         closeButton.textContent = "X";
         closeButton.style.position = "absolute";
@@ -200,7 +199,7 @@ export const DownloadableTables = () => {
         modalOverlay.appendChild(modalContent);
         document.body.appendChild(modalOverlay);
 
-        // Close modal when clicking outside the modal content
+        // Close modal when clicking outside modal content
         modalOverlay.onclick = (e) => {
           if (e.target === modalOverlay) {
             document.body.removeChild(modalOverlay);
@@ -220,6 +219,6 @@ export const DownloadableTables = () => {
   }, []);
 
   return null;
-}; 
+};
 
 <DownloadableTables />
