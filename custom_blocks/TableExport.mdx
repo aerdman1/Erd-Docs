@@ -35,15 +35,22 @@ export const DownloadableTables = () => {
         await loadScript(
           "https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"
         );
-        loadCSS(
-          "https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"
-        );
+        loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
     };
 
     // Load dependencies and then execute the table processing code.
     loadDependencies()
       .then(() => {
+        // Inject a style override for the DataTables search box.
+        const styleOverride = document.createElement("style");
+        styleOverride.textContent = `
+          .dataTables_wrapper .dataTables_filter input {
+            padding: 5px 20px !important;
+          }
+        `;
+        document.head.appendChild(styleOverride);
+
         const tables = document.querySelectorAll("table");
 
         tables.forEach((table, index) => {
