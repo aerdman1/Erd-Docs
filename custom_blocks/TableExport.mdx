@@ -35,7 +35,9 @@ export const DownloadableTables = () => {
         await loadScript(
           "https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"
         );
-        loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
+        loadCSS(
+          "https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css"
+        );
       }
     };
 
@@ -56,21 +58,25 @@ export const DownloadableTables = () => {
 
             // Create the folded-corner trigger element.
             const trigger = document.createElement("div");
-            trigger.innerHTML =
-              '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+            trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
             trigger.title = "Table Preferences";
+
+            // Updated gradient + box shadow for the trigger
             trigger.style.position = "absolute";
             trigger.style.top = "0px";
             trigger.style.right = "0px";
-            trigger.style.backgroundColor = "rgba(0,0,0,0.6)";
-            trigger.style.color = "#fff";
-            trigger.style.padding = "4px";
-            // Rounded bottom‑left corner to mimic a page fold:
-            trigger.style.borderRadius = "0 0 0 8px";
+            trigger.style.padding = "6px 8px";
             trigger.style.cursor = "pointer";
             trigger.style.fontSize = "0.75rem";
             trigger.style.zIndex = "10";
-            // Mark this element for removal in the popup clone.
+            trigger.style.borderRadius = "0 0 0 8px";
+            trigger.style.color = "#fff";
+            trigger.style.background = "linear-gradient(180deg, #56b8ff, #018ef5)";
+            trigger.style.boxShadow =
+              "0 1px 8px 0 rgba(1, 142, 245, 0.7), 0 2px 4px 0 rgba(0, 0, 0, 0.05), " +
+              "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.15), " +
+              "inset 0 1px 0 0 hsla(0, 0%, 100%, 0.35)";
+            trigger.style.filter = "saturate(1.25)";
             trigger.setAttribute("data-dt-buttons", "true");
 
             // Insert the trigger as the first child so it sits on top.
@@ -88,10 +94,10 @@ export const DownloadableTables = () => {
             menu.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
             menu.style.display = "none";
             menu.style.flexDirection = "column";
-            menu.style.gap = "4px";
+            menu.style.alignItems = "center"; // Center the buttons horizontally
+            menu.style.gap = "6px";
             menu.style.zIndex = "10000";
-            menu.style.padding = "4px";
-            // Mark this element for removal in the popup clone.
+            menu.style.padding = "8px";
             menu.setAttribute("data-dt-buttons", "true");
 
             // Helper: Build CSV string from table rows.
@@ -114,12 +120,12 @@ export const DownloadableTables = () => {
               return csvData;
             };
 
-            // Helper: create an action button (icon only).
-            const createActionButton = (iconHTML, title, bgColor, onClick) => {
+            // Helper: create an action button (icon + gradient background).
+            const createActionButton = (iconHTML, title, gradientStart, gradientEnd, onClick) => {
               const btn = document.createElement("button");
               btn.innerHTML = iconHTML;
               btn.title = title;
-              btn.style.backgroundColor = bgColor;
+              btn.style.background = `linear-gradient(180deg, ${gradientStart}, ${gradientEnd})`;
               btn.style.border = "none";
               btn.style.color = "#fff";
               btn.style.fontWeight = "bold";
@@ -129,15 +135,49 @@ export const DownloadableTables = () => {
               btn.style.fontSize = "0.625rem";
               btn.style.display = "inline-flex";
               btn.style.alignItems = "center";
+              btn.style.justifyContent = "center";
+              // Example box shadow + filter to match the trigger style
+              btn.style.boxShadow =
+                "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+              btn.style.filter = "saturate(1.25)";
               btn.onclick = onClick;
               return btn;
             };
 
-            // Action buttons:
+            // Action buttons (with updated gradient colors):
+            const filterBtn = createActionButton(
+              '<i class="fa fa-filter" aria-hidden="true"></i>',
+              "Filter Table",
+              "#ff9c9c",
+              "#e3342f",
+              () => {
+                // If DataTables (and jQuery) are loaded, use DataTables. Otherwise, simple filter.
+                if (window.jQuery && window.jQuery.fn.DataTable) {
+                  const $table = window.jQuery(table);
+                  if (!$table.hasClass("dataTable")) {
+                    $table.DataTable();
+                  }
+                } else {
+                  const query = prompt("Enter text to filter rows:");
+                  if (query !== null) {
+                    const rows = table.querySelectorAll("tbody tr");
+                    rows.forEach((row) => {
+                      if (row.innerText.toLowerCase().includes(query.toLowerCase())) {
+                        row.style.display = "";
+                      } else {
+                        row.style.display = "none";
+                      }
+                    });
+                  }
+                }
+              }
+            );
+
             const downloadBtn = createActionButton(
               '<i class="fa fa-download" aria-hidden="true"></i>',
               "Download as CSV",
-              "#3490dc",
+              "#56b8ff",
+              "#018ef5",
               () => {
                 const csvData = buildCSV();
                 const blob = new Blob([csvData], {
@@ -156,13 +196,12 @@ export const DownloadableTables = () => {
             const printBtn = createActionButton(
               '<i class="fa fa-print" aria-hidden="true"></i>',
               "Print Table",
+              "#88eaa0",
               "#38c172",
               () => {
                 const printWindow = window.open("", "", "width=800,height=600");
                 if (printWindow) {
-                  printWindow.document.write(
-                    "<html><head><title>Print Table</title>"
-                  );
+                  printWindow.document.write("<html><head><title>Print Table</title>");
                   printWindow.document.write(
                     '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
                   );
@@ -182,6 +221,7 @@ export const DownloadableTables = () => {
             const copyBtn = createActionButton(
               '<i class="fa fa-clipboard" aria-hidden="true"></i>',
               "Copy Table Data",
+              "#c8a4ee",
               "#9561e2",
               async () => {
                 const csvData = buildCSV();
@@ -194,59 +234,25 @@ export const DownloadableTables = () => {
               }
             );
 
-            // NEW: Filter button (now placed at the top) to enable row filtering, pagination, etc.
-            const filterBtn = createActionButton(
-              '<i class="fa fa-filter" aria-hidden="true"></i>',
-              "Filter Table",
-              "#e3342f",
-              () => {
-                // Option 1: If DataTables (and jQuery) are loaded, initialize DataTable for built‑in filtering and pagination.
-                if (window.jQuery && window.jQuery.fn.DataTable) {
-                  const $table = window.jQuery(table);
-                  // Initialize only if not already initialized.
-                  if (!$table.hasClass("dataTable")) {
-                    $table.DataTable();
-                  }
-                } else {
-                  // Option 2: Simple manual filter (fallback)
-                  const query = prompt("Enter text to filter rows:");
-                  if (query !== null) {
-                    const rows = table.querySelectorAll("tbody tr");
-                    rows.forEach((row) => {
-                      if (
-                        row.innerText.toLowerCase().includes(query.toLowerCase())
-                      ) {
-                        row.style.display = "";
-                      } else {
-                        row.style.display = "none";
-                      }
-                    });
-                  }
-                }
-              }
-            );
-
             const popupBtn = createActionButton(
               '<i class="fa fa-arrows-alt" aria-hidden="true"></i>',
               "View Table in Popup",
+              "#fccb94",
               "#f6993f",
               () => {
-                // Instead of cloning the whole wrapper (which includes the buttons),
-                // clone the wrapper and then remove the elements marked with data-dt-buttons.
                 const wrapper =
-                  table.closest(".rdmd-table") ||
-                  table.closest(".rdmd-table-inner");
+                  table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
                 let clone;
                 if (wrapper) {
                   clone = wrapper.cloneNode(true);
-                  const injected = clone.querySelectorAll(
-                    '[data-dt-buttons="true"]'
-                  );
+                  // Remove the triggers/menus in the clone so we only see the table.
+                  const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
                   injected.forEach((el) => el.remove());
                   clone.style.margin = "0";
                 } else {
                   clone = table.cloneNode(true);
                 }
+
                 const markdownWrapper = document.createElement("div");
                 markdownWrapper.className = "markdown-body";
                 markdownWrapper.appendChild(clone);
@@ -278,8 +284,7 @@ export const DownloadableTables = () => {
                 modalContent.appendChild(markdownWrapper);
 
                 const closeButton = document.createElement("button");
-                closeButton.innerHTML =
-                  '<i class="fa fa-times" aria-hidden="true"></i>';
+                closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
                 closeButton.title = "Close";
                 closeButton.style.position = "absolute";
                 closeButton.style.top = "10px";
@@ -305,7 +310,6 @@ export const DownloadableTables = () => {
             );
 
             // Append the action buttons to the fly‑out menu in the desired order:
-            // Filter button first, then download, print, copy, and popup.
             menu.appendChild(filterBtn);
             menu.appendChild(downloadBtn);
             menu.appendChild(printBtn);
@@ -315,7 +319,6 @@ export const DownloadableTables = () => {
             // Show/hide the fly‑out menu on hover.
             trigger.addEventListener("mouseenter", () => {
               menu.style.display = "flex";
-              menu.style.flexDirection = "column";
             });
             trigger.addEventListener("mouseleave", () => {
               menu.style.display = "none";
