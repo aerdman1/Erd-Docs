@@ -146,11 +146,18 @@ export const DownloadableTables = () => {
         if (wrapper) {
           clone = wrapper.cloneNode(true);
           // Remove any injected buttons container from the clone
-          const injectedContainers = clone.querySelectorAll('[data-dt-buttons="true"]');
+          const injectedContainers = clone.querySelectorAll(
+            '[data-dt-buttons="true"]'
+          );
           injectedContainers.forEach((el) => el.remove());
         } else {
           clone = table.cloneNode(true);
         }
+
+        // Wrap the cloned element inside a div with class "markdown-body"
+        const markdownWrapper = document.createElement("div");
+        markdownWrapper.className = "markdown-body";
+        markdownWrapper.appendChild(clone);
 
         // Create modal overlay
         const modalOverlay = document.createElement("div");
@@ -169,16 +176,16 @@ export const DownloadableTables = () => {
         const modalContent = document.createElement("div");
         modalContent.style.backgroundColor = "#fff";
         modalContent.style.padding = "20px";
-        modalContent.style.paddingTop = "40px"; // extra top padding for close button
+        modalContent.style.paddingTop = "40px";
         modalContent.style.borderRadius = "4px";
         modalContent.style.maxHeight = "90%";
         modalContent.style.overflow = "auto";
         modalContent.style.position = "relative";
 
-        // Append the cloned wrapper (or table) to modal content
-        modalContent.appendChild(clone);
+        // Append the markdown wrapper (with our cloned table) to modal content
+        modalContent.appendChild(markdownWrapper);
 
-        // Create close button (without icons)
+        // Create close button
         const closeButton = document.createElement("button");
         closeButton.textContent = "X";
         closeButton.style.position = "absolute";
@@ -196,7 +203,7 @@ export const DownloadableTables = () => {
         modalOverlay.appendChild(modalContent);
         document.body.appendChild(modalOverlay);
 
-        // Close modal when clicking outside modal content
+        // Close modal when clicking outside the modal content
         modalOverlay.onclick = (e) => {
           if (e.target === modalOverlay) {
             document.body.removeChild(modalOverlay);
