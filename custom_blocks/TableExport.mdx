@@ -12,7 +12,7 @@ export const DownloadableTables = () => {
       if (table.getAttribute("data-csv-processed")) return;
       table.setAttribute("data-csv-processed", "true");
 
-      // Create a container for the buttons
+      // Create a container for the buttons (inserted above the table)
       const container = document.createElement("div");
       container.style.marginBottom = "8px";
       container.style.display = "flex";
@@ -20,14 +20,14 @@ export const DownloadableTables = () => {
       container.style.justifyContent = "flex-end";
       container.style.width = "100%";
 
-      // Helper: Build CSV string from table
+      // Helper: Build CSV string from table rows
       const buildCSV = () => {
         const rows = Array.from(table.querySelectorAll("tr"));
         let csvData = "";
-        rows.forEach(row => {
+        rows.forEach((row) => {
           const cells = Array.from(row.querySelectorAll("th, td"));
           let rowData = [];
-          cells.forEach(cell => {
+          cells.forEach((cell) => {
             let text = cell.innerText.trim();
             text = text.split('"').join('""');
             if (text.indexOf(",") !== -1 || text.indexOf('"') !== -1) {
@@ -88,6 +88,7 @@ export const DownloadableTables = () => {
             '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
           );
           printWindow.document.write("</head><body>");
+          // Use the table's outerHTML (or its wrapper if available)
           printWindow.document.write(table.outerHTML);
           printWindow.document.write("</body></html>");
           printWindow.document.close();
@@ -123,7 +124,7 @@ export const DownloadableTables = () => {
         }
       };
 
-      // Button: Popup (icon only) – Opens a modal displaying the full table
+      // Button: Popup (icon only) – Opens a modal displaying the full table with all classes intact
       const popupButton = document.createElement("button");
       popupButton.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
       popupButton.title = "View Table in Popup";
@@ -138,11 +139,24 @@ export const DownloadableTables = () => {
       popupButton.style.display = "inline-flex";
       popupButton.style.alignItems = "center";
       popupButton.onclick = () => {
-        // Determine if the table is wrapped in a container with class "rdmd-table-inner"
+        // Check if the table is wrapped in an element with class "rdmd-table-inner"
         const wrapper = table.closest(".rdmd-table-inner");
-        const contentToShow = wrapper ? wrapper.outerHTML : table.outerHTML;
+        let clone;
+        if (wrapper) {
+          // Clone the entire wrapper so we keep all classes and styles
+          clone = wrapper.cloneNode(true);
+          // Remove the first child if it is our injected button container (assumes it's a div)
+          if (
+            clone.firstElementChild &&
+            clone.firstElementChild.tagName.toLowerCase() === "div"
+          ) {
+            clone.removeChild(clone.firstElementChild);
+          }
+        } else {
+          clone = table.cloneNode(true);
+        }
 
-        // Create overlay
+        // Create modal overlay
         const modalOverlay = document.createElement("div");
         modalOverlay.style.position = "fixed";
         modalOverlay.style.top = "0";
@@ -155,7 +169,7 @@ export const DownloadableTables = () => {
         modalOverlay.style.alignItems = "center";
         modalOverlay.style.zIndex = "9999";
 
-        // Create modal content container with extra top padding
+        // Create modal content container with extra padding so the close button doesn't overlap the table
         const modalContent = document.createElement("div");
         modalContent.style.backgroundColor = "#fff";
         modalContent.style.padding = "20px";
@@ -165,10 +179,10 @@ export const DownloadableTables = () => {
         modalContent.style.overflow = "auto";
         modalContent.style.position = "relative";
 
-        // Insert the table (or its wrapper) into modal content
-        modalContent.innerHTML = contentToShow;
+        // Append the cloned table (or wrapper) to modal content
+        modalContent.appendChild(clone);
 
-        // Create close button
+        // Create close button (no icons inside the modal)
         const closeButton = document.createElement("button");
         closeButton.textContent = "X";
         closeButton.style.position = "absolute";
@@ -194,7 +208,7 @@ export const DownloadableTables = () => {
         };
       };
 
-      // Append all buttons to container
+      // Append all buttons to the container
       container.appendChild(csvButton);
       container.appendChild(printButton);
       container.appendChild(copyButton);
