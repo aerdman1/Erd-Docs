@@ -18,16 +18,19 @@ export const DownloadableTables = () => {
       container.style.display = "flex";
       container.style.gap = "8px";
 
-      // Button: Download to CSV
+      // Button: Download
       const csvButton = document.createElement("button");
-      csvButton.textContent = "Download to CSV";
+      csvButton.innerHTML = '<i class="fa fa-download" aria-hidden="true"></i> Download';
       csvButton.style.backgroundColor = "#3490dc"; // blue
       csvButton.style.border = "none";
       csvButton.style.color = "#fff";
       csvButton.style.fontWeight = "bold";
-      csvButton.style.padding = "8px 16px";
+      csvButton.style.padding = "6px 12px";
       csvButton.style.borderRadius = "4px";
       csvButton.style.cursor = "pointer";
+      csvButton.style.fontSize = "0.875rem";
+      csvButton.style.display = "inline-flex";
+      csvButton.style.alignItems = "center";
       csvButton.onclick = () => {
         const rows = Array.from(table.querySelectorAll("tr"));
         let csvData = "";
@@ -36,9 +39,9 @@ export const DownloadableTables = () => {
           let rowData = [];
           cells.forEach(cell => {
             let text = cell.innerText.trim();
-            // Escape double quotes by replacing them with two double quotes
+            // Escape double quotes
             text = text.split('"').join('""');
-            // Wrap in quotes if text contains a comma or a double quote
+            // Wrap in quotes if necessary
             if (text.indexOf(",") !== -1 || text.indexOf('"') !== -1) {
               text = '"' + text + '"';
             }
@@ -56,20 +59,28 @@ export const DownloadableTables = () => {
         document.body.removeChild(link);
       };
 
-      // Button: Print Table (opens a new window with the table's HTML)
+      // Button: Print
       const printButton = document.createElement("button");
-      printButton.textContent = "Print Table";
+      printButton.innerHTML = '<i class="fa fa-print" aria-hidden="true"></i> Print';
       printButton.style.backgroundColor = "#38c172"; // green
       printButton.style.border = "none";
       printButton.style.color = "#fff";
       printButton.style.fontWeight = "bold";
-      printButton.style.padding = "8px 16px";
+      printButton.style.padding = "6px 12px";
       printButton.style.borderRadius = "4px";
       printButton.style.cursor = "pointer";
+      printButton.style.fontSize = "0.875rem";
+      printButton.style.display = "inline-flex";
+      printButton.style.alignItems = "center";
       printButton.onclick = () => {
         const printWindow = window.open("", "", "width=800,height=600");
         if (printWindow) {
-          printWindow.document.write("<html><head><title>Print Table</title></head><body>");
+          printWindow.document.write("<html><head><title>Print Table</title>");
+          // Include Font Awesome CSS for icons in the print window
+          printWindow.document.write(
+            '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">'
+          );
+          printWindow.document.write("</head><body>");
           printWindow.document.write(table.outerHTML);
           printWindow.document.write("</body></html>");
           printWindow.document.close();
@@ -81,26 +92,29 @@ export const DownloadableTables = () => {
         }
       };
 
-      // Button: Copy Table HTML to clipboard
+      // Button: Copy
       const copyButton = document.createElement("button");
-      copyButton.textContent = "Copy Table HTML";
+      copyButton.innerHTML = '<i class="fa fa-clipboard" aria-hidden="true"></i> Copy';
       copyButton.style.backgroundColor = "#9561e2"; // purple
       copyButton.style.border = "none";
       copyButton.style.color = "#fff";
       copyButton.style.fontWeight = "bold";
-      copyButton.style.padding = "8px 16px";
+      copyButton.style.padding = "6px 12px";
       copyButton.style.borderRadius = "4px";
       copyButton.style.cursor = "pointer";
+      copyButton.style.fontSize = "0.875rem";
+      copyButton.style.display = "inline-flex";
+      copyButton.style.alignItems = "center";
       copyButton.onclick = async () => {
         try {
           await navigator.clipboard.writeText(table.outerHTML);
-          alert("Table HTML copied to clipboard!");
+          alert("Table HTML copied!");
         } catch (err) {
-          alert("Failed to copy: " + err);
+          alert("Copy failed: " + err);
         }
       };
 
-      // Append the buttons to the container and then insert it before the table
+      // Append buttons to container, then insert container before the table
       container.appendChild(csvButton);
       container.appendChild(printButton);
       container.appendChild(copyButton);
