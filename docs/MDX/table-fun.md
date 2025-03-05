@@ -1,7 +1,7 @@
 ---
 title: Table Fun
 deprecated: false
-hidden: false
+hidden: true
 metadata:
   robots: index
 ---
