@@ -138,6 +138,10 @@ export const DownloadableTables = () => {
       popupButton.style.display = "inline-flex";
       popupButton.style.alignItems = "center";
       popupButton.onclick = () => {
+        // Determine if the table is wrapped in a container with class "rdmd-table-inner"
+        const wrapper = table.closest(".rdmd-table-inner");
+        const contentToShow = wrapper ? wrapper.outerHTML : table.outerHTML;
+
         // Create overlay
         const modalOverlay = document.createElement("div");
         modalOverlay.style.position = "fixed";
@@ -161,8 +165,8 @@ export const DownloadableTables = () => {
         modalContent.style.overflow = "auto";
         modalContent.style.position = "relative";
 
-        // Insert table HTML into modal content
-        modalContent.innerHTML = table.outerHTML;
+        // Insert the table (or its wrapper) into modal content
+        modalContent.innerHTML = contentToShow;
 
         // Create close button
         const closeButton = document.createElement("button");
