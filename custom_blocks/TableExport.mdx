@@ -70,6 +70,8 @@ export const DownloadableTables = () => {
             trigger.style.cursor = "pointer";
             trigger.style.fontSize = "0.75rem";
             trigger.style.zIndex = "10";
+            // Mark this element for removal in the popup clone.
+            trigger.setAttribute("data-dt-buttons", "true");
 
             // Insert the trigger as the first child so it sits on top.
             tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
@@ -89,6 +91,8 @@ export const DownloadableTables = () => {
             menu.style.gap = "4px";
             menu.style.zIndex = "10000";
             menu.style.padding = "4px";
+            // Mark this element for removal in the popup clone.
+            menu.setAttribute("data-dt-buttons", "true");
 
             // Helper: Build CSV string from table rows.
             const buildCSV = () => {
@@ -190,7 +194,7 @@ export const DownloadableTables = () => {
               }
             );
 
-            // NEW: Filter button to enable row filtering, pagination, etc.
+            // NEW: Filter button (now placed at the top) to enable row filtering, pagination, etc.
             const filterBtn = createActionButton(
               '<i class="fa fa-filter" aria-hidden="true"></i>',
               "Filter Table",
@@ -227,6 +231,8 @@ export const DownloadableTables = () => {
               "View Table in Popup",
               "#f6993f",
               () => {
+                // Instead of cloning the whole wrapper (which includes the buttons),
+                // clone the wrapper and then remove the elements marked with data-dt-buttons.
                 const wrapper =
                   table.closest(".rdmd-table") ||
                   table.closest(".rdmd-table-inner");
@@ -298,11 +304,12 @@ export const DownloadableTables = () => {
               }
             );
 
-            // Append the action buttons to the fly‑out menu.
+            // Append the action buttons to the fly‑out menu in the desired order:
+            // Filter button first, then download, print, copy, and popup.
+            menu.appendChild(filterBtn);
             menu.appendChild(downloadBtn);
             menu.appendChild(printBtn);
             menu.appendChild(copyBtn);
-            menu.appendChild(filterBtn);
             menu.appendChild(popupBtn);
 
             // Show/hide the fly‑out menu on hover.
