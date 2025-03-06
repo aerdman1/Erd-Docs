@@ -58,7 +58,6 @@ export const TableToolsComponent = () => {
     loadDependencies()
       .then(() => {
         // Inline style overrides.
-        // NOTE: For maintainability, consider moving these styles to an external CSS file.
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
           table.dataTable, table.dataTable th, table.dataTable td {
