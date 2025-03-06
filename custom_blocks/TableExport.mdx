@@ -126,7 +126,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
 }
 .dt-button {
   background-color: #007bff !important;
-  background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
+  background: linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79)) !important;
   color: #fff !important;
   border: none !important;
   border-radius: 20px !important;
@@ -150,7 +150,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
 .dt-button {
   transform: none !important;
   background-color: #007bff !important;
-  background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
+  background: linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79)) !important;
 }
 /* Force search to appear first and buttons second */
 .dt-nav .dataTables_filter {
@@ -161,12 +161,12 @@ table.dataTable, table.dataTable th, table.dataTable td {
 }
 /* Custom classes for Popup and Close buttons */
 .custom-popup-button {
-  background-color: #FFA500 !important; /* Modern Orange */
+  background-color: #FFA500 !important; /* Clean modern orange */
   border: none !important;
   color: #fff !important;
 }
 .custom-close-button {
-  background-color: #E74C3C !important; /* Soft Red */
+  background-color: #E74C3C !important; /* Not too harsh red */
   border: none !important;
   color: #fff !important;
 }
@@ -194,11 +194,12 @@ table.dataTable, table.dataTable th, table.dataTable td {
           trigger.style.padding = "4px 6px";
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
-          trigger.style.zIndex = "10";
+          trigger.style.zIndex = "9999";  // Increased z-index for visibility
           trigger.style.borderRadius = "0px 0px 0px 3px";
           trigger.style.color = "rgb(255, 255, 255)";
-          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245 / 79%))";
+          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
           trigger.style.filter = "saturate(1.15)";
+          trigger.style.display = "block";
           trigger.setAttribute("data-dt-trigger", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
@@ -243,17 +244,15 @@ table.dataTable, table.dataTable th, table.dataTable td {
                   text: '<i class="fa fa-arrows-alt"></i> Popup',
                   className: "custom-popup-button",
                   action: function (e, dt, node, config) {
-                    // Build the modal popup, removing buttons, trigger, and search.
+                    // Build the modal popup, removing buttons and search.
                     let wrapper =
                       table.closest(".rdmd-table") ||
                       table.closest(".rdmd-table-inner");
                     let clone;
                     if (wrapper) {
                       clone = wrapper.cloneNode(true);
-                      // Remove trigger & buttons.
                       const injected = clone.querySelectorAll('[data-dt-trigger], [data-dt-buttons]');
                       injected.forEach((el) => el.remove());
-                      // Also remove the search container.
                       const searchDiv = clone.querySelector(".dataTables_filter");
                       if (searchDiv) searchDiv.remove();
                       clone.style.margin = "0";
@@ -285,7 +284,6 @@ table.dataTable, table.dataTable th, table.dataTable td {
                     modalContent.style.position = "relative";
                     modalContent.style.minWidth = "800px";
                     modalContent.style.margin = "20px";
-                    // Append only the table clone (no buttons or search).
                     modalContent.appendChild(markdownWrapper);
                     modalOverlay.appendChild(modalContent);
                     document.body.appendChild(modalOverlay);
@@ -342,4 +340,4 @@ table.dataTable, table.dataTable th, table.dataTable td {
   return null;
 };
 
-<DownloadableTables /> 
+<DownloadableTables />
