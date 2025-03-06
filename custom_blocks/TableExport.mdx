@@ -99,7 +99,7 @@ export const DownloadableTables = () => {
 /* Pagination buttons - all pages */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
   color: #fff !important;
-  border: none;
+ border: none !important;
   border-radius: 6px;
   margin: 2px;
   padding: 6px 12px;
@@ -119,6 +119,7 @@ export const DownloadableTables = () => {
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
   background: #0056b3; /* Slightly darker blue on hover */
   color: #fff !important;
+   border: none !important;
 }
 
 /* Current page button - darker blue and no hover weirdness */
@@ -137,7 +138,7 @@ export const DownloadableTables = () => {
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
   background: #003f7f !important;
   color: #fff !important;
-  border:none;
+  border: none !important;
 }
 
 /* Disabled pagination button */
