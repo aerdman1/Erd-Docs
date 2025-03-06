@@ -26,39 +26,23 @@ export const DownloadableTables = () => {
       document.head.appendChild(link);
     };
 
-    // Load required dependencies.
+    // Load required dependencies using newer CDN links.
     const loadDependencies = async () => {
       if (!window.jQuery) {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
       if (!window.jQuery.fn.DataTable) {
-        await loadScript(
-          "https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"
-        );
-        loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
+        await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
+        loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
       }
-      await loadScript(
-        "https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"
-      );
-      loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
-      await loadScript(
-        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"
-      );
-      await loadScript(
-        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"
-      );
-      await loadScript(
-        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"
-      );
-      await loadScript(
-        "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
-      );
-      await loadScript(
-        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
-      );
-      await loadScript(
-        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"
-      );
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js");
+      loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js");
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js");
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js");
     };
 
     loadDependencies()
@@ -205,6 +189,11 @@ table.dataTable, table.dataTable th, table.dataTable td {
             const dt = $table.DataTable({
               // Custom DOM: nav bar row with buttons and search field above the table.
               dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'Bf>>rtip",
+              // Update language: hide "Search" label and use a placeholder.
+              language: {
+                search: "",
+                searchPlaceholder: "Search Table:"
+              },
               buttons: [
                 {
                   extend: "copy",
@@ -228,7 +217,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
                 },
                 {
                   extend: "colvis",
-                  text: '<i class="fa fa-columns"></i> Column Visibility'
+                  text: '<i class="fa fa-columns"></i> Col'
                 },
                 {
                   text: '<i class="fa fa-arrows-alt"></i> Popup',
@@ -296,7 +285,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
                   }
                 },
                 {
-                  text: '<i class="fa fa-ban"></i> Close Filter',
+                  text: '<i class="fa fa-ban"></i> Close',
                   action: function (e, dt, node, config) {
                     dt.destroy();
                     const original = table.getAttribute("data-original-html");
