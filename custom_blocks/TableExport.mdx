@@ -47,7 +47,7 @@ export const DownloadableTables = () => {
 
     loadDependencies()
       .then(() => {
-        // Append style overrides (preserving all your original styles)
+        // Append style overrides (preserving your original styles)
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
 table.dataTable, table.dataTable th, table.dataTable td {
@@ -64,10 +64,11 @@ table.dataTable, table.dataTable th, table.dataTable td {
 .dataTables_wrapper .dataTables_filter {
   margin-bottom: 0.5rem;
   font-size: 12px;
+  order: 0 !important;
 }
 .dataTables_wrapper .dataTables_filter input {
   border: 1px solid #ccc;
-  margin-left:25px;
+  margin-left: 25px;
   border-radius: 6px;
   padding: 4px 10px !important;
   outline: none;
@@ -151,6 +152,24 @@ table.dataTable, table.dataTable th, table.dataTable td {
   background-color: #007bff !important;
   background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
 }
+/* Force search to appear first and buttons second */
+.dt-nav .dataTables_filter {
+  order: 0 !important;
+}
+.dt-nav .dt-buttons {
+  order: 1 !important;
+}
+/* Custom classes for Popup and Close buttons */
+.custom-popup-button {
+  background-color: #FFA500 !important; /* Modern Orange */
+  border: none !important;
+  color: #fff !important;
+}
+.custom-close-button {
+  background-color: #E74C3C !important; /* Soft Red */
+  border: none !important;
+  color: #fff !important;
+}
         `;
         document.head.appendChild(styleOverride);
 
@@ -178,7 +197,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
           trigger.style.zIndex = "10";
           trigger.style.borderRadius = "0px 0px 0px 3px";
           trigger.style.color = "rgb(255, 255, 255)";
-          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1 142 245 / 79%))";
+          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245 / 79%))";
           trigger.style.filter = "saturate(1.15)";
           trigger.setAttribute("data-dt-trigger", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
@@ -188,7 +207,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
             const $table = window.jQuery(table);
             if (table.getAttribute("data-filter-enabled") === "true") return;
             const dt = $table.DataTable({
-              // Custom DOM: search first (f) then buttons (B) in a single nav row above the table.
+              // Custom DOM: search field (f) first then buttons (B) in one nav row above the table.
               dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
               // Update language: hide "Search" label and use a placeholder.
               language: {
@@ -222,16 +241,21 @@ table.dataTable, table.dataTable th, table.dataTable td {
                 },
                 {
                   text: '<i class="fa fa-arrows-alt"></i> Popup',
+                  className: "custom-popup-button",
                   action: function (e, dt, node, config) {
-                    // Build the modal popup.
+                    // Build the modal popup, removing buttons, trigger, and search.
                     let wrapper =
                       table.closest(".rdmd-table") ||
                       table.closest(".rdmd-table-inner");
                     let clone;
                     if (wrapper) {
                       clone = wrapper.cloneNode(true);
+                      // Remove trigger & buttons.
                       const injected = clone.querySelectorAll('[data-dt-trigger], [data-dt-buttons]');
                       injected.forEach((el) => el.remove());
+                      // Also remove the search container.
+                      const searchDiv = clone.querySelector(".dataTables_filter");
+                      if (searchDiv) searchDiv.remove();
                       clone.style.margin = "0";
                     } else {
                       clone = table.cloneNode(true);
@@ -261,19 +285,23 @@ table.dataTable, table.dataTable th, table.dataTable td {
                     modalContent.style.position = "relative";
                     modalContent.style.minWidth = "800px";
                     modalContent.style.margin = "20px";
+                    // Append only the table clone (no buttons or search).
                     modalContent.appendChild(markdownWrapper);
                     modalOverlay.appendChild(modalContent);
                     document.body.appendChild(modalOverlay);
                     const closeButton = document.createElement("button");
                     closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
                     closeButton.title = "Close";
+                    closeButton.className = "custom-close-button";
+                    // Style the close button with a soft red background.
                     closeButton.style.position = "absolute";
                     closeButton.style.top = "10px";
                     closeButton.style.right = "10px";
-                    closeButton.style.background = "transparent";
+                    closeButton.style.background = "#E74C3C";
                     closeButton.style.border = "none";
                     closeButton.style.fontSize = "1.5rem";
                     closeButton.style.cursor = "pointer";
+                    closeButton.style.color = "#fff";
                     closeButton.onclick = () => {
                       document.body.removeChild(modalOverlay);
                     };
