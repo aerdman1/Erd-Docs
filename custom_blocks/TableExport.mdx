@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 
 export const DownloadableTables = () => {
   useEffect(() => {
+    // Helper to load a script dynamically.
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -16,6 +17,7 @@ export const DownloadableTables = () => {
       });
     };
 
+    // Helper to load a CSS stylesheet dynamically.
     const loadCSS = (href) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -23,34 +25,44 @@ export const DownloadableTables = () => {
       document.head.appendChild(link);
     };
 
+    // Load jQuery + DataTables + Buttons
     const loadDependencies = async () => {
+      // 1) jQuery
       if (!window.jQuery) {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
 
+      // 2) DataTables core
       if (!window.jQuery.fn.DataTable) {
         await loadScript("https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js");
         loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
 
+      // 3) DataTables Buttons + CSS
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
       loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
 
+      // 4) For HTML5 export (csv, excel, pdf) + print:
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
+
+      // For Excel export, need JSZip:
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+
+      // For PDF export, need pdfmake + vfs_fonts:
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js");
-
-      // Font Awesome for icons
-      loadCSS("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
     };
 
     loadDependencies()
       .then(() => {
+        // ─────────────────────────────────────────────────────────────────────────
+        // Inject a style override for a more modern DataTables look:
+        // Adjust colors, gradients, fonts, etc. to match your branding.
+        // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-/* All your existing styles (keep as-is) */
+/* General DataTables wrapper */
 .dataTables_wrapper {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 0.875rem;
@@ -59,6 +71,85 @@ export const DownloadableTables = () => {
   margin: 0 auto;
   border: none;
 }
+
+/* Search box */
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 0.5rem;
+  font-size: 12px;
+}
+.dataTables_wrapper .dataTables_filter input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px 10px !important;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
+
+/* Info text (e.g., "Showing 1 to 10 of 20 entries") */
+.dataTables_wrapper .dataTables_info {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 8px;
+}
+
+/* Pagination buttons - all pages */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px;
+  margin: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  height: auto;
+  box-sizing: border-box;
+  box-shadow: none;
+  transition: background 0.2s ease;
+  transform: none !important;
+  outline: none !important;
+}
+
+/* Hover for regular page buttons */
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #0056b3; /* Slightly darker blue on hover */
+  color: #fff !important;
+  border: none !important;
+  opacity: .9;
+}
+
+/* Current page button - darker blue and no hover weirdness */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #003f7f !important; /* Darker blue */
+  color: #fff !important;
+  font-weight: bold;
+  cursor: default;
+  box-shadow: none;
+  transform: none !important;
+  outline: none !important;
+  border: none;
+}
+
+/* Current page button hover - no change */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: #003f7f !important;
+  color: #fff !important;
+  border: none !important;
+  opacity: 1;
+}
+
+/* Disabled pagination button */
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: transparent !important;
+  cursor: not-allowed;
+}
+
+/* DataTables export/print buttons */
 .dt-button {
   background-color: #007bff !important;
   background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
@@ -69,130 +160,293 @@ export const DownloadableTables = () => {
   font-size: 0.65rem !important;
   font-weight: 500 !important;
   cursor: pointer !important;
+  transition: background 0.2s ease;
+  box-shadow: none !important;
   margin: 2px;
   height: auto;
   line-height: 1.4;
+  box-sizing: border-box;
+  transform: none !important;
+  outline: none !important;
 }
+
+/* Hover for export/print buttons */
 .dt-button:hover {
-  background: #0056b3 !important;
+  background: #0056b3 !important; /* Slightly darker on hover */
   color: #fff !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dt-button {
+  transform: none !important;
+  background-color: #007bff !important;
+  background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
 }
         `;
         document.head.appendChild(styleOverride);
 
+        // Process all tables on the page
         const tables = document.querySelectorAll("table");
 
         tables.forEach((table) => {
+          // Prevent double-processing
           if (table.getAttribute("data-csv-processed")) return;
           table.setAttribute("data-csv-processed", "true");
 
+          // Find the .rdmd-table wrapper
           const tableWrapper = table.closest(".rdmd-table");
           if (!tableWrapper) return;
 
+          // Ensure the wrapper is relative so the absolute-positioned menu can appear
           tableWrapper.style.position = "relative";
 
+          // ─────────────────────────────────────────────────────────────────────────
+          // 1) Create the top-right "Table Preferences" trigger (folded-corner)
+          // ─────────────────────────────────────────────────────────────────────────
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
           trigger.title = "Table Preferences";
-          Object.assign(trigger.style, {
-            position: "absolute",
-            top: "0px",
-            right: "0px",
-            padding: "4px",
-            cursor: "pointer",
-            fontSize: "0.75rem",
-            zIndex: "10",
-            borderRadius: "0 0 0 8px",
-            color: "#fff",
-            background: "linear-gradient(180deg, #56b8ff, #018ef5)",
-          });
+          trigger.style.position = "absolute";
+          trigger.style.top = "0px";
+          trigger.style.right = "0px";
+          trigger.style.padding = "4px";
+          trigger.style.cursor = "pointer";
+          trigger.style.fontSize = "0.75rem";
+          trigger.style.zIndex = "10";
+          trigger.style.borderRadius = "0 0 0 8px";
+          trigger.style.color = "#fff";
+          trigger.style.background = "linear-gradient(180deg, #56b8ff, #018ef5)";
+          trigger.style.boxShadow =
+            "0 1px 8px 0 rgba(1, 142, 245, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.05), " +
+            "0 1px 2px 0 rgba(0, 0, 0, 0.05), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.15), " +
+            "inset 0 1px 0 0 hsla(0, 0%, 100%, 0.35)";
+          trigger.style.filter = "saturate(1.25)";
+          // Mark so we can remove it in the popup clone
           trigger.setAttribute("data-dt-buttons", "true");
+
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
+          // ─────────────────────────────────────────────────────────────────────────
+          // 2) Create the fly‑out menu container (hidden by default)
+          // ─────────────────────────────────────────────────────────────────────────
           const menu = document.createElement("div");
-          Object.assign(menu.style, {
-            position: "absolute",
-            top: "21px",
-            right: "1px",
-            backgroundColor: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-            display: "none",
-            flexDirection: "column",
-            gap: "6px",
-            zIndex: "10000",
-            padding: "8px",
-          });
+          menu.style.position = "absolute";
+          menu.style.top = "21px";
+          menu.style.right = "1px";
+          menu.style.backgroundColor = "#fff";
+          menu.style.border = "1px solid #ccc";
+          menu.style.borderRadius = "4px";
+          menu.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
+          menu.style.display = "none";
+          menu.style.flexDirection = "column";
+          menu.style.alignItems = "center";
+          menu.style.gap = "6px";
+          menu.style.zIndex = "10000";
+          menu.style.padding = "8px";
+          // Mark so we can remove it in the popup clone
           menu.setAttribute("data-dt-buttons", "true");
 
+          // ─────────────────────────────────────────────────────────────────────────
+          // 3) FILTER / DISABLE button - toggles DataTables on / off
+          // ─────────────────────────────────────────────────────────────────────────
+          const filterBtn = document.createElement("button");
+          filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
+          filterBtn.title = "Enable Sorting / Export / Print";
+          filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
+          filterBtn.style.border = "none";
+          filterBtn.style.color = "#fff";
+          filterBtn.style.fontWeight = "bold";
+          filterBtn.style.padding = "6px 12px";
+          filterBtn.style.borderRadius = "4px";
+          filterBtn.style.cursor = "pointer";
+          filterBtn.style.fontSize = "0.625rem";
+          filterBtn.style.display = "inline-flex";
+          filterBtn.style.alignItems = "center";
+          filterBtn.style.justifyContent = "center";
+          filterBtn.style.boxShadow =
+            "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+          filterBtn.style.filter = "saturate(1.25)";
+
+          // Store a flag on the table to track if DataTables is active
           table.setAttribute("data-filter-enabled", "false");
 
-          const enableDataTable = () => {
-            const $table = window.jQuery(table);
-
-            if (!$table.hasClass("dataTable")) {
-              $table.DataTable({
-                dom: "Bfrtip",
-                buttons: [
-                  {
-                    extend: "copy",
-                    text: '<i class="fas fa-copy"></i> Copy',
-                  },
-                  {
-                    extend: "csv",
-                    text: '<i class="fas fa-file-csv"></i> CSV',
-                  },
-                  {
-                    extend: "excel",
-                    text: '<i class="fas fa-file-excel"></i> Excel',
-                  },
-                  {
-                    extend: "pdf",
-                    text: '<i class="fas fa-file-pdf"></i> PDF',
-                  },
-                  {
-                    extend: "print",
-                    text: '<i class="fas fa-print"></i> Print',
-                  },
-                ],
-              });
-            }
-            table.setAttribute("data-filter-enabled", "true");
-          };
-
-          const disableDataTable = () => {
-            const $table = window.jQuery(table);
-            $table.DataTable().destroy();
-            const originalHTML = table.getAttribute("data-original-html");
-            if (originalHTML) {
-              table.innerHTML = originalHTML;
-              table.removeAttribute("data-original-html");
-            }
-            table.setAttribute("data-filter-enabled", "false");
-          };
-
-          const filterBtn = document.createElement("button");
-          filterBtn.innerHTML = '<i class="fa fa-filter"></i>';
-          filterBtn.title = "Enable Sorting / Export / Print";
           filterBtn.onclick = () => {
-            if (table.getAttribute("data-filter-enabled") === "true") {
-              disableDataTable();
-              filterBtn.innerHTML = '<i class="fa fa-filter"></i>';
-              filterBtn.title = "Enable Sorting / Export / Print";
-            } else {
+            const $table = window.jQuery(table);
+            const isEnabled = table.getAttribute("data-filter-enabled") === "true";
+
+            if (!isEnabled) {
+              // 1) Store the table's original HTML so we can revert later
               table.setAttribute("data-original-html", table.innerHTML);
-              enableDataTable();
-              filterBtn.innerHTML = '<i class="fa fa-ban"></i>';
+
+              // 2) Initialize DataTables with export / print buttons using icons
+              if (!$table.hasClass("dataTable")) {
+                $table.DataTable({
+                  dom: "Bfrtip",
+                  buttons: [
+                    {
+                      extend: "copy",
+                      text: '<i class="fa fa-copy"></i> Copy'
+                    },
+                    {
+                      extend: "csv",
+                      text: '<i class="fa fa-file-csv"></i> CSV'
+                    },
+                    {
+                      extend: "excel",
+                      text: '<i class="fa fa-file-excel"></i> Excel'
+                    },
+                    {
+                      extend: "pdf",
+                      text: '<i class="fa fa-file-pdf"></i> PDF'
+                    },
+                    {
+                      extend: "print",
+                      text: '<i class="fa fa-print"></i> Print'
+                    }
+                  ]
+                });
+              }
+              table.setAttribute("data-filter-enabled", "true");
+
+              // 3) Change button to "Disable"
+              filterBtn.innerHTML = '<i class="fa fa-ban" aria-hidden="true"></i>';
               filterBtn.title = "Disable Sorting / Export / Print";
+              filterBtn.style.background = "linear-gradient(180deg, #999999, #666666)";
+            } else {
+              // Currently enabled -> disable it
+              // 1) Destroy DataTables
+              $table.DataTable().destroy();
+
+              // 2) Revert to the original HTML
+              const originalHTML = table.getAttribute("data-original-html");
+              if (originalHTML) {
+                table.innerHTML = originalHTML;
+                table.removeAttribute("data-original-html");
+              }
+
+              table.setAttribute("data-filter-enabled", "false");
+
+              // 3) Change button back to "Enable"
+              filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
+              filterBtn.title = "Enable Sorting / Export / Print";
+              filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
             }
           };
+
           menu.appendChild(filterBtn);
 
-          trigger.addEventListener("mouseenter", () => (menu.style.display = "flex"));
-          trigger.addEventListener("mouseleave", () => (menu.style.display = "none"));
-          menu.addEventListener("mouseenter", () => (menu.style.display = "flex"));
-          menu.addEventListener("mouseleave", () => (menu.style.display = "none"));
+          // ─────────────────────────────────────────────────────────────────────────
+          // 4) POP‑UP button (orange) - shows table in a modal
+          // ─────────────────────────────────────────────────────────────────────────
+          const popupBtn = document.createElement("button");
+          popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
+          popupBtn.title = "View Table in Popup";
+          popupBtn.style.background = "linear-gradient(180deg, #fccb94, #f6993f)";
+          popupBtn.style.border = "none";
+          popupBtn.style.color = "#fff";
+          popupBtn.style.fontWeight = "bold";
+          popupBtn.style.padding = "6px 12px";
+          popupBtn.style.borderRadius = "4px";
+          popupBtn.style.cursor = "pointer";
+          popupBtn.style.fontSize = "0.625rem";
+          popupBtn.style.display = "inline-flex";
+          popupBtn.style.alignItems = "center";
+          popupBtn.style.justifyContent = "center";
+          popupBtn.style.boxShadow =
+            "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+          popupBtn.style.filter = "saturate(1.25)";
+
+          popupBtn.onclick = () => {
+            const wrapper =
+              table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
+            let clone;
+            if (wrapper) {
+              clone = wrapper.cloneNode(true);
+              // Remove triggers/menus from the clone
+              const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
+              injected.forEach((el) => el.remove());
+              clone.style.margin = "0";
+            } else {
+              clone = table.cloneNode(true);
+            }
+
+            // Put the clone in a markdown-body wrapper
+            const markdownWrapper = document.createElement("div");
+            markdownWrapper.className = "markdown-body";
+            markdownWrapper.appendChild(clone);
+
+            // Modal overlay
+            const modalOverlay = document.createElement("div");
+            modalOverlay.style.position = "fixed";
+            modalOverlay.style.top = "0";
+            modalOverlay.style.left = "0";
+            modalOverlay.style.width = "100%";
+            modalOverlay.style.height = "100%";
+            modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            modalOverlay.style.display = "flex";
+            modalOverlay.style.justifyContent = "center";
+            modalOverlay.style.alignItems = "center";
+            modalOverlay.style.zIndex = "9999";
+            modalOverlay.style.overflow = "auto";
+
+            const modalContent = document.createElement("div");
+            modalContent.style.backgroundColor = "#fff";
+            modalContent.style.padding = "20px";
+            modalContent.style.paddingTop = "40px";
+            modalContent.style.borderRadius = "4px";
+            modalContent.style.maxHeight = "90%";
+            modalContent.style.overflow = "auto";
+            modalContent.style.position = "relative";
+            modalContent.style.minWidth = "800px";
+            modalContent.style.margin = "20px";
+
+            modalContent.appendChild(markdownWrapper);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+
+            // Close button in top-right corner
+            const closeButton = document.createElement("button");
+            closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
+            closeButton.title = "Close";
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "10px";
+            closeButton.style.right = "10px";
+            closeButton.style.background = "transparent";
+            closeButton.style.border = "none";
+            closeButton.style.fontSize = "1.5rem";
+            closeButton.style.cursor = "pointer";
+            closeButton.onclick = () => {
+              document.body.removeChild(modalOverlay);
+            };
+            modalContent.appendChild(closeButton);
+
+            // Close modal if user clicks outside the modal content
+            modalOverlay.onclick = (e) => {
+              if (e.target === modalOverlay) {
+                document.body.removeChild(modalOverlay);
+              }
+            };
+          };
+
+          menu.appendChild(popupBtn);
+
+          // ─────────────────────────────────────────────────────────────────────────
+          // 5) Show/hide the fly‑out menu on hover
+          // ─────────────────────────────────────────────────────────────────────────
+          trigger.addEventListener("mouseenter", () => {
+            menu.style.display = "flex";
+          });
+          trigger.addEventListener("mouseleave", () => {
+            menu.style.display = "none";
+          });
+          menu.addEventListener("mouseenter", () => {
+            menu.style.display = "flex";
+          });
+          menu.addEventListener("mouseleave", () => {
+            menu.style.display = "none";
+          });
+
+          // Attach the menu to the table wrapper
           tableWrapper.appendChild(menu);
         });
       })
