@@ -11,7 +11,8 @@ export const DownloadableTables = () => {
         script.src = src;
         script.async = true;
         script.onload = () => resolve();
-        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+        script.onerror = () =>
+          reject(new Error(`Failed to load script: ${src}`));
         document.body.appendChild(script);
       });
     };
@@ -28,16 +29,34 @@ export const DownloadableTables = () => {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
       if (!window.jQuery.fn.DataTable) {
-        await loadScript("https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js");
+        await loadScript(
+          "https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"
+        );
         loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"
+      );
       loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js");
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"
+      );
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"
+      );
+      // Load the Column Visibility button dependency
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"
+      );
     };
 
     loadDependencies()
@@ -45,7 +64,7 @@ export const DownloadableTables = () => {
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
 table.dataTable, table.dataTable th, table.dataTable td {
-    box-sizing: inherit;
+  box-sizing: inherit;
 }
 .dataTables_wrapper {
   font-family: "Helvetica Neue", Arial, sans-serif;
@@ -54,12 +73,6 @@ table.dataTable, table.dataTable th, table.dataTable td {
   background: #fff;
   margin: 0 auto;
   border: none;
-}
-div[title="Table Preferences"] {
-  opacity: .7;
-}
-div[title="Table Preferences"]:hover {
-  opacity: 1;
 }
 .dataTables_wrapper .dataTables_filter {
   margin-bottom: 0.5rem;
@@ -161,6 +174,7 @@ div[title="Table Preferences"]:hover {
           if (!tableWrapper) return;
           tableWrapper.style.position = "relative";
 
+          // Create the trigger button (3-dot icon)
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
           trigger.title = "Table Preferences";
@@ -178,41 +192,31 @@ div[title="Table Preferences"]:hover {
           trigger.setAttribute("data-dt-buttons", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
-          const menu = document.createElement("div");
-          menu.style.position = "absolute";
-          menu.style.top = "21px";
-          menu.style.right = "1px";
-          menu.style.backgroundColor = "#fff";
-          menu.style.border = "1px solid #ccc";
-          menu.style.borderRadius = "4px";
-          menu.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
-          menu.style.display = "none";
-          menu.style.flexDirection = "column";
-          menu.style.alignItems = "center";
-          menu.style.gap = "6px";
-          menu.style.zIndex = "10000";
-          menu.style.padding = "8px";
-          menu.setAttribute("data-dt-buttons", "true");
+          // Create the popup button (orange) and hide it initially
+          const popupBtn = document.createElement("button");
+          popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
+          popupBtn.title = "View Table in Popup";
+          popupBtn.style.position = "absolute";
+          popupBtn.style.top = "0px";
+          popupBtn.style.right = "40px";
+          popupBtn.style.background = "linear-gradient(180deg, #FF7F50, #FF6347)";
+          popupBtn.style.border = "none";
+          popupBtn.style.color = "#fff";
+          popupBtn.style.fontWeight = "bold";
+          popupBtn.style.padding = "6px 12px";
+          popupBtn.style.borderRadius = "4px";
+          popupBtn.style.cursor = "pointer";
+          popupBtn.style.fontSize = "0.625rem";
+          popupBtn.style.display = "none";
+          popupBtn.style.alignItems = "center";
+          popupBtn.style.justifyContent = "center";
+          popupBtn.style.boxShadow = "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+          popupBtn.style.filter = "saturate(1.25)";
+          popupBtn.setAttribute("data-dt-buttons", "true");
+          tableWrapper.appendChild(popupBtn);
 
-          const filterBtn = document.createElement("button");
-          filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
-          filterBtn.title = "Enable Sorting / Export / Print";
-          filterBtn.style.background = "linear-gradient(180deg, #32CD32, #228B22)";
-          filterBtn.style.border = "none";
-          filterBtn.style.color = "#fff";
-          filterBtn.style.fontWeight = "bold";
-          filterBtn.style.padding = "6px 12px";
-          filterBtn.style.borderRadius = "4px";
-          filterBtn.style.cursor = "pointer";
-          filterBtn.style.fontSize = "0.625rem";
-          filterBtn.style.display = "inline-flex";
-          filterBtn.style.alignItems = "center";
-          filterBtn.style.justifyContent = "center";
-          filterBtn.style.boxShadow = "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
-          filterBtn.style.filter = "saturate(1.25)";
-          table.setAttribute("data-filter-enabled", "false");
-
-          filterBtn.onclick = () => {
+          // Toggle DataTables functionality when clicking the trigger
+          trigger.onclick = () => {
             const $table = window.jQuery(table);
             const isEnabled = table.getAttribute("data-filter-enabled") === "true";
             if (!isEnabled) {
@@ -240,14 +244,17 @@ div[title="Table Preferences"]:hover {
                     {
                       extend: "print",
                       text: '<i class="fa fa-print"></i> Print'
+                    },
+                    {
+                      extend: "colvis",
+                      text: '<i class="fa fa-columns"></i> Column Visibility'
                     }
                   ]
                 });
               }
               table.setAttribute("data-filter-enabled", "true");
-              filterBtn.innerHTML = '<i class="fa fa-ban" aria-hidden="true"></i>';
-              filterBtn.title = "Disable Sorting / Export / Print";
-              filterBtn.style.background = "linear-gradient(180deg, #999999, #666666)";
+              trigger.innerHTML = '<i class="fa fa-ban" aria-hidden="true"></i>';
+              popupBtn.style.display = "inline-flex";
             } else {
               $table.DataTable().destroy();
               const originalHTML = table.getAttribute("data-original-html");
@@ -256,31 +263,12 @@ div[title="Table Preferences"]:hover {
                 table.removeAttribute("data-original-html");
               }
               table.setAttribute("data-filter-enabled", "false");
-              filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
-              filterBtn.title = "Enable Sorting / Export / Print";
-              filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
+              trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+              popupBtn.style.display = "none";
             }
           };
 
-          menu.appendChild(filterBtn);
-
-          const popupBtn = document.createElement("button");
-          popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
-          popupBtn.title = "View Table in Popup";
-          popupBtn.style.background = "linear-gradient(180deg, #FF7F50, #FF6347)";
-          popupBtn.style.border = "none";
-          popupBtn.style.color = "#fff";
-          popupBtn.style.fontWeight = "bold";
-          popupBtn.style.padding = "6px 12px";
-          popupBtn.style.borderRadius = "4px";
-          popupBtn.style.cursor = "pointer";
-          popupBtn.style.fontSize = "0.625rem";
-          popupBtn.style.display = "inline-flex";
-          popupBtn.style.alignItems = "center";
-          popupBtn.style.justifyContent = "center";
-          popupBtn.style.boxShadow = "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
-          popupBtn.style.filter = "saturate(1.25)";
-
+          // Popup button opens the table in a modal
           popupBtn.onclick = () => {
             const wrapper =
               table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
@@ -341,34 +329,6 @@ div[title="Table Preferences"]:hover {
               }
             };
           };
-
-          menu.appendChild(popupBtn);
-
-          trigger.addEventListener("click", (e) => {
-            e.stopPropagation();
-            if (menu.style.display === "none" || menu.style.display === "") {
-              menu.style.display = "flex";
-            } else {
-              menu.style.display = "none";
-            }
-          });
-
-          document.addEventListener("click", (e) => {
-            if (!tableWrapper.contains(e.target)) {
-              menu.style.display = "none";
-            }
-          });
-
-          trigger.addEventListener("mouseenter", () => {
-            trigger.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
-          });
-          trigger.addEventListener("mouseleave", () => {
-            if (menu.style.display === "none" || menu.style.display === "") {
-              trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
-            }
-          });
-
-          tableWrapper.appendChild(menu);
         });
       })
       .catch((err) => {
