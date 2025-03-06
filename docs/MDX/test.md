@@ -5,8 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-<DownloadableTables />
-
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor malesuada scelerisque eu mollis ex.
 
 | ID | Name               | Type      | Description                                    |
