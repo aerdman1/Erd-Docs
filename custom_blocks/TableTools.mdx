@@ -312,18 +312,20 @@ table.dataTable, table.dataTable th, table.dataTable td {
                   }
                 },
                 {
-                  text: '<i class="fa fa-ban"></i> Close',
-                  action: function (e, dt, node, config) {
-                    dt.destroy();
-                    const original = table.getAttribute("data-original-html");
-                    if (original) {
-                      table.innerHTML = original;
-                      table.removeAttribute("data-original-html");
+                    text: '<i class="fa fa-ban"></i> Close',
+                    className: "dt-button custom-close-button",
+                    action: function (e, dt, node, config) {
+                      dt.destroy();
+                      const original = table.getAttribute("data-original-html");
+                      if (original) {
+                        table.innerHTML = original;
+                        table.removeAttribute("data-original-html");
+                      }
+                      table.setAttribute("data-filter-enabled", "false");
+                      trigger.style.display = "block";
                     }
-                    table.setAttribute("data-filter-enabled", "false");
-                    trigger.style.display = "block";
                   }
-                }
+                  
               ]
             });
             table.setAttribute("data-filter-enabled", "true");
