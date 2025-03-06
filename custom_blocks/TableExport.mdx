@@ -47,7 +47,7 @@ export const DownloadableTables = () => {
 
     loadDependencies()
       .then(() => {
-        // Append style overrides (preserving your original styles)
+        // Append style overrides (preserving all your original styles)
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
 table.dataTable, table.dataTable th, table.dataTable td {
@@ -150,13 +150,6 @@ table.dataTable, table.dataTable th, table.dataTable td {
   background-color: #007bff !important;
   background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
 }
-/* Force search to appear first and buttons second */
-.dt-nav .dataTables_filter {
-  order: 0 !important;
-}
-.dt-nav .dt-buttons {
-  order: 1 !important;
-}
         `;
         document.head.appendChild(styleOverride);
 
@@ -184,7 +177,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
           trigger.style.zIndex = "10";
           trigger.style.borderRadius = "0px 0px 0px 3px";
           trigger.style.color = "rgb(255, 255, 255)";
-          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1 142, 245 / 79%))";
+          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1 142 245 / 79%))";
           trigger.style.filter = "saturate(1.15)";
           trigger.setAttribute("data-dt-trigger", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
@@ -194,7 +187,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
             const $table = window.jQuery(table);
             if (table.getAttribute("data-filter-enabled") === "true") return;
             const dt = $table.DataTable({
-              // Custom DOM: search field (f) first then buttons (B) in one nav row above the table.
+              // Custom DOM: search first (f) then buttons (B) in a single nav row above the table.
               dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
               // Update language: hide "Search" label and use a placeholder.
               language: {
