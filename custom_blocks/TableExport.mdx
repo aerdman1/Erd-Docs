@@ -64,6 +64,8 @@ table.dataTable, table.dataTable th, table.dataTable td {
 .dataTables_wrapper .dataTables_filter {
   margin-bottom: 0.5rem;
   font-size: 12px;
+  /* Force search to appear first */
+  order: 0;
 }
 .dataTables_wrapper .dataTables_filter input {
   border: 1px solid #ccc;
@@ -150,6 +152,13 @@ table.dataTable, table.dataTable th, table.dataTable td {
   background-color: #007bff !important;
   background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
 }
+/* Ensure in the custom nav the search (filter) appears first and buttons second */
+.dt-nav .dataTables_filter {
+  order: 0;
+}
+.dt-nav .dt-buttons {
+  order: 1;
+}
         `;
         document.head.appendChild(styleOverride);
 
@@ -187,7 +196,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
             const $table = window.jQuery(table);
             if (table.getAttribute("data-filter-enabled") === "true") return;
             const dt = $table.DataTable({
-              // Custom DOM: search first (f) then buttons (B) in a single nav row above the table.
+              // Custom DOM: search field (f) first then buttons (B) in a single nav row above the table.
               dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
               // Update language: hide "Search" label and use a placeholder.
               language: {
@@ -313,4 +322,4 @@ table.dataTable, table.dataTable th, table.dataTable td {
   return null;
 };
 
-<DownloadableTables /> 
+<DownloadableTables />
