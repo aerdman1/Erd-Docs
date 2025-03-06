@@ -5,7 +5,11 @@ import React, { useEffect } from "react";
 
 export const TableToolsComponent = () => {
   useEffect(() => {
-    // Helper to load a script dynamically.
+    /**
+     * Dynamically load a JavaScript file.
+     * @param {string} src - The source URL of the script.
+     * @returns {Promise} Resolves when the script is loaded.
+     */
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -18,7 +22,10 @@ export const TableToolsComponent = () => {
       });
     };
 
-    // Helper to load a CSS stylesheet dynamically.
+    /**
+     * Dynamically load a CSS stylesheet.
+     * @param {string} href - The URL of the CSS file.
+     */
     const loadCSS = (href) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -26,7 +33,10 @@ export const TableToolsComponent = () => {
       document.head.appendChild(link);
     };
 
-    // Load required dependencies using newer CDN links.
+    /**
+     * Load required dependencies via CDN.
+     * This includes jQuery, DataTables (JS & CSS), and DataTables Buttons and export libraries.
+     */
     const loadDependencies = async () => {
       if (!window.jQuery) {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
@@ -47,152 +57,152 @@ export const TableToolsComponent = () => {
 
     loadDependencies()
       .then(() => {
-        // Append style overrides (preserving your original styles)
+        // Inline style overrides.
+        // NOTE: For maintainability, consider moving these styles to an external CSS file.
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-table.dataTable, table.dataTable th, table.dataTable td {
-  box-sizing: inherit;
-}
-.dataTables_wrapper {
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  font-size: 0.875rem;
-  color: #333;
-  background: #fff;
-  margin: 0 auto;
-  border: none;
-}
-.dataTables_wrapper .dataTables_filter {
-  margin-bottom: 0.5rem;
-  font-size: 12px;
-  order: 0 !important;
-}
-.dataTables_wrapper .dataTables_filter input {
-  border: 1px solid #ccc;
-  margin-left: 25px;
-  border-radius: 6px;
-  padding: 4px 10px !important;
-  outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.dataTables_wrapper .dataTables_filter input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
-}
-.dataTables_wrapper .dataTables_info {
-  font-size: 12px;
-  color: #666;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-  color: #fff !important;
-  border: none !important;
-  border-radius: 6px;
-  margin: 2px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 12px !important;
-  font-weight: 500;
-  line-height: 1;
-  height: auto;
-  box-sizing: border-box;
-  box-shadow: none;
-  transform: none !important;
-  outline: none !important;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #0056b3;
-  color: #fff !important;
-  border: none !important;
-  opacity: 0.9;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: #003f7f !important;
-  color: #fff !important;
-  font-weight: bold;
-  cursor: default;
-  box-shadow: none;
-  transform: none !important;
-  outline: none !important;
-  border: none;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: #003f7f !important;
-  color: #fff !important;
-  border: none !important;
-  opacity: 1;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-  background: transparent !important;
-  cursor: not-allowed;
-}
-.dt-button {
-  background-color: #007bff !important;
-  background: linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79)) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 20px !important;
-  padding: 1px 14px !important;
-  font-size: 0.65rem !important;
-  font-weight: 500 !important;
-  cursor: pointer !important;
-  box-shadow: none !important;
-  margin: 2px;
-  height: auto;
-  line-height: 1.4;
-  box-sizing: border-box;
-  transform: none !important;
-  outline: none !important;
-}
-.dt-button:hover {
-  background: #0056b3 !important;
-  color: #fff !important;
-}
-.dataTables_wrapper .dataTables_paginate .paginate_button,
-.dt-button {
-  transform: none !important;
-  background-color: #007bff !important;
-  background: linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79)) !important;
-}
-/* Force search to appear first and buttons second */
-.dt-nav .dataTables_filter {
-  order: 0 !important;
-}
-.dt-nav .dt-buttons {
-  order: 1 !important;
-}
-/* Custom classes for Popup and Close buttons */
-.custom-popup-button {
-  background: #FFA500 !important; /* Clean modern orange */
-  border: none !important;
-  color: #fff !important;
-}
-.custom-close-button {
-  background: #E74C3C !important; /* Soft red */
-  border: none !important;
-  color: #fff !important;
-}
-
-[data-dt-trigger="true"] {
-opacity:.8;
-}
-[data-dt-trigger="true"]:hover {
-opacity:1;
-}
-
+          table.dataTable, table.dataTable th, table.dataTable td {
+            box-sizing: inherit;
+          }
+          .dataTables_wrapper {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 0.875rem;
+            color: #333;
+            background: #fff;
+            margin: 0 auto;
+            border: none;
+          }
+          .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 0.5rem;
+            font-size: 12px;
+            order: 0 !important;
+          }
+          .dataTables_wrapper .dataTables_filter input {
+            border: 1px solid #ccc;
+            margin-left: 25px;
+            border-radius: 6px;
+            padding: 4px 10px !important;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+          }
+          .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+          }
+          .dataTables_wrapper .dataTables_info {
+            font-size: 12px;
+            color: #666;
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button {
+            color: #fff !important;
+            border: none !important;
+            border-radius: 6px;
+            margin: 2px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px !important;
+            font-weight: 500;
+            line-height: 1;
+            height: auto;
+            box-sizing: border-box;
+            box-shadow: none;
+            transform: none !important;
+            outline: none !important;
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #0056b3;
+            color: #fff !important;
+            border: none !important;
+            opacity: 0.9;
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #003f7f !important;
+            color: #fff !important;
+            font-weight: bold;
+            cursor: default;
+            box-shadow: none;
+            transform: none !important;
+            outline: none !important;
+            border: none;
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #003f7f !important;
+            color: #fff !important;
+            border: none !important;
+            opacity: 1;
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            background: transparent !important;
+            cursor: not-allowed;
+          }
+          .dt-button {
+            background-color: #007bff !important;
+            background: linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79)) !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 20px !important;
+            padding: 1px 14px !important;
+            font-size: 0.65rem !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            box-shadow: none !important;
+            margin: 2px;
+            height: auto;
+            line-height: 1.4;
+            box-sizing: border-box;
+            transform: none !important;
+            outline: none !important;
+          }
+          .dt-button:hover {
+            background: #0056b3 !important;
+            color: #fff !important;
+          }
+          .dataTables_wrapper .dataTables_paginate .paginate_button,
+          .dt-button {
+            transform: none !important;
+            background-color: #007bff !important;
+            background: linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79)) !important;
+          }
+          /* Force search to appear first and buttons second */
+          .dt-nav .dataTables_filter {
+            order: 0 !important;
+          }
+          .dt-nav .dt-buttons {
+            order: 1 !important;
+          }
+          /* Custom classes for Popup and Close buttons */
+          .custom-popup-button {
+            background: #FFA500 !important; /* Clean modern orange */
+            border: none !important;
+            color: #fff !important;
+          }
+          .custom-close-button {
+            background: #E74C3C !important; /* Soft red */
+            border: none !important;
+            color: #fff !important;
+          }
+          [data-dt-trigger="true"] {
+            opacity: .8;
+          }
+          [data-dt-trigger="true"]:hover {
+            opacity: 1;
+          }
         `;
         document.head.appendChild(styleOverride);
 
-        // Process each table.
+        // Process each table for DataTables integration.
         const tables = document.querySelectorAll("table");
         tables.forEach((table) => {
+          // Skip processing if already done.
           if (table.getAttribute("data-dt-processed")) return;
           table.setAttribute("data-dt-processed", "true");
-          // Store the original table HTML for later restoration.
+          // Store the original table HTML to allow restoration.
           table.setAttribute("data-original-html", table.innerHTML);
           const tableWrapper = table.closest(".rdmd-table");
           if (!tableWrapper) return;
           tableWrapper.style.position = "relative";
 
-          // Create the trigger button (3-dot icon) with your original styling.
+          // Create a trigger button (3-dot icon) to enable Table Tools.
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
           trigger.title = "Enable Table Tools";
@@ -214,15 +224,17 @@ opacity:1;
           // When the trigger is clicked, initialize DataTables with a unified nav bar.
           trigger.onclick = () => {
             const $table = window.jQuery(table);
+            // Avoid reinitializing if filtering is already enabled.
             if (table.getAttribute("data-filter-enabled") === "true") return;
             const dt = $table.DataTable({
-              // Custom DOM: search field (f) first then buttons (B) in one nav row above the table.
+              // Custom DOM structure: search field (f) then buttons (B) in a unified nav row.
               dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
-              // Update language: hide "Search" label and use a placeholder.
+              // Update language settings for the search field.
               language: {
                 search: "",
                 searchPlaceholder: "Search Table:"
               },
+              // Define DataTables buttons for exporting and popup functionality.
               buttons: [
                 {
                   extend: "copy",
@@ -252,13 +264,14 @@ opacity:1;
                   text: '<i class="fa fa-arrows-alt"></i> Popup',
                   className: "custom-popup-button",
                   action: function (e, dt, node, config) {
-                    // Build the modal popup, removing buttons and search.
+                    // Build modal popup for table tools.
                     let wrapper =
                       table.closest(".rdmd-table") ||
                       table.closest(".rdmd-table-inner");
                     let clone;
                     if (wrapper) {
                       clone = wrapper.cloneNode(true);
+                      // Remove triggers and buttons from the cloned table.
                       const injected = clone.querySelectorAll('[data-dt-trigger], [data-dt-buttons]');
                       injected.forEach((el) => el.remove());
                       const searchDiv = clone.querySelector(".dataTables_filter");
@@ -267,9 +280,11 @@ opacity:1;
                     } else {
                       clone = table.cloneNode(true);
                     }
+                    // Wrap the clone in a markdown container.
                     const markdownWrapper = document.createElement("div");
                     markdownWrapper.className = "markdown-body";
                     markdownWrapper.appendChild(clone);
+                    // Create modal overlay.
                     const modalOverlay = document.createElement("div");
                     modalOverlay.style.position = "fixed";
                     modalOverlay.style.top = "0";
@@ -282,6 +297,7 @@ opacity:1;
                     modalOverlay.style.alignItems = "center";
                     modalOverlay.style.zIndex = "9999";
                     modalOverlay.style.overflow = "auto";
+                    // Create modal content container.
                     const modalContent = document.createElement("div");
                     modalContent.style.backgroundColor = "#fff";
                     modalContent.style.padding = "20px";
@@ -295,12 +311,11 @@ opacity:1;
                     modalContent.appendChild(markdownWrapper);
                     modalOverlay.appendChild(modalContent);
                     document.body.appendChild(modalOverlay);
+                    // Create a close button for the modal.
                     const closeButton = document.createElement("button");
                     closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
                     closeButton.title = "Close";
                     closeButton.className = "custom-close-button";
-                    // Remove inline background so the class takes effect.
-                    // closeButton.style.background = "#E74C3C";
                     closeButton.style.position = "absolute";
                     closeButton.style.top = "10px";
                     closeButton.style.right = "10px";
@@ -312,6 +327,7 @@ opacity:1;
                       document.body.removeChild(modalOverlay);
                     };
                     modalContent.appendChild(closeButton);
+                    // Allow closing the modal by clicking outside its content.
                     modalOverlay.onclick = (e) => {
                       if (e.target === modalOverlay) {
                         document.body.removeChild(modalOverlay);
@@ -320,24 +336,26 @@ opacity:1;
                   }
                 },
                 {
-                    text: '<i class="fa fa-ban"></i> Close',
-                    className: "dt-button custom-close-button",
-                    action: function (e, dt, node, config) {
-                      dt.destroy();
-                      const original = table.getAttribute("data-original-html");
-                      if (original) {
-                        table.innerHTML = original;
-                        table.removeAttribute("data-original-html");
-                      }
-                      table.setAttribute("data-filter-enabled", "false");
-                      trigger.style.display = "block";
+                  text: '<i class="fa fa-ban"></i> Close',
+                  className: "dt-button custom-close-button",
+                  action: function (e, dt, node, config) {
+                    // Destroy DataTable and restore original table HTML.
+                    dt.destroy();
+                    const original = table.getAttribute("data-original-html");
+                    if (original) {
+                      table.innerHTML = original;
+                      table.removeAttribute("data-original-html");
                     }
+                    table.setAttribute("data-filter-enabled", "false");
+                    // Reveal the trigger button.
+                    trigger.style.display = "block";
                   }
-                  
+                }
               ]
             });
+            // Mark table as having DataTables filtering enabled.
             table.setAttribute("data-filter-enabled", "true");
-            // Hide the trigger button once filter mode is enabled.
+            // Hide the trigger button once DataTables is active.
             trigger.style.display = "none";
           };
         });
@@ -350,4 +368,4 @@ opacity:1;
   return null;
 };
 
-<TableToolsComponent /> 
+<TableToolsComponent />
