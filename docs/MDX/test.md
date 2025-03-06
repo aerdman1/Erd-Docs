@@ -7,7 +7,7 @@ metadata:
 ---
 <DownloadableTables />
 
-tLorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor malesuada scelerisque eu mollis ex.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor malesuada scelerisque eu mollis ex.
 
 | ID | Name               | Type      | Description                                    |
 | -- | ------------------ | --------- | ---------------------------------------------- |
