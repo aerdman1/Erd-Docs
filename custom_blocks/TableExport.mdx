@@ -63,6 +63,10 @@ export const DownloadableTables = () => {
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
 /* General DataTables wrapper */
+
+table.dataTable, table.dataTable th, table.dataTable td {
+    box-sizing: inherit;
+}
 .dataTables_wrapper {
   font-family: "Helvetica Neue", Arial, sans-serif;
   font-size: 0.875rem;
