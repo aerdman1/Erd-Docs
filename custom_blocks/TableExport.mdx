@@ -93,10 +93,12 @@ table.dataTable, table.dataTable th, table.dataTable td {
   padding: 4px 10px !important;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  max-width:200px;
 }
 .dataTables_wrapper .dataTables_filter input:focus {
   border-color: #007bff;
   box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+  max-width:300px;
 }
 .dataTables_wrapper .dataTables_info {
   font-size: 12px;
@@ -235,7 +237,7 @@ opacity:1;
               // Update language: hide "Search" label and use a placeholder.
               language: {
                 search: "",
-                searchPlaceholder: "Search Table",
+                searchPlaceholder: "Search Table:",
               },
               buttons: [
                 {
