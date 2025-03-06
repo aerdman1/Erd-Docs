@@ -58,7 +58,6 @@ export const DownloadableTables = () => {
       .then(() => {
         // ─────────────────────────────────────────────────────────────────────────
         // Inject a style override for a more modern DataTables look:
-        // Adjust colors, gradients, fonts, etc. to match your branding.
         // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
@@ -77,12 +76,11 @@ table.dataTable, table.dataTable th, table.dataTable td {
 }
 
 div[title="Table Preferences"] {
-opacity:.7;
+  opacity: .7;
 }
 
 div[title="Table Preferences"]:hover {
-opacity:1;
-border-radius: 0;
+  opacity: 1;
 }
 
 /* Search box */
@@ -102,14 +100,13 @@ border-radius: 0;
   box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
 }
 
-/* Info text (e.g., "Showing 1 to 10 of 20 entries") */
+/* Info text */
 .dataTables_wrapper .dataTables_info {
-  font-size: inherit;
+  font-size: 12px;
   color: #666;
-  font-size:12px;
 }
 
-/* Pagination buttons - all pages */
+/* Pagination buttons */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
   color: #fff !important;
   border: none !important;
@@ -129,15 +126,15 @@ border-radius: 0;
 
 /* Hover for regular page buttons */
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #0056b3; /* Slightly darker blue on hover */
+  background: #0056b3;
   color: #fff !important;
   border: none !important;
-  opacity: .9;
+  opacity: 0.9;
 }
 
-/* Current page button - darker blue and no hover weirdness */
+/* Current page button */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: #003f7f !important; /* Darker blue */
+  background: #003f7f !important;
   color: #fff !important;
   font-weight: bold;
   cursor: default;
@@ -147,7 +144,7 @@ border-radius: 0;
   border: none;
 }
 
-/* Current page button hover - no change */
+/* Current page button hover */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
   background: #003f7f !important;
   color: #fff !important;
@@ -183,7 +180,7 @@ border-radius: 0;
 
 /* Hover for export/print buttons */
 .dt-button:hover {
-  background: #0056b3 !important; /* Slightly darker on hover */
+  background: #0056b3 !important;
   color: #fff !important;
 }
 
@@ -200,7 +197,7 @@ border-radius: 0;
         const tables = document.querySelectorAll("table");
 
         tables.forEach((table) => {
-          // Prevent double-processing
+          // Prevent double‑processing
           if (table.getAttribute("data-csv-processed")) return;
           table.setAttribute("data-csv-processed", "true");
 
@@ -208,11 +205,11 @@ border-radius: 0;
           const tableWrapper = table.closest(".rdmd-table");
           if (!tableWrapper) return;
 
-          // Ensure the wrapper is relative so the absolute-positioned menu can appear
+          // Ensure the wrapper is relative so the absolute‑positioned menu can appear
           tableWrapper.style.position = "relative";
 
           // ─────────────────────────────────────────────────────────────────────────
-          // 1) Create the top-right "Table Preferences" trigger (folded-corner)
+          // 1) Create the top‑right "Table Preferences" trigger (folded‑corner)
           // ─────────────────────────────────────────────────────────────────────────
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
@@ -254,12 +251,12 @@ border-radius: 0;
           menu.setAttribute("data-dt-buttons", "true");
 
           // ─────────────────────────────────────────────────────────────────────────
-          // 3) FILTER / DISABLE button - toggles DataTables on / off
+          // 3) FILTER / DISABLE button – toggles DataTables on/off
           // ─────────────────────────────────────────────────────────────────────────
           const filterBtn = document.createElement("button");
           filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
           filterBtn.title = "Enable Sorting / Export / Print";
-          filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
+          filterBtn.style.background = "linear-gradient(180deg, #32CD32, #228B22)";
           filterBtn.style.border = "none";
           filterBtn.style.color = "#fff";
           filterBtn.style.fontWeight = "bold";
@@ -270,8 +267,7 @@ border-radius: 0;
           filterBtn.style.display = "inline-flex";
           filterBtn.style.alignItems = "center";
           filterBtn.style.justifyContent = "center";
-          filterBtn.style.boxShadow =
-            "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+          filterBtn.style.boxShadow = "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
           filterBtn.style.filter = "saturate(1.25)";
 
           // Store a flag on the table to track if DataTables is active
@@ -321,10 +317,9 @@ border-radius: 0;
               filterBtn.style.background = "linear-gradient(180deg, #999999, #666666)";
             } else {
               // Currently enabled -> disable it
-              // 1) Destroy DataTables
               $table.DataTable().destroy();
 
-              // 2) Revert to the original HTML
+              // 1) Revert to the original HTML
               const originalHTML = table.getAttribute("data-original-html");
               if (originalHTML) {
                 table.innerHTML = originalHTML;
@@ -333,7 +328,7 @@ border-radius: 0;
 
               table.setAttribute("data-filter-enabled", "false");
 
-              // 3) Change button back to "Enable"
+              // 2) Change button back to "Enable"
               filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
               filterBtn.title = "Enable Sorting / Export / Print";
               filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
@@ -343,12 +338,12 @@ border-radius: 0;
           menu.appendChild(filterBtn);
 
           // ─────────────────────────────────────────────────────────────────────────
-          // 4) POP‑UP button (orange) - shows table in a modal
+          // 4) POP‑UP button (coral) – shows table in a modal
           // ─────────────────────────────────────────────────────────────────────────
           const popupBtn = document.createElement("button");
           popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
           popupBtn.title = "View Table in Popup";
-          popupBtn.style.background = "linear-gradient(180deg, #fccb94, #f6993f)";
+          popupBtn.style.background = "linear-gradient(180deg, #FF7F50, #FF6347)";
           popupBtn.style.border = "none";
           popupBtn.style.color = "#fff";
           popupBtn.style.fontWeight = "bold";
@@ -359,8 +354,7 @@ border-radius: 0;
           popupBtn.style.display = "inline-flex";
           popupBtn.style.alignItems = "center";
           popupBtn.style.justifyContent = "center";
-          popupBtn.style.boxShadow =
-            "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
+          popupBtn.style.boxShadow = "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
           popupBtn.style.filter = "saturate(1.25)";
 
           popupBtn.onclick = () => {
@@ -411,7 +405,7 @@ border-radius: 0;
             modalOverlay.appendChild(modalContent);
             document.body.appendChild(modalOverlay);
 
-            // Close button in top-right corner
+            // Close button in top‑right corner
             const closeButton = document.createElement("button");
             closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
             closeButton.title = "Close";
@@ -438,19 +432,35 @@ border-radius: 0;
           menu.appendChild(popupBtn);
 
           // ─────────────────────────────────────────────────────────────────────────
-          // 5) Show/hide the fly‑out menu on hover
+          // 5) Remove hover‑based menu display and instead toggle menu on trigger click
+          // ─────────────────────────────────────────────────────────────────────────
+          trigger.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (menu.style.display === "none" || menu.style.display === "") {
+              menu.style.display = "flex";
+            } else {
+              menu.style.display = "none";
+            }
+          });
+
+          // Hide menu if clicking outside the table wrapper
+          document.addEventListener("click", (e) => {
+            if (!tableWrapper.contains(e.target)) {
+              menu.style.display = "none";
+            }
+          });
+
+          // ─────────────────────────────────────────────────────────────────────────
+          // 6) Add hover icon switch for the trigger
           // ─────────────────────────────────────────────────────────────────────────
           trigger.addEventListener("mouseenter", () => {
-            menu.style.display = "flex";
+            trigger.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
           });
           trigger.addEventListener("mouseleave", () => {
-            menu.style.display = "none";
-          });
-          menu.addEventListener("mouseenter", () => {
-            menu.style.display = "flex";
-          });
-          menu.addEventListener("mouseleave", () => {
-            menu.style.display = "none";
+            // Only revert if menu is not open
+            if (menu.style.display === "none" || menu.style.display === "") {
+              trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+            }
           });
 
           // Attach the menu to the table wrapper
@@ -466,4 +476,3 @@ border-radius: 0;
 };
 
 <DownloadableTables />
- 
