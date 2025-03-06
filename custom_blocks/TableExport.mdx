@@ -32,17 +32,37 @@ export const DownloadableTables = () => {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
       if (!window.jQuery.fn.DataTable) {
-        await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
-        loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
+        await loadScript(
+          "https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"
+        );
+        loadCSS(
+          "https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"
+        );
       }
-      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js");
-      loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
-      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js");
-      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js");
-      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js");
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"
+      );
+      loadCSS(
+        "https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"
+      );
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"
+      );
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"
+      );
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js"
+      );
     };
 
     loadDependencies()
@@ -166,7 +186,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
   color: #fff !important;
 }
 .custom-close-button {
-  background-color: #E74C3C !important; /* Soft red */
+  background-color: #E74C3C !important; /* Not too harsh red */
   border: none !important;
   color: #fff !important;
 }
@@ -186,7 +206,8 @@ table.dataTable, table.dataTable th, table.dataTable td {
 
           // Create the trigger button (3-dot icon) with your original styling.
           const trigger = document.createElement("div");
-          trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+          trigger.innerHTML =
+            '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
           trigger.title = "Enable Filter";
           trigger.style.position = "absolute";
           trigger.style.top = "0px";
@@ -194,10 +215,11 @@ table.dataTable, table.dataTable th, table.dataTable td {
           trigger.style.padding = "4px 6px";
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
-          trigger.style.zIndex = "9999";
+          trigger.style.zIndex = "9999"; // Increased z-index for visibility
           trigger.style.borderRadius = "0px 0px 0px 3px";
           trigger.style.color = "rgb(255, 255, 255)";
-          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
+          trigger.style.background =
+            "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
           trigger.style.filter = "saturate(1.15)";
           trigger.style.display = "block";
           trigger.setAttribute("data-dt-trigger", "true");
@@ -213,32 +235,32 @@ table.dataTable, table.dataTable th, table.dataTable td {
               // Update language: hide "Search" label and use a placeholder.
               language: {
                 search: "",
-                searchPlaceholder: "Search Table:"
+                searchPlaceholder: "Search Table:",
               },
               buttons: [
                 {
                   extend: "copy",
-                  text: '<i class="fa fa-copy"></i> Copy'
+                  text: '<i class="fa fa-copy"></i> Copy',
                 },
                 {
                   extend: "csv",
-                  text: '<i class="fa fa-file-csv"></i> CSV'
+                  text: '<i class="fa fa-file-csv"></i> CSV',
                 },
                 {
                   extend: "excel",
-                  text: '<i class="fa fa-file-excel"></i> Excel'
+                  text: '<i class="fa fa-file-excel"></i> Excel',
                 },
                 {
                   extend: "pdf",
-                  text: '<i class="fa fa-file-pdf"></i> PDF'
+                  text: '<i class="fa fa-file-pdf"></i> PDF',
                 },
                 {
                   extend: "print",
-                  text: '<i class="fa fa-print"></i> Print'
+                  text: '<i class="fa fa-print"></i> Print',
                 },
                 {
                   extend: "colvis",
-                  text: '<i class="fa fa-columns"></i> Columns'
+                  text: '<i class="fa fa-columns"></i> Columns',
                 },
                 {
                   text: '<i class="fa fa-arrows-alt"></i> Popup',
@@ -251,9 +273,12 @@ table.dataTable, table.dataTable th, table.dataTable td {
                     let clone;
                     if (wrapper) {
                       clone = wrapper.cloneNode(true);
-                      const injected = clone.querySelectorAll('[data-dt-trigger], [data-dt-buttons]');
+                      const injected = clone.querySelectorAll(
+                        "[data-dt-trigger], [data-dt-buttons]"
+                      );
                       injected.forEach((el) => el.remove());
-                      const searchDiv = clone.querySelector(".dataTables_filter");
+                      const searchDiv =
+                        clone.querySelector(".dataTables_filter");
                       if (searchDiv) searchDiv.remove();
                       clone.style.margin = "0";
                     } else {
@@ -288,14 +313,15 @@ table.dataTable, table.dataTable th, table.dataTable td {
                     modalOverlay.appendChild(modalContent);
                     document.body.appendChild(modalOverlay);
                     const closeButton = document.createElement("button");
-                    closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
+                    closeButton.innerHTML =
+                      '<i class="fa fa-times" aria-hidden="true"></i>';
                     closeButton.title = "Close";
                     closeButton.className = "custom-close-button";
-                    // Remove inline background so the class takes effect.
-                    // closeButton.style.background = "#E74C3C";
+                    // Style the close button with a soft red background.
                     closeButton.style.position = "absolute";
                     closeButton.style.top = "10px";
                     closeButton.style.right = "10px";
+                    closeButton.style.background = "#E74C3C";
                     closeButton.style.border = "none";
                     closeButton.style.fontSize = "1.5rem";
                     closeButton.style.cursor = "pointer";
@@ -309,10 +335,11 @@ table.dataTable, table.dataTable th, table.dataTable td {
                         document.body.removeChild(modalOverlay);
                       }
                     };
-                  }
+                  },
                 },
                 {
                   text: '<i class="fa fa-ban"></i> Close',
+                  className: "dt-button custom-close-button",
                   action: function (e, dt, node, config) {
                     dt.destroy();
                     const original = table.getAttribute("data-original-html");
@@ -322,9 +349,9 @@ table.dataTable, table.dataTable th, table.dataTable td {
                     }
                     table.setAttribute("data-filter-enabled", "false");
                     trigger.style.display = "block";
-                  }
-                }
-              ]
+                  },
+                },
+              ],
             });
             table.setAttribute("data-filter-enabled", "true");
             // Hide the trigger button once filter mode is enabled.
@@ -340,4 +367,4 @@ table.dataTable, table.dataTable th, table.dataTable td {
   return null;
 };
 
-<DownloadableTables />
+<DownloadableTables />;
