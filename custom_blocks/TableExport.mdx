@@ -5,19 +5,18 @@ import React, { useEffect } from "react";
 
 export const DownloadableTables = () => {
   useEffect(() => {
-    // Load a script dynamically.
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
         script.src = src;
         script.async = true;
-        script.onload = resolve;
-        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+        script.onload = () => resolve();
+        script.onerror = () =>
+          reject(new Error(`Failed to load script: ${src}`));
         document.body.appendChild(script);
       });
     };
 
-    // Load a CSS file dynamically.
     const loadCSS = (href) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -45,38 +44,123 @@ export const DownloadableTables = () => {
 
     loadDependencies()
       .then(() => {
-        // Optional style override for the nav row
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-          table.dataTable, table.dataTable th, table.dataTable td {
-            box-sizing: inherit;
-          }
-          .dt-nav {
-            margin-bottom: 10px;
-          }
-          .dt-nav .dt-button {
-            margin-right: 5px;
-          }
+table.dataTable, table.dataTable th, table.dataTable td {
+  box-sizing: inherit;
+}
+.dataTables_wrapper {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.875rem;
+  color: #333;
+  background: #fff;
+  margin: 0 auto;
+  border: none;
+}
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 0.5rem;
+  font-size: 12px;
+}
+.dataTables_wrapper .dataTables_filter input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px 10px !important;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
+.dataTables_wrapper .dataTables_info {
+  font-size: 12px;
+  color: #666;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px;
+  margin: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px !important;
+  font-weight: 500;
+  line-height: 1;
+  height: auto;
+  box-sizing: border-box;
+  box-shadow: none;
+  transform: none !important;
+  outline: none !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #0056b3;
+  color: #fff !important;
+  border: none !important;
+  opacity: 0.9;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #003f7f !important;
+  color: #fff !important;
+  font-weight: bold;
+  cursor: default;
+  box-shadow: none;
+  transform: none !important;
+  outline: none !important;
+  border: none;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: #003f7f !important;
+  color: #fff !important;
+  border: none !important;
+  opacity: 1;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: transparent !important;
+  cursor: not-allowed;
+}
+.dt-button {
+  background-color: #007bff !important;
+  background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 1px 14px !important;
+  font-size: 0.65rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  margin: 2px;
+  height: auto;
+  line-height: 1.4;
+  box-sizing: border-box;
+  transform: none !important;
+  outline: none !important;
+}
+.dt-button:hover {
+  background: #0056b3 !important;
+  color: #fff !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dt-button {
+  transform: none !important;
+  background-color: #007bff !important;
+  background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
+}
         `;
         document.head.appendChild(styleOverride);
 
         const tables = document.querySelectorAll("table");
         tables.forEach((table) => {
-          if (table.getAttribute("data-dt-processed")) return;
-          table.setAttribute("data-dt-processed", "true");
-
-          // Store the original table HTML to allow reverting later.
-          table.setAttribute("data-original-html", table.innerHTML);
-
-          // Find the table wrapper (.rdmd-table) and ensure it’s positioned relatively.
+          if (table.getAttribute("data-csv-processed")) return;
+          table.setAttribute("data-csv-processed", "true");
           const tableWrapper = table.closest(".rdmd-table");
           if (!tableWrapper) return;
           tableWrapper.style.position = "relative";
 
-          // Create the initial trigger button (3-dot icon).
+          // Create the trigger button (3-dot icon)
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
-          trigger.title = "Enable Filter";
+          trigger.title = "Table Preferences";
           trigger.style.position = "absolute";
           trigger.style.top = "0px";
           trigger.style.right = "0px";
@@ -86,125 +170,150 @@ export const DownloadableTables = () => {
           trigger.style.zIndex = "10";
           trigger.style.borderRadius = "0px 0px 0px 3px";
           trigger.style.color = "rgb(255, 255, 255)";
-          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
+          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1 142 245 / 79%))";
           trigger.style.filter = "saturate(1.15)";
-          trigger.setAttribute("data-dt-trigger", "true");
+          trigger.setAttribute("data-dt-buttons", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
-          // On clicking the trigger, initialize DataTables with a custom nav bar.
+          // Create the popup button (orange) with provided style
+          const popupBtn = document.createElement("button");
+          popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
+          popupBtn.title = "View Table in Popup";
+          popupBtn.style.position = "relative";
+          popupBtn.style.bottom = "0px";
+          popupBtn.style.left = "4px";
+          popupBtn.style.background = "linear-gradient(rgb(255, 127, 80), rgb(255, 99, 71))";
+          popupBtn.style.border = "none";
+          popupBtn.style.color = "rgb(255, 255, 255)";
+          popupBtn.style.fontWeight = "bold";
+          popupBtn.style.padding = "6px 12px";
+          popupBtn.style.borderRadius = "4px";
+          popupBtn.style.cursor = "pointer";
+          popupBtn.style.fontSize = "0.625rem";
+          popupBtn.style.display = "inline-flex";
+          popupBtn.style.alignItems = "center";
+          popupBtn.style.justifyContent = "center";
+          popupBtn.style.boxShadow = "rgba(0, 0, 0, 0.2) 0px 1px 6px, rgba(0, 0, 0, 0.15) 0px -1px 2px inset";
+          popupBtn.style.filter = "saturate(1.25)";
+          // Initially hidden
+          popupBtn.style.display = "none";
+          popupBtn.setAttribute("data-dt-buttons", "true");
+          // Insert the popup button above the table (before the table element)
+          tableWrapper.insertBefore(popupBtn, table);
+
+          // Toggle DataTables functionality when clicking the trigger
           trigger.onclick = () => {
             const $table = window.jQuery(table);
-            if (table.getAttribute("data-filter-enabled") === "true") return;
-            const dt = $table.DataTable({
-              // Custom DOM: A single nav row containing the buttons (B) and filter input (f)
-              dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'Bf>>rtip",
-              buttons: [
-                {
-                  extend: "copy",
-                  text: '<i class="fa fa-copy"></i> Copy'
-                },
-                {
-                  extend: "csv",
-                  text: '<i class="fa fa-file-csv"></i> CSV'
-                },
-                {
-                  extend: "excel",
-                  text: '<i class="fa fa-file-excel"></i> Excel'
-                },
-                {
-                  extend: "pdf",
-                  text: '<i class="fa fa-file-pdf"></i> PDF'
-                },
-                {
-                  extend: "print",
-                  text: '<i class="fa fa-print"></i> Print'
-                },
-                {
-                  extend: "colvis",
-                  text: '<i class="fa fa-columns"></i> Column Visibility'
-                },
-                {
-                  text: '<i class="fa fa-arrows-alt"></i> Popup',
-                  action: function (e, dt, node, config) {
-                    // Popup modal code:
-                    let wrapper = table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
-                    let clone;
-                    if (wrapper) {
-                      clone = wrapper.cloneNode(true);
-                      const injected = clone.querySelectorAll('[data-dt-trigger], [data-dt-buttons]');
-                      injected.forEach((el) => el.remove());
-                      clone.style.margin = "0";
-                    } else {
-                      clone = table.cloneNode(true);
+            const isEnabled = table.getAttribute("data-filter-enabled") === "true";
+            if (!isEnabled) {
+              table.setAttribute("data-original-html", table.innerHTML);
+              if (!$table.hasClass("dataTable")) {
+                $table.DataTable({
+                  dom: "Bfrtip",
+                  buttons: [
+                    {
+                      extend: "copy",
+                      text: '<i class="fa fa-copy"></i> Copy'
+                    },
+                    {
+                      extend: "csv",
+                      text: '<i class="fa fa-file-csv"></i> CSV'
+                    },
+                    {
+                      extend: "excel",
+                      text: '<i class="fa fa-file-excel"></i> Excel'
+                    },
+                    {
+                      extend: "pdf",
+                      text: '<i class="fa fa-file-pdf"></i> PDF'
+                    },
+                    {
+                      extend: "print",
+                      text: '<i class="fa fa-print"></i> Print'
+                    },
+                    {
+                      extend: "colvis",
+                      text: '<i class="fa fa-columns"></i> Column Visibility'
                     }
-                    const markdownWrapper = document.createElement("div");
-                    markdownWrapper.className = "markdown-body";
-                    markdownWrapper.appendChild(clone);
-                    const modalOverlay = document.createElement("div");
-                    modalOverlay.style.position = "fixed";
-                    modalOverlay.style.top = "0";
-                    modalOverlay.style.left = "0";
-                    modalOverlay.style.width = "100%";
-                    modalOverlay.style.height = "100%";
-                    modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                    modalOverlay.style.display = "flex";
-                    modalOverlay.style.justifyContent = "center";
-                    modalOverlay.style.alignItems = "center";
-                    modalOverlay.style.zIndex = "9999";
-                    modalOverlay.style.overflow = "auto";
-                    const modalContent = document.createElement("div");
-                    modalContent.style.backgroundColor = "#fff";
-                    modalContent.style.padding = "20px";
-                    modalContent.style.paddingTop = "40px";
-                    modalContent.style.borderRadius = "4px";
-                    modalContent.style.maxHeight = "90%";
-                    modalContent.style.overflow = "auto";
-                    modalContent.style.position = "relative";
-                    modalContent.style.minWidth = "800px";
-                    modalContent.style.margin = "20px";
-                    modalContent.appendChild(markdownWrapper);
-                    modalOverlay.appendChild(modalContent);
-                    document.body.appendChild(modalOverlay);
-                    const closeButton = document.createElement("button");
-                    closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
-                    closeButton.title = "Close";
-                    closeButton.style.position = "absolute";
-                    closeButton.style.top = "10px";
-                    closeButton.style.right = "10px";
-                    closeButton.style.background = "transparent";
-                    closeButton.style.border = "none";
-                    closeButton.style.fontSize = "1.5rem";
-                    closeButton.style.cursor = "pointer";
-                    closeButton.onclick = () => {
-                      document.body.removeChild(modalOverlay);
-                    };
-                    modalContent.appendChild(closeButton);
-                    modalOverlay.onclick = (e) => {
-                      if (e.target === modalOverlay) {
-                        document.body.removeChild(modalOverlay);
-                      }
-                    };
-                  }
-                },
-                {
-                  text: '<i class="fa fa-ban"></i> Close Filter',
-                  action: function (e, dt, node, config) {
-                    dt.destroy();
-                    const original = table.getAttribute("data-original-html");
-                    if (original) {
-                      table.innerHTML = original;
-                      table.removeAttribute("data-original-html");
-                    }
-                    table.setAttribute("data-filter-enabled", "false");
-                    // Show trigger button again.
-                    trigger.style.display = "block";
-                  }
-                }
-              ]
-            });
-            table.setAttribute("data-filter-enabled", "true");
-            // Hide the trigger after enabling the filter.
-            trigger.style.display = "none";
+                  ]
+                });
+              }
+              table.setAttribute("data-filter-enabled", "true");
+              trigger.innerHTML = '<i class="fa fa-ban" aria-hidden="true"></i>';
+              popupBtn.style.display = "inline-flex";
+            } else {
+              $table.DataTable().destroy();
+              const originalHTML = table.getAttribute("data-original-html");
+              if (originalHTML) {
+                table.innerHTML = originalHTML;
+                table.removeAttribute("data-original-html");
+              }
+              table.setAttribute("data-filter-enabled", "false");
+              trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+              popupBtn.style.display = "none";
+            }
+          };
+
+          // Popup button opens the table in a modal
+          popupBtn.onclick = () => {
+            const wrapper =
+              table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
+            let clone;
+            if (wrapper) {
+              clone = wrapper.cloneNode(true);
+              const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
+              injected.forEach((el) => el.remove());
+              clone.style.margin = "0";
+            } else {
+              clone = table.cloneNode(true);
+            }
+            const markdownWrapper = document.createElement("div");
+            markdownWrapper.className = "markdown-body";
+            markdownWrapper.appendChild(clone);
+            const modalOverlay = document.createElement("div");
+            modalOverlay.style.position = "fixed";
+            modalOverlay.style.top = "0";
+            modalOverlay.style.left = "0";
+            modalOverlay.style.width = "100%";
+            modalOverlay.style.height = "100%";
+            modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            modalOverlay.style.display = "flex";
+            modalOverlay.style.justifyContent = "center";
+            modalOverlay.style.alignItems = "center";
+            modalOverlay.style.zIndex = "9999";
+            modalOverlay.style.overflow = "auto";
+            const modalContent = document.createElement("div");
+            modalContent.style.backgroundColor = "#fff";
+            modalContent.style.padding = "20px";
+            modalContent.style.paddingTop = "40px";
+            modalContent.style.borderRadius = "4px";
+            modalContent.style.maxHeight = "90%";
+            modalContent.style.overflow = "auto";
+            modalContent.style.position = "relative";
+            modalContent.style.minWidth = "800px";
+            modalContent.style.margin = "20px";
+            modalContent.appendChild(markdownWrapper);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+            const closeButton = document.createElement("button");
+            closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
+            closeButton.title = "Close";
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "10px";
+            closeButton.style.right = "10px";
+            closeButton.style.background = "transparent";
+            closeButton.style.border = "none";
+            closeButton.style.fontSize = "1.5rem";
+            closeButton.style.cursor = "pointer";
+            closeButton.onclick = () => {
+              document.body.removeChild(modalOverlay);
+            };
+            modalContent.appendChild(closeButton);
+            modalOverlay.onclick = (e) => {
+              if (e.target === modalOverlay) {
+                document.body.removeChild(modalOverlay);
+              }
+            };
           };
         });
       })
