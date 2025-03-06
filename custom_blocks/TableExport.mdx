@@ -187,8 +187,8 @@ table.dataTable, table.dataTable th, table.dataTable td {
             const $table = window.jQuery(table);
             if (table.getAttribute("data-filter-enabled") === "true") return;
             const dt = $table.DataTable({
-              // Custom DOM: nav bar row with buttons and search field above the table.
-              dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'Bf>>rtip",
+              // Custom DOM: search first (f) then buttons (B) in a single nav row above the table.
+              dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
               // Update language: hide "Search" label and use a placeholder.
               language: {
                 search: "",
