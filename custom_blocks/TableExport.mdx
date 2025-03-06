@@ -5,7 +5,6 @@ import React, { useEffect } from "react";
 
 export const DownloadableTables = () => {
   useEffect(() => {
-    // Helper to load a script dynamically.
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -17,7 +16,6 @@ export const DownloadableTables = () => {
       });
     };
 
-    // Helper to load a CSS stylesheet dynamically.
     const loadCSS = (href) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -25,44 +23,27 @@ export const DownloadableTables = () => {
       document.head.appendChild(link);
     };
 
-    // Load jQuery + DataTables + Buttons
     const loadDependencies = async () => {
-      // 1) jQuery
       if (!window.jQuery) {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
-
-      // 2) DataTables core
       if (!window.jQuery.fn.DataTable) {
         await loadScript("https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js");
         loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
-
-      // 3) DataTables Buttons + CSS
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
       loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
-
-      // 4) For HTML5 export (csv, excel, pdf) + print:
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
       await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
-
-      // For Excel export, need JSZip:
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
-
-      // For PDF export, need pdfmake + vfs_fonts:
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
       await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js");
     };
 
     loadDependencies()
       .then(() => {
-        // ─────────────────────────────────────────────────────────────────────────
-        // Inject a style override for a more modern DataTables look:
-        // ─────────────────────────────────────────────────────────────────────────
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
-/* General DataTables wrapper */
-
 table.dataTable, table.dataTable th, table.dataTable td {
     box-sizing: inherit;
 }
@@ -74,17 +55,12 @@ table.dataTable, table.dataTable th, table.dataTable td {
   margin: 0 auto;
   border: none;
 }
-
 div[title="Table Preferences"] {
   opacity: .7;
 }
-
 div[title="Table Preferences"]:hover {
   opacity: 1;
-  border-radius:0 !important;
 }
-
-/* Search box */
 .dataTables_wrapper .dataTables_filter {
   margin-bottom: 0.5rem;
   font-size: 12px;
@@ -100,14 +76,10 @@ div[title="Table Preferences"]:hover {
   border-color: #007bff;
   box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
 }
-
-/* Info text */
 .dataTables_wrapper .dataTables_info {
   font-size: 12px;
   color: #666;
 }
-
-/* Pagination buttons */
 .dataTables_wrapper .dataTables_paginate .paginate_button {
   color: #fff !important;
   border: none !important;
@@ -124,16 +96,12 @@ div[title="Table Preferences"]:hover {
   transform: none !important;
   outline: none !important;
 }
-
-/* Hover for regular page buttons */
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
   background: #0056b3;
   color: #fff !important;
   border: none !important;
   opacity: 0.9;
 }
-
-/* Current page button */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
   background: #003f7f !important;
   color: #fff !important;
@@ -144,22 +112,16 @@ div[title="Table Preferences"]:hover {
   outline: none !important;
   border: none;
 }
-
-/* Current page button hover */
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
   background: #003f7f !important;
   color: #fff !important;
   border: none !important;
   opacity: 1;
 }
-
-/* Disabled pagination button */
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
   background: transparent !important;
   cursor: not-allowed;
 }
-
-/* DataTables export/print buttons */
 .dt-button {
   background-color: #007bff !important;
   background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
@@ -178,13 +140,10 @@ div[title="Table Preferences"]:hover {
   transform: none !important;
   outline: none !important;
 }
-
-/* Hover for export/print buttons */
 .dt-button:hover {
   background: #0056b3 !important;
   color: #fff !important;
 }
-
 .dataTables_wrapper .dataTables_paginate .paginate_button,
 .dt-button {
   transform: none !important;
@@ -194,24 +153,14 @@ div[title="Table Preferences"]:hover {
         `;
         document.head.appendChild(styleOverride);
 
-        // Process all tables on the page
         const tables = document.querySelectorAll("table");
-
         tables.forEach((table) => {
-          // Prevent double‑processing
           if (table.getAttribute("data-csv-processed")) return;
           table.setAttribute("data-csv-processed", "true");
-
-          // Find the .rdmd-table wrapper
           const tableWrapper = table.closest(".rdmd-table");
           if (!tableWrapper) return;
-
-          // Ensure the wrapper is relative so the absolute‑positioned menu can appear
           tableWrapper.style.position = "relative";
 
-          // ─────────────────────────────────────────────────────────────────────────
-          // 1) Create the top‑right "Table Preferences" trigger (folded‑corner)
-          // ─────────────────────────────────────────────────────────────────────────
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
           trigger.title = "Table Preferences";
@@ -222,18 +171,13 @@ div[title="Table Preferences"]:hover {
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
           trigger.style.zIndex = "10";
-          trigger.style.borderRadius = "0 0 3px 10px";
-          trigger.style.color = "#fff";
-          trigger.style.background = "linear-gradient(180deg, #56b8ff, #018ef5)";
+          trigger.style.borderRadius = "0px 0px 0px 3px";
+          trigger.style.color = "rgb(255, 255, 255)";
+          trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1 142 245 / 79%))";
           trigger.style.filter = "saturate(1.15)";
-          // Mark so we can remove it in the popup clone
           trigger.setAttribute("data-dt-buttons", "true");
-
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
-          // ─────────────────────────────────────────────────────────────────────────
-          // 2) Create the fly‑out menu container (hidden by default)
-          // ─────────────────────────────────────────────────────────────────────────
           const menu = document.createElement("div");
           menu.style.position = "absolute";
           menu.style.top = "21px";
@@ -248,12 +192,8 @@ div[title="Table Preferences"]:hover {
           menu.style.gap = "6px";
           menu.style.zIndex = "10000";
           menu.style.padding = "8px";
-          // Mark so we can remove it in the popup clone
           menu.setAttribute("data-dt-buttons", "true");
 
-          // ─────────────────────────────────────────────────────────────────────────
-          // 3) FILTER / DISABLE button – toggles DataTables on/off
-          // ─────────────────────────────────────────────────────────────────────────
           const filterBtn = document.createElement("button");
           filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
           filterBtn.title = "Enable Sorting / Export / Print";
@@ -270,19 +210,13 @@ div[title="Table Preferences"]:hover {
           filterBtn.style.justifyContent = "center";
           filterBtn.style.boxShadow = "0 1px 6px rgba(0,0,0,0.2), inset 0 -1px 2px rgba(0,0,0,0.15)";
           filterBtn.style.filter = "saturate(1.25)";
-
-          // Store a flag on the table to track if DataTables is active
           table.setAttribute("data-filter-enabled", "false");
 
           filterBtn.onclick = () => {
             const $table = window.jQuery(table);
             const isEnabled = table.getAttribute("data-filter-enabled") === "true";
-
             if (!isEnabled) {
-              // 1) Store the table's original HTML so we can revert later
               table.setAttribute("data-original-html", table.innerHTML);
-
-              // 2) Initialize DataTables with export / print buttons using icons
               if (!$table.hasClass("dataTable")) {
                 $table.DataTable({
                   dom: "Bfrtip",
@@ -311,25 +245,17 @@ div[title="Table Preferences"]:hover {
                 });
               }
               table.setAttribute("data-filter-enabled", "true");
-
-              // 3) Change button to "Disable"
               filterBtn.innerHTML = '<i class="fa fa-ban" aria-hidden="true"></i>';
               filterBtn.title = "Disable Sorting / Export / Print";
               filterBtn.style.background = "linear-gradient(180deg, #999999, #666666)";
             } else {
-              // Currently enabled -> disable it
               $table.DataTable().destroy();
-
-              // 1) Revert to the original HTML
               const originalHTML = table.getAttribute("data-original-html");
               if (originalHTML) {
                 table.innerHTML = originalHTML;
                 table.removeAttribute("data-original-html");
               }
-
               table.setAttribute("data-filter-enabled", "false");
-
-              // 2) Change button back to "Enable"
               filterBtn.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
               filterBtn.title = "Enable Sorting / Export / Print";
               filterBtn.style.background = "linear-gradient(180deg, #ff9c9c, #e3342f)";
@@ -338,9 +264,6 @@ div[title="Table Preferences"]:hover {
 
           menu.appendChild(filterBtn);
 
-          // ─────────────────────────────────────────────────────────────────────────
-          // 4) POP‑UP button (coral) – shows table in a modal
-          // ─────────────────────────────────────────────────────────────────────────
           const popupBtn = document.createElement("button");
           popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
           popupBtn.title = "View Table in Popup";
@@ -364,20 +287,15 @@ div[title="Table Preferences"]:hover {
             let clone;
             if (wrapper) {
               clone = wrapper.cloneNode(true);
-              // Remove triggers/menus from the clone
               const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
               injected.forEach((el) => el.remove());
               clone.style.margin = "0";
             } else {
               clone = table.cloneNode(true);
             }
-
-            // Put the clone in a markdown-body wrapper
             const markdownWrapper = document.createElement("div");
             markdownWrapper.className = "markdown-body";
             markdownWrapper.appendChild(clone);
-
-            // Modal overlay
             const modalOverlay = document.createElement("div");
             modalOverlay.style.position = "fixed";
             modalOverlay.style.top = "0";
@@ -390,7 +308,6 @@ div[title="Table Preferences"]:hover {
             modalOverlay.style.alignItems = "center";
             modalOverlay.style.zIndex = "9999";
             modalOverlay.style.overflow = "auto";
-
             const modalContent = document.createElement("div");
             modalContent.style.backgroundColor = "#fff";
             modalContent.style.padding = "20px";
@@ -401,12 +318,9 @@ div[title="Table Preferences"]:hover {
             modalContent.style.position = "relative";
             modalContent.style.minWidth = "800px";
             modalContent.style.margin = "20px";
-
             modalContent.appendChild(markdownWrapper);
             modalOverlay.appendChild(modalContent);
             document.body.appendChild(modalOverlay);
-
-            // Close button in top‑right corner
             const closeButton = document.createElement("button");
             closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
             closeButton.title = "Close";
@@ -421,8 +335,6 @@ div[title="Table Preferences"]:hover {
               document.body.removeChild(modalOverlay);
             };
             modalContent.appendChild(closeButton);
-
-            // Close modal if user clicks outside the modal content
             modalOverlay.onclick = (e) => {
               if (e.target === modalOverlay) {
                 document.body.removeChild(modalOverlay);
@@ -432,9 +344,6 @@ div[title="Table Preferences"]:hover {
 
           menu.appendChild(popupBtn);
 
-          // ─────────────────────────────────────────────────────────────────────────
-          // 5) Remove hover‑based menu display and instead toggle menu on trigger click
-          // ─────────────────────────────────────────────────────────────────────────
           trigger.addEventListener("click", (e) => {
             e.stopPropagation();
             if (menu.style.display === "none" || menu.style.display === "") {
@@ -444,27 +353,21 @@ div[title="Table Preferences"]:hover {
             }
           });
 
-          // Hide menu if clicking outside the table wrapper
           document.addEventListener("click", (e) => {
             if (!tableWrapper.contains(e.target)) {
               menu.style.display = "none";
             }
           });
 
-          // ─────────────────────────────────────────────────────────────────────────
-          // 6) Add hover icon switch for the trigger
-          // ─────────────────────────────────────────────────────────────────────────
           trigger.addEventListener("mouseenter", () => {
             trigger.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
           });
           trigger.addEventListener("mouseleave", () => {
-            // Only revert if menu is not open
             if (menu.style.display === "none" || menu.style.display === "") {
               trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
             }
           });
 
-          // Attach the menu to the table wrapper
           tableWrapper.appendChild(menu);
         });
       })
