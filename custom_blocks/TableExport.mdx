@@ -29,17 +29,33 @@ export const DownloadableTables = () => {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
       if (!window.jQuery.fn.DataTable) {
-        await loadScript("https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js");
+        await loadScript(
+          "https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"
+        );
         loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"
+      );
       loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css");
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
-      await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js");
-      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js");
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"
+      );
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"
+      );
+      await loadScript(
+        "https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"
+      );
+      await loadScript(
+        "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"
+      );
     };
 
     loadDependencies()
@@ -193,13 +209,16 @@ table.dataTable, table.dataTable th, table.dataTable td {
           popupBtn.style.display = "inline-flex";
           popupBtn.style.alignItems = "center";
           popupBtn.style.justifyContent = "center";
-          popupBtn.style.boxShadow = "rgba(0, 0, 0, 0.2) 0px 1px 6px, rgba(0, 0, 0, 0.15) 0px -1px 2px inset";
+          popupBtn.style.boxShadow =
+            "rgba(0, 0, 0, 0.2) 0px 1px 6px, rgba(0, 0, 0, 0.15) 0px -1px 2px inset";
           popupBtn.style.filter = "saturate(1.25)";
           // Initially hidden
           popupBtn.style.display = "none";
           popupBtn.setAttribute("data-dt-buttons", "true");
-          // Insert the popup button above the table (before the table element)
-          tableWrapper.insertBefore(popupBtn, table);
+          // Insert the popup button above the table using table's parent (which directly contains the table)
+          if (table.parentNode) {
+            table.parentNode.insertBefore(popupBtn, table);
+          }
 
           // Toggle DataTables functionality when clicking the trigger
           trigger.onclick = () => {
@@ -257,7 +276,8 @@ table.dataTable, table.dataTable th, table.dataTable td {
           // Popup button opens the table in a modal
           popupBtn.onclick = () => {
             const wrapper =
-              table.closest(".rdmd-table") || table.closest(".rdmd-table-inner");
+              table.closest(".rdmd-table") ||
+              table.closest(".rdmd-table-inner");
             let clone;
             if (wrapper) {
               clone = wrapper.cloneNode(true);
