@@ -33,9 +33,9 @@ export const DownloadableTables = () => {
       }
       if (!window.jQuery.fn.DataTable) {
         await loadScript(
-          "https://cdn.datatables.net/2.2.2/js/dataTables.min.js"
+          "https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"
         );
-        loadCSS("https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.min.css");
+        loadCSS("https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css");
       }
       await loadScript(
         "https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"
@@ -66,6 +66,106 @@ export const DownloadableTables = () => {
         // Append style overrides (preserving all your original styles)
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
+table.dataTable, table.dataTable th, table.dataTable td {
+  box-sizing: inherit;
+}
+.dataTables_wrapper {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 0.875rem;
+  color: #333;
+  background: #fff;
+  margin: 0 auto;
+  border: none;
+}
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 0.5rem;
+  font-size: 12px;
+}
+.dataTables_wrapper .dataTables_filter input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px 10px !important;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
+.dataTables_wrapper .dataTables_info {
+  font-size: 12px;
+  color: #666;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  color: #fff !important;
+  border: none !important;
+  border-radius: 6px;
+  margin: 2px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 12px !important;
+  font-weight: 500;
+  line-height: 1;
+  height: auto;
+  box-sizing: border-box;
+  box-shadow: none;
+  transform: none !important;
+  outline: none !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: #0056b3;
+  color: #fff !important;
+  border: none !important;
+  opacity: 0.9;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #003f7f !important;
+  color: #fff !important;
+  font-weight: bold;
+  cursor: default;
+  box-shadow: none;
+  transform: none !important;
+  outline: none !important;
+  border: none;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: #003f7f !important;
+  color: #fff !important;
+  border: none !important;
+  opacity: 1;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  background: transparent !important;
+  cursor: not-allowed;
+}
+.dt-button {
+  background-color: #007bff !important;
+  background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 20px !important;
+  padding: 1px 14px !important;
+  font-size: 0.65rem !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  margin: 2px;
+  height: auto;
+  line-height: 1.4;
+  box-sizing: border-box;
+  transform: none !important;
+  outline: none !important;
+}
+.dt-button:hover {
+  background: #0056b3 !important;
+  color: #fff !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dt-button {
+  transform: none !important;
+  background-color: #007bff !important;
+  background: linear-gradient(rgb(86, 184, 255), rgb(1, 142, 245)) !important;
+}
         `;
         document.head.appendChild(styleOverride);
 
