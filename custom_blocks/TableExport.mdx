@@ -166,7 +166,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
   color: #fff !important;
 }
 .custom-close-button {
-  background-color: #E74C3C !important; /* Not too harsh red */
+  background-color: #E74C3C !important; /* Soft red */
   border: none !important;
   color: #fff !important;
 }
@@ -194,7 +194,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
           trigger.style.padding = "4px 6px";
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
-          trigger.style.zIndex = "9999";  // Increased z-index for visibility
+          trigger.style.zIndex = "9999";
           trigger.style.borderRadius = "0px 0px 0px 3px";
           trigger.style.color = "rgb(255, 255, 255)";
           trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
@@ -291,11 +291,11 @@ table.dataTable, table.dataTable th, table.dataTable td {
                     closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
                     closeButton.title = "Close";
                     closeButton.className = "custom-close-button";
-                    // Style the close button with a soft red background.
+                    // Remove inline background so the class takes effect.
+                    // closeButton.style.background = "#E74C3C";
                     closeButton.style.position = "absolute";
                     closeButton.style.top = "10px";
                     closeButton.style.right = "10px";
-                    closeButton.style.background = "#E74C3C";
                     closeButton.style.border = "none";
                     closeButton.style.fontSize = "1.5rem";
                     closeButton.style.cursor = "pointer";
