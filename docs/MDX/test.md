@@ -31,6 +31,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor 
 | 18 | LastPasswordChange | Timestamp | Date and time of the last password change      |
 | 19 | MFAEnabled         | Boolean   | Indicates if multi-factor authentication is on |
 | 20 | Notes              | Text      | Internal notes about the user                  |
+| 21 | Test               | Test      | Test                                           |
 
 test
 
