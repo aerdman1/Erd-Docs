@@ -241,19 +241,6 @@ opacity:1;
           trigger.setAttribute("data-dt-trigger", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
-          // Change icon and background on hover.
-          trigger.addEventListener("mouseover", () => {
-            trigger.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
-            trigger.style.background =
-              "linear-gradient(rgb(70, 140, 240), rgba(0, 120, 230, 0.8))";
-          });
-          trigger.addEventListener("mouseout", () => {
-            trigger.innerHTML =
-              '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
-            trigger.style.background =
-              "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
-          });
-
           // When the trigger is clicked, initialize DataTables with a unified nav bar.
           trigger.onclick = () => {
             const $table = window.jQuery(table);
@@ -379,7 +366,7 @@ opacity:1;
                     table.setAttribute("data-filter-enabled", "false");
                     trigger.style.display = "block";
                   },
-                },
+                },ß
               ],
             });
             table.setAttribute("data-filter-enabled", "true");
