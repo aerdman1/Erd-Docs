@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 
 export const DownloadableTables = () => {
   useEffect(() => {
+    // Helper to load a script dynamically.
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
         const script = document.createElement("script");
@@ -17,6 +18,7 @@ export const DownloadableTables = () => {
       });
     };
 
+    // Helper to load a CSS stylesheet dynamically.
     const loadCSS = (href) => {
       const link = document.createElement("link");
       link.rel = "stylesheet";
@@ -24,6 +26,7 @@ export const DownloadableTables = () => {
       document.head.appendChild(link);
     };
 
+    // Load required dependencies.
     const loadDependencies = async () => {
       if (!window.jQuery) {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
@@ -60,6 +63,7 @@ export const DownloadableTables = () => {
 
     loadDependencies()
       .then(() => {
+        // Append style overrides (preserving all your original styles)
         const styleOverride = document.createElement("style");
         styleOverride.textContent = `
 table.dataTable, table.dataTable th, table.dataTable td {
@@ -165,18 +169,21 @@ table.dataTable, table.dataTable th, table.dataTable td {
         `;
         document.head.appendChild(styleOverride);
 
+        // Process each table.
         const tables = document.querySelectorAll("table");
         tables.forEach((table) => {
-          if (table.getAttribute("data-csv-processed")) return;
-          table.setAttribute("data-csv-processed", "true");
+          if (table.getAttribute("data-dt-processed")) return;
+          table.setAttribute("data-dt-processed", "true");
+          // Store the original table HTML for later restoration.
+          table.setAttribute("data-original-html", table.innerHTML);
           const tableWrapper = table.closest(".rdmd-table");
           if (!tableWrapper) return;
           tableWrapper.style.position = "relative";
 
-          // Create the trigger button (3-dot icon)
+          // Create the trigger button (3-dot icon) with your original styling.
           const trigger = document.createElement("div");
           trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
-          trigger.title = "Table Preferences";
+          trigger.title = "Enable Filter";
           trigger.style.position = "absolute";
           trigger.style.top = "0px";
           trigger.style.right = "0px";
@@ -188,152 +195,124 @@ table.dataTable, table.dataTable th, table.dataTable td {
           trigger.style.color = "rgb(255, 255, 255)";
           trigger.style.background = "linear-gradient(rgb(86, 184, 255), rgb(1 142 245 / 79%))";
           trigger.style.filter = "saturate(1.15)";
-          trigger.setAttribute("data-dt-buttons", "true");
+          trigger.setAttribute("data-dt-trigger", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
-          // Create the popup button (orange) with provided style
-          const popupBtn = document.createElement("button");
-          popupBtn.innerHTML = '<i class="fa fa-arrows-alt" aria-hidden="true"></i>';
-          popupBtn.title = "View Table in Popup";
-          popupBtn.style.position = "relative";
-          popupBtn.style.bottom = "0px";
-          popupBtn.style.left = "4px";
-          popupBtn.style.background = "linear-gradient(rgb(255, 127, 80), rgb(255, 99, 71))";
-          popupBtn.style.border = "none";
-          popupBtn.style.color = "rgb(255, 255, 255)";
-          popupBtn.style.fontWeight = "bold";
-          popupBtn.style.padding = "6px 12px";
-          popupBtn.style.borderRadius = "4px";
-          popupBtn.style.cursor = "pointer";
-          popupBtn.style.fontSize = "0.625rem";
-          popupBtn.style.display = "inline-flex";
-          popupBtn.style.alignItems = "center";
-          popupBtn.style.justifyContent = "center";
-          popupBtn.style.boxShadow =
-            "rgba(0, 0, 0, 0.2) 0px 1px 6px, rgba(0, 0, 0, 0.15) 0px -1px 2px inset";
-          popupBtn.style.filter = "saturate(1.25)";
-          // Initially hidden
-          popupBtn.style.display = "none";
-          popupBtn.setAttribute("data-dt-buttons", "true");
-          // Insert the popup button above the table using table's parent (which directly contains the table)
-          if (table.parentNode) {
-            table.parentNode.insertBefore(popupBtn, table);
-          }
-
-          // Toggle DataTables functionality when clicking the trigger
+          // When the trigger is clicked, initialize DataTables with a unified nav bar.
           trigger.onclick = () => {
             const $table = window.jQuery(table);
-            const isEnabled = table.getAttribute("data-filter-enabled") === "true";
-            if (!isEnabled) {
-              table.setAttribute("data-original-html", table.innerHTML);
-              if (!$table.hasClass("dataTable")) {
-                $table.DataTable({
-                  dom: "Bfrtip",
-                  buttons: [
-                    {
-                      extend: "copy",
-                      text: '<i class="fa fa-copy"></i> Copy'
-                    },
-                    {
-                      extend: "csv",
-                      text: '<i class="fa fa-file-csv"></i> CSV'
-                    },
-                    {
-                      extend: "excel",
-                      text: '<i class="fa fa-file-excel"></i> Excel'
-                    },
-                    {
-                      extend: "pdf",
-                      text: '<i class="fa fa-file-pdf"></i> PDF'
-                    },
-                    {
-                      extend: "print",
-                      text: '<i class="fa fa-print"></i> Print'
-                    },
-                    {
-                      extend: "colvis",
-                      text: '<i class="fa fa-columns"></i> Column Visibility'
+            if (table.getAttribute("data-filter-enabled") === "true") return;
+            const dt = $table.DataTable({
+              // Custom DOM: nav bar row with buttons and search field above the table.
+              dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'Bf>>rtip",
+              buttons: [
+                {
+                  extend: "copy",
+                  text: '<i class="fa fa-copy"></i> Copy'
+                },
+                {
+                  extend: "csv",
+                  text: '<i class="fa fa-file-csv"></i> CSV'
+                },
+                {
+                  extend: "excel",
+                  text: '<i class="fa fa-file-excel"></i> Excel'
+                },
+                {
+                  extend: "pdf",
+                  text: '<i class="fa fa-file-pdf"></i> PDF'
+                },
+                {
+                  extend: "print",
+                  text: '<i class="fa fa-print"></i> Print'
+                },
+                {
+                  extend: "colvis",
+                  text: '<i class="fa fa-columns"></i> Column Visibility'
+                },
+                {
+                  text: '<i class="fa fa-arrows-alt"></i> Popup',
+                  action: function (e, dt, node, config) {
+                    // Build the modal popup.
+                    let wrapper =
+                      table.closest(".rdmd-table") ||
+                      table.closest(".rdmd-table-inner");
+                    let clone;
+                    if (wrapper) {
+                      clone = wrapper.cloneNode(true);
+                      const injected = clone.querySelectorAll('[data-dt-trigger], [data-dt-buttons]');
+                      injected.forEach((el) => el.remove());
+                      clone.style.margin = "0";
+                    } else {
+                      clone = table.cloneNode(true);
                     }
-                  ]
-                });
-              }
-              table.setAttribute("data-filter-enabled", "true");
-              trigger.innerHTML = '<i class="fa fa-ban" aria-hidden="true"></i>';
-              popupBtn.style.display = "inline-flex";
-            } else {
-              $table.DataTable().destroy();
-              const originalHTML = table.getAttribute("data-original-html");
-              if (originalHTML) {
-                table.innerHTML = originalHTML;
-                table.removeAttribute("data-original-html");
-              }
-              table.setAttribute("data-filter-enabled", "false");
-              trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
-              popupBtn.style.display = "none";
-            }
-          };
-
-          // Popup button opens the table in a modal
-          popupBtn.onclick = () => {
-            const wrapper =
-              table.closest(".rdmd-table") ||
-              table.closest(".rdmd-table-inner");
-            let clone;
-            if (wrapper) {
-              clone = wrapper.cloneNode(true);
-              const injected = clone.querySelectorAll('[data-dt-buttons="true"]');
-              injected.forEach((el) => el.remove());
-              clone.style.margin = "0";
-            } else {
-              clone = table.cloneNode(true);
-            }
-            const markdownWrapper = document.createElement("div");
-            markdownWrapper.className = "markdown-body";
-            markdownWrapper.appendChild(clone);
-            const modalOverlay = document.createElement("div");
-            modalOverlay.style.position = "fixed";
-            modalOverlay.style.top = "0";
-            modalOverlay.style.left = "0";
-            modalOverlay.style.width = "100%";
-            modalOverlay.style.height = "100%";
-            modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-            modalOverlay.style.display = "flex";
-            modalOverlay.style.justifyContent = "center";
-            modalOverlay.style.alignItems = "center";
-            modalOverlay.style.zIndex = "9999";
-            modalOverlay.style.overflow = "auto";
-            const modalContent = document.createElement("div");
-            modalContent.style.backgroundColor = "#fff";
-            modalContent.style.padding = "20px";
-            modalContent.style.paddingTop = "40px";
-            modalContent.style.borderRadius = "4px";
-            modalContent.style.maxHeight = "90%";
-            modalContent.style.overflow = "auto";
-            modalContent.style.position = "relative";
-            modalContent.style.minWidth = "800px";
-            modalContent.style.margin = "20px";
-            modalContent.appendChild(markdownWrapper);
-            modalOverlay.appendChild(modalContent);
-            document.body.appendChild(modalOverlay);
-            const closeButton = document.createElement("button");
-            closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
-            closeButton.title = "Close";
-            closeButton.style.position = "absolute";
-            closeButton.style.top = "10px";
-            closeButton.style.right = "10px";
-            closeButton.style.background = "transparent";
-            closeButton.style.border = "none";
-            closeButton.style.fontSize = "1.5rem";
-            closeButton.style.cursor = "pointer";
-            closeButton.onclick = () => {
-              document.body.removeChild(modalOverlay);
-            };
-            modalContent.appendChild(closeButton);
-            modalOverlay.onclick = (e) => {
-              if (e.target === modalOverlay) {
-                document.body.removeChild(modalOverlay);
-              }
-            };
+                    const markdownWrapper = document.createElement("div");
+                    markdownWrapper.className = "markdown-body";
+                    markdownWrapper.appendChild(clone);
+                    const modalOverlay = document.createElement("div");
+                    modalOverlay.style.position = "fixed";
+                    modalOverlay.style.top = "0";
+                    modalOverlay.style.left = "0";
+                    modalOverlay.style.width = "100%";
+                    modalOverlay.style.height = "100%";
+                    modalOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                    modalOverlay.style.display = "flex";
+                    modalOverlay.style.justifyContent = "center";
+                    modalOverlay.style.alignItems = "center";
+                    modalOverlay.style.zIndex = "9999";
+                    modalOverlay.style.overflow = "auto";
+                    const modalContent = document.createElement("div");
+                    modalContent.style.backgroundColor = "#fff";
+                    modalContent.style.padding = "20px";
+                    modalContent.style.paddingTop = "40px";
+                    modalContent.style.borderRadius = "4px";
+                    modalContent.style.maxHeight = "90%";
+                    modalContent.style.overflow = "auto";
+                    modalContent.style.position = "relative";
+                    modalContent.style.minWidth = "800px";
+                    modalContent.style.margin = "20px";
+                    modalContent.appendChild(markdownWrapper);
+                    modalOverlay.appendChild(modalContent);
+                    document.body.appendChild(modalOverlay);
+                    const closeButton = document.createElement("button");
+                    closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
+                    closeButton.title = "Close";
+                    closeButton.style.position = "absolute";
+                    closeButton.style.top = "10px";
+                    closeButton.style.right = "10px";
+                    closeButton.style.background = "transparent";
+                    closeButton.style.border = "none";
+                    closeButton.style.fontSize = "1.5rem";
+                    closeButton.style.cursor = "pointer";
+                    closeButton.onclick = () => {
+                      document.body.removeChild(modalOverlay);
+                    };
+                    modalContent.appendChild(closeButton);
+                    modalOverlay.onclick = (e) => {
+                      if (e.target === modalOverlay) {
+                        document.body.removeChild(modalOverlay);
+                      }
+                    };
+                  }
+                },
+                {
+                  text: '<i class="fa fa-ban"></i> Close Filter',
+                  action: function (e, dt, node, config) {
+                    dt.destroy();
+                    const original = table.getAttribute("data-original-html");
+                    if (original) {
+                      table.innerHTML = original;
+                      table.removeAttribute("data-original-html");
+                    }
+                    table.setAttribute("data-filter-enabled", "false");
+                    trigger.style.display = "block";
+                  }
+                }
+              ]
+            });
+            table.setAttribute("data-filter-enabled", "true");
+            // Hide the trigger button once filter mode is enabled.
+            trigger.style.display = "none";
           };
         });
       })
