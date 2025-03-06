@@ -82,12 +82,13 @@ table.dataTable, table.dataTable th, table.dataTable td {
   border: none;
 }
 .dataTables_wrapper .dataTables_filter {
-  float: left !important;
-  text-align: left !important;
+    float: left !important;
+    text-align: left !important;
 }
 .dt-nav.row {
-  padding: 0 10px;
+    padding: 0 10px;
 }
+
 .dataTables_wrapper .dataTables_filter {
   margin-bottom: 0.5rem;
   font-size: 12px;
@@ -99,7 +100,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
   padding: 4px 10px !important;
   outline: none;
   transition: border-color 0.4s ease, box-shadow 0.2s ease;
-  margin-right: 10px !important;
+  margin-right:10px !important;
 }
 .dataTables_wrapper .dataTables_filter input:focus {
   border-color: #007bff;
@@ -131,8 +132,9 @@ table.dataTable, table.dataTable th, table.dataTable td {
   border: none !important;
   opacity: 1;
 }
+
 .paginate_button {
-  opacity: .8;
+    opacity: .8;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
   background: #003f7f !important;
@@ -155,6 +157,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
   cursor: not-allowed;
   opacity: 0 !important;
 }
+
 .dt-button {
   background-color: #007bff !important;
   background: linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79)) !important;
@@ -172,10 +175,10 @@ table.dataTable, table.dataTable th, table.dataTable td {
   box-sizing: border-box;
   transform: none !important;
   outline: none !important;
-  opacity: .8;
+  opacity:.8;
 }
 .dt-button:hover {
-  opacity: 1;
+opacity:1;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button,
 .dt-button {
@@ -192,12 +195,12 @@ table.dataTable, table.dataTable th, table.dataTable td {
 }
 /* Custom classes for Popup and Close buttons */
 .custom-popup-button {
-  background: #FFA500 !important;
+  background: #FFA500 !important; /* Clean modern orange */
   border: none !important;
   color: #fff !important;
 }
 .custom-close-button {
-  background: #E74C3C !important;
+  background: #E74C3C !important; /* Not too harsh red */
   border: none !important;
   color: #fff !important;
 }
@@ -215,73 +218,50 @@ table.dataTable, table.dataTable th, table.dataTable td {
           if (!tableWrapper) return;
           tableWrapper.style.position = "relative";
 
-          // Create a trigger container with fixed width and centered text.
+          // Create the trigger button (3-dot icon) with your original styling.
           const trigger = document.createElement("div");
+          trigger.innerHTML =
+            '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+          trigger.title = "Enable Filter";
           trigger.style.position = "absolute";
           trigger.style.top = "0px";
           trigger.style.right = "0px";
           trigger.style.padding = "1px 10px 2px 10px";
           trigger.style.cursor = "pointer";
           trigger.style.fontSize = "0.75rem";
-          trigger.style.zIndex = "9999";
+          trigger.style.zIndex = "9999"; // Increased z-index for visibility
           trigger.style.borderRadius = "0px 0px 2px 3px";
           trigger.style.color = "rgb(255, 255, 255)";
           trigger.style.background =
             "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
           trigger.style.filter = "saturate(1.15)";
           trigger.style.display = "block";
-          // Ensure fixed dimensions so padding/width don't change.
-          trigger.style.width = "40px";
-          trigger.style.textAlign = "center";
-          trigger.style.transition = "background 0.3s ease";
-
-          // Create two icon elements: one for ellipsis, one for filter.
-          const iconEllipsis = document.createElement("i");
-          iconEllipsis.className = "fa fa-ellipsis-v";
-          iconEllipsis.setAttribute("aria-hidden", "true");
-          iconEllipsis.style.transition = "opacity 0.3s ease";
-          iconEllipsis.style.opacity = "1";
-          iconEllipsis.style.position = "absolute";
-          iconEllipsis.style.left = "50%";
-          iconEllipsis.style.transform = "translateX(-50%)";
-
-          const iconFilter = document.createElement("i");
-          iconFilter.className = "fa fa-filter";
-          iconFilter.setAttribute("aria-hidden", "true");
-          iconFilter.style.transition = "opacity 0.3s ease";
-          iconFilter.style.opacity = "0";
-          iconFilter.style.position = "absolute";
-          iconFilter.style.left = "50%";
-          iconFilter.style.transform = "translateX(-50%)";
-
-          // Append both icons so they stack exactly.
-          trigger.appendChild(iconEllipsis);
-          trigger.appendChild(iconFilter);
-          trigger.title = "Enable Filter";
+          // Add a transition for a smooth background change.
+          trigger.style.transition = "background 0.3s ease, color 0.3s ease";
           trigger.setAttribute("data-dt-trigger", "true");
           tableWrapper.insertBefore(trigger, tableWrapper.firstChild);
 
-          // On hover, fade the ellipsis out and the filter in; darken the background.
+          // Change icon and background on hover.
           trigger.addEventListener("mouseover", () => {
-            iconEllipsis.style.opacity = "0";
-            iconFilter.style.opacity = "1";
+            trigger.innerHTML = '<i class="fa fa-filter" aria-hidden="true"></i>';
             trigger.style.background =
               "linear-gradient(rgb(70, 140, 240), rgba(0, 120, 230, 0.8))";
           });
-          // On mouse leave, revert the changes.
           trigger.addEventListener("mouseout", () => {
-            iconEllipsis.style.opacity = "1";
-            iconFilter.style.opacity = "0";
+            trigger.innerHTML =
+              '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
             trigger.style.background =
               "linear-gradient(rgb(86, 184, 255), rgba(1, 142, 245, 0.79))";
           });
 
-          // When the trigger is clicked, initialize DataTables.
+          // When the trigger is clicked, initialize DataTables with a unified nav bar.
           trigger.onclick = () => {
             const $table = window.jQuery(table);
             if (table.getAttribute("data-filter-enabled") === "true") return;
             const dt = $table.DataTable({
+              // Custom DOM: search field (f) first then buttons (B) in one nav row above the table.
               dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
+              // Update language: hide "Search" label and use a placeholder.
               language: {
                 search: "",
                 searchPlaceholder: "Search Table",
@@ -315,6 +295,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
                   text: '<i class="fa fa-arrows-alt"></i> Popup',
                   className: "custom-popup-button",
                   action: function (e, dt, node, config) {
+                    // Build the modal popup, removing buttons and search.
                     let wrapper =
                       table.closest(".rdmd-table") ||
                       table.closest(".rdmd-table-inner");
@@ -365,6 +346,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
                       '<i class="fa fa-times" aria-hidden="true"></i>';
                     closeButton.title = "Close";
                     closeButton.className = "custom-close-button";
+                    // Style the close button with a soft red background.
                     closeButton.style.position = "absolute";
                     closeButton.style.top = "10px";
                     closeButton.style.right = "10px";
