@@ -243,15 +243,21 @@ export const BannerMessage = ({
       fontSize: '1rem',
       transition: 'transform 0.2s ease, box-shadow 0.2s ease'
     },
+    // Updated toggleButton style as provided
     toggleButton: {
       margin: '1rem auto',
       display: 'block',
       padding: '0.5rem 1rem',
-      background: '#1DB954',
-      color: '#fff',
+      fontSize: '13px',
+      fontWeight: 'bold',
+      background: 'rgb(15, 105, 189)',
+      color: 'rgb(255, 255, 255)',
       border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer'
+      borderRadius: '0 0 0 10px',
+      cursor: 'pointer',
+      position: 'absolute',
+      right: 0,
+      bottom: '23px'
     },
     note: {
       marginTop: '1rem',
@@ -323,7 +329,7 @@ export const BannerMessage = ({
   return (
     <>
       {/* Banner Injection Content */}
-      <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
+      <div id="custom-banner-content" style={{ display: 'none', width: '100%', position: 'relative' }}>
         <div style={containerStyles}>
           {message || defaults.message}
         </div>
@@ -333,7 +339,17 @@ export const BannerMessage = ({
             style={uiStyles.toggleButton}
             onClick={() => setShowGenerator((prev) => !prev)}
           >
-            {showGenerator ? 'Hide Generator' : 'Show Generator'}
+            {showGenerator ? (
+              <>
+                <i className="fas fa-times" style={{ marginRight: '0.5rem' }}></i>
+                Close
+              </>
+            ) : (
+              <>
+                <i className="fas fa-edit" style={{ marginRight: '0.5rem' }}></i>
+                Edit
+              </>
+            )}
           </button>
         )}
       </div>
