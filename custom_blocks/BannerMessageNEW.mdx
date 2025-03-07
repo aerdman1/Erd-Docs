@@ -4,8 +4,7 @@ name: BannerMessageNEW
 import React, { useState, useEffect } from "react";
 
 export const BannerMessage = ({
-  message:
-    propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
+  message: propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor: propBannerColor = "#008EF5",
   bannerTextColor: propBannerTextColor = "#ffffff",
   fontSize: propFontSize = "16px",
@@ -26,8 +25,7 @@ export const BannerMessage = ({
   }
 
   // Map incoming fontWeight "normal" to "400"
-  const initialFontWeight =
-    propFontWeight === "normal" ? "400" : propFontWeight;
+  const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
 
   // Use incoming props to initialize state
   const [message, setMessage] = useState(propMessage);
@@ -262,6 +260,7 @@ export const BannerMessage = ({
       border: "none",
       borderRadius: "10px 0px 0px 10px",
       cursor: "pointer",
+      maxWidth: "80px",
     },
     note: {
       marginTop: "1rem",
@@ -354,7 +353,9 @@ export const BannerMessage = ({
             padding: "1px 10px",
           }}
         >
-          <div style={containerStyles}>{message || defaults.message}</div>
+          <div style={containerStyles}>
+            {message || defaults.message}
+          </div>
           {isAdmin && (
             <button
               style={uiStyles.toggleButton}
@@ -384,7 +385,10 @@ export const BannerMessage = ({
 
       {/* Admin Generator UI */}
       {showGenerator && (
-        <div style={{ transform: "scale(0.8)", transformOrigin: "top left" }}>
+        <div
+          className="generator-ui"
+          style={{ transform: "scale(0.8)", transformOrigin: "top left" }}
+        >
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
               <h3 style={uiStyles.heading}>Banner Generator</h3>
