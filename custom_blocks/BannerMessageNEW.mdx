@@ -342,13 +342,15 @@ export const BannerMessage = ({
     <>
       {/* CSS in the component */}
       <style>{`
-        .generator-ui {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          z-index: 1000;
-        }
+.generator-ui {
+    position: fixed;
+    top: 34vh;
+    right: -24vh;
+    z-index: 1000;
+    background: #2C303B;
+    overflow-y: auto;
+    box-shadow: -5px 0 10px rgba(0, 0, 0, 0.2);
+}
       `}</style>
 
       {/* Banner Injection Content */}
