@@ -1,11 +1,10 @@
 ---
 name: BannerMessageNEW
 ---
-import React, { useState, useEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
 
 export const BannerMessage = ({
-  message:
-    propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
+  message: propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor: propBannerColor = "#381D71",
   bannerTextColor: propBannerTextColor = "#ffffff",
   fontSize: propFontSize = "16px",
@@ -26,8 +25,7 @@ export const BannerMessage = ({
   }
 
   // Map incoming fontWeight "normal" to "400"
-  const initialFontWeight =
-    propFontWeight === "normal" ? "400" : propFontWeight;
+  const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
 
   // Use incoming props to initialize state
   const [message, setMessage] = useState(propMessage);
@@ -51,8 +49,8 @@ export const BannerMessage = ({
     }
   };
 
-  // Get header height on mount and update on window resize
-  useEffect(() => {
+  // Use useLayoutEffect to measure header height immediately after layout
+  useLayoutEffect(() => {
     updateHeaderHeight();
     window.addEventListener("resize", updateHeaderHeight);
     return () => window.removeEventListener("resize", updateHeaderHeight);
@@ -65,13 +63,7 @@ export const BannerMessage = ({
     setBannerTextColor(propBannerTextColor);
     setFontSize(propFontSize);
     setFontWeight(propFontWeight === "normal" ? "400" : propFontWeight);
-  }, [
-    propMessage,
-    propBannerColor,
-    propBannerTextColor,
-    propFontSize,
-    propFontWeight,
-  ]);
+  }, [propMessage, propBannerColor, propBannerTextColor, propFontSize, propFontWeight]);
 
   const handlePresetChange = (e) => {
     const selectedPreset = e.target.value;
@@ -359,7 +351,7 @@ export const BannerMessage = ({
 
   // Dynamic generator styles using headerHeight
   const generatorStyles = {
-    position: "fixed", // Change to fixed
+    position: "fixed",
     top: `${headerHeight + 50}px`,
     right: "20px",
     width: "600px",
@@ -555,8 +547,8 @@ export const BannerMessage = ({
               <div style={uiStyles.note}>
                 <span style={{ marginRight: "0.5rem" }}>ℹ️</span>
                 <span>
-                  Copy the code above, click "Edit," then paste it on the page
-                  and save. It will go live for the public.
+                  Copy the code above, click "Edit," then paste it on the page and
+                  save. It will go live for the public.
                 </span>
               </div>
             </div>
@@ -578,4 +570,4 @@ export const BannerMessage = ({
   );
 };
 
-<BannerMessage />
+export default BannerMessage;
