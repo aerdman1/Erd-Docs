@@ -140,7 +140,7 @@ export const BannerMessage = ({
       maxWidth: '800px',
       margin: '2rem auto',
       padding: '2rem',
-      background: '#fff',
+      background: '#2C303B',
       borderRadius: '12px',
       boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
       fontFamily: 'Inter, sans-serif',
@@ -156,7 +156,7 @@ export const BannerMessage = ({
     },
     heading: {
       margin: 0,
-      color: '#333',
+      color: '#fff',
       fontSize: '1.75rem',
       fontWeight: 600
     },
@@ -170,7 +170,7 @@ export const BannerMessage = ({
       display: 'block',
       marginBottom: '0.5rem',
       fontWeight: 500,
-      color: '#555',
+      color: '#fff',
       fontSize: '1rem'
     },
     input: {
@@ -179,6 +179,7 @@ export const BannerMessage = ({
       borderRadius: '6px',
       border: '1px solid #ddd',
       fontSize: '1rem',
+      background: '#384248',
       transition: 'border-color 0.2s ease-in-out'
     },
     select: {
@@ -187,6 +188,7 @@ export const BannerMessage = ({
       borderRadius: '6px',
       border: '1px solid #ddd',
       fontSize: '1rem',
+      background: '#384248',
       transition: 'border-color 0.2s ease-in-out'
     },
     row: {
@@ -319,15 +321,28 @@ export const BannerMessage = ({
             style={uiStyles.input}
           />
         </label>
-        <label style={uiStyles.label}>
-          Preset:
-          <select value={preset} onChange={handlePresetChange} style={uiStyles.select}>
-            <option value="custom">Custom (you choose colors)</option>
-            <option value="critical">Critical (Red)</option>
-            <option value="warning">Warning (Yellow)</option>
-            <option value="standard">Standard (Blue)</option>
-          </select>
-        </label>
+        <div style={uiStyles.row}>
+          <label style={uiStyles.label}>
+            Preset:
+            <select value={preset} onChange={handlePresetChange} style={uiStyles.select}>
+              <option value="custom">Custom (you choose colors)</option>
+              <option value="critical">Critical (Red)</option>
+              <option value="warning">Warning (Yellow)</option>
+              <option value="standard">Standard (Blue)</option>
+            </select>
+          </label>
+          <label style={uiStyles.label}>
+            Banner Placement:
+            <select
+              value={placement}
+              onChange={(e) => setPlacement(e.target.value)}
+              style={uiStyles.select}
+            >
+              <option value="top">Top (first in header)</option>
+              <option value="bottom">Bottom (default)</option>
+            </select>
+          </label>
+        </div>
         {preset === 'custom' ? (
           <div style={uiStyles.fourColumnRow}>
             <div>
@@ -395,17 +410,6 @@ export const BannerMessage = ({
             </div>
           </div>
         )}
-        <label style={uiStyles.label}>
-          Banner Placement:
-          <select
-            value={placement}
-            onChange={(e) => setPlacement(e.target.value)}
-            style={uiStyles.select}
-          >
-            <option value="top">Top (first in header)</option>
-            <option value="bottom">Bottom (default)</option>
-          </select>
-        </label>
         <h4 style={uiStyles.sectionHeading}>Generated Code:</h4>
         <pre style={uiStyles.code}>{generatedSnippet}</pre>
         <button
