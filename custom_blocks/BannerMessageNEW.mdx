@@ -259,17 +259,17 @@ export const BannerMessage = ({
     },
     // Edit/Close toggleButton
     toggleButton: {
-        display: "flex",
-        opacity: 0.8,
-        padding: "6px 12px",
-        fontSize: "11px",
-        fontWeight: "bold",
-        background: "rgb(18, 24, 27)",
-        color: "rgb(255, 255, 255)",
-        borderRadius: "20px",
-        cursor: "pointer",
-        maxWidth: "80px",
-        border: "1px solid #80808096",
+      display: "flex",
+      opacity: 0.8,
+      padding: "6px 12px",
+      fontSize: "11px",
+      fontWeight: "bold",
+      background: "rgb(18, 24, 27)",
+      color: "rgb(255, 255, 255)",
+      borderRadius: "20px",
+      cursor: "pointer",
+      maxWidth: "80px",
+      border: "1px solid #80808096",
     },
     note: {
       marginTop: "1rem",
@@ -289,6 +289,18 @@ export const BannerMessage = ({
       color: "#ffffff",
     },
   };
+
+  // When the generator is toggled, add/remove the "blurred" class on the background container
+  useEffect(() => {
+    const contentBody = document.querySelector("div.content-body.grid-75");
+    if (contentBody) {
+      if (showGenerator) {
+        contentBody.classList.add("blurred");
+      } else {
+        contentBody.classList.remove("blurred");
+      }
+    }
+  }, [showGenerator]);
 
   // Create banner container on mount and remove on unmount
   useEffect(() => {
@@ -367,6 +379,13 @@ export const BannerMessage = ({
       {/* CSS in the component */}
       <style>{`
         /* Additional CSS rules can be added here if needed */
+        .content-body.grid-75.blurred {
+          filter: blur(5px) brightness(0.5);
+        }
+        /* Exclude generator UI from the blur/dim effect */
+        .content-body.grid-75.blurred .generator-ui {
+          filter: none;
+        }
       `}</style>
 
       {/* Banner Injection Content */}
