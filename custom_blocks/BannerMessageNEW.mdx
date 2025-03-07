@@ -342,20 +342,17 @@ export const BannerMessage = ({
     <>
       {/* CSS in the component */}
       <style>{`
-   .generator-ui {
-        position: fixed;
-        top: 0;
-        right: -400px;
-        width: 400px;
-        height: 100vh;
-        z-index: 1000;
-        background: #2C303B;
-        overflow-y: auto;
-        transition: right 0.3s ease;
-    }
-    .generator-ui.open {
-        right: 0;
-    }
+.generator-ui {
+    position: fixed;
+    bottom:0;
+    right: 0;
+    width: 600px; /* or whatever fixed width you want */
+    height: 800px; /* full height of the screen */
+    z-index: 1000;
+    background: #2C303B; /* optional to match the design */
+    overflow-y: auto;
+    box-shadow: -5px 0 10px rgba(0,0,0,0.2); /* optional */
+}
 
       `}</style>
 
