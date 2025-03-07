@@ -263,36 +263,26 @@ export const BannerMessage = ({
     }
   };
 
-// ── Effect 1: Create banner container on mount and remove on unmount ──
-useEffect(() => {
-  const headerElement = document.querySelector('header.rm-Header');
-  if (!headerElement) return;
-
-  // Create bannerWrapper only if it doesn't already exist
-  let bannerWrapper = document.getElementById('custom-banner-container');
-  if (!bannerWrapper) {
-    bannerWrapper = document.createElement('div');
-    bannerWrapper.id = 'custom-banner-container';
-  }
-  try {
+  // ── Effect 1: Create banner container on mount and remove on unmount ──
+  useEffect(() => {
+    const headerElement = document.querySelector('header.rm-Header');
+    if (!headerElement) return;
+    // Create bannerWrapper only if it doesn't already exist
+    let bannerWrapper = document.getElementById('custom-banner-container');
+    if (!bannerWrapper) {
+      bannerWrapper = document.createElement('div');
+      bannerWrapper.id = 'custom-banner-container';
+    }
+    // Use firstElementChild to ensure we have a proper element reference
     if (placement === 'top') {
-      // Check if there's a valid first element child
-      if (headerElement.firstElementChild) {
-        headerElement.insertBefore(bannerWrapper, headerElement.firstElementChild);
-      } else {
-        headerElement.appendChild(bannerWrapper);
-      }
+      headerElement.insertBefore(bannerWrapper, headerElement.firstElementChild);
     } else {
       headerElement.appendChild(bannerWrapper);
     }
-  } catch (e) {
-    console.error("Error inserting bannerWrapper:", e);
-  }
-  return () => {
-    if (bannerWrapper) bannerWrapper.remove();
-  };
-}, []);
-
+    return () => {
+      if (bannerWrapper) bannerWrapper.remove();
+    };
+  }, []); // Run once on mount
 
   // ── Effect 2: Update banner container's styles, content, and placement on changes ──
   useEffect(() => {
