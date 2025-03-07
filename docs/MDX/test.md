@@ -6,5 +6,3 @@ metadata:
   robots: index
 ---
 test
-
-<BannerMessageNEW />
