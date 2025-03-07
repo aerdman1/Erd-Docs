@@ -3,7 +3,7 @@ name: Stepper
 ---
 import React, { useState } from 'react';
 
-export const StepperTest = ({ steps, position = "top" }) => {
+export const Stepper1 = ({ steps, position = "top" }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const handleNext = () => {
@@ -19,7 +19,7 @@ export const StepperTest = ({ steps, position = "top" }) => {
   };
 
   return (
-    <div className="bg-opacity-80 border-1 border-violet-950/10 rounded-lg shadow-md text-white p-6 w-150 bg-radial from-purple-200 from-30% to-violet-950 to-80%">
+    <div className="bg-opacity-80 border-1 border-white/10 rounded-lg shadow-md text-white p-6 w-150 bg-radial from-purple-200 from-30% to-violet-950 to-80%">
       <div className={`flex flex-col ${position === 'bottom' ? 'flex-col-reverse' : ''} w-full`}>
         <div
           className={`flex ${position === 'top' || position === 'bottom' ? 'flex-row' : 'flex-col'} items-center justify-center space-x-6`}
@@ -85,7 +85,7 @@ export const StepperTest = ({ steps, position = "top" }) => {
   );
 };
 
-export const StepperDemoTest = () => {
+export const StepperDemo = () => {
   const steps = [
     {
       header: "Step 1: Introduction",
@@ -127,7 +127,7 @@ export const StepperDemoTest = () => {
   );
 };
 
-export const stepsTest = [
+export const steps = [
   {
     header: "Components page",
     content: 
@@ -151,4 +151,4 @@ export const stepsTest = [
   },
 ];
 
-<StepperTest steps={stepsTest} position="top" />
+<Stepper1 steps={steps} position="top" />
