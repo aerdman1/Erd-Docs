@@ -241,15 +241,18 @@ export const BannerMessage = ({
       fontSize: '1rem',
       transition: 'transform 0.2s ease, box-shadow 0.2s ease'
     },
-    // Updated toggleButton style (no absolute positioning)
+    // Edit/Close toggleButton 
     toggleButton: {
+      position: 'absolute',
+      right: '9px',
+      bottom: '0px',
       padding: '0.5rem 1rem',
       fontSize: '13px',
       fontWeight: 'bold',
       background: 'rgb(15, 105, 189)',
       color: 'rgb(255, 255, 255)',
       border: 'none',
-      borderRadius: '0 0 0 10px',
+      borderRadius: '12px 12px 0px 0px',
       cursor: 'pointer'
     },
     note: {
@@ -342,12 +345,12 @@ export const BannerMessage = ({
               {showGenerator ? (
                 <>
                   <i className="fas fa-times" style={{ marginRight: '0.5rem' }}></i>
-                  Close
+                  Banner
                 </>
               ) : (
                 <>
                   <i className="fas fa-edit" style={{ marginRight: '0.5rem' }}></i>
-                  Edit
+                  Banner
                 </>
               )}
             </button>
