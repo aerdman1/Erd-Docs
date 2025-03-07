@@ -340,11 +340,19 @@ export const BannerMessage = ({
 
   return (
     <>
+      {/* CSS in the component */}
+      <style>{`
+        .generator-ui {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 1000;
+        }
+      `}</style>
+
       {/* Banner Injection Content */}
-      <div
-        id="custom-banner-content"
-        style={{ display: "none", width: "100%" }}
-      >
+      <div id="custom-banner-content" style={{ display: "none", width: "100%" }}>
         <div
           style={{
             display: "flex",
@@ -353,9 +361,7 @@ export const BannerMessage = ({
             padding: "1px 10px",
           }}
         >
-          <div style={containerStyles}>
-            {message || defaults.message}
-          </div>
+          <div style={containerStyles}>{message || defaults.message}</div>
           {isAdmin && (
             <button
               style={uiStyles.toggleButton}
@@ -385,10 +391,7 @@ export const BannerMessage = ({
 
       {/* Admin Generator UI */}
       {showGenerator && (
-        <div
-          className="generator-ui"
-          style={{ transform: "scale(0.8)", transformOrigin: "top left" }}
-        >
+        <div className="generator-ui" style={{ transform: "scale(0.8)", transformOrigin: "top left" }}>
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
               <h3 style={uiStyles.heading}>Banner Generator</h3>
