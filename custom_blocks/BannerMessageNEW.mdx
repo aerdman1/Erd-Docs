@@ -36,8 +36,6 @@ export const BannerMessage = ({
   const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
   const [placement, setPlacement] = useState('bottom'); // 'top' or 'bottom'
   const [copied, setCopied] = useState(false);
-  // New state to toggle the popup editor
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   // Sync state with props if they change externally
   useEffect(() => {
@@ -267,15 +265,10 @@ export const BannerMessage = ({
   useEffect(() => {
     const headerElement = document.querySelector('header.rm-Header');
     if (!headerElement) return;
-    // Create bannerWrapper only if it doesn't already exist
-    let bannerWrapper = document.getElementById('custom-banner-container');
-    if (!bannerWrapper) {
-      bannerWrapper = document.createElement('div');
-      bannerWrapper.id = 'custom-banner-container';
-    }
-    // Use firstElementChild to ensure we have a proper element reference
+    let bannerWrapper = document.createElement('div');
+    bannerWrapper.id = 'custom-banner-container';
     if (placement === 'top') {
-      headerElement.insertBefore(bannerWrapper, headerElement.firstElementChild);
+      headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
     } else {
       headerElement.appendChild(bannerWrapper);
     }
@@ -291,17 +284,16 @@ export const BannerMessage = ({
     const bannerWrapper = document.getElementById('custom-banner-container');
     if (!bannerWrapper) return;
     Object.assign(bannerWrapper.style, bannerStyles);
-    // Only reinsert if bannerWrapper isn't already a child of headerElement
-    if (placement === 'top' && bannerWrapper.parentNode !== headerElement) {
-      headerElement.insertBefore(bannerWrapper, headerElement.firstElementChild);
-    } else if (placement === 'bottom' && bannerWrapper.parentNode !== headerElement) {
+    if (placement === 'top') {
+      headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
+    } else {
       headerElement.appendChild(bannerWrapper);
     }
     const bannerContent = document.getElementById('custom-banner-content');
-    if (bannerContent && bannerContent.parentNode !== bannerWrapper) {
-      bannerWrapper.appendChild(bannerContent);
-    }
     if (bannerContent) {
+      if (bannerContent.parentNode !== bannerWrapper) {
+        bannerWrapper.appendChild(bannerContent);
+      }
       bannerContent.style.display = '';
     }
   }, [bannerColor, bannerTextColor, fontSize, fontWeight, message, preset, placement, bannerStyles]);
@@ -320,182 +312,140 @@ export const BannerMessage = ({
 
   return (
     <>
-      {/* Popup Admin Generator UI - only render if user is admin */}
-      {isAdmin && (
-        <>
-          {/* Toggle Button - fixed in bottom right */}
-          <div style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            zIndex: 9999,
-          }}>
-            <button
-              onClick={() => setIsPopupOpen(!isPopupOpen)}
-              style={{
-                padding: '10px 20px',
-                borderRadius: '20px',
-                background: '#1DB954',
-                color: '#fff',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1rem'
-              }}
-            >
-              {isPopupOpen ? 'Close Banner Editor' : 'Open Banner Editor'}
-            </button>
+      {/* Admin Generator UI with scaling wrapper */}
+      <div style={{ transform: 'scale(0.8)', transformOrigin: 'top left' }}>
+        <div style={uiStyles.container}>
+          <div style={uiStyles.headerRow}>
+            <h3 style={uiStyles.heading}>Banner Generator</h3>
+            <img 
+              src="https://owlbertsio-resized.s3.amazonaws.com/Traffic.psd.png" 
+              alt="Owlbert" 
+              style={uiStyles.image}
+            />
           </div>
-          {/* Popup container */}
-          {isPopupOpen && (
-            <div style={{
-              position: 'fixed',
-              bottom: '80px', // adjust so it sits above the toggle button
-              right: '20px',
-              zIndex: 9999,
-              background: '#2C303B',
-              borderRadius: '12px',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
-              overflow: 'auto',
-              maxHeight: '80vh'
-            }}>
-              <div style={{ transform: 'scale(0.8)', transformOrigin: 'top left' }}>
-                <div style={uiStyles.container}>
-                  <div style={uiStyles.headerRow}>
-                    <h3 style={uiStyles.heading}>Banner Generator</h3>
-                    <img 
-                      src="https://owlbertsio-resized.s3.amazonaws.com/Traffic.psd.png" 
-                      alt="Owlbert" 
-                      style={uiStyles.image}
-                    />
-                  </div>
-                  <label style={uiStyles.label}>
-                    Message:
-                    <input
-                      type="text"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      style={uiStyles.input}
-                    />
-                  </label>
-                  <div style={uiStyles.row}>
-                    <label style={uiStyles.label}>
-                      Preset:
-                      <select value={preset} onChange={handlePresetChange} style={uiStyles.select}>
-                        <option value="custom">Custom (you choose colors)</option>
-                        <option value="critical">Critical (Red)</option>
-                        <option value="warning">Warning (Yellow)</option>
-                        <option value="standard">Standard (Blue)</option>
-                      </select>
-                    </label>
-                    <label style={uiStyles.label}>
-                      Banner Placement:
-                      <select
-                        value={placement}
-                        onChange={(e) => setPlacement(e.target.value)}
-                        style={uiStyles.select}
-                      >
-                        <option value="top">Top (first in header)</option>
-                        <option value="bottom">Bottom (default)</option>
-                      </select>
-                    </label>
-                  </div>
-                  {preset === 'custom' ? (
-                    <div style={uiStyles.fourColumnRow}>
-                      <div>
-                        <label style={uiStyles.label}>BG Color 🎨</label>
-                        <input
-                          type="color"
-                          value={bannerColor}
-                          onChange={(e) => setBannerColor(e.target.value)}
-                          style={uiStyles.colorInput}
-                        />
-                      </div>
-                      <div>
-                        <label style={uiStyles.label}>Text Color 🎨</label>
-                        <input
-                          type="color"
-                          value={bannerTextColor}
-                          onChange={(e) => setBannerTextColor(e.target.value)}
-                          style={uiStyles.colorInput}
-                        />
-                      </div>
-                      <div>
-                        <label style={uiStyles.label}>Font Size</label>
-                        <input
-                          type="text"
-                          value={fontSize}
-                          onChange={(e) => setFontSize(e.target.value)}
-                          style={uiStyles.input}
-                        />
-                      </div>
-                      <div>
-                        <label style={uiStyles.label}>Font Weight</label>
-                        <select
-                          value={fontWeight}
-                          onChange={(e) => setFontWeight(e.target.value)}
-                          style={uiStyles.select}
-                        >
-                          <option value="300">Light</option>
-                          <option value="400">Normal</option>
-                          <option value="700">Bold</option>
-                        </select>
-                      </div>
-                    </div>
-                  ) : (
-                    <div style={uiStyles.row}>
-                      <div>
-                        <label style={uiStyles.label}>Font Size</label>
-                        <input
-                          type="text"
-                          value={fontSize}
-                          onChange={(e) => setFontSize(e.target.value)}
-                          style={uiStyles.input}
-                        />
-                      </div>
-                      <div>
-                        <label style={uiStyles.label}>Font Weight</label>
-                        <select
-                          value={fontWeight}
-                          onChange={(e) => setFontWeight(e.target.value)}
-                          style={uiStyles.select}
-                        >
-                          <option value="300">Light</option>
-                          <option value="400">Normal</option>
-                          <option value="700">Bold</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-                  <h4 style={uiStyles.sectionHeading}>Generated Code:</h4>
-                  <pre style={uiStyles.code}>{generatedSnippet}</pre>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(generatedSnippet);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    style={uiStyles.button}
-                  >
-                    Copy to Clipboard
-                  </button>
-                  {copied && (
-                    <div style={{ textAlign: 'center', marginTop: '1rem', color: '#ffffff' }}>
-                      Copied!
-                    </div>
-                  )}
-                  <div style={uiStyles.note}>
-                    <span style={{ marginRight: '0.5rem' }}>ℹ️</span>
-                    <span>
-                      Copy the code above, click "Edit," then paste it on the page and save. It will go live for the public.
-                    </span>
-                  </div>
-                </div>
+          <label style={uiStyles.label}>
+            Message:
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              style={uiStyles.input}
+            />
+          </label>
+          <div style={uiStyles.row}>
+            <label style={uiStyles.label}>
+              Preset:
+              <select value={preset} onChange={handlePresetChange} style={uiStyles.select}>
+                <option value="custom">Custom (you choose colors)</option>
+                <option value="critical">Critical (Red)</option>
+                <option value="warning">Warning (Yellow)</option>
+                <option value="standard">Standard (Blue)</option>
+              </select>
+            </label>
+            <label style={uiStyles.label}>
+              Banner Placement:
+              <select
+                value={placement}
+                onChange={(e) => setPlacement(e.target.value)}
+                style={uiStyles.select}
+              >
+                <option value="top">Top (first in header)</option>
+                <option value="bottom">Bottom (default)</option>
+              </select>
+            </label>
+          </div>
+          {preset === 'custom' ? (
+            <div style={uiStyles.fourColumnRow}>
+              <div>
+                <label style={uiStyles.label}>BG Color 🎨</label>
+                <input
+                  type="color"
+                  value={bannerColor}
+                  onChange={(e) => setBannerColor(e.target.value)}
+                  style={uiStyles.colorInput}
+                />
+              </div>
+              <div>
+                <label style={uiStyles.label}>Text Color 🎨</label>
+                <input
+                  type="color"
+                  value={bannerTextColor}
+                  onChange={(e) => setBannerTextColor(e.target.value)}
+                  style={uiStyles.colorInput}
+                />
+              </div>
+              <div>
+                <label style={uiStyles.label}>Font Size</label>
+                <input
+                  type="text"
+                  value={fontSize}
+                  onChange={(e) => setFontSize(e.target.value)}
+                  style={uiStyles.input}
+                />
+              </div>
+              <div>
+                <label style={uiStyles.label}>Font Weight</label>
+                <select
+                  value={fontWeight}
+                  onChange={(e) => setFontWeight(e.target.value)}
+                  style={uiStyles.select}
+                >
+                  <option value="300">Light</option>
+                  <option value="400">Normal</option>
+                  <option value="700">Bold</option>
+                </select>
+              </div>
+            </div>
+          ) : (
+            <div style={uiStyles.row}>
+              <div>
+                <label style={uiStyles.label}>Font Size</label>
+                <input
+                  type="text"
+                  value={fontSize}
+                  onChange={(e) => setFontSize(e.target.value)}
+                  style={uiStyles.input}
+                />
+              </div>
+              <div>
+                <label style={uiStyles.label}>Font Weight</label>
+                <select
+                  value={fontWeight}
+                  onChange={(e) => setFontWeight(e.target.value)}
+                  style={uiStyles.select}
+                >
+                  <option value="300">Light</option>
+                  <option value="400">Normal</option>
+                  <option value="700">Bold</option>
+                </select>
               </div>
             </div>
           )}
-        </>
-      )}
-      
+          <h4 style={uiStyles.sectionHeading}>Generated Code:</h4>
+          <pre style={uiStyles.code}>{generatedSnippet}</pre>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(generatedSnippet);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            style={uiStyles.button}
+          >
+            Copy to Clipboard
+          </button>
+          {copied && (
+            <div style={{ textAlign: 'center', marginTop: '1rem', color: '#ffffff' }}>
+              Copied!
+            </div>
+          )}
+          <div style={uiStyles.note}>
+            <span style={{ marginRight: '0.5rem' }}>ℹ️</span>
+            <span>
+              Copy the code above, click "Edit," then paste it on the page and save. It will go live for the public.
+            </span>
+          </div>
+        </div>
+      </div>
       {/* Banner Injection Content */}
       <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
         <div style={containerStyles}>
