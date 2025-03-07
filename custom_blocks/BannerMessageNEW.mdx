@@ -253,7 +253,7 @@ export const BannerMessage = ({
       color: "#ffffff",
       padding: "1rem",
       borderRadius: "6px",
-      overflowX: "auto",
+      overflowX: "hidden",
       fontFamily: "monospace",
       marginBottom: "1.5rem",
       fontSize: "0.95rem",
@@ -515,15 +515,24 @@ export const BannerMessage = ({
                 <div>
                   <label style={uiStyles.label}>Font Size</label>
                   <select
-  value={fontSize}
-  onChange={(e) => setFontSize(e.target.value)}
-  style={uiStyles.select}
->
-  {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
-    <option key={size} value={size}>{size}</option>
-  ))}
-</select>
-
+                    value={fontSize}
+                    onChange={(e) => setFontSize(e.target.value)}
+                    style={uiStyles.select}
+                  >
+                    {[
+                      "12px",
+                      "13px",
+                      "14px",
+                      "15px",
+                      "16px",
+                      "17px",
+                      "18px",
+                    ].map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label style={uiStyles.label}>Font Weight</label>
