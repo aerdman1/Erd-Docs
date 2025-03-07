@@ -514,12 +514,16 @@ export const BannerMessage = ({
                 </div>
                 <div>
                   <label style={uiStyles.label}>Font Size</label>
-                  <input
-                    type="text"
-                    value={fontSize}
-                    onChange={(e) => setFontSize(e.target.value)}
-                    style={uiStyles.input}
-                  />
+                  <select
+  value={fontSize}
+  onChange={(e) => setFontSize(e.target.value)}
+  style={uiStyles.select}
+>
+  {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
+    <option key={size} value={size}>{size}</option>
+  ))}
+</select>
+
                 </div>
                 <div>
                   <label style={uiStyles.label}>Font Weight</label>
