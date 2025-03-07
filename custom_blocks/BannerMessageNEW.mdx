@@ -344,13 +344,16 @@ export const BannerMessage = ({
       <style>{`
 .generator-ui {
     position: fixed;
-    top: 34vh;
-    right: -24vh;
+    top: 0;
+    right: 0;
+    width: 400px; /* or whatever fixed width you want */
+    height: 100vh; /* full height of the screen */
     z-index: 1000;
-    background: #2C303B;
+    background: #2C303B; /* optional to match the design */
     overflow-y: auto;
-    box-shadow: -5px 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: -5px 0 10px rgba(0,0,0,0.2); /* optional */
 }
+
       `}</style>
 
       {/* Banner Injection Content */}
