@@ -38,6 +38,23 @@ export const BannerMessage = ({
   const [copied, setCopied] = useState(false);
   // Toggle the generator UI for admin users
   const [showGenerator, setShowGenerator] = useState(false);
+  // Dynamic header height for positioning the generator below the header
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  // Function to update header height
+  const updateHeaderHeight = () => {
+    const header = document.querySelector("header.rm-Header");
+    if (header) {
+      setHeaderHeight(header.offsetHeight);
+    }
+  };
+
+  // Get header height on mount and update on window resize
+  useEffect(() => {
+    updateHeaderHeight();
+    window.addEventListener("resize", updateHeaderHeight);
+    return () => window.removeEventListener("resize", updateHeaderHeight);
+  }, []);
 
   // Sync state with props if they change externally
   useEffect(() => {
@@ -338,21 +355,26 @@ export const BannerMessage = ({
     };
   }, []);
 
+  // Dynamic generator styles using headerHeight
+  const generatorStyles = {
+    position: "fixed",
+    top: `${headerHeight}px`,
+    right: 0,
+    width: "600px",
+    height: `calc(100vh - ${headerHeight}px)`,
+    zIndex: 1000,
+    background: "#2C303B",
+    overflowY: "auto",
+    boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
+    transform: "scale(0.8)",
+    transformOrigin: "top left",
+  };
+
   return (
     <>
       {/* CSS in the component */}
       <style>{`
-.generator-ui {
-    position: fixed;
-    bottom: -100px;
-    right: -50px;
-    width: 600px;
-    height: calc(100vh - 120px); /* Take up remaining height */
-    z-index: 1000;
-    background: #2C303B;
-    overflow-y: auto;
-    box-shadow: -5px 0 10px rgba(0,0,0,0.2);
-}
+        /* Additional CSS rules can be added here if needed */
       `}</style>
 
       {/* Banner Injection Content */}
@@ -373,18 +395,12 @@ export const BannerMessage = ({
             >
               {showGenerator ? (
                 <>
-                  <i
-                    className="fas fa-times"
-                    style={{ marginRight: "0.5rem" }}
-                  ></i>
+                  <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>
                   Banner
                 </>
               ) : (
                 <>
-                  <i
-                    className="fas fa-edit"
-                    style={{ marginRight: "0.5rem" }}
-                  ></i>
+                  <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>
                   Banner
                 </>
               )}
@@ -395,7 +411,7 @@ export const BannerMessage = ({
 
       {/* Admin Generator UI */}
       {showGenerator && (
-        <div className="generator-ui" style={{ transform: "scale(0.8)", transformOrigin: "top left" }}>
+        <div className="generator-ui" style={generatorStyles}>
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
               <h3 style={uiStyles.heading}>Banner Generator</h3>
@@ -520,21 +536,14 @@ export const BannerMessage = ({
               Copy to Clipboard
             </button>
             {copied && (
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: "1rem",
-                  color: "#ffffff",
-                }}
-              >
+              <div style={{ textAlign: "center", marginTop: "1rem", color: "#ffffff" }}>
                 Copied!
               </div>
             )}
             <div style={uiStyles.note}>
               <span style={{ marginRight: "0.5rem" }}>ℹ️</span>
               <span>
-                Copy the code above, click "Edit," then paste it on the page and
-                save. It will go live for the public.
+                Copy the code above, click "Edit," then paste it on the page and save. It will go live for the public.
               </span>
             </div>
           </div>
