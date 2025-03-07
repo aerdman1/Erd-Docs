@@ -287,7 +287,7 @@ export const BannerMessage = ({
       color: "#ffffff",
       fontSize: "0.9rem",
       display: "flex",
-      alignItems: "center",
+                      alignItems: "center",
     },
     sectionHeading: {
       fontSize: "1.25rem",
@@ -525,27 +525,29 @@ export const BannerMessage = ({
             )}
             <h4 style={uiStyles.sectionHeading}>Generated Code:</h4>
             <pre style={uiStyles.code}>{generatedSnippet}</pre>
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(generatedSnippet);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-              }}
-              style={uiStyles.button}
-            >
-              Copy to Clipboard
-            </button>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(generatedSnippet);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                style={uiStyles.button}
+              >
+                Copy to Clipboard
+              </button>
+              <div style={uiStyles.note}>
+                <span style={{ marginRight: "0.5rem" }}>ℹ️</span>
+                <span>
+                  Copy the code above, click "Edit," then paste it on the page and save. It will go live for the public.
+                </span>
+              </div>
+            </div>
             {copied && (
               <div style={{ textAlign: "center", marginTop: "1rem", color: "#ffffff" }}>
                 Copied!
               </div>
             )}
-            <div style={uiStyles.note}>
-              <span style={{ marginRight: "0.5rem" }}>ℹ️</span>
-              <span>
-                Copy the code above, click "Edit," then paste it on the page and save. It will go live for the public.
-              </span>
-            </div>
           </div>
         </div>
       )}
