@@ -175,23 +175,31 @@ export const BannerMessage = ({
     },
     input: {
       width: '100%',
-      padding: '0.75rem',
+      padding: '0.40rem',
       borderRadius: '6px',
       border: '1px solid #ddd',
       color: '#fff',
       fontSize: '1rem',
       background: '#384248',
+      marginTop: '2px',
       transition: 'border-color 0.2s ease-in-out'
     },
+    // Modified select style: remove native appearance and add a custom down arrow
     select: {
       width: '100%',
-      padding: '0.75rem',
+      padding: '0.60rem',
+      paddingRight: '2.5rem',
       color: '#fff',
       borderRadius: '6px',
       border: '1px solid #ddd',
       fontSize: '1rem',
-      background: '#384248',
-      transition: 'border-color 0.2s ease-in-out'
+      background: `#384248 url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='1,3 5,7 9,3' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center`,
+      backgroundSize: '1em',
+      marginTop: '2px',
+      transition: 'border-color 0.2s ease-in-out',
+      appearance: 'none',
+      WebkitAppearance: 'none',
+      MozAppearance: 'none'
     },
     row: {
       display: 'flex',
@@ -208,8 +216,7 @@ export const BannerMessage = ({
       width: '100%',
       height: '45px',
       padding: 0,
-      border: '1px solid #ddd',
-      borderRadius: '6px',
+      border: 0,
       cursor: 'pointer',
       background: 'none'
     },
