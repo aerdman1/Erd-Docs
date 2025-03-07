@@ -387,7 +387,11 @@ export const BannerMessage = ({
           {isAdmin && (
             <button
               style={uiStyles.toggleButton}
-              onClick={() => setShowGenerator((prev) => !prev)}
+              onClick={() => {
+                // Recalculate header height on button click
+                updateHeaderHeight();
+                setShowGenerator((prev) => !prev);
+              }}
             >
               {showGenerator ? (
                 <>
@@ -570,5 +574,4 @@ export const BannerMessage = ({
   );
 };
 
-
-<BannerMessage />
+export default BannerMessage;
