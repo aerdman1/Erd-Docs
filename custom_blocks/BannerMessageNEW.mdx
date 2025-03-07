@@ -358,16 +358,16 @@ export const BannerMessage = ({
   // Dynamic generator styles using headerHeight
   const generatorStyles = {
     position: "fixed",
-    top: `${headerHeight}px + 150px`,  // Add to account for extra space 
+    top: `${headerHeight}px - 150px`,  // Add to account for extra space 
     right: 0,
     width: "600px",
-    height: `calc(100vh - ${headerHeight}px + 150)`,
+    height: `calc(100vh - ${headerHeight}px - 150)`,
     zIndex: 1000,
     background: "#2C303B",
     overflowY: "auto",
     boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
     transform: "scale(0.7)",
-    transformOrigin: "top left",
+    transformOrigin: "top right",
   };
 
   return (
