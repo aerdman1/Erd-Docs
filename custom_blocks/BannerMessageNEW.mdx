@@ -251,16 +251,16 @@ export const BannerMessage = ({
     },
     // Edit/Close toggleButton
     toggleButton: {
-      position: "absolute",
-      right: "9px",
-      bottom: "0px",
-      padding: "0.5rem 1rem",
-      fontSize: "13px",
+      display: "flex",
+      opacity: ".8",
+      marginRight: "-10px",
+      padding: "6px 12px",
+      fontSize: "11px",
       fontWeight: "bold",
       background: "rgb(15, 105, 189)",
       color: "rgb(255, 255, 255)",
       border: "none",
-      borderRadius: "12px 12px 0px 0px",
+      borderRadius: "10px 0px 0px 10px",
       cursor: "pointer",
     },
     note: {
@@ -351,7 +351,7 @@ export const BannerMessage = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "10px",
+            padding: "1px 10px",
           }}
         >
           <div style={containerStyles}>{message || defaults.message}</div>
