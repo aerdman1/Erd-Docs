@@ -358,7 +358,7 @@ export const BannerMessage = ({
   // Dynamic generator styles using headerHeight
   const generatorStyles = {
     position: "fixed",
-    top: `${headerHeight}px`,
+    top: `${headerHeight + 100}px`,  // Adding 100px to account for extra space if needed
     right: 0,
     width: "600px",
     height: `calc(100vh - ${headerHeight}px)`,
