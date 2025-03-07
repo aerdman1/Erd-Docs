@@ -190,15 +190,20 @@ export const BannerMessage = ({
       fontSize: "1rem",
     },
     input: {
-      width: "93%",
-      padding: "0.40rem",
-      borderRadius: "6px",
-      border: "1px solid #ddd",
-      color: "#adb4c1",
-      fontSize: "1rem",
-      background: "#384248",
-      marginTop: "2px",
-      transition: "border-color 0.2s ease-in-out",
+        width: "93%",
+        minHeight: "50px", // Slightly taller than a regular input
+        padding: "0.5rem",
+        borderRadius: "6px",
+        border: "1px solid #ddd",
+        color: "#adb4c1",
+        fontSize: "1rem",
+        background: "#384248",
+        marginTop: "2px",
+        transition: "border-color 0.2s ease-in-out",
+        resize: "vertical", // Allows vertical resizing
+        overflowY: "auto", // Ensures it handles long text
+        whiteSpace: "pre-wrap", // Keeps text wrapping correctly
+        wordWrap: "break-word",
     },
     select: {
       width: "100%",
