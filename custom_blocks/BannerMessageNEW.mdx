@@ -452,12 +452,11 @@ export const BannerMessage = ({
             </div>
             <label style={uiStyles.label}>
               Message:
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                style={uiStyles.input}
-              />
+              <textarea
+    value={message}
+    onChange={(e) => setMessage(e.target.value)}
+    style={uiStyles.input}
+  />
             </label>
             <div style={uiStyles.row}>
               <label style={uiStyles.label}>
