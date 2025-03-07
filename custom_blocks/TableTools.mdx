@@ -94,7 +94,7 @@ table.dataTable, table.dataTable th, table.dataTable td {
   line-height: 1;
   height: auto;
   box-sizing: border-box;
-  box-shadow: none;
+  box-shadow: none !important;
   transform: none !important;
   outline: none !important;
 }
@@ -169,6 +169,10 @@ table.dataTable, table.dataTable th, table.dataTable td {
   background: #E74C3C !important; /* Soft red */
   border: none !important;
   color: #fff !important;
+}
+/* Hide buttons in popup modal */
+.tablePopUp .dt-buttons {
+  display: none;
 }
         `;
         document.head.appendChild(styleOverride);
@@ -256,8 +260,10 @@ table.dataTable, table.dataTable th, table.dataTable td {
                       const searchDiv = clone.querySelector(".dataTables_filter");
                       if (searchDiv) searchDiv.remove();
                       clone.style.margin = "0";
+                      clone.classList.add("tablePopUp");
                     } else {
                       clone = table.cloneNode(true);
+                      clone.classList.add("tablePopUp");
                     }
                     const markdownWrapper = document.createElement("div");
                     markdownWrapper.className = "markdown-body";
@@ -312,20 +318,19 @@ table.dataTable, table.dataTable th, table.dataTable td {
                   }
                 },
                 {
-                    text: '<i class="fa fa-ban"></i> Close',
-                    className: "dt-button custom-close-button",
-                    action: function (e, dt, node, config) {
-                      dt.destroy();
-                      const original = table.getAttribute("data-original-html");
-                      if (original) {
-                        table.innerHTML = original;
-                        table.removeAttribute("data-original-html");
-                      }
-                      table.setAttribute("data-filter-enabled", "false");
-                      trigger.style.display = "block";
+                  text: '<i class="fa fa-ban"></i> Close',
+                  className: "dt-button custom-close-button",
+                  action: function (e, dt, node, config) {
+                    dt.destroy();
+                    const original = table.getAttribute("data-original-html");
+                    if (original) {
+                      table.innerHTML = original;
+                      table.removeAttribute("data-original-html");
                     }
+                    table.setAttribute("data-filter-enabled", "false");
+                    trigger.style.display = "block";
                   }
-                  
+                }
               ]
             });
             table.setAttribute("data-filter-enabled", "true");
