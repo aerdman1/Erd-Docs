@@ -230,7 +230,7 @@ export const BannerMessage = ({
     },
     fourColumnRow: {
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+      gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
       gap: "1rem",
       marginBottom: "1rem",
     },
@@ -287,7 +287,8 @@ export const BannerMessage = ({
       color: "#ffffff",
       fontSize: "0.9rem",
       display: "flex",
-                      alignItems: "center",
+      alignItems: "center",
+      maxWidth: "300px",
     },
     sectionHeading: {
       fontSize: "1.25rem",
@@ -358,7 +359,7 @@ export const BannerMessage = ({
   // Dynamic generator styles using headerHeight
   const generatorStyles = {
     position: "fixed",                      // Change to fixed
-    top: `${headerHeight + 100}px`,         // Always 150px below the header
+    top: `${headerHeight + 100}px`,         // Always 100px below the header (updated from 150px)
     right: "20px",
     width: "600px",
     height: `100%`,  // Full height minus header and offset
