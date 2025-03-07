@@ -1,31 +1,33 @@
 ---
 name: BannerMessageNEW
 ---
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 export const BannerMessage = ({
-  message: propMessage = 'Hello! 👋 This is your site-wide announcement banner — customize it to share updates, reminders, or anything important.',
-  bannerColor: propBannerColor = '#00bcff',
-  bannerTextColor: propBannerTextColor = '#ffffff',
-  fontSize: propFontSize = '16px',
-  fontWeight: propFontWeight = 'normal',
+  message:
+    propMessage = "Hello! 👋 This is your site-wide announcement banner — customize it to share updates, reminders, or anything important.",
+  bannerColor: propBannerColor = "#008EF5",
+  bannerTextColor: propBannerTextColor = "#ffffff",
+  fontSize: propFontSize = "16px",
+  fontWeight: propFontWeight = "normal",
 }) => {
   // Check if the user is an admin based on the hub-me script data
   let isAdmin = false;
-  if (typeof document !== 'undefined') {
-    const hubElem = document.getElementById('hub-me');
+  if (typeof document !== "undefined") {
+    const hubElem = document.getElementById("hub-me");
     if (hubElem) {
       try {
-        const hubData = JSON.parse(hubElem.getAttribute('data-json'));
+        const hubData = JSON.parse(hubElem.getAttribute("data-json"));
         isAdmin = hubData.isAdmin;
       } catch (e) {
-        console.error('Error parsing hub-me data', e);
+        console.error("Error parsing hub-me data", e);
       }
     }
   }
 
   // Map incoming fontWeight "normal" to "400"
-  const initialFontWeight = propFontWeight === 'normal' ? '400' : propFontWeight;
+  const initialFontWeight =
+    propFontWeight === "normal" ? "400" : propFontWeight;
 
   // Use incoming props to initialize state
   const [message, setMessage] = useState(propMessage);
@@ -33,8 +35,8 @@ export const BannerMessage = ({
   const [bannerTextColor, setBannerTextColor] = useState(propBannerTextColor);
   const [fontSize, setFontSize] = useState(propFontSize);
   const [fontWeight, setFontWeight] = useState(initialFontWeight);
-  const [preset, setPreset] = useState('custom'); // 'critical', 'warning', 'standard', 'custom'
-  const [placement, setPlacement] = useState('bottom'); // 'top' or 'bottom'
+  const [preset, setPreset] = useState("custom"); // 'critical', 'warning', 'standard', 'custom'
+  const [placement, setPlacement] = useState("bottom"); // 'top' or 'bottom'
   const [copied, setCopied] = useState(false);
   // Toggle the generator UI for admin users
   const [showGenerator, setShowGenerator] = useState(false);
@@ -45,30 +47,36 @@ export const BannerMessage = ({
     setBannerColor(propBannerColor);
     setBannerTextColor(propBannerTextColor);
     setFontSize(propFontSize);
-    setFontWeight(propFontWeight === 'normal' ? '400' : propFontWeight);
-  }, [propMessage, propBannerColor, propBannerTextColor, propFontSize, propFontWeight]);
+    setFontWeight(propFontWeight === "normal" ? "400" : propFontWeight);
+  }, [
+    propMessage,
+    propBannerColor,
+    propBannerTextColor,
+    propFontSize,
+    propFontWeight,
+  ]);
 
   const handlePresetChange = (e) => {
     const selectedPreset = e.target.value;
     setPreset(selectedPreset);
-    if (selectedPreset === 'critical') {
-      setBannerColor('#dc2626');
-      setBannerTextColor('#ffffff');
-    } else if (selectedPreset === 'warning') {
-      setBannerColor('#facc15');
-      setBannerTextColor('#000000');
-    } else if (selectedPreset === 'standard') {
-      setBannerColor('#2563eb');
-      setBannerTextColor('#ffffff');
-    } else if (selectedPreset === 'custom') {
-      setBannerColor('#00bcff');
-      setBannerTextColor('#ffffff');
+    if (selectedPreset === "critical") {
+      setBannerColor("#dc2626");
+      setBannerTextColor("#ffffff");
+    } else if (selectedPreset === "warning") {
+      setBannerColor("#facc15");
+      setBannerTextColor("#000000");
+    } else if (selectedPreset === "standard") {
+      setBannerColor("#2563eb");
+      setBannerTextColor("#ffffff");
+    } else if (selectedPreset === "custom") {
+      setBannerColor("#00bcff");
+      setBannerTextColor("#ffffff");
     }
   };
 
   const generateBannerProps = () => {
     let props = `message="${message}"`;
-    if (preset !== 'custom') {
+    if (preset !== "custom") {
       props += ` ${preset}={true}`;
     } else {
       props += ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
@@ -86,29 +94,29 @@ export const BannerMessage = ({
       bannerTextColor: "#ffffff",
       fontSize: "16px",
       fontWeight: "normal",
-      message: "Critical Alert: Please check immediately!"
+      message: "Critical Alert: Please check immediately!",
     },
     warning: {
       bannerColor: "#facc15",
       bannerTextColor: "#000000",
       fontSize: "16px",
       fontWeight: "normal",
-      message: "Warning Alert: There might be an issue."
+      message: "Warning Alert: There might be an issue.",
     },
     standard: {
       bannerColor: "#2563eb",
       bannerTextColor: "#ffffff",
       fontSize: "16px",
       fontWeight: "normal",
-      message: "Standard Alert: Here is some information."
+      message: "Standard Alert: Here is some information.",
     },
     custom: {
       bannerColor: "#00BCFF",
       bannerTextColor: "#ffffff",
       fontSize: "14px",
       fontWeight: "bold",
-      message: "Here is my banner message - hope you enjoy!"
-    }
+      message: "Here is my banner message - hope you enjoy!",
+    },
   };
 
   const defaults = defaultPresets[preset];
@@ -122,7 +130,7 @@ export const BannerMessage = ({
     width: "100%",
     boxSizing: "border-box",
     borderRadius: "0px",
-    padding: "10px"
+    padding: "10px",
   };
 
   // Container styles for public banner content (injected into header)
@@ -132,154 +140,154 @@ export const BannerMessage = ({
     padding: "1rem 1.5rem",
     textAlign: "center",
     boxSizing: "border-box",
-    fontFamily: 'Inter, sans-serif'
+    fontFamily: "Inter, sans-serif",
   };
 
   // Inline styles for Admin Generator UI
   const uiStyles = {
     container: {
-      maxWidth: '800px',
-      margin: '2rem auto',
-      padding: '2rem',
-      background: '#2C303B',
-      borderRadius: '12px',
-      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
-      fontFamily: 'Inter, sans-serif'
+      maxWidth: "800px",
+      margin: "2rem auto",
+      padding: "2rem",
+      background: "#2C303B",
+      borderRadius: "12px",
+      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
+      fontFamily: "Inter, sans-serif",
     },
     headerRow: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '1.5rem',
-      position: 'relative'
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "1.5rem",
+      position: "relative",
     },
     heading: {
       margin: 0,
-      color: '#fff',
-      fontSize: '1.75rem',
-      fontWeight: 600
+      color: "#fff",
+      fontSize: "1.75rem",
+      fontWeight: 600,
     },
     image: {
-      position: 'absolute',
-      top: '-23px',
-      right: '-32px',
-      maxWidth: '71px',
-      height: 'auto'
+      position: "absolute",
+      top: "-23px",
+      right: "-32px",
+      maxWidth: "71px",
+      height: "auto",
     },
     label: {
-      display: 'block',
-      marginBottom: '0.5rem',
+      display: "block",
+      marginBottom: "0.5rem",
       fontWeight: 500,
-      color: '#fff',
-      fontSize: '1rem'
+      color: "#fff",
+      fontSize: "1rem",
     },
     input: {
-      width: '93%',
-      padding: '0.40rem',
-      borderRadius: '6px',
-      border: '1px solid #ddd',
-      color: '#fff',
-      fontSize: '1rem',
-      background: '#384248',
-      marginTop: '2px',
-      transition: 'border-color 0.2s ease-in-out'
+      width: "93%",
+      padding: "0.40rem",
+      borderRadius: "6px",
+      border: "1px solid #ddd",
+      color: "#fff",
+      fontSize: "1rem",
+      background: "#384248",
+      marginTop: "2px",
+      transition: "border-color 0.2s ease-in-out",
     },
     select: {
-      width: '100%',
-      padding: '0.60rem',
-      paddingRight: '2.5rem',
-      color: '#fff',
-      borderRadius: '6px',
-      border: '1px solid #ddd',
-      fontSize: '1rem',
+      width: "100%",
+      padding: "0.60rem",
+      paddingRight: "2.5rem",
+      color: "#fff",
+      borderRadius: "6px",
+      border: "1px solid #ddd",
+      fontSize: "1rem",
       background: `#384248 url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='1,3 5,7 9,3' stroke='%23fff' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center`,
-      backgroundSize: '1em',
-      marginTop: '2px',
-      transition: 'border-color 0.2s ease-in-out',
-      appearance: 'none',
-      WebkitAppearance: 'none',
-      MozAppearance: 'none'
+      backgroundSize: "1em",
+      marginTop: "2px",
+      transition: "border-color 0.2s ease-in-out",
+      appearance: "none",
+      WebkitAppearance: "none",
+      MozAppearance: "none",
     },
     row: {
-      display: 'flex',
-      gap: '1rem',
-      marginBottom: '1rem'
+      display: "flex",
+      gap: "1rem",
+      marginBottom: "1rem",
     },
     fourColumnRow: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-      gap: '1rem',
-      marginBottom: '1rem'
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+      gap: "1rem",
+      marginBottom: "1rem",
     },
     colorInput: {
-      width: '100%',
-      height: '45px',
+      width: "100%",
+      height: "45px",
       padding: 0,
       border: 0,
-      cursor: 'pointer',
-      background: 'none'
+      cursor: "pointer",
+      background: "none",
     },
     code: {
-      background: '#2d2d2d',
-      color: '#ffffff',
-      padding: '1rem',
-      borderRadius: '6px',
-      overflowX: 'auto',
-      fontFamily: 'monospace',
-      marginBottom: '1.5rem',
-      fontSize: '0.95rem'
+      background: "#2d2d2d",
+      color: "#ffffff",
+      padding: "1rem",
+      borderRadius: "6px",
+      overflowX: "auto",
+      fontFamily: "monospace",
+      marginBottom: "1.5rem",
+      fontSize: "0.95rem",
     },
     button: {
-      padding: '0.75rem 1.5rem',
-      cursor: 'pointer',
-      background: '#1DB954',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '30px',
-      display: 'block',
-      margin: '0 auto',
-      fontSize: '1rem',
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+      padding: "0.75rem 1.5rem",
+      cursor: "pointer",
+      background: "#1DB954",
+      color: "#fff",
+      border: "none",
+      borderRadius: "30px",
+      display: "block",
+      margin: "0 auto",
+      fontSize: "1rem",
+      transition: "transform 0.2s ease, box-shadow 0.2s ease",
     },
-    // Edit/Close toggleButton 
+    // Edit/Close toggleButton
     toggleButton: {
-      position: 'absolute',
-      right: '9px',
-      bottom: '0px',
-      padding: '0.5rem 1rem',
-      fontSize: '13px',
-      fontWeight: 'bold',
-      background: 'rgb(15, 105, 189)',
-      color: 'rgb(255, 255, 255)',
-      border: 'none',
-      borderRadius: '12px 12px 0px 0px',
-      cursor: 'pointer'
+      position: "absolute",
+      right: "9px",
+      bottom: "0px",
+      padding: "0.5rem 1rem",
+      fontSize: "13px",
+      fontWeight: "bold",
+      background: "rgb(15, 105, 189)",
+      color: "rgb(255, 255, 255)",
+      border: "none",
+      borderRadius: "12px 12px 0px 0px",
+      cursor: "pointer",
     },
     note: {
-      marginTop: '1rem',
-      padding: '1rem',
-      borderLeft: '4px solid #1DB954',
-      backgroundColor: '#000000',
-      color: '#ffffff',
-      fontSize: '0.9rem',
-      display: 'flex',
-      alignItems: 'center'
+      marginTop: "1rem",
+      padding: "1rem",
+      borderLeft: "4px solid #1DB954",
+      backgroundColor: "#000000",
+      color: "#ffffff",
+      fontSize: "0.9rem",
+      display: "flex",
+      alignItems: "center",
     },
     sectionHeading: {
-      fontSize: '1.25rem',
-      marginBottom: '1rem',
-      textAlign: 'center',
-      color: '#ffffff'
-    }
+      fontSize: "1.25rem",
+      marginBottom: "1rem",
+      textAlign: "center",
+      color: "#ffffff",
+    },
   };
 
   // Create banner container on mount and remove on unmount
   useEffect(() => {
-    const headerElement = document.querySelector('header.rm-Header');
+    const headerElement = document.querySelector("header.rm-Header");
     if (!headerElement) return;
-    let bannerWrapper = document.createElement('div');
-    bannerWrapper.id = 'custom-banner-container';
-    if (placement === 'top') {
+    let bannerWrapper = document.createElement("div");
+    bannerWrapper.id = "custom-banner-container";
+    if (placement === "top") {
       headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
     } else {
       headerElement.appendChild(bannerWrapper);
@@ -291,52 +299,62 @@ export const BannerMessage = ({
 
   // Update banner container's styles, content, and placement on changes
   useEffect(() => {
-    const headerElement = document.querySelector('header.rm-Header');
+    const headerElement = document.querySelector("header.rm-Header");
     if (!headerElement) return;
-    const bannerWrapper = document.getElementById('custom-banner-container');
+    const bannerWrapper = document.getElementById("custom-banner-container");
     if (!bannerWrapper) return;
     Object.assign(bannerWrapper.style, bannerStyles);
-    if (placement === 'top') {
+    if (placement === "top") {
       headerElement.insertBefore(bannerWrapper, headerElement.firstChild);
     } else {
       headerElement.appendChild(bannerWrapper);
     }
-    const bannerContent = document.getElementById('custom-banner-content');
+    const bannerContent = document.getElementById("custom-banner-content");
     if (bannerContent) {
       if (bannerContent.parentNode !== bannerWrapper) {
         bannerWrapper.appendChild(bannerContent);
       }
-      bannerContent.style.display = '';
+      bannerContent.style.display = "";
     }
-  }, [bannerColor, bannerTextColor, fontSize, fontWeight, message, preset, placement, bannerStyles]);
+  }, [
+    bannerColor,
+    bannerTextColor,
+    fontSize,
+    fontWeight,
+    message,
+    preset,
+    placement,
+    bannerStyles,
+  ]);
 
   // Listen for route changes and remove the banner container
   useEffect(() => {
     const handleRouteChange = () => {
-      const bannerWrapper = document.getElementById('custom-banner-container');
+      const bannerWrapper = document.getElementById("custom-banner-container");
       if (bannerWrapper) bannerWrapper.remove();
     };
-    window.addEventListener('popstate', handleRouteChange);
+    window.addEventListener("popstate", handleRouteChange);
     return () => {
-      window.removeEventListener('popstate', handleRouteChange);
+      window.removeEventListener("popstate", handleRouteChange);
     };
   }, []);
 
   return (
     <>
       {/* Banner Injection Content */}
-      <div id="custom-banner-content" style={{ display: 'none', width: '100%' }}>
+      <div
+        id="custom-banner-content"
+        style={{ display: "none", width: "100%" }}
+      >
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '10px'
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "10px",
           }}
         >
-          <div style={containerStyles}>
-            {message || defaults.message}
-          </div>
+          <div style={containerStyles}>{message || defaults.message}</div>
           {isAdmin && (
             <button
               style={uiStyles.toggleButton}
@@ -344,12 +362,18 @@ export const BannerMessage = ({
             >
               {showGenerator ? (
                 <>
-                  <i className="fas fa-times" style={{ marginRight: '0.5rem' }}></i>
+                  <i
+                    className="fas fa-times"
+                    style={{ marginRight: "0.5rem" }}
+                  ></i>
                   Banner
                 </>
               ) : (
                 <>
-                  <i className="fas fa-edit" style={{ marginRight: '0.5rem' }}></i>
+                  <i
+                    className="fas fa-edit"
+                    style={{ marginRight: "0.5rem" }}
+                  ></i>
                   Banner
                 </>
               )}
@@ -360,7 +384,7 @@ export const BannerMessage = ({
 
       {/* Admin Generator UI */}
       {showGenerator && (
-        <div style={{ transform: 'scale(0.8)', transformOrigin: 'top left' }}>
+        <div style={{ transform: "scale(0.8)", transformOrigin: "top left" }}>
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
               <h3 style={uiStyles.heading}>Banner Generator</h3>
@@ -382,7 +406,11 @@ export const BannerMessage = ({
             <div style={uiStyles.row}>
               <label style={uiStyles.label}>
                 Preset:
-                <select value={preset} onChange={handlePresetChange} style={uiStyles.select}>
+                <select
+                  value={preset}
+                  onChange={handlePresetChange}
+                  style={uiStyles.select}
+                >
                   <option value="custom">Custom (you choose colors)</option>
                   <option value="critical">Critical (Red)</option>
                   <option value="warning">Warning (Yellow)</option>
@@ -401,7 +429,7 @@ export const BannerMessage = ({
                 </select>
               </label>
             </div>
-            {preset === 'custom' ? (
+            {preset === "custom" ? (
               <div style={uiStyles.fourColumnRow}>
                 <div>
                   <label style={uiStyles.label}>BG Color 🎨</label>
@@ -481,14 +509,21 @@ export const BannerMessage = ({
               Copy to Clipboard
             </button>
             {copied && (
-              <div style={{ textAlign: 'center', marginTop: '1rem', color: '#ffffff' }}>
+              <div
+                style={{
+                  textAlign: "center",
+                  marginTop: "1rem",
+                  color: "#ffffff",
+                }}
+              >
                 Copied!
               </div>
             )}
             <div style={uiStyles.note}>
-              <span style={{ marginRight: '0.5rem' }}>ℹ️</span>
+              <span style={{ marginRight: "0.5rem" }}>ℹ️</span>
               <span>
-                Copy the code above, click "Edit," then paste it on the page and save. It will go live for the public.
+                Copy the code above, click "Edit," then paste it on the page and
+                save. It will go live for the public.
               </span>
             </div>
           </div>
