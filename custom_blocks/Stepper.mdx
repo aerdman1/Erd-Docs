@@ -1,0 +1,65 @@
+---
+name: Stepper
+---
+import { useState } from "react";
+
+export default function Stepper() {
+  const [step, setStep] = useState(2);
+
+  const steps = [
+    { id: 1, label: "Go to Components page" },
+    { id: 2, label: "Create New" },
+    { id: 3, label: "Add to Docs" },
+  ];
+
+  return (
+    <div className="bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-600 via-pink-600 to-blue-600 rounded-lg p-8 max-w-xl shadow-sm">  
+      {/* Background^ */}
+      <div className="flex items-center justify-between mb-8">
+        {steps.map((s, index) => (
+          <div key={s.id} className="flex items-center gap-1">
+            <div
+              className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                step >= s.id ? "bg-purple-500 text-white" : "bg-gray-200 text-gray-400"
+              }`}
+            >
+              {s.id}
+            </div>
+            {index < steps.length - 1 && (
+              <div className="w-50 h-1 bg-gray-100"></div>
+            )}
+          </div>
+        ))}
+      </div>
+      <h4 className="font-semibold text-gray-800">{steps[step - 1].label}</h4>
+      {/* content header^ */}
+      <p className="text-gray-600">
+        {step === 2 ? (
+   				<>
+      		Next Steps:
+      		<br />
+      		• Select 'Create New' to start building your own components with real-time preview
+      		<br />
+      		• Browse Marketplace to get share and access community-created components
+    			</>
+  			 ) : ("")}
+      </p>
+      <div className="flex justify-between mt-4">
+        <button
+          className="text-gray-500 hover:text-gray-200 font-medium uppercase text-sm"
+          disabled={step === 1}
+          onClick={() => setStep(step - 1)}
+        >
+          Back
+        </button>
+        <button
+          className="text-purple-500 hover:text-gray-200 font-medium uppercase text-sm"
+          disabled={step === steps.length}
+          onClick={() => setStep(step + 1)}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
