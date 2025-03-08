@@ -20,7 +20,7 @@ export function StepperComponent({ steps }) {
         padding: 24px;
         border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        background: radial-gradient(circle at center, #c9a4ff 20%, #4a2a8f 80%);
+        background: radial-gradient(circle at center, #c9a4ff96 20%, #4a2a8f 80%);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
       .progress-container {
@@ -198,18 +198,18 @@ export function StepperComponent({ steps }) {
       header: "Confirmation",
       content:        
       <div>
-      <p>Review the details you have entered. If everything looks good, submit the form. If you need to make any changes, you can go back to the previous step.</p>
+      <p>Review the details you have entered. If everything looks good, submit the form. If you need to make any changes, you can go back to the last step.</p>
       </div>,
     },
     {
-      header: "Completion",
+      header: "Another Step",
       content:        
       <div>
       <p>Congratulations! You have completed the steps successfully.</p>
       </div>,
     },
     {
-      header: "Extra Step (Hidden)",
+      header: "And Another!)",
       content:        
       <div>
       <p>This step is not displayed by default but exists in the code.</p>
