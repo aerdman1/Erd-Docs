@@ -3,7 +3,7 @@ name: Stepper
 ---
 import React, { useState } from 'react';
 
-export const Stepper1 = ({ steps, position = "top" }) => {
+export const StepperComponent = ({ steps, position = "top" }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
   const handleNext = () => {
@@ -151,4 +151,4 @@ export const steps = [
   },
 ];
 
-<Stepper1 steps={steps} position="top" />
+<StepperComponent steps={steps} position="top" />
