@@ -5,7 +5,16 @@ import React, { useState, useEffect } from "react";
 
 export function StepperComponent({ steps }) {
   const [currentStep, setCurrentStep] = useState(0);
-  const visibleSteps = steps.slice(0, 3); // Show only the first 4 steps
+  const [isVisible, setIsVisible] = useState(false); // Controls fade-in
+
+  useEffect(() => {
+    // Delay visibility to allow styles to load properly
+    const timeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 1000); // 1 second delay
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     // Inject CSS dynamically into the <head>
@@ -22,6 +31,11 @@ export function StepperComponent({ steps }) {
         border: 1px solid rgba(255, 255, 255, 0.2);
         background: radial-gradient(circle at center, #c9a4ff96 20%, #4a2a8f 80%);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      .stepper-container.visible {
+        opacity: 1;
       }
       .progress-container {
         display: flex;
@@ -32,15 +46,14 @@ export function StepperComponent({ steps }) {
         max-width: 500px;
         margin: 20px auto;
       }
-      /* Background Line (Adjusted to Start & Stop at Circles) */
       .progress-container::before {
         background-color: rgba(255, 255, 255, 0.2);
         content: "";
         height: 3px;
         position: absolute;
         top: 50%;
-        left: 12.5%; /* Starts right after first circle */
-        right: 12.5%; /* Ends before last circle */
+        left: 12.5%;
+        right: 12.5%;
         transform: translateY(-50%);
         z-index: 2;
         border-radius: 2px;
@@ -84,7 +97,6 @@ export function StepperComponent({ steps }) {
         color: #fff;
         border: 3px solid white;
       }
-      /* Step Titles Below Circles */
       .step-title {
         position: absolute;
         top: 45px;
@@ -135,14 +147,17 @@ export function StepperComponent({ steps }) {
     };
   }, []);
 
+  // ✅ Move this here so it is defined before being used
+  const visibleSteps = steps.slice(0, 3); // Ensure `visibleSteps` is properly available
+
   return (
-    <div className="stepper-container">
+    <div className={`stepper-container ${isVisible ? "visible" : ""}`}>
       {/* Progress Bar */}
       <div className="progress-container">
         <div
           className="progress"
           style={{
-            width: `${(currentStep / (visibleSteps.length - 1)) * 75}%`, // Match the trimmed line length
+            width: `${(currentStep / (visibleSteps.length - 1)) * 75}%`,
           }}
         ></div>
 
@@ -176,6 +191,7 @@ export function StepperComponent({ steps }) {
     </div>
   );
 }
+
 
 <StepperComponent
   position="top"
