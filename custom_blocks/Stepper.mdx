@@ -3,7 +3,7 @@ name: Stepper
 ---
 import React, { useState, useEffect } from "react";
 
-export function StepperComponent({ steps, verticalTrue = true, backgroundTheme = "purple" }) {
+export function StepperComponent({ steps, verticalTrue = false, backgroundTheme = "purple" }) {
   const themes = {
     purple: {
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
@@ -14,7 +14,7 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
     },
     blue: {
       background: "radial-gradient(circle at top, #4da6ff 20%, #0073e6 80%)",
-      circle: "linear-gradient(to top, #80ccff, #4da6ff)", 
+      circle: "linear-gradient(to top, #80ccff, #4da6ff)",
       circleActive: "linear-gradient(to top, #1a8cff, #0066cc)",
       square: "linear-gradient(to top, #66ccff, #3399ff)",
       squareActive: "linear-gradient(to top, #99ddff, #66ccff)",
@@ -255,8 +255,10 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
       .vertical-circle-container .step-title.active {
         color: rgba(255, 255, 255, 1);
       }
+      /* Adjust vertical content alignment */
       .vertical-layout .step-content {
-        margin-left: 190px;
+        margin: 0 0 0 190px;
+        align-self: center;
       }
     `;
     document.head.appendChild(styleOverride);
@@ -280,8 +282,12 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
               const shapeClass = step.stepType === "square" ? "square" : "circle";
               return (
                 <div key={index} className="vertical-circle-container">
-                  <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>{index + 1}</div>
-                  <div className={`step-title ${index === currentStep ? "active" : ""}`}>{step.header}</div>
+                  <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>
+                    {index + 1}
+                  </div>
+                  <div className={`step-title ${index === currentStep ? "active" : ""}`}>
+                    {step.header}
+                  </div>
                 </div>
               );
             })}
@@ -314,8 +320,12 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
           const shapeClass = step.stepType === "square" ? "square" : "circle";
           return (
             <div key={index} className="circle-container">
-              <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>{index + 1}</div>
-              <div className={`step-title ${index === currentStep ? "active" : ""}`}>{step.header}</div>
+              <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>
+                {index + 1}
+              </div>
+              <div className={`step-title ${index === currentStep ? "active" : ""}`}>
+                {step.header}
+              </div>
             </div>
           );
         })}
