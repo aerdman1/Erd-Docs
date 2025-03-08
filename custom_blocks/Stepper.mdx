@@ -3,7 +3,7 @@ name: Stepper
 ---
 import React, { useState, useEffect } from "react";
 
-export function StepperComponent({ steps, verticalTrue = false, backgroundTheme = "purple" }) {
+export function StepperComponent({ steps, verticalTrue = true, backgroundTheme = "purple" }) {
   const themes = {
     purple: {
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
@@ -14,12 +14,11 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
     },
     blue: {
       background: "radial-gradient(circle at top, #4da6ff 20%, #0073e6 80%)",
-      circle: "linear-gradient(to top, #80ccff, #4da6ff)",
+      circle: "linear-gradient(to top, #80ccff, #4da6ff)", 
       circleActive: "linear-gradient(to top, #1a8cff, #0066cc)",
       square: "linear-gradient(to top, #66ccff, #3399ff)",
       squareActive: "linear-gradient(to top, #99ddff, #66ccff)",
     },
-    // Add more themes here as needed
   };
 
   // Use the provided theme key or fall back to "purple"
@@ -164,6 +163,13 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         color: white;
         font-weight: 400;
       }
+      .step-header {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: white;
+      }
       .stepper-buttons {
         margin-top: 20px;
         display: flex;
@@ -261,50 +267,33 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
 
   if (verticalTrue) {
     return (
-      <div
-        className={`stepper-container transition-opacity duration-500 ${
-          isVisible ? "opacity-100 visible" : "opacity-0 invisible"
-        }`}
-      >
+      <div className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
         <div className="vertical-layout">
           <div className="vertical-timeline">
             <div
               className={`vertical-progress ${currentStep > 0 ? "active" : ""}`}
               style={{
-                height: currentStep === 0
-                  ? "0%"
-                  : `${(currentStep / (steps.length - 1)) * 80}%`
+                height: currentStep === 0 ? "0%" : `${(currentStep / (steps.length - 1)) * 80}%`
               }}
             ></div>
             {steps.map((step, index) => {
               const shapeClass = step.stepType === "square" ? "square" : "circle";
               return (
                 <div key={index} className="vertical-circle-container">
-                  <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>
-                    {index + 1}
-                  </div>
-                  <div className={`step-title ${index === currentStep ? "active" : ""}`}>
-                    {step.header}
-                  </div>
+                  <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>{index + 1}</div>
+                  <div className={`step-title ${index === currentStep ? "active" : ""}`}>{step.header}</div>
                 </div>
               );
             })}
           </div>
           <div className="step-content">
+            <h2 className="step-header">{steps[currentStep].header}</h2>
             {steps[currentStep].content}
             <div className="stepper-buttons">
-              <button
-                className="btn"
-                onClick={() => setCurrentStep(currentStep - 1)}
-                disabled={currentStep === 0}
-              >
+              <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
                 BACK
               </button>
-              <button
-                className="btn"
-                onClick={() => setCurrentStep(currentStep + 1)}
-                disabled={currentStep === steps.length - 1}
-              >
+              <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
                 NEXT
               </button>
             </div>
@@ -315,48 +304,31 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   }
 
   return (
-    <div
-      className={`stepper-container transition-opacity duration-500 ${
-        isVisible ? "opacity-100 visible" : "opacity-0 invisible"
-      }`}
-    >
+    <div className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
       <div className="progress-container">
         <div
           className={`progress ${currentStep > 0 ? "active" : ""}`}
-          style={{
-            width: `${(currentStep / (steps.length - 1)) * 80}%`,
-          }}
+          style={{ width: `${(currentStep / (steps.length - 1)) * 80}%` }}
         ></div>
         {steps.map((step, index) => {
           const shapeClass = step.stepType === "square" ? "square" : "circle";
           return (
             <div key={index} className="circle-container">
-              <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>
-                {index + 1}
-              </div>
-              <div className={`step-title ${index === currentStep ? "active" : ""}`}>
-                {step.header}
-              </div>
+              <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>{index + 1}</div>
+              <div className={`step-title ${index === currentStep ? "active" : ""}`}>{step.header}</div>
             </div>
           );
         })}
       </div>
       <div className="step-content">
+        <h2 className="step-header">{steps[currentStep].header}</h2>
         {steps[currentStep].content}
       </div>
       <div className="stepper-buttons">
-        <button
-          className="btn"
-          onClick={() => setCurrentStep(currentStep - 1)}
-          disabled={currentStep === 0}
-        >
+        <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
           BACK
         </button>
-        <button
-          className="btn"
-          onClick={() => setCurrentStep(currentStep + 1)}
-          disabled={currentStep === steps.length - 1}
-        >
+        <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
           NEXT
         </button>
       </div>
@@ -366,7 +338,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
 
 <StepperComponent
   verticalFalse
-  backgroundTheme="purple" 
+  backgroundTheme="purple"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
     { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
