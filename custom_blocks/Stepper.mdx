@@ -32,30 +32,28 @@ export function StepperComponent({ steps }) {
         max-width: 500px;
         margin: 20px auto;
       }
-      /* Background Line (Full width, behind everything) */
       .progress-container::before {
+        background-color: rgba(255, 255, 255, 0.2);
         content: "";
-        position: absolute;
-        width: 100%;
         height: 3px;
-        background-color: rgba(255, 255, 255, 0.3);
-        top: 50%;
         left: 0;
+        position: absolute;
+        top: 50%;
         transform: translateY(-50%);
-        z-index: 0; /* Behind circles */
+        width: 100%;
+        z-index: 2;
         border-radius: 2px;
       }
-      /* Progress Line (Dynamic width, above background line) */
       .progress {
-        position: absolute;
+        background-color: rgba(255, 255, 255, 0.8);
         height: 3px;
-        background-color: rgba(255, 255, 255, 0.9);
+        position: absolute;
         top: 50%;
-        left: 0;
         transform: translateY(-50%);
         transition: width 0.4s ease;
+        width: 0%;
+        z-index: -1;
         border-radius: 2px;
-        z-index: 1; /* Above background line, but below circles */
       }
       .circle {
         align-items: center;
@@ -70,7 +68,7 @@ export function StepperComponent({ steps }) {
         justify-content: center;
         transition: 0.4s ease;
         width: 34px;
-        z-index: 2; /* Circles on top */
+        z-index: 1;
       }
       .circle.active {
         background: linear-gradient(to top, #e2c0ff, #b78cff);
@@ -130,7 +128,6 @@ export function StepperComponent({ steps }) {
     <div className="stepper-container">
       {/* Progress Bar */}
       <div className="progress-container">
-        {/* Dynamic Progress Line */}
         <div
           className="progress"
           style={{
@@ -138,7 +135,7 @@ export function StepperComponent({ steps }) {
           }}
         ></div>
 
-        {/* Step Circles */}
+        {/* Circles */}
         {visibleSteps.map((step, index) => (
           <div key={index} className={`circle ${index <= currentStep ? "active" : ""}`}>
             {index + 1}
