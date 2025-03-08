@@ -24,7 +24,7 @@ metadata:
 
   .content-body .rm-Markdown {
     opacity: 0;
-    animation: fadeIn 0.8s ease-in-out forwards;
+    animation: fadeIn 1.8s ease-in-out forwards;
   }
 </style>
 `}</HTMLBlock>
