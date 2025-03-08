@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 
 export function StepperComponent({ steps }) {
   const [currentStep, setCurrentStep] = useState(0);
-  const visibleSteps = steps.slice(0, 4); // Show only the first 4 steps
+  const visibleSteps = steps.slice(0, 3); // Show only the first 4 steps
 
   useEffect(() => {
     // Inject CSS dynamically into the <head>
@@ -177,7 +177,6 @@ export function StepperComponent({ steps }) {
   );
 }
 
-// Example usage with 5 steps but only showing 4
 <StepperComponent
   position="top"
   steps={[
