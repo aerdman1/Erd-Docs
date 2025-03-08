@@ -144,6 +144,13 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         padding: 10px;
         color: white;
         font-weight: 400;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+      }
+      .step-content.fade-in {
+        opacity: 1;
+        transform: translateY(0);
       }
       .stepper-buttons {
         margin-top: 20px;
@@ -263,8 +270,9 @@ export function StepperComponent({ steps, verticalTrue = false }) {
   <div
     className={`vertical-progress ${currentStep > 0 ? "active" : ""}`}
     style={{
-      height: `${(currentStep / (steps.length - 1)) * 100}%`,
-    }}
+        height: `calc(${(currentStep / (steps.length - 1)) * 100}% - ${(1 / (steps.length - 1)) * 100 / 2}%)`,
+      }}
+      
   ></div>
 
             {steps.map((step, index) => {
@@ -283,7 +291,7 @@ export function StepperComponent({ steps, verticalTrue = false }) {
           </div>
 
           {/* Step Content on the right */}
-          <div className="step-content">
+          <div className="step-content fade-in">
             {steps[currentStep].content}
 
             <div className="stepper-buttons">
