@@ -206,13 +206,28 @@ export function StepperComponent({ steps, verticalTrue = false }) {
       .vertical-circle-container .square {
         margin-left: 13px; /* 30 - (34/2) = 13 */
       }
-      /* Title below each shape, also left-aligned if desired */
+
+      /* Title to the RIGHT of each shape (vertically centered) */
       .vertical-circle-container .step-title {
-        position: relative;
-        top: auto;
-        margin-top: 6px;
-        margin-left: 13px;
+        position: absolute;
+        top: 50%;
+        left: 60px; /* Enough space to clear the shape */
+        transform: translateY(-50%);
+        width: auto;
+        min-width: 140px; /* Ensures we have space for the text */
         text-align: left;
+        font-size: 14px;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.6);
+        transition: color 0.3s ease;
+      }
+      .vertical-circle-container .step-title.active {
+        color: rgba(255, 255, 255, 1);
+      }
+
+      /* Push vertical step content further right to avoid overlap */
+      .vertical-layout .step-content {
+        margin-left: 40px; /* Extra spacing from timeline+titles */
       }
     `;
     document.head.appendChild(styleOverride);
@@ -339,9 +354,8 @@ export function StepperComponent({ steps, verticalTrue = false }) {
   );
 }
 
-
 <StepperComponent
-  verticalFalse
+  verticalTrue
   steps={[
     { header: "Step 1", content: <p>Vertical step 1 content! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nibh nisl, iaculis in vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
      </p>, stepType: "circle" },
