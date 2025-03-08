@@ -3,7 +3,13 @@ name: Stepper
 ---
 import React, { useState, useEffect } from "react";
 
-export function StepperComponent({ steps, verticalTrue = false, backgroundTheme = "purple" }) {
+export function StepperComponent({ 
+  steps, 
+  verticalTrue = false, 
+  backgroundTheme = "purple", 
+  verticalSpacing = "20px", 
+  horizontalSpacing = "0px" 
+}) {
   const themes = {
     purple: {
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
@@ -36,7 +42,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   }, []);
 
   useEffect(() => {
-    // Dynamically inject CSS into the <head> using the current theme
+    // Dynamically inject CSS into the <head> using the current theme and spacing props
     const styleOverride = document.createElement("style");
     styleOverride.textContent = `
       .stepper-container {
@@ -56,6 +62,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: ${horizontalSpacing};
         position: relative;
         width: 100%;
         max-width: 90%;
@@ -233,7 +240,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       }
       .vertical-circle-container {
         position: relative;
-        margin: 20px 0;
+        margin: ${verticalSpacing} 0;
       }
       .vertical-circle-container .circle,
       .vertical-circle-container .square {
@@ -265,7 +272,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
     return () => {
       document.head.removeChild(styleOverride);
     };
-  }, [backgroundTheme]);
+  }, [backgroundTheme, verticalSpacing, horizontalSpacing]);
 
   if (verticalTrue) {
     return (
@@ -349,6 +356,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
 <StepperComponent
   verticalFalse
   backgroundTheme="purple"
+  verticalSpacing="20px"
+  horizontalSpacing="0px"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
     { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
