@@ -1,100 +1,141 @@
 ---
 name: Stepper
 ---
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export function StepperComponent({ steps, position = "top" }) {
   const [currentStep, setCurrentStep] = useState(0);
   const visibleSteps = steps.slice(0, 4); // Show only the first 4 steps
 
-  const handleNext = () => {
-    if (currentStep < visibleSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
+  useEffect(() => {
+    // Inject CSS dynamically into the <head>
+    const styleOverride = document.createElement("style");
+    styleOverride.textContent = `
+      .stepper-container {
+        position: relative;
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+        margin: 20px auto;
+      }
+      .progress-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        max-width: 400px;
+        margin: 20px auto;
+      }
+      .progress-container::before {
+        background-color: #e0e0e0;
+        content: "";
+        height: 4px;
+        left: 0;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 100%;
+        z-index: -1;
+      }
+      .progress {
+        background-color: #7c3aed;
+        height: 4px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        transition: width 0.4s ease;
+        width: 0%;
+        z-index: -1;
+      }
+      .circle {
+        align-items: center;
+        background-color: #fff;
+        border: 3px solid #e0e0e0;
+        border-radius: 50%;
+        color: #999;
+        display: flex;
+        font-size: 14px;
+        font-weight: bold;
+        height: 40px;
+        justify-content: center;
+        transition: 0.4s ease;
+        width: 40px;
+        z-index: 1;
+      }
+      .circle.active {
+        border-color: #7c3aed;
+        color: #7c3aed;
+      }
+      .step-content {
+        margin-top: 20px;
+        font-size: 16px;
+        padding: 10px;
+      }
+      .stepper-buttons {
+        margin-top: 20px;
+      }
+      .btn {
+        background-color: #7c3aed;
+        border: 0;
+        border-radius: 6px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+        margin: 5px;
+        padding: 8px 30px;
+        transition: 0.2s;
+      }
+      .btn:disabled {
+        background-color: #e0e0e0;
+        cursor: not-allowed;
+      }
+    `;
+    document.head.appendChild(styleOverride);
 
-  const handlePrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  if (!steps || !steps.length) {
-    return <p>No steps provided.</p>;
-  }
-
-  const circleLineElements = [];
-  for (let i = 0; i < visibleSteps.length; i++) {
-    const isActive = i <= currentStep;
-
-    // Circle + label
-    circleLineElements.push(
-      <div className="flex flex-col items-center flex-1 min-w-0" key={`step-${i}`}>
-        <div
-          className={`stepper-step w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${
-            isActive
-              ? "bg-gradient-to-t from-violet-300 to-violet-400 text-white border-violet-100"
-              : "bg-violet-200 text-white border-violet-100/10 opacity-40"
-          }`}
-        >
-          {i + 1}
-        </div>
-        <div className="font-semibold text-center text-sm mt-2 w-[80px] truncate">
-          {visibleSteps[i].header}
-        </div>
-      </div>
-    );
-
-    // Connector line (except after the last step)
-    if (i < visibleSteps.length - 1) {
-      circleLineElements.push(
-        <div
-          className={`h-1 ${
-            i < currentStep ? "bg-violet-300" : "bg-gray-300"
-          } flex-1`} // Keep lines flexing evenly
-          key={`line-${i}`}
-        />
-      );
-    }
-  }
+    return () => {
+      document.head.removeChild(styleOverride); // Cleanup on unmount
+    };
+  }, []);
 
   return (
-    <div className="bg-opacity-80 border border-white/10 rounded-lg shadow-md text-white p-6 w-full bg-radial from-purple-200 from-30% to-violet-950 to-80%">
-      <div
-        className={`flex flex-col ${
-          position === "bottom" ? "flex-col-reverse" : ""
-        } w-full`}
-      >
-        {/* Step Circles + Connector Lines */}
-        <div className="flex items-center justify-between w-full">
-          {circleLineElements}
-        </div>
+    <div className="stepper-container">
+      {/* Progress Bar */}
+      <div className="progress-container">
+        <div
+          className="progress"
+          style={{
+            width: `${(currentStep / (visibleSteps.length - 1)) * 100}%`,
+          }}
+        ></div>
 
-        {/* Current Step Content + Navigation */}
-        <div className="mt-4 flex flex-col items-center ml-5 mr-5">
-          <div className="w-full">{visibleSteps[currentStep].content}</div>
-
-          <div className="flex pt-4 justify-between w-full">
-            <button
-              className="border-transparent bg-transparent text-gray-400 hover:text-gray-200 font-bold uppercase text-sm"
-              onClick={handlePrev}
-              disabled={currentStep === 0}
-            >
-              Back
-            </button>
-            <button
-              className="border-transparent bg-transparent font-bold text-sm text-purple-200 uppercase"
-              onClick={handleNext}
-              disabled={currentStep === visibleSteps.length - 1}
-            >
-              Next
-            </button>
+        {/* Circles */}
+        {visibleSteps.map((step, index) => (
+          <div
+            key={index}
+            className={`circle ${index <= currentStep ? "active" : ""}`}
+          >
+            {index + 1}
           </div>
-        </div>
+        ))}
+      </div>
+
+      {/* Step Content */}
+      <div className="step-content">{visibleSteps[currentStep].content}</div>
+
+      {/* Navigation Buttons */}
+      <div className="stepper-buttons">
+        <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
+          Back
+        </button>
+        <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === visibleSteps.length - 1}>
+          Next
+        </button>
       </div>
     </div>
   );
 }
+
 
 // Example usage with 5 steps but only showing 4
 <StepperComponent
