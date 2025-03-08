@@ -1,6 +1,14 @@
 ---
 name: Stepper
 ---
+<HTMLBlock>{`
+<style>
+  .content-body .rm-Markdown {
+    opacity: 0;
+  }
+</style>
+`}</HTMLBlock>
+
 import React, { useState, useEffect } from "react";
 
 export function StepperComponent({ steps }) {
@@ -206,19 +214,5 @@ export function StepperComponent({ steps }) {
     { header: "Step 5", content: <p>Final confirmation.</p> },
   ]}
 />
-
-<HTMLBlock>{`
-<style>
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-
-  .content-body .rm-Markdown {
-    opacity: 0;
-    animation: fadeIn 1.8s ease-in-out forwards;
-  }
-</style>
-`}</HTMLBlock>
 
 
