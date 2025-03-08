@@ -1,77 +1,96 @@
 ---
 name: Stepper
 ---
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-export const StepperComponent = ({ steps, position = "top" }) => {
+export function StepperComponent({ steps, position = "top" }) {
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Move forward one step
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
 
+  // Move backward one step
   const handlePrev = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
-  return (
-    <div className="bg-opacity-80 border-1 border-white/10 rounded-lg shadow-md text-white p-6 w-150 bg-radial from-purple-200 from-30% to-violet-950 to-80%">
-      <div className={`flex flex-col ${position === 'bottom' ? 'flex-col-reverse' : ''} w-full`}>
+
+  if (!steps || !steps.length) {
+    return <p>No steps provided.</p>;
+  }
+
+  /**
+   * Build an array of alternating "circle" and "line" elements.
+   * For N steps, you'll end up with (2N - 1) elements total:
+   *    Circle -> Line -> Circle -> Line -> ... -> Circle
+   */
+  const circleLineElements = [];
+  for (let i = 0; i < steps.length; i++) {
+    const isActive = i <= currentStep;
+
+    // Circle + label
+    circleLineElements.push(
+      <div className="flex flex-col items-center" key={`step-${i}`}>
         <div
-          className={`flex ${position === 'top' || position === 'bottom' ? 'flex-row' : 'flex-col'} items-center justify-center space-x-6`}
+          className={`stepper-step w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${
+            isActive
+              ? "bg-gradient-to-t from-violet-300 to-violet-400 text-white border-violet-100"
+              : "bg-violet-200 text-white border-violet-100/10 opacity-40"
+          }`}
         >
-          {/* Step Circles with Text */}
-          {steps.map((step, index) => (
-            <div className="flex flex-col items-center w-full" key={index}>
-              <div
-                className={`stepper-step w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                  index <= currentStep
-                    ? 'bg-linear-to-t from-violet-300 to-violet-400 text-white border-violet-100'
-                    : 'bg-violet-200 text-white border-violet-100/10 opacity-40'
-                }`}
-              >
-                {index + 1}
-              </div>
-              <div className="font-semibold text-center text-sm mt-2">{step.header}</div>
-            </div>
-          ))}
+          {i + 1}
+        </div>
+        <div className="font-semibold text-center text-sm mt-2">
+          {steps[i].header}
+        </div>
+      </div>
+    );
+
+    // Connector line (except after the last step)
+    if (i < steps.length - 1) {
+      circleLineElements.push(
+        <div
+          className={`flex-1 h-1 ${
+            i < currentStep ? "bg-violet-300" : "bg-gray-300"
+          } mx-2`}
+          style={{ transition: "width 0.3s ease" }}
+          key={`line-${i}`}
+        />
+      );
+    }
+  }
+
+  return (
+    <div className="bg-opacity-80 border border-white/10 rounded-lg shadow-md text-white p-6 w-150 bg-radial from-purple-200 from-30% to-violet-950 to-80%">
+      <div
+        className={`flex flex-col ${
+          position === "bottom" ? "flex-col-reverse" : ""
+        } w-full`}
+      >
+        {/* Step Circles + Connector Lines */}
+        <div className="flex items-center justify-center w-full">
+          {circleLineElements}
         </div>
 
-        {/* Connecting Lines Between Steps */}
-        <div className="absolute flex gap-8 w-135 ml-25 mt-4">
-          {steps.map((step, index) => (
-            <div key={index} className="relative flex-grow">
-              {index < steps.length - 1 && (
-                <div
-                  className={`absolute top-1/2 left-0 w-full h-1 ${index < currentStep ? 'bg-violet-300' : 'bg-gray-300'}`}
-                  style={{ transition: 'width 0.3s ease' }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Step Content and Navigation Buttons */}
+        {/* Current Step Content + Navigation */}
         <div className="mt-4 flex flex-col items-center ml-5 mr-5">
-          {/* Step Content */}
-          <div className="w-full">
-            {steps[currentStep].content}
-          </div>
+          <div className="w-full">{steps[currentStep].content}</div>
 
-          {/* Back and Next buttons */}
           <div className="flex pt-4 justify-between w-full">
             <button
-              className="border-transparent bg-transparent text-gray-400 hover:text-gray-200 font-medium font-bold uppercase text-sm"
+              className="border-transparent bg-transparent text-gray-400 hover:text-gray-200 font-bold uppercase text-sm"
               onClick={handlePrev}
               disabled={currentStep === 0}
             >
               Back
             </button>
             <button
-              className="border-transparent bg-transparent font-medium font-bold text-sm text-purple-200 uppercase"
+              className="border-transparent bg-transparent font-bold text-sm text-purple-200 uppercase"
               onClick={handleNext}
               disabled={currentStep === steps.length - 1}
             >
@@ -80,32 +99,25 @@ export const StepperComponent = ({ steps, position = "top" }) => {
           </div>
         </div>
       </div>
-     </div>
+    </div>
   );
-};
+}
 
-export const steps = [
-  {
-    header: "Components page",
-    content: 
-    <div>
-      <p><b>Getting Started</b></p>
-      <p>In your dashboard, navigate to your content tab. This is where you'll find Custom Components in your sidebar.</p>
-     </div>,
-  },
-  {
-    header: "Create New",
-    content: 
-      <div>
-      <p><b>Next Steps:</b></p>
-      <p>Select “Create New” to start building your own components with real-time preview.</p>
-      <p>Need more inspiration? Browse our new Marketplace, a place to share and access community-created components.</p>
-      </div>,
-  },
-  {
-    header: "	Add to Docs	",
-    content: <p>Once your component is saved, you can reuse and customize it across your docs! (You don't need to be tied to the same content)</p>,
-  },
-];
 
-<StepperComponent steps={steps} position="top" />
+<StepperComponent
+  position="top"
+  steps={[
+    {
+      header: "Step 1",
+      content: <div>Some content for step 1</div>,
+    },
+    {
+      header: "Step 2",
+      content: <div>Some content for step 2</div>,
+    },
+    {
+      header: "Step 3",
+      content: <div>Some content for step 3</div>,
+    },
+  ]}
+/>
