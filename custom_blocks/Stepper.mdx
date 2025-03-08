@@ -68,12 +68,13 @@ export function StepperComponent({ steps }) {
         justify-content: center;
         transition: 0.4s ease;
         width: 34px;
-        z-index: 1;
+        z-index: 99999999;
       }
       .circle.active {
         background: linear-gradient(to top, #e2c0ff, #b78cff);
         color: #fff;
         border: 3px solid white;
+    
       }
       .step-content {
         margin-top: 20px;
