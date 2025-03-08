@@ -8,150 +8,22 @@ export function StepperComponent({ steps }) {
   const [isVisible, setIsVisible] = useState(false); // Controls fade-in
 
   useEffect(() => {
-    // Delay visibility to allow styles to load properly
+    // Hide stepper completely on page load and fade in smoothly
     const timeout = setTimeout(() => {
       setIsVisible(true);
-    }, 1000); // 1 second delay
+    }, 1000); // Delay fade-in by 1 second
 
     return () => clearTimeout(timeout);
   }, []);
 
-  useEffect(() => {
-    // Inject CSS dynamically into the <head>
-    const styleOverride = document.createElement("style");
-    styleOverride.textContent = `
-      .stepper-container {
-        position: relative;
-        text-align: center;
-        width: 100%;
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 24px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        background: radial-gradient(circle at center, #c9a4ff96 20%, #4a2a8f 80%);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-      }
-      .stepper-container.visible {
-        opacity: 1;
-      }
-      .progress-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        width: 100%;
-        max-width: 500px;
-        margin: 20px auto;
-      }
-      .progress-container::before {
-        background-color: rgba(255, 255, 255, 0.2);
-        content: "";
-        height: 3px;
-        position: absolute;
-        top: 50%;
-        left: 12.5%;
-        right: 12.5%;
-        transform: translateY(-50%);
-        z-index: 2;
-        border-radius: 2px;
-      }
-      .progress {
-        background-color: rgba(255, 255, 255, 0.8);
-        height: 3px;
-        position: absolute;
-        top: 50%;
-        left: 12.5%;
-        transition: width 0.4s ease;
-        width: 0%;
-        z-index: -1;
-        border-radius: 2px;
-      }
-      .circle-container {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 25%;
-        text-align: center;
-      }
-      .circle {
-        align-items: center;
-        background: linear-gradient(to top, #b78cff, #8c5eff);
-        border: 3px solid rgba(255, 255, 255, 0.6);
-        border-radius: 50%;
-        color: #fff;
-        display: flex;
-        font-size: 14px;
-        font-weight: bold;
-        height: 34px;
-        justify-content: center;
-        transition: 0.4s ease;
-        width: 34px;
-        z-index: 999;
-      }
-      .circle.active {
-        background: linear-gradient(to top, #e2c0ff, #b78cff);
-        color: #fff;
-        border: 3px solid white;
-      }
-      .step-title {
-        position: absolute;
-        top: 45px;
-        font-size: 14px;
-        font-weight: bold;
-        color: rgba(255, 255, 255, 0.6);
-        transition: color 0.3s ease;
-        width: 100px;
-        text-align: center;
-      }
-      .step-title.active {
-        color: rgba(255, 255, 255, 1);
-      }
-      .step-content {
-        margin-top: 50px;
-        font-size: 16px;
-        padding: 10px;
-        color: white;
-        font-weight: 400;
-      }
-      .stepper-buttons {
-        margin-top: 20px;
-        display: flex;
-        justify-content: space-between;
-      }
-      .btn {
-        background: transparent;
-        border: none;
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-        padding: 6px 12px;
-        transition: color 0.2s ease;
-      }
-      .btn:hover {
-        color: rgba(255, 255, 255, 0.9);
-      }
-      .btn:disabled {
-        color: rgba(255, 255, 255, 0.3);
-        cursor: not-allowed;
-      }
-    `;
-    document.head.appendChild(styleOverride);
-
-    return () => {
-      document.head.removeChild(styleOverride); // Cleanup on unmount
-    };
-  }, []);
-
-  // ✅ Move this here so it is defined before being used
   const visibleSteps = steps.slice(0, 3); // Ensure `visibleSteps` is properly available
 
   return (
-    <div className={`stepper-container ${isVisible ? "visible" : ""}`}>
+    <div
+      className={`stepper-container transition-opacity duration-500 ${
+        isVisible ? "opacity-100 visible" : "opacity-0 invisible"
+      }`}
+    >
       {/* Progress Bar */}
       <div className="progress-container">
         <div
@@ -181,10 +53,18 @@ export function StepperComponent({ steps }) {
 
       {/* Navigation Buttons */}
       <div className="stepper-buttons">
-        <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
+        <button
+          className="btn"
+          onClick={() => setCurrentStep(currentStep - 1)}
+          disabled={currentStep === 0}
+        >
           BACK
         </button>
-        <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === visibleSteps.length - 1}>
+        <button
+          className="btn"
+          onClick={() => setCurrentStep(currentStep + 1)}
+          disabled={currentStep === visibleSteps.length - 1}
+        >
           NEXT
         </button>
       </div>
