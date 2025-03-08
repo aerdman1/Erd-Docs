@@ -6,42 +6,25 @@ metadata:
   robots: index
 ---
 <StepperComponent
-  position="top"
   steps={[
-    {
-      header: "asdfasdfsa",
-      content:  
-      <div>
-      <p>This is the first step of the process. You will get introduced to the system. Make sure to review the provided information carefully.</p>
-      </div>,
-    },
-    {
-      header: "Details",
-      content:         
-      <div>
-      <p>This step asks for your personal details. Fill out the required fields. Ensure that all your details are correct before moving on.</p>
-     </div>,
-    },
-    {
-      header: "Confirmation",
-      content:        
-      <div>
-      <p>Review the details you have entered. If everything looks good, submit the form. If you need to make any changes, you can go back to the last step.</p>
-      </div>,
-    },
-    {
-      header: "Another Step",
-      content:        
-      <div>
-      <p>Congratulations! You have completed the steps successfully.</p>
-      </div>,
-    },
-    {
-      header: "And Another!)",
-      content:        
-      <div>
-      <p>This step iasdfasdfsadult but exists in the code.</p>
-      </div>,
-    },
+    { header: "Step 1", content: <p>Welcome to step 1!</p> },
+    { header: "Step 2", content: <p>Now enter your details.</p> },
+    { header: "Step 3", content: <p>Review your information.</p> },
+    { header: "Step 4", content: <p>Almost done!</p> },
+    { header: "Step 5", content: <p>Final confirmation.</p> },
   ]}
 />
+
+<HTMLBlock>{`
+<style>
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .content-body .rm-Markdown {
+    opacity: 0;
+    animation: fadeIn 0.8s ease-in-out forwards;
+  }
+</style>
+`}</HTMLBlock>
