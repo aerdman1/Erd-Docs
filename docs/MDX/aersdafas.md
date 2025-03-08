@@ -40,7 +40,7 @@ metadata:
       header: "And Another!)",
       content:        
       <div>
-      <p>This step is not displayed by default but exists in the code.</p>
+      <p>This step iasdfasdfsadult but exists in the code.</p>
       </div>,
     },
   ]}
