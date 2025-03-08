@@ -1,20 +1,18 @@
 ---
 name: Stepper
 ---
-
 import React, { useState } from "react";
 
 export function StepperComponent({ steps, position = "top" }) {
   const [currentStep, setCurrentStep] = useState(0);
+  const visibleSteps = steps.slice(0, 4); // Show only the first 4 steps
 
-  // Move forward one step
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < visibleSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
   };
 
-  // Move backward one step
   const handlePrev = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
@@ -25,18 +23,13 @@ export function StepperComponent({ steps, position = "top" }) {
     return <p>No steps provided.</p>;
   }
 
-  /**
-   * Build an array of alternating "circle" and "line" elements.
-   * For N steps, you'll end up with (2N - 1) elements total:
-   *    Circle -> Line -> Circle -> Line -> ... -> Circle
-   */
   const circleLineElements = [];
-  for (let i = 0; i < steps.length; i++) {
+  for (let i = 0; i < visibleSteps.length; i++) {
     const isActive = i <= currentStep;
 
     // Circle + label
     circleLineElements.push(
-      <div className="flex flex-col items-center" key={`step-${i}`}>
+      <div className="flex flex-col items-center flex-1 min-w-0" key={`step-${i}`}>
         <div
           className={`stepper-step w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${
             isActive
@@ -46,20 +39,19 @@ export function StepperComponent({ steps, position = "top" }) {
         >
           {i + 1}
         </div>
-        <div className="font-semibold text-center text-sm mt-2">
-          {steps[i].header}
+        <div className="font-semibold text-center text-sm mt-2 w-[80px] truncate">
+          {visibleSteps[i].header}
         </div>
       </div>
     );
 
     // Connector line (except after the last step)
-    if (i < steps.length - 1) {
+    if (i < visibleSteps.length - 1) {
       circleLineElements.push(
         <div
-          className={`flex-1 h-1 ${
+          className={`h-1 ${
             i < currentStep ? "bg-violet-300" : "bg-gray-300"
-          } mx-2`}
-          style={{ transition: "width 0.3s ease" }}
+          } flex-1`} // Keep lines flexing evenly
           key={`line-${i}`}
         />
       );
@@ -74,13 +66,13 @@ export function StepperComponent({ steps, position = "top" }) {
         } w-full`}
       >
         {/* Step Circles + Connector Lines */}
-        <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-between w-full">
           {circleLineElements}
         </div>
 
         {/* Current Step Content + Navigation */}
         <div className="mt-4 flex flex-col items-center ml-5 mr-5">
-          <div className="w-full">{steps[currentStep].content}</div>
+          <div className="w-full">{visibleSteps[currentStep].content}</div>
 
           <div className="flex pt-4 justify-between w-full">
             <button
@@ -93,7 +85,7 @@ export function StepperComponent({ steps, position = "top" }) {
             <button
               className="border-transparent bg-transparent font-bold text-sm text-purple-200 uppercase"
               onClick={handleNext}
-              disabled={currentStep === steps.length - 1}
+              disabled={currentStep === visibleSteps.length - 1}
             >
               Next
             </button>
@@ -104,7 +96,7 @@ export function StepperComponent({ steps, position = "top" }) {
   );
 }
 
-
+// Example usage with 5 steps but only showing 4
 <StepperComponent
   position="top"
   steps={[
@@ -127,6 +119,20 @@ export function StepperComponent({ steps, position = "top" }) {
       content:        
       <div>
       <p>Review the details you have entered. If everything looks good, submit the form. If you need to make any changes, you can go back to the previous step.</p>
+      </div>,
+    },
+    {
+      header: "Completion",
+      content:        
+      <div>
+      <p>Congratulations! You have completed the steps successfully.</p>
+      </div>,
+    },
+    {
+      header: "Extra Step (Hidden)",
+      content:        
+      <div>
+      <p>This step is not displayed by default but exists in the code.</p>
       </div>,
     },
   ]}
