@@ -138,7 +138,8 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         color: rgba(255, 255, 255, 1);
       }
       .step-content {
-        margin-top: 80px;
+        margin: 80px auto 0 auto;
+        max-width:80%;
         font-size: 16px;
         padding: 10px;
         color: white;
@@ -238,7 +239,7 @@ export function StepperComponent({ steps, verticalTrue = false }) {
 
       /* Push vertical step content further right to avoid overlap */
       .vertical-layout .step-content {
-        margin-left: 100px; /* Extra spacing from timeline+titles */
+        margin-left: 190px; /* Extra spacing from timeline+titles */
       }
     `;
     document.head.appendChild(styleOverride);
@@ -373,11 +374,11 @@ export function StepperComponent({ steps, verticalTrue = false }) {
     
     { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections. Follow a consistent tone and style guide.</p>, stepType: "circle" },
     
-    { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
+    { header: "Format Content  Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
     
     { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
     
-    { header: "Finalize and Maintain", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
+    { header: "Publish and Maintain", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
   ]}
 />
 
