@@ -72,6 +72,7 @@ export function StepperComponent({ steps }) {
         flex: 1; /* Dynamically spaces circles based on number of steps */
         text-align: center;
       }
+      /* Circle Step Style */
       .circle {
         align-items: center;
         background: linear-gradient(to top, #b78cff, #8c5eff);
@@ -89,6 +90,27 @@ export function StepperComponent({ steps }) {
       }
       .circle.active {
         background: linear-gradient(to top, #e2c0ff, #b78cff);
+        color: #fff;
+        border: 3px solid white;
+      }
+      /* Square Step Style */
+      .square {
+        align-items: center;
+        background: linear-gradient(to top, #ff8c6b, #ff5e42);
+        border: 3px solid rgba(255, 255, 255, 0.6);
+        border-radius: 6px; /* Slightly rounded edges */
+        color: #fff;
+        display: flex;
+        font-size: 14px;
+        font-weight: bold;
+        height: 34px;
+        justify-content: center;
+        transition: 0.4s ease;
+        width: 34px;
+        z-index: 999;
+      }
+      .square.active {
+        background: linear-gradient(to top, #ffb09c, #ff8c6b);
         color: #fff;
         border: 3px solid white;
       }
@@ -134,9 +156,6 @@ export function StepperComponent({ steps }) {
         color: rgba(255, 255, 255, 0.3);
         cursor: not-allowed;
       }
-    .content-body .rm-Markdown {
-     opacity: 1 !important;
-     }
     `;
     document.head.appendChild(styleOverride);
 
@@ -160,17 +179,20 @@ export function StepperComponent({ steps }) {
           }}
         ></div>
 
-        {/* Step Circles with Titles Below */}
-        {steps.map((step, index) => (
-          <div key={index} className="circle-container">
-            <div className={`circle ${index <= currentStep ? "active" : ""}`}>
-              {index + 1}
+        {/* Step Circles or Squares with Titles Below */}
+        {steps.map((step, index) => {
+          const shapeClass = step.stepType === "square" ? "square" : "circle";
+          return (
+            <div key={index} className="circle-container">
+              <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>
+                {index + 1}
+              </div>
+              <div className={`step-title ${index === currentStep ? "active" : ""}`}>
+                {step.header}
+              </div>
             </div>
-            <div className={`step-title ${index === currentStep ? "active" : ""}`}>
-              {step.header}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Step Content */}
@@ -202,13 +224,14 @@ export function StepperComponent({ steps }) {
 
 <StepperComponent
   steps={[
-    { header: "Step 1", content: <p>Welcome to step 1!</p> },
-    { header: "Step 2", content: <p>Now enter your details.</p> },
-    { header: "Step 3", content: <p>Review your information.</p> },
-    { header: "Step 4", content: <p>Almost done!</p> },
-    { header: "Step 5", content: <p>Final confirmation.</p> },
+    { header: "Step 1", content: <p>Welcome to step 1!</p>, stepType: "circle" },
+    { header: "Step 2", content: <p>Now enter your details.</p>, stepType: "square" },
+    { header: "Step 3", content: <p>Review your information.</p>, stepType: "circle" },
+    { header: "Step 4", content: <p>Almost done!</p>, stepType: "square" },
+    { header: "Step 5", content: <p>Final confirmation.</p>, stepType: "circle" },
   ]}
 />
+
 
 <HTMLBlock>{`
 <style>
