@@ -180,23 +180,23 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         position: absolute;
         left: 30px; /* Center of .vertical-timeline */
         top: 34px; /* Start AFTER the first circle */
-        bottom: 0;
+        bottom: 34px; /* Stop BEFORE the last circle */
         width: 3px;
         background-color: rgba(255, 255, 255, 0.2);
         border-radius: 2px;
         z-index: 0;
-      }      
+      }           
       .vertical-progress {
         position: absolute;
-        left: 30px; /* Same center as ::before */
-        top: 34px; /* Match the timeline start */
+        left: 30px; /* Keep it aligned */
+        top: 34px; /* Start AFTER first circle */
         width: 3px;
         background-color: rgba(255, 255, 255, 0.8);
         transition: height 0.4s ease;
-        height: 0%;
+        height: calc(100% - 34px); /* Limit height to prevent overshooting */
         z-index: -1;
         border-radius: 2px;
-      }      
+      }           
       .vertical-circle-container {
         position: relative;
         margin: 20px 0;
