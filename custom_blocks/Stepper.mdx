@@ -209,21 +209,16 @@ export function StepperComponent({ steps }) {
 
 <HTMLBlock>{`
 <style>
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
   .content-body .rm-Markdown {
     opacity: 0;
-    transition: opacity 0.8s ease-in-out;
-  }
-
-  /* Delay the fade-in slightly to avoid unstyled content flash */
-  .content-body.loaded .rm-Markdown {
-    opacity: 1;
+    animation: fadeIn 0.8s ease-in-out forwards;
   }
 </style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    document.querySelector(".content-body").classList.add("loaded");
-  });
-</script>
 `}</HTMLBlock>
+
 
