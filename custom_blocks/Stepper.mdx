@@ -1,6 +1,7 @@
 ---
 name: Stepper
 ---
+
 import React, { useState } from "react";
 
 export function StepperComponent({ steps, position = "top" }) {
@@ -66,7 +67,7 @@ export function StepperComponent({ steps, position = "top" }) {
   }
 
   return (
-    <div className="bg-opacity-80 border border-white/10 rounded-lg shadow-md text-white p-6 w-150 bg-radial from-purple-200 from-30% to-violet-950 to-80%">
+    <div className="bg-opacity-80 border border-white/10 rounded-lg shadow-md text-white p-6 w-full bg-radial from-purple-200 from-30% to-violet-950 to-80%">
       <div
         className={`flex flex-col ${
           position === "bottom" ? "flex-col-reverse" : ""
