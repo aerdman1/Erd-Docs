@@ -5,6 +5,12 @@ hidden: false
 metadata:
   robots: index
 ---
+<HTMLBlock>{`
+
+`}</HTMLBlock>
+
+<br />
+
 <StepperComponent
   steps={[
     { header: "Step 1", content: <p>Welcome to step 1!</p> },
