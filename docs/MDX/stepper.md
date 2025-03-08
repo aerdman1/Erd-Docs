@@ -30,7 +30,7 @@ metadata:
 <br />
 
 <StepperComponent
-  verticalFalse
+  verticalTrue
   backgroundTheme="purple"
   verticalSpacing="20px"
   horizontalSpacing="0px"
