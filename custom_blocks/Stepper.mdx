@@ -1,7 +1,6 @@
 ---
 name: Stepper
 ---
-
 import React, { useState, useEffect } from "react";
 
 export function StepperComponent({ steps }) {
@@ -12,7 +11,7 @@ export function StepperComponent({ steps }) {
     // Hide stepper completely on page load and fade in smoothly
     const timeout = setTimeout(() => {
       setIsVisible(true);
-    }, 100); // Delay fade-in by 1 second
+    }, 1000); // Delay fade-in by 1 second
 
     return () => clearTimeout(timeout);
   }, []);
@@ -48,8 +47,8 @@ export function StepperComponent({ steps }) {
         height: 3px;
         position: absolute;
         top: 50%;
-        left: 12.5%;
-        right: 12.5%;
+        left: 7%;
+        right: 7%;
         transform: translateY(-50%);
         z-index: 2;
         border-radius: 2px;
@@ -59,7 +58,7 @@ export function StepperComponent({ steps }) {
         height: 3px;
         position: absolute;
         top: 50%;
-        left: 12.5%;
+        left: 7%;
         transition: width 0.4s ease;
         width: 0%;
         z-index: -1;
@@ -70,7 +69,7 @@ export function StepperComponent({ steps }) {
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 25%;
+        flex: 1; /* Dynamically spaces circles based on number of steps */
         text-align: center;
       }
       .circle {
@@ -143,8 +142,6 @@ export function StepperComponent({ steps }) {
     };
   }, []);
 
-  const visibleSteps = steps.slice(0, 3); // Keep this before returning JSX
-
   return (
     <div
       className={`stepper-container transition-opacity duration-500 ${
@@ -156,12 +153,12 @@ export function StepperComponent({ steps }) {
         <div
           className="progress"
           style={{
-            width: `${(currentStep / (visibleSteps.length - 1)) * 75}%`,
+            width: `${(currentStep / (steps.length - 1)) * 86}%`,
           }}
         ></div>
 
         {/* Step Circles with Titles Below */}
-        {visibleSteps.map((step, index) => (
+        {steps.map((step, index) => (
           <div key={index} className="circle-container">
             <div className={`circle ${index <= currentStep ? "active" : ""}`}>
               {index + 1}
@@ -175,7 +172,7 @@ export function StepperComponent({ steps }) {
 
       {/* Step Content */}
       <div className="step-content">
-        {visibleSteps[currentStep].content}
+        {steps[currentStep].content}
       </div>
 
       {/* Navigation Buttons */}
@@ -190,7 +187,7 @@ export function StepperComponent({ steps }) {
         <button
           className="btn"
           onClick={() => setCurrentStep(currentStep + 1)}
-          disabled={currentStep === visibleSteps.length - 1}
+          disabled={currentStep === steps.length - 1}
         >
           NEXT
         </button>
@@ -201,46 +198,32 @@ export function StepperComponent({ steps }) {
 
 
 <StepperComponent
-  position="top"
   steps={[
-    {
-      header: "Introduction",
-      content:  
-      <div>
-      <p>This is the first step of the process. You will get introduced to the system. Make sure to review the provided information carefully.</p>
-      </div>,
-    },
-    {
-      header: "Details",
-      content:         
-      <div>
-      <p>This step asks for your personal details. Fill out the required fields. Ensure that all your details are correct before moving on.</p>
-     </div>,
-    },
-    {
-      header: "Confirmation",
-      content:        
-      <div>
-      <p>Review the details you have entered. If everything looks good, submit the form. If you need to make any changes, you can go back to the last step.</p>
-      </div>,
-    },
-    {
-      header: "Another Step",
-      content:        
-      <div>
-      <p>Congratulations! You have completed the steps successfully.</p>
-      </div>,
-    },
-    {
-      header: "And Another!)",
-      content:        
-      <div>
-      <p>This step is not displayed by default but exists in the code.</p>
-      </div>,
-    },
+    { header: "Step 1", content: <p>Welcome to step 1!</p> },
+    { header: "Step 2", content: <p>Now enter your details.</p> },
+    { header: "Step 3", content: <p>Review your information.</p> },
+    { header: "Step 4", content: <p>Almost done!</p> },
+    { header: "Step 5", content: <p>Final confirmation.</p> },
   ]}
 />
 
 <HTMLBlock>{`
-<style>html{.stepper-container:none !important;}</style>
+<style>
+  .content-body .rm-Markdown {
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+  }
+
+  /* Delay the fade-in slightly to avoid unstyled content flash */
+  .content-body.loaded .rm-Markdown {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelector(".content-body").classList.add("loaded");
+  });
+</script>
 `}</HTMLBlock>
+
