@@ -108,16 +108,25 @@ export function StepperComponent({ steps, position = "top" }) {
   position="top"
   steps={[
     {
-      header: "Step 1",
-      content: <div>Some content for step 1</div>,
+      header: "Introduction",
+      content:    <div>
+          <p>This is the first step of the process. You will get introduced to the system.</p>
+          <p>Make sure to review the provided information carefully.</p>
+        </div>,
     },
     {
-      header: "Step 2",
-      content: <div>Some content for step 2</div>,
+      header: "Details",
+      content:         <div>
+          <p>This step asks for your personal details. Fill out the required fields.</p>
+          <p>Ensure that all your details are correct before moving on.</p>
+        </div>,
     },
     {
-      header: "Step 3",
-      content: <div>Some content for step 3</div>,
+      header: "Confirmation",
+      content:         <div>
+          <p>Review the details you have entered. If everything looks good, submit the form.</p>
+          <p>If you need to make any changes, you can go back to the previous step.</p>
+        </div>,
     },
   ]}
 />
