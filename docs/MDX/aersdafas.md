@@ -9,7 +9,7 @@ metadata:
   position="top"
   steps={[
     {
-      header: "Introduction",
+      header: "asdfasdfsa",
       content:  
       <div>
       <p>This is the first step of the process. You will get introduced to the system. Make sure to review the provided information carefully.</p>
