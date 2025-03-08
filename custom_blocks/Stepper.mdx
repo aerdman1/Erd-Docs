@@ -131,14 +131,14 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         font-weight: bold;
         color: rgba(255, 255, 255, 0.6);
         transition: color 0.3s ease;
-        width: 100px;
+        width: auto;
         text-align: center;
       }
       .step-title.active {
         color: rgba(255, 255, 255, 1);
       }
       .step-content {
-        margin-top: 50px;
+        margin-top: 80px;
         font-size: 16px;
         padding: 10px;
         color: white;
@@ -369,20 +369,18 @@ export function StepperComponent({ steps, verticalTrue = false }) {
 <StepperComponent
   verticalFalse
   steps={[
-    { header: "Step 1", content: <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nibh nisl, iaculis in vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
-     </p>, stepType: "circle" },
+    { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
     
-    { header: "Step 2", content: <p>Praesent nibh nisl, iaculis in vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
-     </p>, stepType: "circle" },
+    { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections. Follow a consistent tone and style guide.</p>, stepType: "circle" },
     
-    { header: "Step 3", content: <p>Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
-     </p>, stepType: "circle" },
+    { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
     
-    { header: "Step 4", content: <p>Vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
-     </p>, stepType: "circle" },
+    { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
     
+    { header: "Finalize and Maintain", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
   ]}
 />
+
 
 
 
