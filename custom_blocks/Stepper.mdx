@@ -3,7 +3,7 @@ name: Stepper
 ---
 import React, { useState, useEffect } from "react";
 
-export function StepperComponent({ steps, orientation = "vertical" }) {
+export function StepperComponent({ steps, vertical = false }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false); // Controls fade-in
 
@@ -11,7 +11,7 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
     // Hide stepper completely on page load and fade in smoothly
     const timeout = setTimeout(() => {
       setIsVisible(true);
-    }, 300); // Delay fade-in 
+    }, 300); // Delay fade-in
 
     return () => clearTimeout(timeout);
   }, []);
@@ -32,6 +32,7 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         background: radial-gradient(circle at center, #a76ef9 20%, #4a2a8f 80%);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
+      /* HORIZONTAL LAYOUT (DEFAULT) */
       .progress-container {
         display: flex;
         justify-content: space-between;
@@ -47,8 +48,8 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         height: 3px;
         position: absolute;
         top: 50%;
-        left: 7%;
-        right: 7%;
+        left: 10%; /* Start after first circle */
+        right: 10%; /* End before last circle */
         transform: translateY(-50%);
         z-index: 2;
         border-radius: 2px;
@@ -58,7 +59,7 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         height: 3px;
         position: absolute;
         top: 50%;
-        left: 7%;
+        left: 10%;
         transition: width 0.4s ease;
         width: 0%;
         z-index: -1;
@@ -86,12 +87,13 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         justify-content: center;
         transition: 0.4s ease;
         width: 34px;
-        z-index: 999;
+        z-index: 99999;
       }
       .circle.active {
         background: linear-gradient(to top, #e2c0ff, #b78cff);
         color: #fff;
         border: 3px solid white;
+        z-index: 99999;
       }
       /* Square Step Style */
       .square {
@@ -107,12 +109,13 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         justify-content: center;
         transition: 0.4s ease;
         width: 34px;
-        z-index: 999;
+        z-index: 99999;
       }
       .square.active {
         background: linear-gradient(to top, #ffb09c, #ff8c6b);
         color: #fff;
         border: 3px solid white;
+        z-index: 99999;
       }
       .step-title {
         position: absolute;
@@ -159,37 +162,36 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
       .content-body .rm-Markdown {
         opacity: 1 !important;
       }
-      
-      /* Vertical Layout Overrides */
+
+      /* VERTICAL LAYOUT */
       .vertical-layout {
         display: flex;
         flex-direction: row;
         align-items: flex-start;
       }
+      /* The timeline is given a fixed width to properly center circles. */
       .vertical-timeline {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         position: relative;
+        width: 60px; /* Enough space for circles to center on line */
         margin-right: 20px;
       }
       .vertical-timeline::before {
         content: "";
         position: absolute;
-        left: 50%;
+        left: 30px; /* Center of .vertical-timeline */
         top: 0;
         bottom: 0;
         width: 3px;
-        background-color: rgba(255,255,255,0.2);
+        background-color: rgba(255, 255, 255, 0.2);
         border-radius: 2px;
-        z-index: 2;
+        z-index: 0;
       }
       .vertical-progress {
         position: absolute;
-        left: 50%;
+        left: 30px; /* Same center as ::before */
         top: 0;
         width: 3px;
-        background-color: rgba(255,255,255,0.8);
+        background-color: rgba(255, 255, 255, 0.8);
         transition: height 0.4s ease;
         height: 0%;
         z-index: -1;
@@ -199,10 +201,18 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         position: relative;
         margin: 20px 0;
       }
+      /* Center the shape on the line (which is at x=30px) */
+      .vertical-circle-container .circle,
+      .vertical-circle-container .square {
+        margin-left: 13px; /* 30 - (34/2) = 13 */
+      }
+      /* Title below each shape, also left-aligned if desired */
       .vertical-circle-container .step-title {
         position: relative;
         top: auto;
-        margin-top: 8px;
+        margin-top: 6px;
+        margin-left: 13px;
+        text-align: left;
       }
     `;
     document.head.appendChild(styleOverride);
@@ -212,8 +222,8 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
     };
   }, []);
 
-  if (orientation === "vertical") {
-    // Render vertical layout: timeline on left, content on right.
+  // If "vertical" is true, render vertical layout
+  if (vertical) {
     return (
       <div
         className={`stepper-container transition-opacity duration-500 ${
@@ -221,6 +231,7 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         }`}
       >
         <div className="vertical-layout">
+          {/* Timeline on the left */}
           <div className="vertical-timeline">
             <div
               className="vertical-progress"
@@ -242,8 +253,11 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
               );
             })}
           </div>
+
+          {/* Step Content on the right */}
           <div className="step-content">
             {steps[currentStep].content}
+
             <div className="stepper-buttons">
               <button
                 className="btn"
@@ -266,7 +280,7 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
     );
   }
 
-  // Default horizontal layout
+  // Default Horizontal Layout
   return (
     <div
       className={`stepper-container transition-opacity duration-500 ${
@@ -278,7 +292,8 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
         <div
           className="progress"
           style={{
-            width: `${(currentStep / (steps.length - 1)) * 86}%`,
+            // For horizontal: line covers 80% (from 10% to 90%)
+            width: `${(currentStep / (steps.length - 1)) * 80}%`,
           }}
         ></div>
 
@@ -326,14 +341,14 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
 
 
 <StepperComponent
+  vertical
   steps={[
-    { header: "Step 1", content: <p>Welcome to step 1!</p>, stepType: "circle" },
-    { header: "Step 2", content: <p>Now enter your details.</p>, stepType: "square" },
-    { header: "Step 3", content: <p>Review your information.</p>, stepType: "circle" },
-    { header: "Step 4", content: <p>Almost done!</p>, stepType: "square" },
-    { header: "Step 5", content: <p>Final confirmation.</p>, stepType: "circle" },
+    { header: "Step 1", content: <p>Vertical step 1 content!</p>, stepType: "circle" },
+    { header: "Step 2", content: <p>Another vertical step.</p>, stepType: "square" },
+    { header: "Step 3", content: <p>Finish up here.</p>, stepType: "circle" },
   ]}
 />
+
 
 
 <HTMLBlock>{`
@@ -343,3 +358,5 @@ export function StepperComponent({ steps, orientation = "vertical" }) {
   }
 </style>
 `}</HTMLBlock>
+
+
