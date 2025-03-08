@@ -55,15 +55,19 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         border-radius: 2px;
       }
       .progress {
-        background-color: rgba(255, 255, 255, 0.8);
+        background-color: rgba(255, 255, 255, 0.3); /* Dim when inactive */
         height: 3px;
         position: absolute;
         top: 50%;
         left: 10%;
-        transition: width 0.4s ease;
+        transition: width 0.4s ease-in-out, background-color 0.4s ease-in-out;
         width: 0%;
-        z-index: -1;
+        z-index: 1; /* Ensure it renders above the default line */
         border-radius: 2px;
+      }
+      
+      .progress.active {
+        background-color: rgba(255, 255, 255, 0.9); /* Brighten when active */
       }
       .circle-container {
         position: relative;
@@ -188,15 +192,19 @@ export function StepperComponent({ steps, verticalTrue = false }) {
       }           
       .vertical-progress {
         position: absolute;
-        left: 30px; /* Keep it aligned */
-        top: 34px; /* Start AFTER first circle */
+        left: 30px;
+        top: 34px;
         width: 3px;
-        background-color: rgba(255, 255, 255, 0.8);
-        transition: height 0.4s ease;
-        height: calc(100% - 34px); /* Limit height to prevent overshooting */
-        z-index: -1;
+        background-color: rgba(255, 255, 255, 0.3); /* Dim when inactive */
+        transition: height 0.4s ease-in-out, background-color 0.4s ease-in-out;
+        height: 0%; /* Start empty */
+        z-index: 1;
         border-radius: 2px;
-      }           
+      }
+      
+      .vertical-progress.active {
+        background-color: rgba(255, 255, 255, 0.9); /* Brighten when active */
+      }      
       .vertical-circle-container {
         position: relative;
         margin: 20px 0;
@@ -248,12 +256,13 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         <div className="vertical-layout">
           {/* Timeline on the left */}
           <div className="vertical-timeline">
-            <div
-              className="vertical-progress"
-              style={{
-                height: `${(currentStep / (steps.length - 1)) * 100}%`,
-              }}
-            ></div>
+  <div
+    className={`vertical-progress ${currentStep > 0 ? "active" : ""}`}
+    style={{
+      height: `${(currentStep / (steps.length - 1)) * 100}%`,
+    }}
+  ></div>
+
             {steps.map((step, index) => {
               const shapeClass = step.stepType === "square" ? "square" : "circle";
               return (
@@ -304,13 +313,13 @@ export function StepperComponent({ steps, verticalTrue = false }) {
     >
       {/* Progress Bar */}
       <div className="progress-container">
-        <div
-          className="progress"
-          style={{
-            // For horizontal: line covers 80% (from 10% to 90%)
-            width: `${(currentStep / (steps.length - 1)) * 80}%`,
-          }}
-        ></div>
+  <div
+    className={`progress ${currentStep > 0 ? "active" : ""}`}
+    style={{
+      width: `${(currentStep / (steps.length - 1)) * 80}%`,
+    }}
+  ></div>
+
 
         {/* Step Circles or Squares with Titles Below */}
         {steps.map((step, index) => {
