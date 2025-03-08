@@ -17,7 +17,6 @@ export const StepperComponent = ({ steps, position = "top" }) => {
       setCurrentStep(currentStep - 1);
     }
   };
-
   return (
     <div className="bg-opacity-80 border-1 border-white/10 rounded-lg shadow-md text-white p-6 w-150 bg-radial from-purple-200 from-30% to-violet-950 to-80%">
       <div className={`flex flex-col ${position === 'bottom' ? 'flex-col-reverse' : ''} w-full`}>
@@ -133,7 +132,7 @@ export const steps = [
     content: 
     <div>
       <p><b>Getting Started</b></p>
-      <p>In you dashboard, navigate to your content tab. This is where you'll find Custom Components in your sidebar.</p>
+      <p>In your dashboard, navigate to your content tab. This is where you'll find Custom Components in your sidebar.</p>
      </div>,
   },
   {
