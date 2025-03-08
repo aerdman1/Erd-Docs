@@ -3,15 +3,9 @@ name: Stepper
 ---
 import React, { useState, useEffect } from "react";
 
-export function StepperComponent({ 
-  steps, 
-  verticalTrue = true, 
-  backgroundTheme = "purple", 
-  verticalSpacing = "20px", 
-  horizontalSpacing = "0px" 
-}) {
+export function StepperComponent({ steps, verticalTrue = true, backgroundTheme = "purple" }) {
   const themes = {
-    purple: {
+    purple: { 
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
       circle: "linear-gradient(to top, #b78cff, #8c5eff)",
       circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
@@ -20,7 +14,7 @@ export function StepperComponent({
     },
     blue: {
       background: "radial-gradient(circle at top, #4da6ff 20%, #0073e6 80%)",
-      circle: "linear-gradient(to top, #80ccff, #4da6ff)",
+      circle: "linear-gradient(to top, #80cff, #4da6ff)",
       circleActive: "linear-gradient(to top, #1a8cff, #0066cc)",
       square: "linear-gradient(to top, #66ccff, #3399ff)",
       squareActive: "linear-gradient(to top, #99ddff, #66ccff)",
@@ -42,7 +36,7 @@ export function StepperComponent({
   }, []);
 
   useEffect(() => {
-    // Dynamically inject CSS into the <head> using the current theme and spacing props
+    // Dynamically inject CSS into the <head> using the current theme
     const styleOverride = document.createElement("style");
     styleOverride.textContent = `
       .stepper-container {
@@ -54,7 +48,7 @@ export function StepperComponent({
         padding: 24px 36px;
         border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.2);
-        background: ${currentTheme.background}; 
+        background: ${currentTheme.background};
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
       /* HORIZONTAL LAYOUT (DEFAULT) */
@@ -62,7 +56,6 @@ export function StepperComponent({
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: ${horizontalSpacing};
         position: relative;
         width: 100%;
         max-width: 90%;
@@ -240,7 +233,7 @@ export function StepperComponent({
       }
       .vertical-circle-container {
         position: relative;
-        margin: ${verticalSpacing} 0;
+        margin: 20px 0;
       }
       .vertical-circle-container .circle,
       .vertical-circle-container .square {
@@ -272,7 +265,7 @@ export function StepperComponent({
     return () => {
       document.head.removeChild(styleOverride);
     };
-  }, [backgroundTheme, verticalSpacing, horizontalSpacing]);
+  }, [backgroundTheme]);
 
   if (verticalTrue) {
     return (
@@ -355,10 +348,8 @@ export function StepperComponent({
 
 <StepperComponent
   verticalFalse
-  backgroundTheme="purple" 
-  verticalSpacing="20px" 
-  horizontalSpacing="0px"
-  steps={[ 
+  backgroundTheme="purple"
+  steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
     { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
     { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
@@ -366,7 +357,6 @@ export function StepperComponent({
     { header: "Publish and Maintain", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
   ]}
 />
-
 
 <HTMLBlock>{`
 <style>
