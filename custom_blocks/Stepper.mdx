@@ -97,7 +97,7 @@ export function StepperComponent({ steps, verticalTrue = false }) {
       .circle.active {
         background: linear-gradient(to top, rgb(193 131 246), rgb(183, 140, 255));
         color: #fff;
-        border: 2px solid white;
+        border: 2px solid #fff;
         z-index: 99999;
         transition: .3s ease;
       }
@@ -105,7 +105,7 @@ export function StepperComponent({ steps, verticalTrue = false }) {
       .square {
         align-items: center;
         background: linear-gradient(to top, #ff8c6b, #ff5e42);
-        border: 3px solid rgba(255, 255, 255, 0.6);
+        border: 2px solid rgba(255, 255, 255, 0.6);
         border-radius: 6px; /* Slightly rounded edges */
         color: #fff;
         display: flex;
@@ -121,7 +121,7 @@ export function StepperComponent({ steps, verticalTrue = false }) {
       .square.active {
         background: linear-gradient(to top, #ffb09c, #ff8c6b);
         color: #fff;
-        border: 3px solid white;
+        border: 2px solid #fff;
         z-index: 99999;
       }
       .step-title {
