@@ -297,10 +297,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
             {steps[currentStep].content}
             <div className="stepper-buttons">
               <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
-                BACK
+                <i className="fa-solid fa-chevron-left"></i> BACK
               </button>
               <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
-                NEXT
+                NEXT <i className="fa-solid fa-chevron-right"></i>
               </button>
             </div>
           </div>
@@ -336,10 +336,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       </div>
       <div className="stepper-buttons">
         <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
-          BACK
+          <i className="fa-solid fa-chevron-left"></i> BACK
         </button>
         <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
-          NEXT
+          NEXT <i className="fa-solid fa-chevron-right"></i>
         </button>
       </div>
     </div>
