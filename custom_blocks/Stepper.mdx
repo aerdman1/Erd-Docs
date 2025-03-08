@@ -3,7 +3,7 @@ name: Stepper
 ---
 import React, { useState, useEffect } from "react";
 
-export function StepperComponent({ steps, vertical = false }) {
+export function StepperComponent({ steps, verticalTrue = false }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false); // Controls fade-in
 
@@ -223,7 +223,7 @@ export function StepperComponent({ steps, vertical = false }) {
   }, []);
 
   // If "vertical" is true, render vertical layout
-  if (vertical) {
+  if (verticalTrue) {
     return (
       <div
         className={`stepper-container transition-opacity duration-500 ${
@@ -341,11 +341,20 @@ export function StepperComponent({ steps, vertical = false }) {
 
 
 <StepperComponent
-  vertical
+  verticalFalse
   steps={[
-    { header: "Step 1", content: <p>Vertical step 1 content!</p>, stepType: "circle" },
-    { header: "Step 2", content: <p>Another vertical step.</p>, stepType: "square" },
-    { header: "Step 3", content: <p>Finish up here.</p>, stepType: "circle" },
+    { header: "Step 1", content: <p>Vertical step 1 content! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nibh nisl, iaculis in vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
+     </p>, stepType: "circle" },
+    
+    { header: "Step 2", content: <p>Vertical step 1 content! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nibh nisl, iaculis in vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
+     </p>, stepType: "square" },
+    
+    { header: "Step 3", content: <p>Vertical step 1 content! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nibh nisl, iaculis in vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
+     </p>, stepType: "circle" },
+    
+    { header: "Step 4", content: <p>Vertical step 1 content! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nibh nisl, iaculis in vulputate vitae, finibus eu tellus. Nunc vitae nunc pulvinar, imperdiet enim id, ornare massa.
+     </p>, stepType: "circle" },
+    
   ]}
 />
 
