@@ -55,6 +55,14 @@ export function StepperComponent({ steps }) {
         z-index: -1;
         border-radius: 2px;
       }
+      .circle-container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 25%; /* Keep even spacing */
+        text-align: center;
+      }
       .circle {
         align-items: center;
         background: linear-gradient(to top, #b78cff, #8c5eff);
@@ -74,26 +82,27 @@ export function StepperComponent({ steps }) {
         background: linear-gradient(to top, #e2c0ff, #b78cff);
         color: #fff;
         border: 3px solid white;
-    
+      }
+      /* Step Titles (Absolute Positioning Below Circles) */
+      .step-title {
+        position: absolute;
+        top: 45px; /* Position below the circle */
+        font-size: 14px;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.6);
+        transition: color 0.3s ease;
+        width: 100px;
+        text-align: center;
+      }
+      .step-title.active {
+        color: rgba(255, 255, 255, 1);
       }
       .step-content {
-        margin-top: 20px;
+        margin-top: 50px;
         font-size: 16px;
         padding: 10px;
         color: white;
         font-weight: 400;
-      }
-      .step-title {
-        font-weight: bold;
-        font-size: 18px;
-        color: white;
-        margin-bottom: 4px;
-      }
-      .step-subtitle {
-        font-weight: bold;
-        font-size: 16px;
-        color: white;
-        margin-bottom: 8px;
       }
       .stepper-buttons {
         margin-top: 20px;
@@ -136,18 +145,21 @@ export function StepperComponent({ steps }) {
           }}
         ></div>
 
-        {/* Circles */}
+        {/* Step Circles with Titles Below (Absolute Positioning) */}
         {visibleSteps.map((step, index) => (
-          <div key={index} className={`circle ${index <= currentStep ? "active" : ""}`}>
-            {index + 1}
+          <div key={index} className="circle-container">
+            <div className={`circle ${index <= currentStep ? "active" : ""}`}>
+              {index + 1}
+            </div>
+            <div className={`step-title ${index === currentStep ? "active" : ""}`}>
+              {step.header}
+            </div>
           </div>
         ))}
       </div>
 
       {/* Step Content */}
       <div className="step-content">
-        <div className="step-title">{visibleSteps[currentStep].header}</div>
-        <div className="step-subtitle">Getting Started</div>
         {visibleSteps[currentStep].content}
       </div>
 
@@ -163,7 +175,6 @@ export function StepperComponent({ steps }) {
     </div>
   );
 }
-
 
 // Example usage with 5 steps but only showing 4
 <StepperComponent
