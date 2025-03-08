@@ -89,15 +89,16 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         font-weight: bold;
         height: 34px;
         justify-content: center;
-        transition: 0.4s ease;
+        transition: 0.3s ease;
         width: 34px;
         z-index: 99999;
       }
       .circle.active {
-        background: linear-gradient(to top, #e2c0ff, #b78cff);
+        background: linear-gradient(to top, rgb(193 131 246), rgb(183, 140, 255));
         color: #fff;
         border: 2px solid white;
         z-index: 99999;
+        transition: .3s ease;
       }
       /* Square Step Style */
       .square {
@@ -111,7 +112,7 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         font-weight: bold;
         height: 34px;
         justify-content: center;
-        transition: 0.4s ease;
+        transition: 0.3s ease;
         width: 34px;
         z-index: 99999;
       }
