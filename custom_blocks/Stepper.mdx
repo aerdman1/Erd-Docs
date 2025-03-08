@@ -25,6 +25,12 @@ export function StepperComponent({ steps, verticalTrue = false }) {
         text-align: center;
         width: 100%;
         max-width: 90%;
+        margin: 20px auto;
+        padding: 24px 36px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+	    background: radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
       /* HORIZONTAL LAYOUT (DEFAULT) */
       .progress-container {
@@ -246,13 +252,11 @@ export function StepperComponent({ steps, verticalTrue = false }) {
   // If "vertical" is true, render vertical layout
   if (verticalTrue) {
     return (
-<div
-  className={`relative text-center w-full max-w-[90%] my-5 mx-auto px-9 py-6 rounded-xl border border-white/20 
-    shadow-md transition-opacity duration-500 
-    ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"} 
-    bg-[radial-gradient(circle_at_top,_#835db9_20%,_#4a2a8f_80%)]`}
->
-
+      <div
+        className={`stepper-container transition-opacity duration-500 ${
+          isVisible ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+      >
         <div className="vertical-layout">
           {/* Timeline on the left */}
           <div className="vertical-timeline">
