@@ -1,6 +1,7 @@
 ---
 name: Stepper
 ---
+
 import React, { useState, useEffect } from "react";
 
 export function StepperComponent({ steps }) {
@@ -239,3 +240,7 @@ export function StepperComponent({ steps }) {
     },
   ]}
 />
+
+<HTMLBlock>{`
+<style>html{.stepper-container:none !important;}</style>
+`}</HTMLBlock>
