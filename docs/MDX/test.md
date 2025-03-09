@@ -1,5 +1,5 @@
 ---
-title: test
+title: Stepper2
 deprecated: false
 hidden: false
 metadata:
