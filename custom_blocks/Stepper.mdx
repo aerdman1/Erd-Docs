@@ -9,8 +9,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
       circle: "linear-gradient(to top, #b78cff, #8c5eff)",
       circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
-      square: "linear-gradient(to top, #ff8c6b, #ff5e42)",
-      squareActive: "linear-gradient(to top, #ffb09c, #ff8c6b)",
+      square: "linear-gradient(to top, #9b72ff, #7d54e6)",
+      squareActive: "linear-gradient(to top, #ad84ff, #9272e6)",
     },
     blue: {
       background: "radial-gradient(circle at top, #4da6ff 20%, #0073e6 80%)",
@@ -19,10 +19,72 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #66ccff, #3399ff)",
       squareActive: "linear-gradient(to top, #99ddff, #66ccff)",
     },
+    red: {
+      background: "radial-gradient(circle at top, #ff6b6b 20%, #ff3b3b 80%)",
+      circle: "linear-gradient(to top, #ff9b9b, #ff6b6b)",
+      circleActive: "linear-gradient(to top, #ffabab, #ff8080)",
+      square: "linear-gradient(to top, #ff8080, #ff4d4d)",
+      squareActive: "linear-gradient(to top, #ff9999, #ff8080)",
+    },
+    green: {
+      background: "radial-gradient(circle at top, #66ff66 20%, #33cc33 80%)",
+      circle: "linear-gradient(to top, #99ff99, #66ff66)",
+      circleActive: "linear-gradient(to top, #b3ffb3, #99ff99)",
+      square: "linear-gradient(to top, #66cc66, #33aa33)",
+      squareActive: "linear-gradient(to top, #80d480, #66cc66)",
+    },
+    transparent: {
+      background: "transparent",
+      circle: "linear-gradient(to top, #b78cff, #8c5eff)",
+      circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
+      square: "linear-gradient(to top, #9b72ff, #7d54e6)",
+      squareActive: "linear-gradient(to top, #ad84ff, #9272e6)",
+    },
   };
 
-  // Use the provided theme key or fall back to "purple"
-  const currentTheme = themes[backgroundTheme] || themes["purple"];
+  // Helper function to adjust a HEX color by a given amount (-255 to 255)
+  function adjustColor(col, amt) {
+    let usePound = false;
+    if (col[0] === "#") {
+      col = col.slice(1);
+      usePound = true;
+    }
+    let num = parseInt(col, 16);
+    let r = (num >> 16) + amt;
+    if (r > 255) r = 255;
+    else if (r < 0) r = 0;
+    let g = ((num >> 8) & 0x00ff) + amt;
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
+    let b = (num & 0x0000ff) + amt;
+    if (b > 255) b = 255;
+    else if (b < 0) b = 0;
+    return (usePound ? "#" : "") + ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0");
+  }
+
+  // Generate a custom theme based on the provided HEX code.
+  function generateCustomTheme(hex) {
+    const veryLightColor = adjustColor(hex, 60);
+    const lightColor = adjustColor(hex, 40);
+    const mediumLightColor = adjustColor(hex, 20);
+    const mediumColor = adjustColor(hex, 0);
+    const darkColor = adjustColor(hex, -40);
+    return {
+      background: `radial-gradient(circle at top, ${lightColor} 20%, ${darkColor} 80%)`,
+      circle: `linear-gradient(to top, ${veryLightColor}, ${lightColor})`,
+      circleActive: `linear-gradient(to top, ${mediumLightColor}, ${lightColor})`,
+      square: `linear-gradient(to top, ${mediumLightColor}, ${mediumColor})`,
+      squareActive: `linear-gradient(to top, ${mediumColor}, ${mediumLightColor})`,
+    };
+  }
+
+  // If backgroundTheme is a valid HEX, generate a custom theme.
+  let customTheme = null;
+  if (/^#([0-9A-Fa-f]{3}){1,2}$/.test(backgroundTheme)) {
+    customTheme = generateCustomTheme(backgroundTheme);
+  }
+  // Use the custom theme if available, otherwise fall back to the predefined themes (defaulting to "purple")
+  const currentTheme = customTheme || themes[backgroundTheme] || themes["purple"];
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -122,6 +184,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         border: 2px solid #fff;
         z-index: 99999;
         transition: 0.3s ease;
+        box-shadow: 0 0 8px rgba(255,255,255,0.8);
       }
       /* Square Step Style */
       #${uniqueId} .square {
@@ -145,6 +208,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         color: #fff;
         border: 2px solid #fff;
         z-index: 99999;
+        box-shadow: 0 0 8px rgba(255,255,255,0.8);
       }
       #${uniqueId} .step-title {
         position: absolute;
@@ -259,13 +323,12 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       #${uniqueId} .vertical-circle-container .step-title.active {
         color: rgba(255, 255, 255, 1);
       }
-      /* Adjust vertical content alignment */
       #${uniqueId} .vertical-layout .step-content {
         margin: 0 0 0 190px;
         align-self: center;
       }
-     .content-body .rm-Markdown {
-      opacity: 1 !important;
+      .content-body .rm-Markdown {
+        opacity: 1 !important;
       }
     `;
     document.head.appendChild(styleOverride);
@@ -362,12 +425,12 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
 
 <StepperComponent
   verticalFalse
-  backgroundTheme="purple"
+  backgroundTheme="transparent"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
-    { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "square" },
+    { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
     { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
-    { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "square" },
+    { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
     { header: "Publish and Maintain Content", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
   ]}
 />
