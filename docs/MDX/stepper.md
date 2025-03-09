@@ -17,19 +17,9 @@ metadata:
   ]}
 />
 
-<HTMLBlock>{`
-<style>
-  .content-body .rm-Markdown {
-     opacity: 0;
-  }
-</style>
-`}</HTMLBlock>
-
-<br />
-
 <StepperComponent
-  verticalFalse
-  backgroundTheme="blue"
+  verticalTrue
+  backgroundTheme="purple"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
     { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "square" },
@@ -40,8 +30,8 @@ metadata:
 />
 
 <StepperComponent
-  verticaTrue
-  backgroundTheme="purple"
+  verticaFalse
+  backgroundTheme="blue"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
     { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "square" },
@@ -62,3 +52,11 @@ metadata:
     { header: "Publish and Maintain Content", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "square" },
   ]}
 />
+
+<HTMLBlock>{`
+<style>
+  .content-body .rm-Markdown {
+     opacity: 0;
+  }
+</style>
+`}</HTMLBlock>
