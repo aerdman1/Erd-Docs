@@ -317,6 +317,9 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       #${uniqueId} .vertical-circle-container .step-title.active {
         color: ${activeTextColor};
       }
+        .content-body .rm-Markdown {
+   			 opacity: 1;
+         }
     `;
     document.head.appendChild(styleOverride);
     return () => {
