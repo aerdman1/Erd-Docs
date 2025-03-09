@@ -1,34 +1,38 @@
 ---
 name: Stepper
 ---
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
-export function StepperComponent({ steps, verticalTrue = true, backgroundTheme = "purple" }) {
+export function StepperComponent({ 
+  steps, 
+  verticalTrue = false, 
+  backgroundTheme = "purple", 
+  verticalSpacing = "20px", 
+  horizontalSpacing = "0px" 
+}) {
   const themes = {
-    purple: { 
+    purple: {
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
       circle: "linear-gradient(to top, #b78cff, #8c5eff)",
       circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
       square: "linear-gradient(to top, #ff8c6b, #ff5e42)",
-      squareActive: "linear-gradient(to top, #ffb09c, #ff8c6b)",
+      squareActive: "linear-gradient(to top, #ffb09c, #ff8c6b)"
     },
     blue: {
       background: "radial-gradient(circle at top, #4da6ff 20%, #0073e6 80%)",
-      circle: "linear-gradient(to top, #80cff, #4da6ff)",
+      circle: "linear-gradient(to top, #80ccff, #4da6ff)",
       circleActive: "linear-gradient(to top, #1a8cff, #0066cc)",
       square: "linear-gradient(to top, #66ccff, #3399ff)",
-      squareActive: "linear-gradient(to top, #99ddff, #66ccff)",
-    },
+      squareActive: "linear-gradient(to top, #99ddff, #66ccff)"
+    }
   };
 
-  // Use the provided theme key or fall back to "purple"
   const currentTheme = themes[backgroundTheme] || themes["purple"];
-
+  const uniqueId = useMemo(() => Math.random().toString(36).substr(2, 9), []);
   const [currentStep, setCurrentStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(false); // Controls fade-in
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Hide stepper on page load and fade in smoothly
     const timeout = setTimeout(() => {
       setIsVisible(true);
     }, 300);
@@ -36,10 +40,9 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
   }, []);
 
   useEffect(() => {
-    // Dynamically inject CSS into the <head> using the current theme
     const styleOverride = document.createElement("style");
     styleOverride.textContent = `
-      .stepper-container {
+      .stepper-container-${uniqueId} {
         position: relative;
         text-align: center;
         width: 100%;
@@ -51,17 +54,17 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         background: ${currentTheme.background};
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
-      /* HORIZONTAL LAYOUT (DEFAULT) */
-      .progress-container {
+      .stepper-container-${uniqueId} .progress-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: ${horizontalSpacing};
         position: relative;
         width: 100%;
         max-width: 90%;
         margin: 20px auto;
       }
-      .progress-container::before {
+      .stepper-container-${uniqueId} .progress-container::before {
         background-color: rgba(255, 255, 255, 0.2);
         content: "";
         height: 3px;
@@ -73,7 +76,7 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         z-index: 2;
         border-radius: 2px;
       }
-      .progress {
+      .stepper-container-${uniqueId} .progress {
         background-color: rgba(255, 255, 255, 0.3);
         height: 3px;
         position: absolute;
@@ -84,10 +87,10 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         z-index: 1;
         border-radius: 2px;
       }
-      .progress.active {
+      .stepper-container-${uniqueId} .progress.active {
         background-color: oklch(0.811 0.111 293.571);
       }
-      .circle-container {
+      .stepper-container-${uniqueId} .circle-container {
         position: relative;
         display: flex;
         flex-direction: column;
@@ -95,8 +98,7 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         flex: 1;
         text-align: center;
       }
-      /* Circle Step Style */
-      .circle {
+      .stepper-container-${uniqueId} .circle {
         align-items: center;
         background: ${currentTheme.circle};
         border: 2px solid rgba(236, 233, 254, 0.6);
@@ -112,15 +114,14 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         z-index: 99999;
         position: relative;
       }
-      .circle.active {
+      .stepper-container-${uniqueId} .circle.active {
         background: ${currentTheme.circleActive};
         color: #fff;
         border: 2px solid #fff;
         z-index: 99999;
         transition: 0.3s ease;
       }
-      /* Square Step Style */
-      .square {
+      .stepper-container-${uniqueId} .square {
         align-items: center;
         background: ${currentTheme.square};
         border: 2px solid rgba(255, 255, 255, 0.6);
@@ -136,13 +137,13 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         z-index: 99999;
         position: relative;
       }
-      .square.active {
+      .stepper-container-${uniqueId} .square.active {
         background: ${currentTheme.squareActive};
         color: #fff;
         border: 2px solid #fff;
         z-index: 99999;
       }
-      .step-title {
+      .stepper-container-${uniqueId} .step-title {
         position: absolute;
         top: 45px;
         font-size: 14px;
@@ -152,10 +153,10 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         width: auto;
         text-align: center;
       }
-      .step-title.active {
+      .stepper-container-${uniqueId} .step-title.active {
         color: rgba(255, 255, 255, 1);
       }
-      .step-content {
+      .stepper-container-${uniqueId} .step-content {
         margin: 80px auto 0 auto;
         max-width: 90%;
         font-size: 16px;
@@ -163,19 +164,19 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         color: white;
         font-weight: 400;
       }
-      .step-header {
+      .stepper-container-${uniqueId} .step-header {
         text-align: center;
         font-size: 24px;
         font-weight: bold;
         margin-bottom: 20px;
         color: white;
       }
-      .stepper-buttons {
+      .stepper-container-${uniqueId} .stepper-buttons {
         margin-top: 20px;
         display: flex;
         justify-content: space-between;
       }
-      .btn {
+      .stepper-container-${uniqueId} .btn {
         background: transparent;
         border: none;
         color: rgba(255, 255, 255, 0.6);
@@ -185,28 +186,27 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         padding: 6px 12px;
         transition: color 0.2s ease;
       }
-      .btn:hover {
+      .stepper-container-${uniqueId} .btn:hover {
         color: rgba(255, 255, 255, 0.9);
       }
-      .btn:disabled {
+      .stepper-container-${uniqueId} .btn:disabled {
         color: rgba(255, 255, 255, 0.3);
         cursor: not-allowed;
       }
-      .content-body .rm-Markdown {
+      .stepper-container-${uniqueId} .content-body .rm-Markdown {
         opacity: 1 !important;
       }
-      /* VERTICAL LAYOUT */
-      .vertical-layout {
+      .stepper-container-${uniqueId} .vertical-layout {
         display: flex;
         flex-direction: row;
         align-items: flex-start;
       }
-      .vertical-timeline {
+      .stepper-container-${uniqueId} .vertical-timeline {
         position: relative;
         width: 60px;
         margin-right: 20px;
       }
-      .vertical-timeline::before {
+      .stepper-container-${uniqueId} .vertical-timeline::before {
         content: "";
         position: absolute;
         left: 30px;
@@ -217,7 +217,7 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         border-radius: 2px;
         z-index: 0;
       }
-      .vertical-progress {
+      .stepper-container-${uniqueId} .vertical-progress {
         position: absolute;
         left: 30px;
         top: 34px;
@@ -228,18 +228,18 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         z-index: 1;
         border-radius: 2px;
       }
-      .vertical-progress.active {
+      .stepper-container-${uniqueId} .vertical-progress.active {
         background-color: rgba(255, 255, 255, 0.9);
       }
-      .vertical-circle-container {
+      .stepper-container-${uniqueId} .vertical-circle-container {
         position: relative;
-        margin: 20px 0;
+        margin: ${verticalSpacing} 0;
       }
-      .vertical-circle-container .circle,
-      .vertical-circle-container .square {
+      .stepper-container-${uniqueId} .vertical-circle-container .circle,
+      .stepper-container-${uniqueId} .vertical-circle-container .square {
         margin-left: 13px;
       }
-      .vertical-circle-container .step-title {
+      .stepper-container-${uniqueId} .vertical-circle-container .step-title {
         position: absolute;
         top: 50%;
         left: 60px;
@@ -252,11 +252,10 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
         color: rgba(255, 255, 255, 0.6);
         transition: color 0.3s ease;
       }
-      .vertical-circle-container .step-title.active {
+      .stepper-container-${uniqueId} .vertical-circle-container .step-title.active {
         color: rgba(255, 255, 255, 1);
       }
-      /* Adjust vertical content alignment */
-      .vertical-layout .step-content {
+      .stepper-container-${uniqueId} .vertical-layout .step-content {
         margin: 0 0 0 190px;
         align-self: center;
       }
@@ -265,11 +264,11 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
     return () => {
       document.head.removeChild(styleOverride);
     };
-  }, [backgroundTheme]);
+  }, [backgroundTheme, verticalSpacing, horizontalSpacing, uniqueId]);
 
   if (verticalTrue) {
     return (
-      <div className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+      <div className={`stepper-container-${uniqueId} transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
         <div className="vertical-layout">
           <div className="vertical-timeline">
             <div
@@ -310,7 +309,7 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
   }
 
   return (
-    <div className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+    <div className={`stepper-container-${uniqueId} transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
       <div className="progress-container">
         <div
           className={`progress ${currentStep > 0 ? "active" : ""}`}
@@ -346,22 +345,147 @@ export function StepperComponent({ steps, verticalTrue = true, backgroundTheme =
   );
 }
 
-<StepperComponent
-  verticalFalse
-  backgroundTheme="blue"
-  steps={[
-    { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
-    { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
-    { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
-    { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
-    { header: "Publish and Maintain", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
-  ]}
-/>
+export function Example1() {
+  return (
+    <StepperComponent
+      verticalFalse
+      backgroundTheme="purple"
+      verticalSpacing="20px"
+      horizontalSpacing="0px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
+        { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" }
+      ]}
+    />
+  );
+}
 
-<HTMLBlock>{`
-<style>
-  .content-body .rm-Markdown {
-    opacity: 0;
-  }
-</style>
-`}</HTMLBlock>
+export function Example2() {
+  return (
+    <StepperComponent
+      verticalTrue
+      backgroundTheme="purple"
+      verticalSpacing="20px"
+      horizontalSpacing="0px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
+        { header: "Write Clear Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" }
+      ]}
+    />
+  );
+}
+
+export function Example3() {
+  return (
+    <StepperComponent
+      verticalFalse
+      backgroundTheme="purple"
+      verticalSpacing="20px"
+      horizontalSpacing="0px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience.</p>, stepType: "square" },
+        { header: "Write Clear Content", content: <p>Use simple language and structured explanations.</p>, stepType: "square" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables.</p>, stepType: "square" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers and live code examples.</p>, stepType: "square" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy before publishing.</p>, stepType: "square" }
+      ]}
+    />
+  );
+}
+
+export function Example4() {
+  return (
+    <StepperComponent
+      verticalTrue
+      backgroundTheme="purple"
+      verticalSpacing="20px"
+      horizontalSpacing="0px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience.</p>, stepType: "square" },
+        { header: "Write Clear Content", content: <p>Use simple language and structured explanations.</p>, stepType: "square" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables.</p>, stepType: "square" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers and live code examples.</p>, stepType: "square" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy before publishing.</p>, stepType: "square" }
+      ]}
+    />
+  );
+}
+
+export function Example5() {
+  return (
+    <StepperComponent
+      verticalFalse
+      backgroundTheme="blue"
+      verticalSpacing="20px"
+      horizontalSpacing="0px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose and target audience.</p>, stepType: "circle" },
+        { header: "Write Clear Content", content: <p>Use simple language and structured explanations.</p>, stepType: "circle" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables.</p>, stepType: "circle" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers and live code examples.</p>, stepType: "square" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy before publishing.</p>, stepType: "square" }
+      ]}
+    />
+  );
+}
+
+export function Example6() {
+  return (
+    <StepperComponent
+      verticalTrue
+      backgroundTheme="blue"
+      verticalSpacing="20px"
+      horizontalSpacing="0px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose and target audience.</p>, stepType: "circle" },
+        { header: "Write Clear Content", content: <p>Use simple language and structured explanations.</p>, stepType: "circle" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables.</p>, stepType: "square" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers and live code examples.</p>, stepType: "square" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy before publishing.</p>, stepType: "square" }
+      ]}
+    />
+  );
+}
+
+export function Example7() {
+  return (
+    <StepperComponent
+      verticalFalse
+      backgroundTheme="purple"
+      verticalSpacing="20px"
+      horizontalSpacing="30px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose and target audience.</p>, stepType: "circle" },
+        { header: "Write Clear Content", content: <p>Use simple language and structured explanations.</p>, stepType: "circle" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables.</p>, stepType: "circle" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers and live code examples.</p>, stepType: "circle" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy before publishing.</p>, stepType: "circle" }
+      ]}
+    />
+  );
+}
+
+export function Example8() {
+  return (
+    <StepperComponent
+      verticalTrue
+      backgroundTheme="blue"
+      verticalSpacing="40px"
+      horizontalSpacing="0px"
+      steps={[
+        { header: "Plan Your Documentation", content: <p>Define the purpose and target audience.</p>, stepType: "square" },
+        { header: "Write Clear Content", content: <p>Use simple language and structured explanations.</p>, stepType: "square" },
+        { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables.</p>, stepType: "square" },
+        { header: "Use Interactive Elements", content: <p>Incorporate API explorers and live code examples.</p>, stepType: "square" },
+        { header: "Publish and Maintain", content: <p>Test documentation for accuracy before publishing.</p>, stepType: "square" }
+      ]}
+    />
+  );
+}
+ 
