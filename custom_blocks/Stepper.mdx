@@ -33,12 +33,40 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #66cc66, #33aa33)",
       squareActive: "linear-gradient(to top, #80d480, #66cc66)",
     },
-    transparent: {
-      background: "transparent",
-      circle: "linear-gradient(to top, #b78cff, #8c5eff)",
-      circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
-      square: "linear-gradient(to top, #9b72ff, #7d54e6)",
-      squareActive: "linear-gradient(to top, #ad84ff, #9272e6)",
+    orange: {
+      background: "radial-gradient(circle at top, #ff9f4f 20%, #ff7b00 80%)",
+      circle: "linear-gradient(to top, #ffc080, #ff9f40)",
+      circleActive: "linear-gradient(to top, #ffb66e, #ff9f4f)",
+      square: "linear-gradient(to top, #ff9f40, #ff7b00)",
+      squareActive: "linear-gradient(to top, #ffb66e, #ff9f40)",
+    },
+    yellow: {
+      background: "radial-gradient(circle at top, #fff79a 20%, #ffeb3b 80%)",
+      circle: "linear-gradient(to top, #ffffb3, #fff176)",
+      circleActive: "linear-gradient(to top, #fff59d, #fff176)",
+      square: "linear-gradient(to top, #fff176, #ffeb3b)",
+      squareActive: "linear-gradient(to top, #fff59d, #fff176)",
+    },
+    indigo: {
+      background: "radial-gradient(circle at top, #5c6bc0 20%, #3949ab 80%)",
+      circle: "linear-gradient(to top, #7986cb, #5c6bc0)",
+      circleActive: "linear-gradient(to top, #5c6bc0, #3f51b5)",
+      square: "linear-gradient(to top, #5c6bc0, #3949ab)",
+      squareActive: "linear-gradient(to top, #7986cb, #5c6bc0)",
+    },
+    white: {
+      background: "#ffffff",
+      circle: "linear-gradient(to top, #f0f0f0, #dcdcdc)",
+      circleActive: "linear-gradient(to top, #c0c0c0, #a8a8a8)",
+      square: "linear-gradient(to top, #dcdcdc, #c0c0c0)",
+      squareActive: "linear-gradient(to top, #a8a8a8, #909090)",
+    },
+    black: {
+      background: "#000000",
+      circle: "linear-gradient(to top, #3a3a3a, #1f1f1f)",
+      circleActive: "linear-gradient(to top, #1f1f1f, #000000)",
+      square: "linear-gradient(to top, #3a3a3a, #1f1f1f)",
+      squareActive: "linear-gradient(to top, #1f1f1f, #000000)",
     },
   };
 
@@ -85,6 +113,14 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   }
   // Use the custom theme if available, otherwise fall back to the predefined themes (defaulting to "purple")
   const currentTheme = customTheme || themes[backgroundTheme] || themes["purple"];
+
+  // For standard themes, adjust text colors based on background.
+  const textColor = (backgroundTheme === "white") ? "black" : "white";
+  const inactiveTextColor = (backgroundTheme === "white") ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.6)";
+  const activeTextColor = (backgroundTheme === "white") ? "rgba(0,0,0,1)" : "rgba(255,255,255,1)";
+  const activeBoxShadow = textColor === "black" 
+    ? "0 0 8px rgba(0,0,0,0.8)" 
+    : "0 0 8px rgba(255,255,255,0.8)";
 
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -167,7 +203,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         background: ${currentTheme.circle};
         border: 2px solid rgba(236, 233, 254, 0.6);
         border-radius: 50%;
-        color: #fff;
+        color: ${textColor};
         display: flex;
         font-size: 14px;
         font-weight: bold;
@@ -180,11 +216,11 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       }
       #${uniqueId} .circle.active {
         background: ${currentTheme.circleActive};
-        color: #fff;
-        border: 2px solid #fff;
+        color: ${textColor};
+        border: 2px solid ${textColor};
         z-index: 99999;
         transition: 0.3s ease;
-        box-shadow: 0 0 8px rgba(255,255,255,0.8);
+        box-shadow: ${activeBoxShadow};
       }
       /* Square Step Style */
       #${uniqueId} .square {
@@ -192,7 +228,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         background: ${currentTheme.square};
         border: 2px solid rgba(255, 255, 255, 0.6);
         border-radius: 6px;
-        color: #fff;
+        color: ${textColor};
         display: flex;
         font-size: 14px;
         font-weight: bold;
@@ -205,30 +241,30 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       }
       #${uniqueId} .square.active {
         background: ${currentTheme.squareActive};
-        color: #fff;
-        border: 2px solid #fff;
+        color: ${textColor};
+        border: 2px solid ${textColor};
         z-index: 99999;
-        box-shadow: 0 0 8px rgba(255,255,255,0.8);
+        box-shadow: ${activeBoxShadow};
       }
       #${uniqueId} .step-title {
         position: absolute;
         top: 45px;
         font-size: 14px;
         font-weight: bold;
-        color: rgba(255, 255, 255, 0.6);
+        color: ${inactiveTextColor};
         transition: color 0.3s ease;
         width: auto;
         text-align: center;
       }
       #${uniqueId} .step-title.active {
-        color: rgba(255, 255, 255, 1);
+        color: ${activeTextColor};
       }
       #${uniqueId} .step-content {
         margin: 80px auto 0 auto;
         max-width: 90%;
         font-size: 16px;
         padding: 10px;
-        color: white;
+        color: ${textColor};
         font-weight: 400;
       }
       #${uniqueId} .step-header {
@@ -236,7 +272,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         font-size: 24px;
         font-weight: bold;
         margin-bottom: 20px;
-        color: white;
+        color: ${textColor};
       }
       #${uniqueId} .stepper-buttons {
         margin-top: 20px;
@@ -246,7 +282,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       #${uniqueId} .btn {
         background: transparent;
         border: none;
-        color: rgba(255, 255, 255, 0.6);
+        color: ${inactiveTextColor};
         font-size: 14px;
         font-weight: bold;
         cursor: pointer;
@@ -254,10 +290,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         transition: color 0.2s ease;
       }
       #${uniqueId} .btn:hover {
-        color: rgba(255, 255, 255, 0.9);
+        color: ${activeTextColor};
       }
       #${uniqueId} .btn:disabled {
-        color: rgba(255, 255, 255, 0.3);
+        color: ${inactiveTextColor};
         cursor: not-allowed;
       }
       #${uniqueId} .content-body .rm-Markdown {
@@ -317,11 +353,11 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         text-align: left;
         font-size: 14px;
         font-weight: bold;
-        color: rgba(255, 255, 255, 0.6);
+        color: ${inactiveTextColor};
         transition: color 0.3s ease;
       }
       #${uniqueId} .vertical-circle-container .step-title.active {
-        color: rgba(255, 255, 255, 1);
+        color: ${activeTextColor};
       }
       #${uniqueId} .vertical-layout .step-content {
         margin: 0 0 0 190px;
@@ -335,7 +371,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
     return () => {
       document.head.removeChild(styleOverride);
     };
-  }, [backgroundTheme, currentTheme, uniqueId]);
+  }, [backgroundTheme, currentTheme, uniqueId, textColor, inactiveTextColor, activeTextColor, activeBoxShadow]);
 
   if (verticalTrue) {
     return (
@@ -370,10 +406,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
             {steps[currentStep].content}
             <div className="stepper-buttons">
               <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
-                BACK
+                <i className="fa fa-arrow-left"></i> BACK
               </button>
               <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
-                NEXT
+                NEXT <i className="fa fa-arrow-right"></i>
               </button>
             </div>
           </div>
@@ -412,10 +448,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       </div>
       <div className="stepper-buttons">
         <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
-          BACK
+          <i className="fa fa-arrow-left"></i> BACK
         </button>
         <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
-          NEXT
+          NEXT <i className="fa fa-arrow-right"></i>
         </button>
       </div>
     </div>
@@ -425,7 +461,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
 
 <StepperComponent
   verticalFalse
-  backgroundTheme="transparent"
+  backgroundTheme="purple"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
     { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
