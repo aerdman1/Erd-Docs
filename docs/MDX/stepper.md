@@ -39,8 +39,6 @@ metadata:
   ]}
 />
 
-<br />
-
 <StepperComponent
   verticaTrue
   backgroundTheme="purple"
@@ -52,8 +50,6 @@ metadata:
     { header: "Publish and Maintain Content", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
   ]}
 />
-
-<br />
 
 <StepperComponent
   verticalTrue
