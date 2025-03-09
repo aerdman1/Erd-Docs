@@ -1,7 +1,7 @@
 ---
 name: Stepper
 ---
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 export function StepperComponent({ steps, verticalTrue = false, backgroundTheme = "purple" }) {
   const themes = {
@@ -25,10 +25,13 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   const currentTheme = themes[backgroundTheme] || themes["purple"];
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(false); // Controls fade-in
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Generate a unique ID for scoping the CSS for this instance
+  const uniqueId = useMemo(() => "stepper-" + Math.random().toString(36).substr(2, 9), []);
 
   useEffect(() => {
-    // Hide stepper on page load and fade in smoothly
+    // Delay showing the stepper for a smooth fade-in
     const timeout = setTimeout(() => {
       setIsVisible(true);
     }, 300);
@@ -36,10 +39,11 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   }, []);
 
   useEffect(() => {
-    // Dynamically inject CSS into the <head> using the current theme
+    // Dynamically inject CSS into the <head> using the unique id to scope selectors
     const styleOverride = document.createElement("style");
     styleOverride.textContent = `
-      .stepper-container {
+      /* Container styling scoped to this instance */
+      #${uniqueId} {
         position: relative;
         text-align: center;
         width: 100%;
@@ -52,7 +56,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
       /* HORIZONTAL LAYOUT (DEFAULT) */
-      .progress-container {
+      #${uniqueId} .progress-container {
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -61,7 +65,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         max-width: 100%;
         margin: 20px auto;
       }
-      .progress-container::before {
+      #${uniqueId} .progress-container::before {
         background-color: rgba(255, 255, 255, 0.2);
         content: "";
         height: 3px;
@@ -73,7 +77,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         z-index: 2;
         border-radius: 2px;
       }
-      .progress {
+      #${uniqueId} .progress {
         background-color: rgba(255, 255, 255, 0.3);
         height: 3px;
         position: absolute;
@@ -84,10 +88,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         z-index: 1;
         border-radius: 2px;
       }
-      .progress.active {
+      #${uniqueId} .progress.active {
         background-color: oklch(0.811 0.111 293.571);
       }
-      .circle-container {
+      #${uniqueId} .circle-container {
         position: relative;
         display: flex;
         flex-direction: column;
@@ -96,7 +100,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         text-align: center;
       }
       /* Circle Step Style */
-      .circle {
+      #${uniqueId} .circle {
         align-items: center;
         background: ${currentTheme.circle};
         border: 2px solid rgba(236, 233, 254, 0.6);
@@ -112,7 +116,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         z-index: 99999;
         position: relative;
       }
-      .circle.active {
+      #${uniqueId} .circle.active {
         background: ${currentTheme.circleActive};
         color: #fff;
         border: 2px solid #fff;
@@ -120,7 +124,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         transition: 0.3s ease;
       }
       /* Square Step Style */
-      .square {
+      #${uniqueId} .square {
         align-items: center;
         background: ${currentTheme.square};
         border: 2px solid rgba(255, 255, 255, 0.6);
@@ -136,13 +140,13 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         z-index: 99999;
         position: relative;
       }
-      .square.active {
+      #${uniqueId} .square.active {
         background: ${currentTheme.squareActive};
         color: #fff;
         border: 2px solid #fff;
         z-index: 99999;
       }
-      .step-title {
+      #${uniqueId} .step-title {
         position: absolute;
         top: 45px;
         font-size: 14px;
@@ -152,10 +156,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         width: auto;
         text-align: center;
       }
-      .step-title.active {
+      #${uniqueId} .step-title.active {
         color: rgba(255, 255, 255, 1);
       }
-      .step-content {
+      #${uniqueId} .step-content {
         margin: 80px auto 0 auto;
         max-width: 90%;
         font-size: 16px;
@@ -163,19 +167,19 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         color: white;
         font-weight: 400;
       }
-      .step-header {
+      #${uniqueId} .step-header {
         text-align: center;
         font-size: 24px;
         font-weight: bold;
         margin-bottom: 20px;
         color: white;
       }
-      .stepper-buttons {
+      #${uniqueId} .stepper-buttons {
         margin-top: 20px;
         display: flex;
         justify-content: space-between;
       }
-      .btn {
+      #${uniqueId} .btn {
         background: transparent;
         border: none;
         color: rgba(255, 255, 255, 0.6);
@@ -185,28 +189,28 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         padding: 6px 12px;
         transition: color 0.2s ease;
       }
-      .btn:hover {
+      #${uniqueId} .btn:hover {
         color: rgba(255, 255, 255, 0.9);
       }
-      .btn:disabled {
+      #${uniqueId} .btn:disabled {
         color: rgba(255, 255, 255, 0.3);
         cursor: not-allowed;
       }
-      .content-body .rm-Markdown {
+      #${uniqueId} .content-body .rm-Markdown {
         opacity: 1 !important;
       }
       /* VERTICAL LAYOUT */
-      .vertical-layout {
+      #${uniqueId} .vertical-layout {
         display: flex;
         flex-direction: row;
         align-items: flex-start;
       }
-      .vertical-timeline {
+      #${uniqueId} .vertical-timeline {
         position: relative;
         width: 60px;
         margin-right: 20px;
       }
-      .vertical-timeline::before {
+      #${uniqueId} .vertical-timeline::before {
         content: "";
         position: absolute;
         left: 30px;
@@ -217,7 +221,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         border-radius: 2px;
         z-index: 0;
       }
-      .vertical-progress {
+      #${uniqueId} .vertical-progress {
         position: absolute;
         left: 30px;
         top: 34px;
@@ -228,18 +232,18 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         z-index: 1;
         border-radius: 2px;
       }
-      .vertical-progress.active {
+      #${uniqueId} .vertical-progress.active {
         background-color: rgba(255, 255, 255, 0.9);
       }
-      .vertical-circle-container {
+      #${uniqueId} .vertical-circle-container {
         position: relative;
         margin: 20px 0;
       }
-      .vertical-circle-container .circle,
-      .vertical-circle-container .square {
+      #${uniqueId} .vertical-circle-container .circle,
+      #${uniqueId} .vertical-circle-container .square {
         margin-left: 13px;
       }
-      .vertical-circle-container .step-title {
+      #${uniqueId} .vertical-circle-container .step-title {
         position: absolute;
         top: 50%;
         left: 60px;
@@ -252,11 +256,11 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         color: rgba(255, 255, 255, 0.6);
         transition: color 0.3s ease;
       }
-      .vertical-circle-container .step-title.active {
+      #${uniqueId} .vertical-circle-container .step-title.active {
         color: rgba(255, 255, 255, 1);
       }
       /* Adjust vertical content alignment */
-      .vertical-layout .step-content {
+      #${uniqueId} .vertical-layout .step-content {
         margin: 0 0 0 190px;
         align-self: center;
       }
@@ -265,11 +269,14 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
     return () => {
       document.head.removeChild(styleOverride);
     };
-  }, [backgroundTheme]);
+  }, [backgroundTheme, currentTheme, uniqueId]);
 
   if (verticalTrue) {
     return (
-      <div className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+      <div
+        id={uniqueId}
+        className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}
+      >
         <div className="vertical-layout">
           <div className="vertical-timeline">
             <div
@@ -310,7 +317,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   }
 
   return (
-    <div className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+    <div
+      id={uniqueId}
+      className={`stepper-container transition-opacity duration-500 ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}
+    >
       <div className="progress-container">
         <div
           className={`progress ${currentStep > 0 ? "active" : ""}`}
@@ -346,14 +356,15 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   );
 }
 
+
 <StepperComponent
   verticalFalse
   backgroundTheme="purple"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
-    { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
+    { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "square" },
     { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
-    { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
+    { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "square" },
     { header: "Publish and Maintain Content", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
   ]}
 />
