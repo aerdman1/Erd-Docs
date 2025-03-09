@@ -87,8 +87,164 @@ metadata:
       { header: "Step D", content: <p>Content for step D.</p>, stepType: "circle" },
     ]}
   />
+</div>
 
-  {/* Add additional examples for green, orange, yellow, indigo, white, black as needed */}
+<div>
+  <h2>Green Horizontal (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalFalse
+    backgroundTheme="green"
+    steps={[
+      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "circle" },
+      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "square" },
+      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "circle" },
+      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "square" },
+    ]}
+  />
+
+  <h2>Green Vertical (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalTrue
+    backgroundTheme="green"
+    steps={[
+      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "square" },
+      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "circle" },
+      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "square" },
+      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "circle" },
+    ]}
+  />
+
+  <h2>Orange Horizontal (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalFalse
+    backgroundTheme="orange"
+    steps={[
+      { header: "Step A", content: <p>Content for step A.</p>, stepType: "circle" },
+      { header: "Step B", content: <p>Content for step B.</p>, stepType: "square" },
+      { header: "Step C", content: <p>Content for step C.</p>, stepType: "circle" },
+      { header: "Step D", content: <p>Content for step D.</p>, stepType: "square" },
+    ]}
+  />
+
+  <h2>Orange Vertical (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalTrue
+    backgroundTheme="orange"
+    steps={[
+      { header: "Step A", content: <p>Content for step A.</p>, stepType: "square" },
+      { header: "Step B", content: <p>Content for step B.</p>, stepType: "circle" },
+      { header: "Step C", content: <p>Content for step C.</p>, stepType: "square" },
+      { header: "Step D", content: <p>Content for step D.</p>, stepType: "circle" },
+    ]}
+  />
+
+  <h2>Yellow Horizontal (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalFalse
+    backgroundTheme="yellow"
+    steps={[
+      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "circle" },
+      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "square" },
+      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "circle" },
+      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "square" },
+    ]}
+  />
+
+  <h2>Yellow Vertical (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalTrue
+    backgroundTheme="yellow"
+    steps={[
+      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "square" },
+      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "circle" },
+      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "square" },
+      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "circle" },
+    ]}
+  />
+
+  <h2>Indigo Horizontal (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalFalse
+    backgroundTheme="indigo"
+    steps={[
+      { header: "Step X", content: <p>Content for step X.</p>, stepType: "circle" },
+      { header: "Step Y", content: <p>Content for step Y.</p>, stepType: "square" },
+      { header: "Step Z", content: <p>Content for step Z.</p>, stepType: "circle" },
+      { header: "Step W", content: <p>Content for step W.</p>, stepType: "square" },
+    ]}
+  />
+
+  <h2>Indigo Vertical (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalTrue
+    backgroundTheme="indigo"
+    steps={[
+      { header: "Step X", content: <p>Content for step X.</p>, stepType: "square" },
+      { header: "Step Y", content: <p>Content for step Y.</p>, stepType: "circle" },
+      { header: "Step Z", content: <p>Content for step Z.</p>, stepType: "square" },
+      { header: "Step W", content: <p>Content for step W.</p>, stepType: "circle" },
+    ]}
+  />
+
+  <h2>White Horizontal (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalFalse
+    backgroundTheme="white"
+    steps={[
+      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "circle" },
+      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "square" },
+      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "circle" },
+      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "square" },
+    ]}
+  />
+
+  <h2>White Vertical (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalTrue
+    backgroundTheme="white"
+    steps={[
+      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "square" },
+      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "circle" },
+      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "square" },
+      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "circle" },
+    ]}
+  />
+
+  <h2>Black Horizontal (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalFalse
+    backgroundTheme="black"
+    steps={[
+      { header: "Step Alpha", content: <p>Content for step Alpha.</p>, stepType: "circle" },
+      { header: "Step Beta", content: <p>Content for step Beta.</p>, stepType: "square" },
+      { header: "Step Gamma", content: <p>Content for step Gamma.</p>, stepType: "circle" },
+      { header: "Step Delta", content: <p>Content for step Delta.</p>, stepType: "square" },
+    ]}
+  />
+
+  <h2>Black Vertical (Mixed Step Types)</h2>
+
+  <StepperComponent
+    verticalTrue
+    backgroundTheme="black"
+    steps={[
+      { header: "Step Alpha", content: <p>Content for step Alpha.</p>, stepType: "square" },
+      { header: "Step Beta", content: <p>Content for step Beta.</p>, stepType: "circle" },
+      { header: "Step Gamma", content: <p>Content for step Gamma.</p>, stepType: "square" },
+      { header: "Step Delta", content: <p>Content for step Delta.</p>, stepType: "circle" },
+    ]}
+  />
 </div>
 
 <HTMLBlock>{`
