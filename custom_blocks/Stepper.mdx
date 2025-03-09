@@ -12,6 +12,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #9b72ff, #7d54e6)",
       squareActive: "linear-gradient(to top, #ad84ff, #9272e6)",
       textColor: "white",
+      line: "rgba(255,255,255,0.2)",
+      lineActive: "rgba(255,255,255,0.3)",
     },
     blue: {
       background: "radial-gradient(circle at top, #4da6ff 20%, #0073e6 80%)",
@@ -20,6 +22,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #66ccff, #3399ff)",
       squareActive: "linear-gradient(to top, #99ddff, #66ccff)",
       textColor: "white",
+      line: "rgba(255,255,255,0.2)",
+      lineActive: "rgba(255,255,255,0.3)",
     },
     red: {
       background: "radial-gradient(circle at top, #ff6b6b 20%, #ff3b3b 80%)",
@@ -28,6 +32,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #ff8080, #ff4d4d)",
       squareActive: "linear-gradient(to top, #ff9999, #ff8080)",
       textColor: "white",
+      line: "rgba(255,255,255,0.2)",
+      lineActive: "rgba(255,255,255,0.3)",
     },
     green: {
       background: "radial-gradient(circle at top, #66ff66 20%, #33cc33 80%)",
@@ -36,6 +42,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #66cc66, #33aa33)",
       squareActive: "linear-gradient(to top, #80d480, #66cc66)",
       textColor: "black",
+      line: "rgba(0,0,0,0.2)",
+      lineActive: "rgba(0,0,0,0.9)",
     },
     orange: {
       background: "radial-gradient(circle at top, #ff9f4f 20%, #ff7b00 80%)",
@@ -44,6 +52,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #ff9f40, #ff7b00)",
       squareActive: "linear-gradient(to top, #ffb66e, #ff9f40)",
       textColor: "black",
+      line: "rgba(0,0,0,0.2)",
+      lineActive: "rgba(0,0,0,0.9)",
     },
     yellow: {
       background: "radial-gradient(circle at top, #fff79a 20%, #ffeb3b 80%)",
@@ -52,6 +62,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #fff176, #ffeb3b)",
       squareActive: "linear-gradient(to top, #fff59d, #fff176)",
       textColor: "black",
+      line: "rgba(0,0,0,0.2)",
+      lineActive: "rgba(0,0,0,0.9)",
     },
     indigo: {
       background: "radial-gradient(circle at top, #5c6bc0 20%, #3949ab 80%)",
@@ -60,6 +72,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #5c6bc0, #3949ab)",
       squareActive: "linear-gradient(to top, #7986cb, #5c6bc0)",
       textColor: "white",
+      line: "rgba(255,255,255,0.2)",
+      lineActive: "rgba(255,255,255,0.9)",
     },
     white: {
       background: "#ffffff",
@@ -68,6 +82,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #dcdcdc, #c0c0c0)",
       squareActive: "linear-gradient(to top, #a8a8a8, #909090)",
       textColor: "black",
+      line: "rgba(0,0,0,0.2)",
+      lineActive: "rgba(0,0,0,0.9)",
     },
     black: {
       background: "#000000",
@@ -76,6 +92,8 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
       square: "linear-gradient(to top, #3a3a3a, #1f1f1f)",
       squareActive: "linear-gradient(to top, #1f1f1f, #000000)",
       textColor: "white",
+      line: "rgba(255,255,255,0.2)",
+      lineActive: "rgba(255,255,255,0.9)",
     },
   };
 
@@ -125,7 +143,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         margin: 20px auto;
       }
       #${uniqueId} .progress-container::before {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: ${currentTheme.line};
         content: "";
         height: 3px;
         position: absolute;
@@ -137,7 +155,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         border-radius: 2px;
       }
       #${uniqueId} .progress {
-        background-color: rgba(255, 255, 255, 0.3);
+        background-color: ${currentTheme.line};
         height: 3px;
         position: absolute;
         top: 50%;
@@ -148,7 +166,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         border-radius: 2px;
       }
       #${uniqueId} .progress.active {
-        background-color: oklch(0.811 0.111 293.571);
+        background-color: ${currentTheme.lineActive};
       }
       #${uniqueId} .circle-container {
         position: relative;
@@ -276,7 +294,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         top: 34px;
         bottom: 34px;
         width: 3px;
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: ${currentTheme.line};
         border-radius: 2px;
         z-index: 0;
       }
@@ -285,14 +303,14 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         left: 30px;
         top: 34px;
         width: 3px;
-        background-color: rgba(255, 255, 255, 0.3);
+        background-color: ${currentTheme.line};
         transition: height 0.3s ease-in-out, background-color 0.3s ease-in-out;
         height: 0%;
         z-index: 1;
         border-radius: 2px;
       }
       #${uniqueId} .vertical-progress.active {
-        background-color: rgba(255, 255, 255, 0.9);
+        background-color: ${currentTheme.lineActive};
       }
       #${uniqueId} .vertical-circle-container {
         position: relative;
@@ -324,9 +342,9 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
         align-self: center;
       }
       
-        .content-body .rm-Markdown {
-    opacity: 1 !important;
-		  }
+      .content-body .rm-Markdown {
+        opacity: 1 !important;
+      }
     `;
     document.head.appendChild(styleOverride);
     return () => {
@@ -415,7 +433,7 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
 
 
 <StepperComponent
-  verticalTrue
+  verticalFalse
   backgroundTheme="purple"
   steps={[
     { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
