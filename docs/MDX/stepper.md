@@ -40,11 +40,11 @@ metadata:
     verticalFalse
     backgroundTheme="blue"
     steps={[
-      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "circle" },
-      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "square" },
-      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "circle" },
-      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "square" },
-      { header: "Step 5", content: <p>Content for step 5.</p>, stepType: "circle" },
+      { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "square" },
+      { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "square" },
+      { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "square" },
+      { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "square" },
+      { header: "Publish and Maintain Content", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "square" },
     ]}
   />
 
@@ -54,11 +54,11 @@ metadata:
     verticalTrue
     backgroundTheme="blue"
     steps={[
-      { header: "Step 1", content: <p>Content for step 1.</p>, stepType: "square" },
-      { header: "Step 2", content: <p>Content for step 2.</p>, stepType: "circle" },
-      { header: "Step 3", content: <p>Content for step 3.</p>, stepType: "square" },
-      { header: "Step 4", content: <p>Content for step 4.</p>, stepType: "circle" },
-      { header: "Step 5", content: <p>Content for step 5.</p>, stepType: "square" },
+      { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "square" },
+      { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "square" },
+      { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "square" },
+      { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "square" },
+      { header: "Publish and Maintain Content", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "square" },
     ]}
   />
 
