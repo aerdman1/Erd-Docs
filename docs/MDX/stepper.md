@@ -34,7 +34,7 @@ metadata:
     ]}
   />
 
-  <h2>Blue Horizontal (Mixed Step Types)</h2>
+  <h2>Blue Horizontal (All Squares)</h2>
 
   <StepperComponent
     verticalFalse
@@ -48,7 +48,7 @@ metadata:
     ]}
   />
 
-  <h2>Blue Vertical (Mixed Step Types)</h2>
+  <h2>Blue Vertical (All Squares)</h2>
 
   <StepperComponent
     verticalTrue
