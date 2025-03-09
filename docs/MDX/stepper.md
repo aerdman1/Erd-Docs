@@ -20,7 +20,7 @@ metadata:
 <HTMLBlock>{`
 <style>
   .content-body .rm-Markdown {
-    
+     opacity: 0;
   }
 </style>
 `}</HTMLBlock>
