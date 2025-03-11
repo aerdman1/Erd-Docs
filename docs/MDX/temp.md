@@ -66,7 +66,7 @@ def hello_world():
 
 ```
 
-```
+```asp
 If you see **different colors for keywords, comments, and strings**, **syntax highlighting is enabled**.
 
 If everything is the **same color** and only has a gray background, ReadMe does not have syntax highlighting, and you may need a different approach (like a custom MDX component for code blocks).
