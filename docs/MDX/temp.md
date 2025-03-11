@@ -5,9 +5,9 @@ hidden: false
 metadata:
   robots: index
 ---
-# TOC
+# TOC ✅
 
-\[toc]
+This is automatically supported via heading tags in ReadMe
 
 ***
 
@@ -42,7 +42,7 @@ MUST TRANSLATE TO:
 
 ***
 
-# pymdownx.tilde
+# pymdownx.tilde ✅
 
 ~~Strikethrough~~
 
@@ -50,7 +50,7 @@ text~~subscript~~
 
 ***
 
-# pymdownx.highlight
+# pymdownx.highlight ✅
 
 ```python
 # This is a test
@@ -64,7 +64,7 @@ def hello_world():
 
 ```
 
-# pymdownx.inlinehilite
+# pymdownx.inlinehilite ✅
 
 ```python
 If you see **different colors for keywords, comments, and strings**, **syntax highlighting is enabled**.
@@ -150,7 +150,7 @@ And more content again.
 
 ***
 
-# pymdownx.tasklist
+# pymdownx.tasklist ✅
 
 Task List
 
