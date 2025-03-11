@@ -7,7 +7,9 @@ metadata:
 ---
 <HTMLBlock>{`
 <style>
-
+section.content-toc.grid-25 {
+    display: inherit !important;
+}
 </style>
 `}</HTMLBlock>
 
