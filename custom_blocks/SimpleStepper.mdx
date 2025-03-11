@@ -64,10 +64,9 @@ export function SimpleStepper({ steps }) {
       content: "";
       height: 3px;
       position: absolute;
-      top: 50%;
+      top: 17px; /* Adjusted to align with the center of the circles (34px/2) */
       left: 10%;
       right: 10%;
-      transform: translateY(-50%);
       z-index: 2;
       border-radius: 2px;
     }
@@ -75,7 +74,7 @@ export function SimpleStepper({ steps }) {
       background-color: ${currentTheme.line};
       height: 3px;
       position: absolute;
-      top: 50%;
+      top: 17px; /* Adjusted to align with the center of the circles */
       left: 10%;
       transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
       width: 0%;
