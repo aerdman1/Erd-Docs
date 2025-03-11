@@ -60,9 +60,18 @@ print("Hello, world!")
 ```
 
 ```python
-# This is a comment (gray)
-def hello_world():  # 'def' should be a different color
-    print("Hello, world!")  # 'print' might be blue, and "Hello, world!" could be green
+
+def hello_world():  
+    print("Hello, world!") n
+
+```
+
+```
+If you see **different colors for keywords, comments, and strings**, **syntax highlighting is enabled**.
+
+If everything is the **same color** and only has a gray background, ReadMe does not have syntax highlighting, and you may need a different approach (like a custom MDX component for code blocks).
+
+Let me know what happens when you test this! 🚀
 
 ```
 
