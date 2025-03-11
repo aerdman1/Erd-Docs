@@ -4,8 +4,14 @@ name: SimpleStepper3
 import React, { useState } from "react";
 
 export function SimpleStepper3({ steps }) {
+  // This component is a simple stepper that shows numbered steps,
+	// displays the header and content for the current step, and includes Next/Back buttons.
+	// The comments below explain each part of the code.
+  
+  // useState hook to track the current step index (starting at 0)
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Define the style for the main container holding the stepper.
   const containerStyle = {
     maxWidth: "600px",
     margin: "40px auto",
@@ -16,10 +22,13 @@ export function SimpleStepper3({ steps }) {
     fontFamily: "Arial, sans-serif",
   };
 
+  // Define the style for the container that holds the step indicators.
   const indicatorContainerStyle = {
     marginBottom: "20px",
   };
- 
+
+  // A function that returns the style for a step indicator circle.
+  // The 'active' parameter is true if the indicator represents the current step.
   const indicatorStyle = (active) => ({
     display: "inline-block",
     width: "30px",
@@ -32,6 +41,7 @@ export function SimpleStepper3({ steps }) {
     fontWeight: "bold",
   });
 
+  // Define the style for the navigation buttons.
   const buttonStyle = {
     padding: "8px 16px",
     margin: "10px",
@@ -42,13 +52,18 @@ export function SimpleStepper3({ steps }) {
     cursor: "pointer",
   };
 
+  // Handler for the "Back" button. It decrements the current step, ensuring it doesn't go below 0.
   const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
-  const handleNext = () =>
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
 
+  // Handler for the "Next" button. It increments the current step, ensuring it doesn't exceed the last step.
+  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+
+  // The JSX returned below renders:
+  // 1. The step indicators (numbered circles)
+  // 2. The header and content for the current step
+  // 3. Navigation buttons ("Back" and "Next")
   return (
     <div style={containerStyle}>
-      {/* Step Indicators */}
       <div style={indicatorContainerStyle}>
         {steps.map((_, index) => (
           <span key={index} style={indicatorStyle(index === currentStep)}>
@@ -56,21 +71,29 @@ export function SimpleStepper3({ steps }) {
           </span>
         ))}
       </div>
-      {/* Step Content */}
       <h2>{steps[currentStep].header}</h2>
       <div>{steps[currentStep].content}</div>
-      {/* Navigation Buttons */}
       <div>
-        <button type="button" style={buttonStyle} onClick={handlePrev} disabled={currentStep === 0}>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={handlePrev}
+          disabled={currentStep === 0}
+        >
           Back
         </button>
-        <button type="button" style={buttonStyle} onClick={handleNext} disabled={currentStep === steps.length - 1}>
+        <button
+          type="button"
+          style={buttonStyle}
+          onClick={handleNext}
+          disabled={currentStep === steps.length - 1}
+        >
           Next
         </button>
       </div>
     </div>
   );
-}
+} 
 
 <SimpleStepper3
   steps={[
@@ -79,3 +102,4 @@ export function SimpleStepper3({ steps }) {
     { header: "Step 3: Review", content: <p>Review and refine your content.</p> },
   ]}
 />
+
