@@ -3,7 +3,7 @@ name: SimpleStepper3
 ---
 import React, { useState } from "react";
 
-export function MinimalStepper({ steps }) {
+export function SimpleStepper3({ steps }) {
   const [currentStep, setCurrentStep] = useState(0);
 
   const containerStyle = {
@@ -72,7 +72,7 @@ export function MinimalStepper({ steps }) {
   );
 }
 
-<MinimalStepper
+<SimpleStepper3
   steps={[
     { header: "Step 1: Plan", content: <p>Plan your documentation and gather resources.</p> },
     { header: "Step 2: Write", content: <p>Write effective and clear documentation.</p> },
