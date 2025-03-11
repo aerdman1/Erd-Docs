@@ -42,7 +42,7 @@ MUST TRANSLATE TO:
 
 ***
 
-# pymdownx.tilde [https://facelessuser.github.io/pymdown-extensions/extensions/tilde/](https://facelessuser.github.io/pymdown-extensions/extensions/tilde/)
+# pymdownx.tilde
 
 ~~Strikethrough~~
 
@@ -108,7 +108,7 @@ Would you like me to generate more test cases for ReadMe? 🚀
 
 ***
 
-# pymdownx.emoji
+# pymdownx.emoji ✅
 
 :+1: :smile: :volcano:
 
