@@ -3,36 +3,68 @@ name: SimpleStepper3
 ---
 import React, { useState } from "react";
 
-export function SimpleStepper3({ steps }) {
+export function MinimalStepper({ steps }) {
   const [currentStep, setCurrentStep] = useState(0);
 
+  const containerStyle = {
+    maxWidth: "600px",
+    margin: "40px auto",
+    padding: "20px",
+    border: "1px solid #ccc",
+    borderRadius: "8px",
+    textAlign: "center",
+    fontFamily: "Arial, sans-serif",
+  };
+
+  const indicatorContainerStyle = {
+    marginBottom: "20px",
+  };
+
+  const indicatorStyle = (active) => ({
+    display: "inline-block",
+    width: "30px",
+    height: "30px",
+    lineHeight: "30px",
+    borderRadius: "50%",
+    backgroundColor: active ? "#835db9" : "#ddd",
+    color: active ? "white" : "black",
+    margin: "0 5px",
+    fontWeight: "bold",
+  });
+
+  const buttonStyle = {
+    padding: "8px 16px",
+    margin: "10px",
+    border: "none",
+    borderRadius: "4px",
+    backgroundColor: "#835db9",
+    color: "white",
+    cursor: "pointer",
+  };
+
+  const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+  const handleNext = () =>
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+
   return (
-    <div>
+    <div style={containerStyle}>
       {/* Step Indicators */}
-      <div>
-        {steps.map((step, index) => (
-          <span key={index}>
-            {index + 1} {index < steps.length - 1 && "- "}
+      <div style={indicatorContainerStyle}>
+        {steps.map((_, index) => (
+          <span key={index} style={indicatorStyle(index === currentStep)}>
+            {index + 1}
           </span>
         ))}
       </div>
       {/* Step Content */}
-      <div>
-        <h2>{steps[currentStep].header}</h2>
-        {steps[currentStep].content}
-      </div>
+      <h2>{steps[currentStep].header}</h2>
+      <div>{steps[currentStep].content}</div>
       {/* Navigation Buttons */}
       <div>
-        <button 
-          onClick={() => setCurrentStep(Math.max(currentStep - 1, 0))} 
-          disabled={currentStep === 0}
-        >
+        <button type="button" style={buttonStyle} onClick={handlePrev} disabled={currentStep === 0}>
           Back
         </button>
-        <button 
-          onClick={() => setCurrentStep(Math.min(currentStep + 1, steps.length - 1))} 
-          disabled={currentStep === steps.length - 1}
-        >
+        <button type="button" style={buttonStyle} onClick={handleNext} disabled={currentStep === steps.length - 1}>
           Next
         </button>
       </div>
@@ -40,19 +72,10 @@ export function SimpleStepper3({ steps }) {
   );
 }
 
-<SimpleStepper3
+<MinimalStepper
   steps={[
-    {
-      header: "Step 1: Plan",
-      content: <p>Plan your documentation and gather resources.</p>,
-    },
-    {
-      header: "Step 2: Write",
-      content: <p>Write effective and clear documentation.</p>,
-    },
-    {
-      header: "Step 3: Review",
-      content: <p>Review and format the content for clarity.</p>,
-    },
+    { header: "Step 1: Plan", content: <p>Plan your documentation and gather resources.</p> },
+    { header: "Step 2: Write", content: <p>Write effective and clear documentation.</p> },
+    { header: "Step 3: Review", content: <p>Review and refine your content.</p> },
   ]}
 />
