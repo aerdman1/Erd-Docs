@@ -52,8 +52,6 @@ text~~subscript~~
 
 # pymdownx.highlight
 
-<br />
-
 ```python
 # This is a test
 print("Hello, world!")
@@ -65,6 +63,8 @@ def hello_world():
     print("Hello, world!") n
 
 ```
+
+# pymdownx.inlinehilite
 
 ```python
 If you see **different colors for keywords, comments, and strings**, **syntax highlighting is enabled**.
@@ -80,71 +80,36 @@ INLINE: markdown_extensions:
 
 ***
 
-:+1:
+# pymdownx.snippets - DO NOT SUPPORT ATM :x:
 
 ***
 
-<br />
+# PXSPER :white_check_mark:
 
-\--8\<-- "libs/util/README.md"
-
-<br />
-
-> ```
-> ```
->
-> <br />
->
-> :thumbsup: :smile:
->
-> <br />
->
-> \=== "Python"\`\`\`python\
+> ```python
 > print("hello")
->
-> ````
->
-> <br />
->
-> \=== "Java"```java
-> System.out.println("hello");
-> ````
->
-> <br />
->
-> ??? example\
-> Hidden content inside collapsible block.
->
-> <br />
->
-> * [x] Task completed
->   * [ ] Task not completed
->
-> <br />
->
-> (tm) (c) (R)
->
-> <br />
->
-> This is a reference \[^1]
->
-> <br />
->
-> [^1]: This is a footnote.
->
-> <br />
->
-> ^^Insert me^^
->
-> <br />
->
-> Text^superscript
->
-> <br />
->
-> \{++ added content ++}
->
-> <br />
->
-> \{-- removed content --}\
-> \`\`\`
+> ```
+
+<br />
+
+***
+
+# pymdownx.superfences :white_check_mark:
+
+<br />
+
+> ```
+> Code inside a blockquote
+> ```
+
+Normally, Markdown doesn’t allow this without escaping or additional indentation.
+
+Would you like me to generate more test cases for ReadMe? 🚀
+
+***
+
+# pymdownx.emoji
+
+:+1: :smile: :volcano:
+
+***
