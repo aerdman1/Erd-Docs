@@ -6,7 +6,89 @@ metadata:
   robots: index
 ---
 <HTMLBlock>{`
-<table data-start="63" data-end="1684"><thead data-start="63" data-end="125"><tr data-start="63" data-end="125"><th data-start="63" data-end="91"><strong data-start="65" data-end="75">Plugin</strong></th><th data-start="91" data-end="112"><strong data-start="93" data-end="111">Support Status</strong></th><th data-start="112" data-end="125"><strong data-start="114" data-end="123">Notes</strong></th></tr></thead><tbody data-start="188" data-end="1684"><tr data-start="188" data-end="277"><td><strong data-start="190" data-end="217">Table of Contents (TOC)</strong></td><td>✅❓</td><td>Automatically supported via heading tags in ReadMe</td></tr><tr data-start="278" data-end="350"><td><strong data-start="280" data-end="294">admonition</strong></td><td>❌ ✅</td><td>Can be mimicked via MDX components</td></tr><tr data-start="351" data-end="421"><td><strong data-start="353" data-end="371">pymdownx.tilde</strong></td><td>✅ ✅</td><td>Strikethrough and subscript work</td></tr><tr data-start="422" data-end="489"><td><strong data-start="424" data-end="446">pymdownx.highlight</strong></td><td>✅ ✅</td><td>Code block highlighting works</td></tr><tr data-start="490" data-end="560"><td><strong data-start="492" data-end="517">pymdownx.inlinehilite</strong></td><td>✅ ✅</td><td>Inline syntax highlighting works</td></tr><tr data-start="561" data-end="659"><td><strong data-start="563" data-end="603">pymdownx.snippets (Reusable Content)</strong></td><td>❌ ❌</td><td>No programmatic way to import reusable content</td></tr><tr data-start="660" data-end="732"><td><strong data-start="662" data-end="686">pymdownx.superfences</strong></td><td>✅ ✅</td><td>Nested fenced blocks are supported</td></tr><tr data-start="733" data-end="806"><td><strong data-start="735" data-end="753">pymdownx.emoji</strong></td><td>✅ ✅</td><td>GitHub-style <code data-start="782" data-end="791">:emoji:</code> syntax works</td></tr><tr data-start="807" data-end="983"><td><strong data-start="809" data-end="828">pymdownx.tabbed</strong></td><td>✅❓</td><td>We have a component for this, but not in their exact syntax (<a data-start="904" data-end="980" rel="noopener" target="_new" href="https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/">Docs</a>)</td></tr><tr data-start="984" data-end="1131"><td><strong data-start="986" data-end="1020">Details (Collapsible Sections)</strong></td><td>❌ ✅</td><td>Requires a workaround (<a data-start="1051" data-end="1128" rel="noopener" target="_new" href="https://facelessuser.github.io/pymdown-extensions/extensions/details/">Docs</a>)</td></tr><tr data-start="1132" data-end="1206"><td><strong data-start="1134" data-end="1155">pymdownx.tasklist</strong></td><td>✅ ✅</td><td>Task lists <code data-start="1179" data-end="1184">[ ]</code> <code data-start="1185" data-end="1190">[x]</code> are supported</td></tr><tr data-start="1207" data-end="1365"><td><strong data-start="1209" data-end="1219">smarty</strong></td><td>❌ ✅</td><td>Needs a replacement or workaround (<a data-start="1277" data-end="1362" rel="noopener" target="_new" href="https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=">Docs</a>)</td></tr><tr data-start="1366" data-end="1527"><td><strong data-start="1368" data-end="1386">pymdownx.caret</strong></td><td>❌ ✅</td><td>Requires a workaround for <code data-start="1428" data-end="1435">&lt;ins&gt;</code> and <code data-start="1440" data-end="1447">&lt;sup&gt;</code> (<a data-start="1449" data-end="1524" rel="noopener" target="_new" href="https://facelessuser.github.io/pymdown-extensions/extensions/caret/">Docs</a>)</td></tr><tr data-start="1528" data-end="1684"><td><strong data-start="1530" data-end="1549">pymdownx.critic</strong></td><td>❌ ✅</td><td>Requires a workaround for Critic Markup (<a data-start="1605" data-end="1681" rel="noopener" target="_new" href="https://facelessuser.github.io/pymdown-extensions/extensions/critic/">Docs</a>)</td></tr></tbody></table>
+<div class="rdmd-html">
+<table>
+<thead>
+<tr>
+<th><strong>Plugin</strong></th>
+<th><strong>Support Status</strong></th>
+<th><strong>Notes</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Table of Contents (TOC)</strong></td>
+<td>✅ ❓</td>
+<td>Automatically supported via heading tags in ReadMe</td>
+</tr>
+<tr>
+<td><strong>admonition</strong></td>
+<td>❌ ✅</td>
+<td>Can be mimicked via MDX components</td>
+</tr>
+<tr>
+<td><strong>pymdownx.tilde</strong></td>
+<td>✅ ✅</td>
+<td>Strikethrough and subscript work</td>
+</tr>
+<tr>
+<td><strong>pymdownx.highlight</strong></td>
+<td>✅ ✅</td>
+<td>Code block highlighting works</td>
+</tr>
+<tr>
+<td><strong>pymdownx.inlinehilite</strong></td>
+<td>✅ ✅</td>
+<td>Inline syntax highlighting works</td>
+</tr>
+<tr>
+<td><strong>pymdownx.snippets (Reusable Content)</strong></td>
+<td>❌ ❌</td>
+<td>No programmatic way to import reusable content</td>
+</tr>
+<tr>
+<td><strong>pymdownx.superfences</strong></td>
+<td>✅ ✅</td>
+<td>Nested fenced blocks are supported</td>
+</tr>
+<tr>
+<td><strong>pymdownx.emoji</strong></td>
+<td>✅ ✅</td>
+<td>GitHub-style <code>:emoji:</code> syntax works</td>
+</tr>
+<tr>
+<td><strong>pymdownx.tabbed</strong></td>
+<td>✅ ❓</td>
+<td>We have a component for this, but not in their exact syntax</td>
+</tr>
+<tr>
+<td><strong>Details (Collapsible Sections)</strong></td>
+<td>❌ ✅</td>
+<td>Requires a workaround</td>
+</tr>
+<tr>
+<td><strong>pymdownx.tasklist</strong></td>
+<td>✅ ✅</td>
+<td>Task lists <code>[ ]</code> <code>[x]</code> are supported</td>
+</tr>
+<tr>
+<td><strong>smarty</strong></td>
+<td>❌ ✅</td>
+<td>Needs a replacement or workaround</td>
+</tr>
+<tr>
+<td><strong>pymdownx.caret</strong></td>
+<td>❌ ✅</td>
+<td>Requires a workaround for <code>&lt;ins&gt;</code> and <code>&lt;sup&gt;</code></td>
+</tr>
+<tr>
+<td><strong>pymdownx.critic</strong></td>
+<td>❌ ✅</td>
+<td>Requires a workaround for Critic Markup</td>
+</tr>
+</tbody>
+</table>
+</div>
 `}</HTMLBlock>
 
 <br />
