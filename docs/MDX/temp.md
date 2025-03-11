@@ -59,6 +59,13 @@ text~~subscript~~
 print("Hello, world!")
 ```
 
+```python
+# This is a comment (gray)
+def hello_world():  # 'def' should be a different color
+    print("Hello, world!")  # 'print' might be blue, and "Hello, world!" could be green
+
+```
+
 <br />
 
 ***
