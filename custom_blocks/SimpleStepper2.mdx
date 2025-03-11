@@ -1,0 +1,180 @@
+---
+name: SimpleStepper2
+---
+import React, { useState } from "react";
+
+export function SimpleStepper2({ steps }) {
+  const theme = {
+    background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
+    circle: "linear-gradient(to top, #b78cff, #8c5eff)",
+    circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
+    textColor: "white",
+    line: "rgba(255,255,255,0.2)",
+    lineActive: "rgba(255,255,255,0.3)",
+  };
+
+  const [currentStep, setCurrentStep] = useState(0);
+
+  // Inline style objects for simplicity
+  const containerStyle = {
+    background: theme.background,
+    color: theme.textColor,
+    borderRadius: "12px",
+    padding: "24px 36px",
+    maxWidth: "90%",
+    margin: "20px auto",
+    border: "1px solid rgba(255,255,255,0.2)",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+    textAlign: "center",
+  };
+
+  const progressContainerStyle = {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    position: "relative",
+    margin: "20px auto",
+    width: "100%",
+  };
+
+  const progressBarStyle = {
+    position: "absolute",
+    top: "17px", // Center of 34px circles
+    left: "10%",
+    height: "3px",
+    borderRadius: "2px",
+    background: theme.line,
+    transition: "width 0.3s ease-in-out",
+  };
+
+  const circleContainerStyle = {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  };
+
+  const circleStyle = (active) => ({
+    width: "34px",
+    height: "34px",
+    borderRadius: "50%",
+    background: active ? theme.circleActive : theme.circle,
+    border: active ? `2px solid ${theme.textColor}` : "2px solid rgba(236,233,254,0.6)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    transition: "0.3s ease",
+    boxShadow: active ? "0 0 8px rgba(255,255,255,0.8)" : "none",
+  });
+
+  const titleStyle = (active) => ({
+    marginTop: "8px",
+    fontSize: "14px",
+    fontWeight: "bold",
+    color: active ? theme.textColor : "rgba(255,255,255,0.6)",
+  });
+
+  const contentStyle = {
+    margin: "10px auto 0 auto",
+    maxWidth: "90%",
+    fontSize: "16px",
+    padding: "10px",
+  };
+
+  const headerStyle = {
+    fontSize: "24px",
+    fontWeight: "bold",
+    marginBottom: "20px",
+  };
+
+  const buttonStyle = {
+    background: "transparent",
+    border: "none",
+    color: "rgba(255,255,255,0.6)",
+    fontSize: "14px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    padding: "6px 12px",
+    transition: "color 0.2s ease",
+  };
+
+  const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+
+  return (
+    <div style={containerStyle}>
+      <div style={progressContainerStyle}>
+        <div
+          style={{
+            ...progressBarStyle,
+            width: `${(currentStep / (steps.length - 1)) * 80}%`,
+            background: currentStep > 0 ? theme.lineActive : theme.line,
+          }}
+        />
+        {steps.map((step, index) => (
+          <div key={index} style={circleContainerStyle}>
+            <div style={circleStyle(index <= currentStep)}>{index + 1}</div>
+            <div style={titleStyle(index === currentStep)}>{step.header}</div>
+          </div>
+        ))}
+      </div>
+      <div style={contentStyle}>
+        <h2 style={headerStyle}>{steps[currentStep].header}</h2>
+        {steps[currentStep].content}
+      </div>
+      <div>
+        <button type="button" style={buttonStyle} onClick={handlePrev} disabled={currentStep === 0}>
+          <i className="fa fa-arrow-left"></i> BACK
+        </button>
+        <button type="button" style={buttonStyle} onClick={handleNext} disabled={currentStep === steps.length - 1}>
+          NEXT <i className="fa fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+<SimpleStepper2
+  steps={[
+    {
+      header: "Plan Your Documentation",
+      content: (
+        <p>
+          Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.
+        </p>
+      ),
+    },
+    {
+      header: "Write Effective Content",
+      content: (
+        <p>
+          Use simple language, structured explanations, and break complex concepts into digestible sections.
+        </p>
+      ),
+    },
+    {
+      header: "Format Content Effectively",
+      content: (
+        <p>
+          Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.
+        </p>
+      ),
+    },
+    {
+      header: "Use Interactive Elements",
+      content: (
+        <p>
+          Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.
+        </p>
+      ),
+    },
+    {
+      header: "Publish and Maintain Content",
+      content: (
+        <p>
+          Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.
+        </p>
+      ),
+    },
+  ]}
+/> 
