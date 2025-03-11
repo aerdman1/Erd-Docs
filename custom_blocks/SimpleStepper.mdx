@@ -9,8 +9,6 @@ export function SimpleStepper({ steps }) {
     background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
     circle: "linear-gradient(to top, #b78cff, #8c5eff)",
     circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
-    square: "linear-gradient(to top, #9b72ff, #7d54e6)",
-    squareActive: "linear-gradient(to top, #ad84ff, #9272e6)",
     textColor: "white",
     line: "rgba(255,255,255,0.2)",
     lineActive: "rgba(255,255,255,0.3)",
@@ -64,7 +62,7 @@ export function SimpleStepper({ steps }) {
       content: "";
       height: 3px;
       position: absolute;
-      top: 17px; /* Adjusted to align with the center of the circles (34px/2) */
+      top: 17px; /* Align with center of 34px circles */
       left: 10%;
       right: 10%;
       z-index: 2;
@@ -74,7 +72,7 @@ export function SimpleStepper({ steps }) {
       background-color: ${currentTheme.line};
       height: 3px;
       position: absolute;
-      top: 17px; /* Adjusted to align with the center of the circles */
+      top: 17px; /* Align with center of circles */
       left: 10%;
       transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
       width: 0%;
@@ -115,30 +113,6 @@ export function SimpleStepper({ steps }) {
       border: 2px solid ${textColor};
       z-index: 99999;
       transition: 0.3s ease;
-      box-shadow: ${activeBoxShadow};
-    }
-    /* Square Step Style */
-    #${uniqueId} .square {
-      align-items: center;
-      background: ${currentTheme.square};
-      border: 2px solid rgba(255, 255, 255, 0.6);
-      border-radius: 6px;
-      color: ${textColor};
-      display: flex;
-      font-size: 14px;
-      font-weight: bold;
-      height: 34px;
-      justify-content: center;
-      transition: 0.3s ease;
-      width: 34px;
-      z-index: 99999;
-      position: relative;
-    }
-    #${uniqueId} .square.active {
-      background: ${currentTheme.squareActive};
-      color: ${textColor};
-      border: 2px solid ${textColor};
-      z-index: 99999;
       box-shadow: ${activeBoxShadow};
     }
     #${uniqueId} .step-title {
@@ -205,29 +179,26 @@ export function SimpleStepper({ steps }) {
             className={`progress ${currentStep > 0 ? "active" : ""}`}
             style={{ width: `${(currentStep / (steps.length - 1)) * 80}%` }}
           ></div>
-          {steps.map((step, index) => {
-            const shapeClass = step.stepType === "square" ? "square" : "circle";
-            return (
-              <div key={index} className="circle-container">
-                <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>
-                  {index + 1}
-                </div>
-                <div className={`step-title ${index === currentStep ? "active" : ""}`}>
-                  {step.header}
-                </div>
+          {steps.map((step, index) => (
+            <div key={index} className="circle-container">
+              <div className={`circle ${index <= currentStep ? "active" : ""}`}>
+                {index + 1}
               </div>
-            );
-          })}
+              <div className={`step-title ${index === currentStep ? "active" : ""}`}>
+                {step.header}
+              </div>
+            </div>
+          ))}
         </div>
         <div className="step-content">
           <h2 className="step-header">{steps[currentStep].header}</h2>
           {steps[currentStep].content}
         </div>
         <div className="stepper-buttons">
-          <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
+          <button type="button" className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
             <i className="fa fa-arrow-left"></i> BACK
           </button>
-          <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
+          <button type="button" className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
             NEXT <i className="fa fa-arrow-right"></i>
           </button>
         </div>
