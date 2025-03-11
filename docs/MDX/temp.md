@@ -90,7 +90,7 @@ INLINE: markdown_extensions:
 
 ***
 
-# pymdownx.snippets ❌ :x:
+# pymdownx.snippets (Reusable Content) ❌ :x:
 
 <HTMLBlock>{`
 Single Line Format
