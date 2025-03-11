@@ -113,3 +113,66 @@ Would you like me to generate more test cases for ReadMe? 🚀
 :+1: :smile: :volcano:
 
 ***
+
+# pymdownx.tabbed  ❌ (we have tabs but not with this syntax)
+
+<HTMLBlock>{`
+=== "Tab 1"
+    Markdown **content**.
+
+    Multiple paragraphs.
+
+=== "Tab 2"
+    More Markdown **content**.
+
+    - list item a
+    - list item b
+`}</HTMLBlock>
+
+***
+
+# Details ❌ [https://facelessuser.github.io/pymdown-extensions/extensions/details/](https://facelessuser.github.io/pymdown-extensions/extensions/details/)
+
+???+ note "Open styled details"
+
+??? danger "Nested details!"\
+And more content again.
+
+***
+
+# pymdownx.tasklist
+
+Task List
+
+* [x] item 1
+  * [x] item A
+  * [ ] item B\
+    more text
+    * [x] item a
+    * [ ] item b
+    * [x] item c
+  * [x] item C
+* [ ] item 2
+* [ ] item 3
+
+***
+
+# smarty ❌  [https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=](https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=)
+
+(tm) &#x20;
+(c) &#x20;
+(r) &#x20;
+c/o &#x20;
++/- &#x20;
+\--> &#x20;
+\<-- &#x20;
+\<--> &#x20;
+\=/= &#x20;
+1/4 &#x20;
+1/2 &#x20;
+3/4 &#x20;
+1st &#x20;
+2nd &#x20;
+3rd &#x20;
+
+***
