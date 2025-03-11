@@ -159,20 +159,32 @@ Task List
 
 # smarty ❌  [https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=](https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=)
 
-(tm) &#x20;
-(c) &#x20;
-(r) &#x20;
-c/o &#x20;
-+/- &#x20;
-\--> &#x20;
-\<-- &#x20;
-\<--> &#x20;
-\=/= &#x20;
-1/4 &#x20;
-1/2 &#x20;
-3/4 &#x20;
-1st &#x20;
-2nd &#x20;
-3rd &#x20;
+(tm)\
+(c)\
+(r)\
+c/o\
++/-\
+\-->\
+\<--\
+\<-->\
+\=/=\
+1/4\
+1/2\
+3/4\
+1st\
+2nd\
+3rd
 
 ***
+
+# pymdownx.caret ❌ [https://facelessuser.github.io/pymdown-extensions/extensions/caret/](https://facelessuser.github.io/pymdown-extensions/extensions/caret/)
+
+^^Insert me^^
+
+H^2^0
+
+text^a\ superscript^
+
+***
+
+# pymdownx.critic  [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
