@@ -4,19 +4,39 @@ name: SimpleStepper
 import React, { useState, useEffect, useMemo } from "react";
 
 export function SimpleStepper({ steps }) {
+  // PURPLE theme only
+  const currentTheme = {
+    background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
+    circle: "linear-gradient(to top, #b78cff, #8c5eff)",
+    circleActive: "linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255))",
+    square: "linear-gradient(to top, #9b72ff, #7d54e6)",
+    squareActive: "linear-gradient(to top, #ad84ff, #9272e6)",
+    textColor: "white",
+    line: "rgba(255,255,255,0.2)",
+    lineActive: "rgba(255,255,255,0.3)",
+  };
+
+  const textColor = currentTheme.textColor;
+  const inactiveTextColor = textColor === "black" ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.6)";
+  const activeTextColor = textColor === "black" ? "rgba(0,0,0,1)" : "rgba(255,255,255,1)";
+  const activeBoxShadow =
+    textColor === "black"
+      ? "0 0 8px rgba(0,0,0,0.8)"
+      : "0 0 8px rgba(255,255,255,0.8)";
+
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const uniqueId = useMemo(() => "stepper-" + Math.random().toString(36).substr(2, 9), []);
 
-  // Fade-in effect on mount
   useEffect(() => {
-    const timeout = setTimeout(() => setIsVisible(true), 300);
+    const timeout = setTimeout(() => {
+      setIsVisible(true);
+    }, 300);
     return () => clearTimeout(timeout);
   }, []);
 
-  // Purple theme CSS (hard-coded)
   const styleContent = `
-    /* Container */
+    /* Container styling scoped to this instance */
     #${uniqueId} {
       position: relative;
       text-align: center;
@@ -26,86 +46,121 @@ export function SimpleStepper({ steps }) {
       padding: 24px 36px;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      background: radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%);
+      background: ${currentTheme.background};
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
-    /* Progress Bar Container */
+    /* HORIZONTAL LAYOUT */
     #${uniqueId} .progress-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: relative;
       width: 100%;
+      max-width: 100%;
       margin: 20px auto;
     }
     #${uniqueId} .progress-container::before {
+      background-color: ${currentTheme.line};
       content: "";
-      background-color: rgba(255,255,255,0.2);
       height: 3px;
       position: absolute;
       top: 50%;
       left: 10%;
       right: 10%;
       transform: translateY(-50%);
-      border-radius: 2px;
       z-index: 2;
+      border-radius: 2px;
     }
-    /* Progress Bar */
     #${uniqueId} .progress {
-      background-color: rgba(255,255,255,0.2);
+      background-color: ${currentTheme.line};
       height: 3px;
       position: absolute;
       top: 50%;
       left: 10%;
-      transition: width 0.3s ease-in-out;
-      width: ${(currentStep / (steps.length - 1)) * 80}%;
-      border-radius: 2px;
+      transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+      width: 0%;
       z-index: 1;
+      border-radius: 2px;
     }
-    /* Step Circles */
+    #${uniqueId} .progress.active {
+      background-color: ${currentTheme.lineActive};
+    }
     #${uniqueId} .circle-container {
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       flex: 1;
       text-align: center;
-      z-index: 3;
     }
+    /* Circle Step Style */
     #${uniqueId} .circle {
-      background: linear-gradient(to top, #b78cff, #8c5eff);
+      align-items: center;
+      background: ${currentTheme.circle};
       border: 2px solid rgba(236, 233, 254, 0.6);
       border-radius: 50%;
-      color: white;
+      color: ${textColor};
       display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 14px;
       font-weight: bold;
       height: 34px;
-      width: 34px;
-      margin: 0 auto;
+      justify-content: center;
       transition: 0.3s ease;
+      width: 34px;
+      z-index: 99999;
+      position: relative;
     }
     #${uniqueId} .circle.active {
-      background: linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255));
-      border: 2px solid white;
-      box-shadow: 0 0 8px rgba(255,255,255,0.8);
+      background: ${currentTheme.circleActive};
+      color: ${textColor};
+      border: 2px solid ${textColor};
+      z-index: 99999;
+      transition: 0.3s ease;
+      box-shadow: ${activeBoxShadow};
     }
-    /* Step Title */
+    /* Square Step Style */
+    #${uniqueId} .square {
+      align-items: center;
+      background: ${currentTheme.square};
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 6px;
+      color: ${textColor};
+      display: flex;
+      font-size: 14px;
+      font-weight: bold;
+      height: 34px;
+      justify-content: center;
+      transition: 0.3s ease;
+      width: 34px;
+      z-index: 99999;
+      position: relative;
+    }
+    #${uniqueId} .square.active {
+      background: ${currentTheme.squareActive};
+      color: ${textColor};
+      border: 2px solid ${textColor};
+      z-index: 99999;
+      box-shadow: ${activeBoxShadow};
+    }
     #${uniqueId} .step-title {
       margin-top: 8px;
       font-size: 14px;
       font-weight: bold;
-      color: rgba(255,255,255,0.6);
+      color: ${inactiveTextColor};
+      transition: color 0.3s ease;
+      width: auto;
+      text-align: center;
     }
     #${uniqueId} .step-title.active {
-      color: rgba(255,255,255,1);
+      color: ${activeTextColor};
     }
-    /* Step Content */
+    /* Horizontal Layout Content */
     #${uniqueId} .step-content {
-      margin: 40px auto 0;
+      margin: 80px auto 0 auto;
       max-width: 90%;
       font-size: 16px;
       padding: 10px;
-      color: white;
+      color: ${textColor};
       font-weight: 400;
     }
     #${uniqueId} .step-header {
@@ -113,9 +168,8 @@ export function SimpleStepper({ steps }) {
       font-size: 24px;
       font-weight: bold;
       margin-bottom: 20px;
-      color: white;
+      color: ${textColor};
     }
-    /* Navigation Buttons */
     #${uniqueId} .stepper-buttons {
       margin-top: 20px;
       display: flex;
@@ -124,7 +178,7 @@ export function SimpleStepper({ steps }) {
     #${uniqueId} .btn {
       background: transparent;
       border: none;
-      color: rgba(255,255,255,0.6);
+      color: ${inactiveTextColor};
       font-size: 14px;
       font-weight: bold;
       cursor: pointer;
@@ -132,30 +186,39 @@ export function SimpleStepper({ steps }) {
       transition: color 0.2s ease;
     }
     #${uniqueId} .btn:hover {
-      color: rgba(255,255,255,1);
+      color: ${activeTextColor};
     }
     #${uniqueId} .btn:disabled {
-      color: rgba(255,255,255,0.6);
+      color: ${inactiveTextColor};
       cursor: not-allowed;
+    }
+    .content-body .rm-Markdown {
+      opacity: 1 !important;
     }
   `;
 
   return (
     <>
       <style>{styleContent}</style>
-      <div id={uniqueId} className={isVisible ? "opacity-100 visible" : "opacity-0 invisible"}>
+      <div id={uniqueId} className={`stepper-container ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
         <div className="progress-container">
-          <div className="progress"></div>
-          {steps.map((step, index) => (
-            <div key={index} className="circle-container">
-              <div className={`circle ${index <= currentStep ? "active" : ""}`}>
-                {index + 1}
+          <div
+            className={`progress ${currentStep > 0 ? "active" : ""}`}
+            style={{ width: `${(currentStep / (steps.length - 1)) * 80}%` }}
+          ></div>
+          {steps.map((step, index) => {
+            const shapeClass = step.stepType === "square" ? "square" : "circle";
+            return (
+              <div key={index} className="circle-container">
+                <div className={`${shapeClass} ${index <= currentStep ? "active" : ""}`}>
+                  {index + 1}
+                </div>
+                <div className={`step-title ${index === currentStep ? "active" : ""}`}>
+                  {step.header}
+                </div>
               </div>
-              <div className={`step-title ${index === currentStep ? "active" : ""}`}>
-                {step.header}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="step-content">
           <h2 className="step-header">{steps[currentStep].header}</h2>
@@ -163,13 +226,23 @@ export function SimpleStepper({ steps }) {
         </div>
         <div className="stepper-buttons">
           <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
-            BACK
+            <i className="fa fa-arrow-left"></i> BACK
           </button>
           <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
-            NEXT
+            NEXT <i className="fa fa-arrow-right"></i>
           </button>
         </div>
       </div>
     </>
   );
 }
+
+<SimpleStepper
+  steps={[
+    { header: "Plan Your Documentation", content: <p>Define the purpose of your documentation and identify your target audience. Outline key topics and gather relevant resources before writing.</p>, stepType: "circle" },
+    { header: "Write Effective Content", content: <p>Use simple language, structured explanations, and break complex concepts into digestible sections.</p>, stepType: "circle" },
+    { header: "Format Content Effectively", content: <p>Utilize headings, bullet points, and tables to improve readability. Add images, code snippets, and examples to enhance clarity.</p>, stepType: "circle" },
+    { header: "Use Interactive Elements", content: <p>Incorporate API explorers, live code examples, and try-it-yourself features for better engagement and hands-on learning.</p>, stepType: "circle" },
+    { header: "Publish and Maintain Content", content: <p>Test documentation for accuracy and clarity before publishing. Keep it updated to reflect new features, changes, or improvements.</p>, stepType: "circle" },
+  ]}
+/>
