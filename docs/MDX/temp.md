@@ -7,7 +7,9 @@ metadata:
 ---
 # TOC ✅
 
-This is automatically supported via heading tags in ReadMe
+## This is automatically supported via heading tags in ReadMe
+
+## This will show up in your TOC
 
 ***
 
