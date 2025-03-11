@@ -3,369 +3,153 @@ name: Dashboard
 ---
 import React, { useEffect, useState } from 'react';
 
-export const DashboardComponent = ({ header = "My Dashboard" }) => {
-  // Existing states
-  const [pageCount, setPageCount] = useState(0);
-  const [totalCategories, setTotalCategories] = useState(0);
-  const [categories, setCategories] = useState([]);
-  const [hubData, setHubData] = useState(null);
-  const [expandedCategories, setExpandedCategories] = useState({});
+export const DocumentsAPI = () => {
+  const [endpoints, setEndpoints] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(null);
 
-  // New states for endpoint/guide details
-  const [pageDetails, setPageDetails] = useState([]);
-  const [fetchingPages, setFetchingPages] = useState(false);
-  const [pageError, setPageError] = useState(null);
-
-  // Determine current page type (reference vs guides)
-  const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
-  const isReference = currentPath.includes("/reference/");
-
-  // On mount, grab sidebar links and user info
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      const navElement = document.querySelector('.rm-Sidebar');
-      if (navElement) {
-        // For reference pages, only count links starting with "/reference/"
-        // For guides pages, count all links (or those starting with "/docs/" if needed)
-        let pageLinks;
-        if (isReference) {
-          pageLinks = navElement.querySelectorAll('a[href^="/reference/"]');
-        } else {
-          pageLinks = navElement.querySelectorAll('a');
-        }
-        setPageCount(pageLinks.length);
+    const fetchData = async () => {
+      try {
+        if (typeof document === 'undefined') return;
+        const sidebar = document.querySelector('.rm-Sidebar');
 
-        // Extract categories from sidebar sections
-        const sectionElements = navElement.querySelectorAll('section.rm-Sidebar-section');
-        const catArray = [];
-        sectionElements.forEach((section) => {
-          const heading = section.querySelector('h2');
-          if (heading) {
-            const title = heading.textContent.trim();
-            // Grab all links inside this category.
-            const links = section.querySelectorAll('a');
-            const linkArray = Array.from(links).map(link => ({
-              title: link.textContent.trim(),
-              href: link.getAttribute('href')
-            }));
-            catArray.push({ title, links: linkArray });
+        if (!sidebar) {
+          setErr("Sidebar not found.");
+          setLoading(false);
+          return;
+        }
+
+        // Find all sections with a specific heading (e.g., "Document Management API")
+        const targetSection = Array.from(sidebar.querySelectorAll('.rm-Sidebar-section'))
+          .find(section => section.querySelector('.rm-Sidebar-heading')?.textContent.includes("Document Management API"));
+
+        if (!targetSection) {
+          setErr("Target API category not found.");
+          setLoading(false);
+          return;
+        }
+
+        // Select only the links within this section and exclude the Overview page
+        const allLinks = Array.from(targetSection.querySelectorAll('a.rm-Sidebar-link'))
+          .filter(link => {
+            const href = link.getAttribute('href');
+            return href && href.startsWith('/reference/') && href !== '/reference/overview';
+          });
+
+        // Extract HTTP method and title from each link
+        const endpointsData = allLinks.map(link => {
+          const href = link.getAttribute('href'); // This is the ReadMe reference page URL
+          const methodEl = link.querySelector('.rm-APIMethod');
+          const method = methodEl ? methodEl.textContent.trim().toUpperCase() : "";
+          const titleEl = link.querySelector('.Sidebar-link-text_label1gCT_uPnx7Gu');
+          const title = titleEl ? titleEl.textContent.trim() : link.textContent.trim();
+          return { href, method, title };
+        });
+
+        // Fetch endpoint details
+        const detailsPromises = endpointsData.map(async ep => {
+          const fullUrl = window.location.origin + ep.href;
+          try {
+            const response = await fetch(fullUrl);
+            if (!response.ok) throw new Error("Network error");
+            const html = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const urlEl = doc.querySelector('[data-testid="serverurl"]') ||
+                          doc.querySelector('.headline-container-article-info-url2nV_XrjpFuVQ');
+            const endpointUrl = urlEl ? urlEl.textContent.trim() : "Not found";
+            return { ...ep, endpointUrl };
+          } catch (error) {
+            console.error("Error fetching", ep.href, error);
+            return { ...ep, endpointUrl: "Error" };
           }
         });
-        setCategories(catArray);
-        setTotalCategories(catArray.length);
+
+        const results = await Promise.all(detailsPromises);
+        setEndpoints(results);
+      } catch (e) {
+        setErr(e.message);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      // Parse Hub‑Me user data from the embedded script.
-      const hubMeElement = document.getElementById("hub-me");
-      if (hubMeElement) {
-        let dataJson = hubMeElement.getAttribute("data-json");
-        dataJson = dataJson.replace(/&quot;/g, '"');
-        try {
-          const parsedHubData = JSON.parse(dataJson);
-          setHubData(parsedHubData);
-        } catch (error) {
-          console.error("Error parsing Hub‑Me data:", error);
-        }
-      }
-    }
-  }, [isReference]);
+    fetchData();
+  }, []);
 
-  const toggleCategory = (index) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
-  };
-
-  // Helper: Extract key page info from an HTML string and estimate reading time
-  const extractPageInfo = (htmlString) => {
-    try {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(htmlString, "text/html");
-
-      // Title: try header with id "content-head" then fallback to document title
-      const titleEl = doc.querySelector("header#content-head h1");
-      const pageTitle = titleEl ? titleEl.innerText.trim() : doc.title || "No Title Found";
-
-      // Description: use meta description if available (truncate to 200 chars), else fallback
-      let description = "No Description Found";
-      const metaDesc = doc.querySelector('meta[name="description"]');
-      if (metaDesc && metaDesc.getAttribute('content')) {
-        description = metaDesc.getAttribute('content').trim();
-        if (description.length > 200) {
-          description = description.slice(0, 200) + '...';
-        }
-      } else {
-        const descEl = doc.querySelector("div[role='doc-subtitle']");
-        if (descEl) {
-          description = descEl.innerText.trim();
-        }
-      }
-
-      // HTTP Method: prioritize the one in the headline container if available
-      const methodEl = doc.querySelector("div.headline-container-article-info2GaOf2jMpV0r span.rm-APIMethod") ||
-                       doc.querySelector("span.rm-APIMethod");
-      const method = methodEl ? methodEl.innerText.trim() : "No Method Found";
-
-      // Endpoint URL: try to grab from the headline container first (loosened selectors)
-      const urlEl = doc.querySelector("div[class^='headline-container-article-info'] span[class^='headline-container-article-info-url']") ||
-                    doc.querySelector("span[class^='headline-container-article-info-url']");
-      const endpointUrl = urlEl ? urlEl.innerText.trim() : "No Endpoint URL Found";
-
-      // Last Updated: first try the footer container, then fallback (loosened selectors)
-      let updatedEl = doc.querySelector("div[class^='Footer-desktop'] div.UpdatedAt p.DateLine") ||
-                      doc.querySelector("div.UpdatedAt p.DateLine");
-      if (!updatedEl) {
-        // Look for any DateLine element anywhere that includes "Updated"
-        const candidates = doc.querySelectorAll("p.DateLine");
-        updatedEl = Array.from(candidates).find(p => p.innerText.includes("Updated"));
-      }
-      const updated = updatedEl ? updatedEl.innerText.trim() : "No Update Info Found";
-
-      // Reading Time: estimate based on text content of the article or body
-      const estimateReadingTime = (rootElement, wordsPerMinute = 200) => {
-        if (!rootElement) return 0;
-        const readableTags = new Set([
-          'P', 'SPAN', 'LI', 'DIV', 'ARTICLE', 'SECTION', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'
-        ]);
-        let totalWords = 0;
-        const walker = doc.createTreeWalker(rootElement, NodeFilter.SHOW_TEXT, {
-          acceptNode: (node) =>
-            node.parentElement && readableTags.has(node.parentElement.tagName)
-              ? NodeFilter.FILTER_ACCEPT
-              : NodeFilter.FILTER_SKIP
-        });
-        while (walker.nextNode()) {
-          const text = walker.currentNode.textContent.trim();
-          totalWords += text.split(/\s+/).filter(word => word.length > 0).length;
-        }
-        return Math.ceil(totalWords / wordsPerMinute);
-      };
-      // Use the article if available; fallback to document body
-      const rootElement = doc.querySelector('.rm-Article') || doc.body;
-      const readingTime = estimateReadingTime(rootElement);
-
-      return { pageTitle, description, method, endpointUrl, updated, readingTime };
-    } catch (e) {
-      console.error("Error extracting page info:", e);
-      return null;
-    }
-  };
-
-  // Function to fetch details for all reference or guide links
-  const fetchAllPageDetails = async () => {
-    setFetchingPages(true);
-    setPageError(null);
-    // Flatten links from categories
-    const flattenedLinks = categories.flatMap(cat => cat.links);
-    let targetLinks;
-    if (isReference) {
-      targetLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/reference/"));
-    } else {
-      // For guides pages, adjust the filter as needed (here we assume guides use "/docs/")
-      targetLinks = flattenedLinks.filter(link => link.href && link.href.startsWith("/docs/"));
-    }
-    // Build full URL for each link (assuming same origin)
-    const fullUrls = targetLinks.map(link => ({
-      ...link,
-      fullUrl: window.location.origin + link.href
-    }));
-
-    try {
-      const detailsPromises = fullUrls.map(async (link) => {
-        try {
-          const response = await fetch(link.fullUrl);
-          if (!response.ok) throw new Error("Network response was not ok");
-          const html = await response.text();
-          const info = extractPageInfo(html);
-          return { ...link, ...info };
-        } catch (err) {
-          console.error("Error fetching", link.href, err);
-          return { ...link, error: err.message };
-        }
-      });
-      const results = await Promise.all(detailsPromises);
-      setPageDetails(results);
-    } catch (err) {
-      setPageError(err.message);
-    } finally {
-      setFetchingPages(false);
-    }
-  };
-
-  // Compute a tally of pages by HTTP method (useful mostly for reference pages)
-  const methodTally = pageDetails.reduce((acc, page) => {
-    if (page.method) {
-      acc[page.method] = (acc[page.method] || 0) + 1;
-    }
-    return acc;
-  }, {});
+  if (loading) return <p>Loading endpoints...</p>;
+  if (err) return <p>Error: {err}</p>;
 
   return (
-    <>
-      {/* Global Custom CSS */}
-      <style>{`
-        section.content-toc.grid-25 { display: none; }
-        .rm-Guides .content-body { max-width: 100%; width: 100%; }
-        .rm-ReferenceMain .rm-Article { max-width: 100%; width: 100%; }
-        li { list-style: none; }
-        li.list-item.mb-2 {margin-left: 10px;}
-        .field-description li+li, .markdown-body li+li {margin-top: auto;}
-        .field-description ol, .field-description ul, .markdown-body ol, .markdown-body ul {padding-left: inherit;display: flex;flex-direction: row;align-content: flex-start;align-items: stretch;flex-wrap: wrap;}
-        a.text-white.font-bold.py-2.px-4.rounded.transition {color: white;}
-        .readme-tailwind .text-blue-500 { text-decoration: none !important; }
-        .field-description a[href], .field-description a:not([href=""]),
-        .markdown-body a[href], .markdown-body a:not([href=""]) {
-          text-decoration: none;
-          padding: 5px 10px;
-          display: inline-block;
+    <div className="grid">
+      {endpoints.map((ep, index) => (
+        <a key={index} href={ep.href} className="card" target="_self">
+          <div className="card-content">
+            {ep.method && (
+              <span className={`method ${ep.method.toLowerCase()}`}>
+                {ep.method}
+              </span>
+            )}
+            <h3>{ep.title}</h3>
+            <div className="path">{ep.endpointUrl}</div>
+          </div>
+          <span className="arrow">›</span>
+        </a>
+      ))}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 8px;
         }
-        button {cursor: pointer; !important;}
-      `}</style>
-
-      {/* Main Container */}
-      <div className="max-w-screen-xl mx-auto p-4">
-        <div className="grid grid-cols-2 gap-4">
-          {/* Left Column: Dashboard Info */}
-          <div className="rounded-xl p-6 shadow-xl border border-gray-300 bg-white">
-            <p className="text-2xl font-bold mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-green-500">
-              {header}
-            </p>
-            <div className="space-y-6">
-              {/* User Information */}
-              <div className="p-4 rounded-xl shadow-md bg-gradient-to-br from-purple-400 to-pink-300 text-white">
-                <p className="text-xl font-semibold mb-2">📊 User Information</p>
-                {hubData ? (
-                  <div className="space-y-1">
-                    <p><strong>Name:</strong> {hubData.user?.name}</p>
-                    <p><strong>Email:</strong> {hubData.user?.email}</p>
-                    <p><strong>Logged In:</strong> {hubData.loggedIn ? "Yes" : "No"}</p>
-                    {hubData.isAdmin && <p><strong>Admin:</strong> Yes</p>}
-                    {hubData.metaData && hubData.metaData.length > 0 && (
-                      <p><strong>Project:</strong> {hubData.metaData[0].name}</p>
-                    )}
-                  </div>
-                ) : (
-                  <p>No user data</p>
-                )}
-              </div>
-              {/* Stats */}
-              <div className="flex flex-row gap-4">
-                <div className="flex-1 p-4 rounded-xl shadow-md bg-gradient-to-br from-blue-400 to-blue-600 text-white text-center transform transition hover:scale-105">
-                  <p className="text-xl font-semibold">📄 Total Pages</p>
-                  <p className="text-3xl">{pageCount}</p>
-                </div>
-                <div className="flex-1 p-4 rounded-xl shadow-md bg-gradient-to-br from-green-400 to-green-600 text-white text-center transform transition hover:scale-105">
-                  <p className="text-xl font-semibold">📁 Total Categories</p>
-                  <p className="text-3xl">{totalCategories}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Categories Launchpad */}
-          <div className="rounded-xl p-6 shadow-xl border border-gray-300">
-            <p className="text-2xl font-bold mb-4 text-center">Categories Launchpad</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {categories.map((cat, index) => (
-                <div key={index} className="p-4 bg-white rounded-xl border shadow-md bg-gradient-to-br from-green-400 to-green-600 text-white text-center transform transition hover:scale-105">
-                  <div className="flex justify-between items-center mb-2">
-                    <p className="text-xl font-semibold">{cat.title}</p>
-                    <button
-                      onClick={() => toggleCategory(index)}
-                      className="text-sm text-white bg-transparent border-none"
-                    >
-                      {expandedCategories[index] ? '⬆️ Hide ' : '⬇️ Show '} ({cat.links.length})
-                    </button>
-                  </div>
-                  {expandedCategories[index] && (
-                    <ul className="mt-2 grid grid-cols-2 gap-2">
-                      {cat.links.map((link, idx) => (
-                        <li key={idx}>
-                          <a 
-                            href={link.href} 
-                            className="block w-full text-gray-800 no-underline hover:text-gray-900 bg-white p-2 rounded transition"
-                          >
-                            {link.title}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* New Section: Page Details Overview */}
-        <div className="mt-10 rounded-xl p-6 shadow-xl border border-gray-300 bg-white">
-          <p className="text-2xl font-bold mb-4 text-center">
-            {isReference ? "Endpoint Details Overview" : "Guide Page Details Overview"}
-          </p>
-          <div className="mb-4 flex justify-center">
-            <button 
-              onClick={fetchAllPageDetails} 
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition border-0"
-              disabled={fetchingPages}
-            >
-              {fetchingPages
-                ? "🔄 Fetching Data..."
-                : isReference 
-                  ? "🔄 Fetch Endpoint Data" 
-                  : "🔄 Fetch Guide Page Data"}
-            </button>
-          </div>
-          {pageError && <p className="text-red-500">{pageError}</p>}
-          {pageDetails.length > 0 && (
-            <>
-              {isReference && (
-                <div className="mb-6">
-                  <h3 className="text-xl font-semibold">Endpoint Method Tally</h3>
-                  <ul className="list-disc list-inside pl-4">
-                    {Object.entries(methodTally).map(([method, count]) => (
-                      <li key={method} className="list-item mb-2">
-                        <strong>{method}:</strong> {count}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {/* Page Cards Grid (using custom class to avoid inherited grid-cols-1 styles) */}
-              <div className="fetch-pages-grid grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {pageDetails.map((page, idx) => (
-                  <div key={idx} className="flex flex-col bg-white border rounded-lg shadow-md p-6 hover:shadow-xl transition-all">
-                    <div>
-                      <p className="font-bold text-lg mb-2">{page.pageTitle || "N/A"}</p>
-                      <p className="text-sm text-gray-700 mb-4">{page.description || "No Description Found"}</p>
-                      {isReference && (
-                        <>
-                          <p className="text-sm mb-1"><span className="font-semibold">Method:</span> {page.method || "N/A"}</p>
-                          <p className="text-sm mb-1"><span className="font-semibold">Endpoint URL:</span> {page.endpointUrl || "N/A"}</p>
-                        </>
-                      )}
-                      <p className="text-sm mb-1"><span className="font-semibold">Last Updated:</span> {page.updated || "N/A"}</p>
-                      <p className="text-sm"><span className="font-semibold">Reading Time:</span> {page.readingTime ?? '--'} minutes</p>
-                    </div>
-                    <div className="mt-auto pt-4">
-                      <a
-                        href={page.href} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition"
-                      >
-                        View Page
-                      </a>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </>
+        .card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #ffffff;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          padding: 16px;
+          text-decoration: none !important;
+          color: inherit;
+          transition: background 0.2s;
+        }
+        .card:hover {
+          background: #f9fafb;
+        }
+        .card-content {
+          flex-grow: 1;
+        }
+        .card h3 {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: bold;
+          color: #111827;
+        }
+        .card .method {
+          font-weight: bold;
+          text-transform: uppercase;
+          font-size: 0.85rem;
+          margin-bottom: 4px;
+          display: block;
+        }
+        .card .method.get { color: #2563eb; }
+        .card .method.post { color: #16a34a; }
+        .card .method.put { color: #ca8a04; }
+        .card .method.delete { color: #dc2626; }
+        .card .path {
+          font-family: monospace;
+          font-size: 0.9rem;
+          color: #6b7280;
+        }
+        .arrow {
+          font-size: 1.2rem;
+          color: #6b7280;
+        }
+      ` }} />
+    </div>
   );
 };
 
-<DashboardComponent header="Interactive Dashboard" />
+<DocumentsAPI />
