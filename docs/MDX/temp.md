@@ -15,7 +15,7 @@ section.content-toc.grid-25 {
 
 <br />
 
-# TOC :question:
+# TOC ✅:question:
 
 ## This is automatically supported via heading tags in ReadMe
 
@@ -134,7 +134,7 @@ Would you like me to generate more test cases for ReadMe? 🚀
 
 ***
 
-# pymdownx.tabbed :question: [https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/](https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/)
+# pymdownx.tabbed ✅:question: [https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/](https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/)
 
 We have this as a Component
 
