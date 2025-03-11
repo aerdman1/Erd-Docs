@@ -1,4 +1,175 @@
 ---
 name: SimpleStepper
 ---
-Test
+import React, { useState, useEffect, useMemo } from "react";
+
+export function SimpleStepper({ steps }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const uniqueId = useMemo(() => "stepper-" + Math.random().toString(36).substr(2, 9), []);
+
+  // Fade-in effect on mount
+  useEffect(() => {
+    const timeout = setTimeout(() => setIsVisible(true), 300);
+    return () => clearTimeout(timeout);
+  }, []);
+
+  // Purple theme CSS (hard-coded)
+  const styleContent = `
+    /* Container */
+    #${uniqueId} {
+      position: relative;
+      text-align: center;
+      width: 100%;
+      max-width: 90%;
+      margin: 20px auto;
+      padding: 24px 36px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    /* Progress Bar Container */
+    #${uniqueId} .progress-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      width: 100%;
+      margin: 20px auto;
+    }
+    #${uniqueId} .progress-container::before {
+      content: "";
+      background-color: rgba(255,255,255,0.2);
+      height: 3px;
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      transform: translateY(-50%);
+      border-radius: 2px;
+      z-index: 2;
+    }
+    /* Progress Bar */
+    #${uniqueId} .progress {
+      background-color: rgba(255,255,255,0.2);
+      height: 3px;
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      transition: width 0.3s ease-in-out;
+      width: ${(currentStep / (steps.length - 1)) * 80}%;
+      border-radius: 2px;
+      z-index: 1;
+    }
+    /* Step Circles */
+    #${uniqueId} .circle-container {
+      position: relative;
+      flex: 1;
+      text-align: center;
+      z-index: 3;
+    }
+    #${uniqueId} .circle {
+      background: linear-gradient(to top, #b78cff, #8c5eff);
+      border: 2px solid rgba(236, 233, 254, 0.6);
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      height: 34px;
+      width: 34px;
+      margin: 0 auto;
+      transition: 0.3s ease;
+    }
+    #${uniqueId} .circle.active {
+      background: linear-gradient(to top, rgb(193, 131, 246), rgb(183, 140, 255));
+      border: 2px solid white;
+      box-shadow: 0 0 8px rgba(255,255,255,0.8);
+    }
+    /* Step Title */
+    #${uniqueId} .step-title {
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      color: rgba(255,255,255,0.6);
+    }
+    #${uniqueId} .step-title.active {
+      color: rgba(255,255,255,1);
+    }
+    /* Step Content */
+    #${uniqueId} .step-content {
+      margin: 40px auto 0;
+      max-width: 90%;
+      font-size: 16px;
+      padding: 10px;
+      color: white;
+      font-weight: 400;
+    }
+    #${uniqueId} .step-header {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: white;
+    }
+    /* Navigation Buttons */
+    #${uniqueId} .stepper-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    #${uniqueId} .btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 6px 12px;
+      transition: color 0.2s ease;
+    }
+    #${uniqueId} .btn:hover {
+      color: rgba(255,255,255,1);
+    }
+    #${uniqueId} .btn:disabled {
+      color: rgba(255,255,255,0.6);
+      cursor: not-allowed;
+    }
+  `;
+
+  return (
+    <>
+      <style>{styleContent}</style>
+      <div id={uniqueId} className={isVisible ? "opacity-100 visible" : "opacity-0 invisible"}>
+        <div className="progress-container">
+          <div className="progress"></div>
+          {steps.map((step, index) => (
+            <div key={index} className="circle-container">
+              <div className={`circle ${index <= currentStep ? "active" : ""}`}>
+                {index + 1}
+              </div>
+              <div className={`step-title ${index === currentStep ? "active" : ""}`}>
+                {step.header}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="step-content">
+          <h2 className="step-header">{steps[currentStep].header}</h2>
+          {steps[currentStep].content}
+        </div>
+        <div className="stepper-buttons">
+          <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
+            BACK
+          </button>
+          <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
+            NEXT
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
