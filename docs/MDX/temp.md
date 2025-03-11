@@ -160,19 +160,19 @@ Task List
 # smarty ❌  [https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=](https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=)
 
 (tm)\
-(c)\
-(r)\
-c/o\
-+/-\
-\-->\
-\<--\
-\<-->\
-\=/=\
-1/4\
-1/2\
-3/4\
-1st\
-2nd\
+(c)
+(r)
+c/o
++/-
+\-->
+\<--
+\<-->
+\=/=
+1/4
+1/2
+3/4
+1st
+2nd
 3rd
 
 ***
@@ -188,3 +188,49 @@ text^a\ superscript^
 ***
 
 # pymdownx.critic  [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
+
+\{++inserted text++}
+
+<br />
+
+\{--removed text--}
+
+<br />
+
+\{\~\~substituted text\~>replacement text\~\~}
+
+<br />
+
+\{==highlighted text==}
+
+<br />
+
+\{==highlighted text==}\{>>This is a comment on the highlighted text\<\<}
+
+<br />
+
+\{--
+
+<br />
+
+* removed item 1
+  * removed item 2- removed sub-item
+    * removed item 3
+
+<br />
+
+\--}
+
+<br />
+
+\{++
+
+<br />
+
+* added item 1
+  * added item 2- added sub-item
+    * added item 3
+
+<br />
+
+++}
