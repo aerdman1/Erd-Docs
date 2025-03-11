@@ -3,10 +3,10 @@ name: SimpleStepper3
 ---
 import React, { useState } from "react";
 
-export function SimpleStepper3({ steps }) {
+export function SimpleStepperComponent({ steps }) {
   // This component is a simple stepper that shows numbered steps,
 	// displays the header and content for the current step, and includes Next/Back buttons.
-	// The comments below explain each part of the code.
+// The comments below explain each part of the code.
   
   // useState hook to track the current step index (starting at 0)
   const [currentStep, setCurrentStep] = useState(0);
@@ -95,7 +95,7 @@ export function SimpleStepper3({ steps }) {
   );
 } 
 
-<SimpleStepper3
+<SimpleStepperComponent
   steps={[
     { header: "Step 1: Plan", content: <p>Plan your documentation and gather resources.</p> },
     { header: "Step 2: Write", content: <p>Write effective and clear documentation.</p> },
