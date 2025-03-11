@@ -189,23 +189,26 @@ text^a\ superscript^
 
 # pymdownx.critic  [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
 
-\{++inserted text++}
+Here is some \{--\*incorrect\*--} Markdown.  I am adding this\{++ here++}.  Here is some more \{--text &#x20;
+&#x20;that I am removing--}text.  And here is even more \{++text that I&#x20;
+&#x20;am ++}adding.\{\~\~
 
 <br />
 
-\{--removed text--}
+\~>  \~\~}Paragraph was deleted and replaced with some spaces.\{\~\~  \~>
 
 <br />
 
-\{\~\~substituted text\~>replacement text\~\~}
+\~\~}Spaces were removed and a paragraph was added.
 
 <br />
 
-\{==highlighted text==}
+And here is a comment on \{==some &#x20;
+&#x20;text==}\{>>This works quite well. I just wanted to comment on it.\<\<}. Substitutions \{\~\~is\~>are\~\~} great!
 
 <br />
 
-\{==highlighted text==}\{>>This is a comment on the highlighted text\<\<}
+General block handling.
 
 <br />
 
@@ -213,9 +216,10 @@ text^a\ superscript^
 
 <br />
 
-* removed item 1
-  * removed item 2- removed sub-item
-    * removed item 3
+* test remove
+  * test remove
+    * test remove- test remove
+      * test remove
 
 <br />
 
@@ -227,9 +231,10 @@ text^a\ superscript^
 
 <br />
 
-* added item 1
-  * added item 2- added sub-item
-    * added item 3
+* test add
+  * test add
+    * test add- test add
+      * test add
 
 <br />
 
