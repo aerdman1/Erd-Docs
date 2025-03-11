@@ -52,7 +52,7 @@ MUST TRANSLATE TO:
 
 ***
 
-# pymdownx.tilde ✅
+# pymdownx.tilde ✅ ✅
 
 ~~Strikethrough~~
 
@@ -60,7 +60,7 @@ text~~subscript~~
 
 ***
 
-# pymdownx.highlight ✅
+# pymdownx.highlight ✅ ✅
 
 ```python
 # This is a test
@@ -74,7 +74,7 @@ def hello_world():
 
 ```
 
-# pymdownx.inlinehilite ✅
+# pymdownx.inlinehilite ✅ ✅
 
 ```python
 If you see **different colors for keywords, comments, and strings**, **syntax highlighting is enabled**.
@@ -104,7 +104,7 @@ Single line format is done by placing the following markup for the single line n
 
 ***
 
-# PXSPER :white_check_mark:
+# PXSPER  ✅ :white_check_mark:
 
 > ```python
 > print("hello")
@@ -114,7 +114,7 @@ Single line format is done by placing the following markup for the single line n
 
 ***
 
-# pymdownx.superfences :white_check_mark:
+# pymdownx.superfences ✅ :white_check_mark:
 
 <br />
 
@@ -128,7 +128,7 @@ Would you like me to generate more test cases for ReadMe? 🚀
 
 ***
 
-# pymdownx.emoji ✅
+# pymdownx.emoji ✅ ✅
 
 :+1: :smile: :volcano:
 
@@ -199,7 +199,7 @@ c/o
 
 ***
 
-# pymdownx.caret ❌ :question: [https://facelessuser.github.io/pymdown-extensions/extensions/caret/](https://facelessuser.github.io/pymdown-extensions/extensions/caret/)
+# pymdownx.caret :x: :white_check_mark: [https://facelessuser.github.io/pymdown-extensions/extensions/caret/](https://facelessuser.github.io/pymdown-extensions/extensions/caret/)
 
 ^^Insert me^^
 
@@ -209,7 +209,7 @@ text^a\ superscript^
 
 ***
 
-# pymdownx.critic ❌ :question: [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
+# pymdownx.critic :x: :white_check_mark: [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
 
 <HTMLBlock>{`
 Here is some {--*incorrect*--} Markdown.  I am adding this{++ here++}.  Here is some more {--text
