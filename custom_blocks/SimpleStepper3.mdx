@@ -1,0 +1,58 @@
+---
+name: SimpleStepper3
+---
+import React, { useState } from "react";
+
+export function SimpleStepper3({ steps }) {
+  const [currentStep, setCurrentStep] = useState(0);
+
+  return (
+    <div>
+      {/* Step Indicators */}
+      <div>
+        {steps.map((step, index) => (
+          <span key={index}>
+            {index + 1} {index < steps.length - 1 && "- "}
+          </span>
+        ))}
+      </div>
+      {/* Step Content */}
+      <div>
+        <h2>{steps[currentStep].header}</h2>
+        {steps[currentStep].content}
+      </div>
+      {/* Navigation Buttons */}
+      <div>
+        <button 
+          onClick={() => setCurrentStep(Math.max(currentStep - 1, 0))} 
+          disabled={currentStep === 0}
+        >
+          Back
+        </button>
+        <button 
+          onClick={() => setCurrentStep(Math.min(currentStep + 1, steps.length - 1))} 
+          disabled={currentStep === steps.length - 1}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+
+<SimpleStepper3
+  steps={[
+    {
+      header: "Step 1: Plan",
+      content: <p>Plan your documentation and gather resources.</p>,
+    },
+    {
+      header: "Step 2: Write",
+      content: <p>Write effective and clear documentation.</p>,
+    },
+    {
+      header: "Step 3: Review",
+      content: <p>Review and format the content for clarity.</p>,
+    },
+  ]}
+/>
