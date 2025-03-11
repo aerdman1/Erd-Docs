@@ -15,7 +15,7 @@ section.content-toc.grid-25 {
 
 <br />
 
-# TOC ✅
+# TOC :question:
 
 ## This is automatically supported via heading tags in ReadMe
 
@@ -23,9 +23,7 @@ section.content-toc.grid-25 {
 
 ***
 
-# [Admonition](pymdownx.tilde)
-
-<br />
+# admonition -  :x: :white_check_mark:
 
 !!! note\
 You should note that the title will be automatically capitalized.
@@ -92,7 +90,7 @@ INLINE: markdown_extensions:
 
 ***
 
-# pymdownx.snippets :x:
+# pymdownx.snippets ❌ :x:
 
 <HTMLBlock>{`
 Single Line Format
@@ -136,7 +134,9 @@ Would you like me to generate more test cases for ReadMe? 🚀
 
 ***
 
-# pymdownx.tabbed  ❌ (we have tabs but not with this syntax)
+# pymdownx.tabbed :question: [https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/](https://facelessuser.github.io/pymdown-extensions/extensions/tabbed/)
+
+We have this as a Component
 
 <HTMLBlock>{`
 === "Tab 1"
@@ -153,7 +153,7 @@ Would you like me to generate more test cases for ReadMe? 🚀
 
 ***
 
-# Details ❌ [https://facelessuser.github.io/pymdown-extensions/extensions/details/](https://facelessuser.github.io/pymdown-extensions/extensions/details/)
+# Details ❌ :white_check_mark: [https://facelessuser.github.io/pymdown-extensions/extensions/details/](https://facelessuser.github.io/pymdown-extensions/extensions/details/)
 
 ???+ note "Open styled details"
 
@@ -179,7 +179,7 @@ Task List
 
 ***
 
-# smarty ❌  [https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=](https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=)
+# smarty ❌ :white_check_mark: [https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=](https://facelessuser.github.io/pymdown-extensions/extensions/smartsymbols/?h=)
 
 (tm)\
 (c)
@@ -199,7 +199,7 @@ c/o
 
 ***
 
-# pymdownx.caret ❌ [https://facelessuser.github.io/pymdown-extensions/extensions/caret/](https://facelessuser.github.io/pymdown-extensions/extensions/caret/)
+# pymdownx.caret ❌ :question: [https://facelessuser.github.io/pymdown-extensions/extensions/caret/](https://facelessuser.github.io/pymdown-extensions/extensions/caret/)
 
 ^^Insert me^^
 
@@ -209,7 +209,7 @@ text^a\ superscript^
 
 ***
 
-# pymdownx.critic ❌  [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
+# pymdownx.critic ❌ :question: [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
 
 <HTMLBlock>{`
 Here is some {--*incorrect*--} Markdown.  I am adding this{++ here++}.  Here is some more {--text
