@@ -71,8 +71,9 @@ If you see **different colors for keywords, comments, and strings**, **syntax hi
 
 If everything is the **same color** and only has a gray background, ReadMe does not have syntax highlighting, and you may need a different approach (like a custom MDX component for code blocks).
 
-Let me know what happens when you test this! 🚀
-
+INLINE: markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
 ```
 
 <br />
