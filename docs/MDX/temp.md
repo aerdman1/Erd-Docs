@@ -189,53 +189,37 @@ text^a\ superscript^
 
 # pymdownx.critic  [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
 
-Here is some \{--\*incorrect\*--} Markdown.  I am adding this\{++ here++}.  Here is some more \{--text &#x20;
-&#x20;that I am removing--}text.  And here is even more \{++text that I&#x20;
-&#x20;am ++}adding.\{\~\~
+<HTMLBlock>{`
+Here is some {--*incorrect*--} Markdown.  I am adding this{++ here++}.  Here is some more {--text
+ that I am removing--}text.  And here is even more {++text that I 
+ am ++}adding.{~~
 
-<br />
+~>  ~~}Paragraph was deleted and replaced with some spaces.{~~  ~>
 
-\~>  \~\~}Paragraph was deleted and replaced with some spaces.\{\~\~  \~>
+~~}Spaces were removed and a paragraph was added.
 
-<br />
-
-\~\~}Spaces were removed and a paragraph was added.
-
-<br />
-
-And here is a comment on \{==some &#x20;
-&#x20;text==}\{>>This works quite well. I just wanted to comment on it.\<\<}. Substitutions \{\~\~is\~>are\~\~} great!
-
-<br />
+And here is a comment on {==some
+ text==}{>>This works quite well. I just wanted to comment on it.<<}. Substitutions {~~is~>are~~} great!
 
 General block handling.
 
-<br />
-
-\{--
-
-<br />
+{--
 
 * test remove
-  * test remove
-    * test remove- test remove
-      * test remove
+* test remove
+* test remove
+    * test remove
+* test remove
 
-<br />
+--}
 
-\--}
-
-<br />
-
-\{++
-
-<br />
+{++
 
 * test add
-  * test add
-    * test add- test add
-      * test add
-
-<br />
+* test add
+* test add
+    * test add
+* test add
 
 ++}
+`}</HTMLBlock>
