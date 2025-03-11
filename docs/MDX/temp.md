@@ -80,7 +80,17 @@ INLINE: markdown_extensions:
 
 ***
 
-# pymdownx.snippets - DO NOT SUPPORT ATM :x:
+# pymdownx.snippets :x:
+
+<HTMLBlock>{`
+Single Line Format
+Single line format is done by placing the following markup for the single line notation:
+
+
+--8<-- "filename.ext"
+`}</HTMLBlock>
+
+<br />
 
 ***
 
@@ -187,7 +197,7 @@ text^a\ superscript^
 
 ***
 
-# pymdownx.critic  [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
+# pymdownx.critic ❌  [https://facelessuser.github.io/pymdown-extensions/extensions/critic/](https://facelessuser.github.io/pymdown-extensions/extensions/critic/)
 
 <HTMLBlock>{`
 Here is some {--*incorrect*--} Markdown.  I am adding this{++ here++}.  Here is some more {--text
