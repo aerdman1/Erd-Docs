@@ -5,32 +5,32 @@ hidden: false
 metadata:
   robots: index
 ---
-```
-```
+\[toc]
 
-<br />
+***
 
 !!! tip\
 This is a helpful tip.
 
-<br />
+***
 
 ~~Strikethrough~~
 
-<br />
-
 text~~subscript~~
 
-<br />
-
-```
-```
+***
 
 <br />
 
-\`print("hi")\`\{.python}
+> ```python
+> print("hello")
+> ```
+
+***
 
 <br />
+
+:+1:
 
 \--8\<-- "libs/util/README.md"
 
@@ -45,15 +45,16 @@ text~~subscript~~
 >
 > <br />
 >
-> \=== "Python"```python
+> \=== "Python"\`\`\`python\
 > print("hello")
-> ```
+>
+> ````
 >
 > <br />
 >
 > \=== "Java"```java
 > System.out.println("hello");
-> ```
+> ````
 >
 > <br />
 >
@@ -91,5 +92,5 @@ text~~subscript~~
 >
 > <br />
 >
-> \{-- removed content --} &#x20;
+> \{-- removed content --}\
 > \`\`\`
