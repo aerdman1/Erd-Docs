@@ -1,12 +1,13 @@
 ---
 name: SimpleStepperComponent
 ---
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 
 export const SimpleStepperComponent = ({ children }) => {
-
   console.log("Children received:", children);
-  const steps = Array.isArray(children) ? children : [children];
+
+  // Ensure `children` is always treated as an array and optimize with `useMemo`
+  const steps = useMemo(() => (Array.isArray(children) ? children : [children]), [children]);
   const [currentStep, setCurrentStep] = useState(0);
 
   const containerStyle = {
@@ -30,6 +31,8 @@ export const SimpleStepperComponent = ({ children }) => {
     color: active ? "white" : "black",
     margin: "0 5px",
     fontWeight: "bold",
+    boxShadow: active ? "0px 0px 10px rgba(131, 93, 185, 0.6)" : "none",
+    transition: "all 0.3s ease-in-out",
   });
 
   const buttonStyle = {
@@ -54,7 +57,6 @@ export const SimpleStepperComponent = ({ children }) => {
           </span>
         ))}
       </div>
-      {/* Ensure proper handling of children in MDX */}
       {steps.length > 0 ? <>{steps[currentStep]}</> : <></>}
       <div>
         <button
@@ -62,6 +64,7 @@ export const SimpleStepperComponent = ({ children }) => {
           style={buttonStyle}
           onClick={handlePrev}
           disabled={currentStep === 0}
+          aria-label="Previous Step"
         >
           Back
         </button>
@@ -70,6 +73,7 @@ export const SimpleStepperComponent = ({ children }) => {
           style={buttonStyle}
           onClick={handleNext}
           disabled={currentStep === steps.length - 1}
+          aria-label="Next Step"
         >
           Next
         </button>
@@ -84,6 +88,7 @@ export const SimpleStep = ({ header, children }) => (
     <div>{children}</div>
   </div>
 );
+
 
 <SimpleStepperComponent>
   <SimpleStep header="Step 1: Plan">
