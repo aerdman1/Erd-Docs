@@ -2,12 +2,12 @@
 name: SimpleStepperComponent
 ---
 import React, { useState, useMemo } from "react";
-// ************ FINAL VERSION  ******************
+
 
 export const SimpleStepperComponent = ({ children }) => {
   console.log("Children received:", children);
 
-  // Ensure `children` is always treated as an array and optimize with `useMemo`
+
   const steps = useMemo(() => (Array.isArray(children) ? children : [children]), [children]);
   const [currentStep, setCurrentStep] = useState(0);
 
