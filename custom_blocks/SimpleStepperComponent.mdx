@@ -3,10 +3,8 @@ name: SimpleStepperComponent
 ---
 import React, { useState, useMemo } from "react";
 
-
 export const SimpleStepperComponent = ({ children }) => {
   console.log("Children received:", children);
-
 
   const steps = useMemo(() => (Array.isArray(children) ? children : [children]), [children]);
   const [currentStep, setCurrentStep] = useState(0);
@@ -28,11 +26,11 @@ export const SimpleStepperComponent = ({ children }) => {
     height: "30px",
     lineHeight: "30px",
     borderRadius: "50%",
-    backgroundColor: active ? "#835db9" : "#ddd",
+    backgroundColor: active ? "#5A3E8B" : "#ddd", // Updated active color for better contrast
     color: active ? "white" : "black",
     margin: "0 5px",
     fontWeight: "bold",
-    boxShadow: active ? "0px 0px 10px rgba(131, 93, 185, 0.6)" : "none",
+    boxShadow: active ? "0px 0px 10px rgba(90, 62, 139, 0.6)" : "none", // Reflects new active color
     transition: "all 0.3s ease-in-out",
   });
 
@@ -41,7 +39,7 @@ export const SimpleStepperComponent = ({ children }) => {
     margin: "10px",
     border: "none",
     borderRadius: "4px",
-    backgroundColor: "#835db9",
+    backgroundColor: "#5A3E8B", // Updated button background for better contrast
     color: "white",
     cursor: "pointer",
   };
@@ -58,7 +56,9 @@ export const SimpleStepperComponent = ({ children }) => {
           </span>
         ))}
       </div>
-      {steps.length > 0 ? <>{steps[currentStep]}</> : <></>}
+      <div aria-live="polite">
+        {steps.length > 0 ? <>{steps[currentStep]}</> : <></>}
+      </div>
       <div>
         <button
           type="button"
@@ -89,7 +89,6 @@ export const SimpleStep = ({ header, children }) => (
     <div>{children}</div>
   </div>
 );
-
 
 <SimpleStepperComponent>
   <SimpleStep header="Step 1: Plan">
