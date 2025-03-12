@@ -16,5 +16,3 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor 
 | 3  | CreatedAt | Timestamp | Date and time the user was created      |
 | 4  | UpdatedAt | Timestamp | Date and time the user was last updated |
 | 5  | Role      | String    | Role assigned to the user               |
-
-test
