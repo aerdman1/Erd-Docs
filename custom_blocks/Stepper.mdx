@@ -3,7 +3,7 @@ name: Stepper
 ---
 import React, { useState, useEffect, useMemo } from "react";
 
-export function StepperComponent({ steps, verticalTrue = false, backgroundTheme = "purple" }) {
+export function StepperComponent({ steps, verticalTrue, backgroundTheme }) {
   const themes = {
     purple: {
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
@@ -351,13 +351,16 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
     return (
       <>
         <style>{styleContent}</style>
-        <div id={uniqueId} className={`stepper-container ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+        <div
+          id={uniqueId}
+          className={`stepper-container ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}
+        >
           <div className="vertical-layout">
             <div className="vertical-timeline">
               <div
                 className={`vertical-progress ${currentStep > 0 ? "active" : ""}`}
                 style={{
-                  height: currentStep === 0 ? "0%" : `${(currentStep / (steps.length - 1)) * 80}%`
+                  height: currentStep === 0 ? "0%" : `${(currentStep / (steps.length - 1)) * 80}%`,
                 }}
               ></div>
               {steps.map((step, index) => {
@@ -378,10 +381,20 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
               <h2 className="step-header">{steps[currentStep].header}</h2>
               {steps[currentStep].content}
               <div className="stepper-buttons">
-                <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                  disabled={currentStep === 0}
+                >
                   <i className="fa fa-arrow-left"></i> BACK
                 </button>
-                <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  disabled={currentStep === steps.length - 1}
+                >
                   NEXT <i className="fa fa-arrow-right"></i>
                 </button>
               </div>
@@ -395,7 +408,10 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
   return (
     <>
       <style>{styleContent}</style>
-      <div id={uniqueId} className={`stepper-container ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+      <div
+        id={uniqueId}
+        className={`stepper-container ${isVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}
+      >
         <div className="progress-container">
           <div
             className={`progress ${currentStep > 0 ? "active" : ""}`}
@@ -420,10 +436,20 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
           {steps[currentStep].content}
         </div>
         <div className="stepper-buttons">
-          <button className="btn" onClick={() => setCurrentStep(currentStep - 1)} disabled={currentStep === 0}>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => setCurrentStep(currentStep - 1)}
+            disabled={currentStep === 0}
+          >
             <i className="fa fa-arrow-left"></i> BACK
           </button>
-          <button className="btn" onClick={() => setCurrentStep(currentStep + 1)} disabled={currentStep === steps.length - 1}>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => setCurrentStep(currentStep + 1)}
+            disabled={currentStep === steps.length - 1}
+          >
             NEXT <i className="fa fa-arrow-right"></i>
           </button>
         </div>
@@ -431,8 +457,6 @@ export function StepperComponent({ steps, verticalTrue = false, backgroundTheme 
     </>
   );
 }
-
-
 
 <StepperComponent
   verticalFalse
