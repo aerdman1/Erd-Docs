@@ -9,18 +9,12 @@ metadata:
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor malesuada scelerisque eu mollis ex.
 
-| ID | Name               | Type      | Description                                    |
-| -- | ------------------ | --------- | ---------------------------------------------- |
-| 1  | UserID             | String    | Unique identifier for the user                 |
-| 2  | Email              | String    | Email address of the user                      |
-| 3  | CreatedAt          | Timestamp | Date and time the user was created             |
-| 4  | UpdatedAt          | Timestamp | Date and time the user was last updated        |
-| 5  | Role               | String    | Role assigned to the user                      |
-
+| ID | Name      | Type      | Description                             |
+| -- | --------- | --------- | --------------------------------------- |
+| 1  | UserID    | String    | Unique identifier for the user          |
+| 2  | Email     | String    | Email address of the user               |
+| 3  | CreatedAt | Timestamp | Date and time the user was created      |
+| 4  | UpdatedAt | Timestamp | Date and time the user was last updated |
+| 5  | Role      | String    | Role assigned to the user               |
 
 test
-
-| Support level assigned to the user                                                                       | test | test | Support level assigned to the user | Support level assigned to the user | Support level assigned to the user | Support level assigned to the user                                                                       | testing123 | testing123 | testing123 | testing123 | testing123 | test                                                                                                     | Support level assigned to the user                                                                       |
-| :------------------------------------------------------------------------------------------------------- | :--- | :--- | :--------------------------------- | :--------------------------------- | :--------------------------------- | :------------------------------------------------------------------------------------------------------- | :--------- | :--------- | :--------- | :--------- | :--------- | :------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------- |
-| Support level assigned to the user Support level assigned to the user Support level assigned to the user | test | test | Support level assigned to the user | Support level assigned to the user | Support level assigned to the user | Support level assigned to the user Support level assigned to the user Support level assigned to the user |            |            |            |            |            | Support level assigned to the user Support level assigned to the user Support level assigned to the user | Support level assigned to the user Support level assigned to the user Support level assigned to the user |
-| test                                                                                                     | test | test |                                    |                                    |                                    |                                                                                                          |            |            |            |            |            |                                                                                                          |                                                                                                          |
