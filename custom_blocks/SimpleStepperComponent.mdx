@@ -3,14 +3,16 @@ name: SimpleStepperComponent
 ---
 import React, { useState } from "react";
 
-export function SimpleStepperComponent({ steps }) {
-  // This component is a simple stepper that shows numbered steps,
-  // displays the header and content for the current step, and includes Next/Back buttons.
-  
-  // useState hook to track the current step index (starting at 0)
+export const SimpleStepperComponent = ({ children }) => {
+
+if (!children) {
+  console.error("SimpleStepperComponent: No children were received.");
+  return null; // Prevent further rendering
+}
+const steps = React.Children.toArray(children);
+
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Define the style for the main container holding the stepper.
   const containerStyle = {
     maxWidth: "600px",
     margin: "40px auto",
@@ -20,13 +22,8 @@ export function SimpleStepperComponent({ steps }) {
     textAlign: "center",
   };
 
-  // Define the style for the container that holds the step indicators.
-  const indicatorContainerStyle = {
-    marginBottom: "20px",
-  };
+  const indicatorContainerStyle = { marginBottom: "20px" };
 
-  // A function that returns the style for a step indicator circle.
-  // The 'active' parameter is true if the indicator represents the current step.
   const indicatorStyle = (active) => ({
     display: "inline-block",
     width: "30px",
@@ -39,7 +36,6 @@ export function SimpleStepperComponent({ steps }) {
     fontWeight: "bold",
   });
 
-  // Define the style for the navigation buttons.
   const buttonStyle = {
     padding: "8px 16px",
     margin: "10px",
@@ -50,16 +46,9 @@ export function SimpleStepperComponent({ steps }) {
     cursor: "pointer",
   };
 
-  // Handler for the "Back" button. It decrements the current step, ensuring it doesn't go below 0.
   const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
-
-  // Handler for the "Next" button. It increments the current step, ensuring it doesn't exceed the last step.
   const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
 
-  // The JSX returned below renders:
-  // 1. The step indicators (numbered circles)
-  // 2. The header and content for the current step
-  // 3. Navigation buttons ("Back" and "Next")
   return (
     <div style={containerStyle}>
       <div style={indicatorContainerStyle}>
@@ -69,8 +58,8 @@ export function SimpleStepperComponent({ steps }) {
           </span>
         ))}
       </div>
-      <h2>{steps[currentStep].header}</h2>
-      <div>{steps[currentStep].content}</div>
+      {/* Ensure proper handling of children in MDX */}
+      {steps.length > 0 ? <>{steps[currentStep]}</> : <></>}
       <div>
         <button
           type="button"
@@ -91,12 +80,24 @@ export function SimpleStepperComponent({ steps }) {
       </div>
     </div>
   );
-}
+};
 
-<SimpleStepperComponent
-  steps={[
-    { header: "Step 1: Plan", content: <p>Plan your documentation and gather resources.</p> },
-    { header: "Step 2: Write", content: <p>Write effective and clear documentation.</p> },
-    { header: "Step 3: Review", content: <p>Review and refine your content.</p> },
-  ]}
-/>
+export const SimpleStep = ({ header, children }) => (
+  <div>
+    <h2>{header}</h2>
+    <div>{children}</div>
+  </div>
+);
+
+// Usage inside an MDX file (ensure it's wrapped correctly)
+<SimpleStepperComponent>
+  <SimpleStep header="Step 1: Plan">
+    <p>Plan your documentation and gather resources.</p>
+  </SimpleStep>
+  <SimpleStep header="Step 2: Write">
+    <p>Write effective and clear documentation.</p>
+  </SimpleStep>
+  <SimpleStep header="Step 3: Review">
+    <p>Review and refine your content.</p>
+  </SimpleStep>
+</SimpleStepperComponent>
