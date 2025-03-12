@@ -5,12 +5,8 @@ import React, { useState } from "react";
 
 export const SimpleStepperComponent = ({ children }) => {
 
-if (!children) {
-  console.error("SimpleStepperComponent: No children were received.");
-  return null; // Prevent further rendering
-}
-const steps = React.Children.toArray(children);
-
+  console.log("Children received:", children);
+  const steps = Array.isArray(children) ? children : [children];
   const [currentStep, setCurrentStep] = useState(0);
 
   const containerStyle = {
@@ -89,7 +85,6 @@ export const SimpleStep = ({ header, children }) => (
   </div>
 );
 
-// Usage inside an MDX file (ensure it's wrapped correctly)
 <SimpleStepperComponent>
   <SimpleStep header="Step 1: Plan">
     <p>Plan your documentation and gather resources.</p>
