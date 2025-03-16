@@ -44,7 +44,7 @@ metadata:
 | 1.1.0   | 2024-03-10   | Added new user profile API   | Fixed login issue            | Minor performance improvements | Stable |
 | 1.2.0   | 2024-06-05   | Integrated caching mechanism | Resolved session timeout bug | Optimized for scalability      | Beta   |
 
-### Table 5: Lots of Columns
+### **Table 5: Lots of Columns**
 
 | Col 1 | Col 2 | Col 3 | Col 4 | Col 5 | Col 6 | Col 7 | Col 8 | Col 9 | Col 10 | Col 11 | Col 12 | Col 13 | Col 14 | Col 15 | Col 16 | Col 17 | Col 18 | Col 19 | Col 20 |
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
