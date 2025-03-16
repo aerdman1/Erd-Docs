@@ -97,6 +97,12 @@ export const TableTools = ({ children }) => {
         dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
+            {
+                extend: "colvis",
+                text: '<i class="fa fa-columns"></i>',
+                className: "dt-btn",
+                attr: { "aria-label": "Toggle column visibility" },
+              },
           {
             extend: "copy",
             text: '<i class="fa fa-copy"></i>',
@@ -131,12 +137,6 @@ export const TableTools = ({ children }) => {
                 window.print();
               }, 100);
             },
-          },
-          {
-            extend: "colvis",
-            text: '<i class="fa fa-columns"></i>',
-            className: "dt-btn",
-            attr: { "aria-label": "Toggle column visibility" },
           },
           {
             text: '<i class="fa fa-ban"></i>',
