@@ -12,7 +12,7 @@ export const PageBannerAdvanced = ({
 }) => {
   // Check if we're in preview mode by looking for "/content/" in the URL.
   const isPreview =
-    typeof window !== "undefined" && window.location.href.includes("/contentNEW/");
+    typeof window !== "undefined" && window.location.href.includes("/docs/");
 
   useEffect(() => {
     if (isPreview) {
