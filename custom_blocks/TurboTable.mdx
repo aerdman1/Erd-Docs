@@ -68,24 +68,25 @@ export const TurboTable = ({ children }) => {
         dom: "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
-          { extend: "copy", text: '<i class="fa fa-copy"></i> Copy' },
-          { extend: "csv", text: '<i class="fa fa-file-csv"></i> CSV' },
-          { extend: "excel", text: '<i class="fa fa-file-excel"></i> Excel' },
-          { extend: "pdf", text: '<i class="fa fa-file-pdf"></i> PDF' },
-          { extend: "print", text: '<i class="fa fa-print"></i> Print',
+          { extend: "copy", text: '<i class="fa fa-copy"></i>', className: 'dt-btn' },
+          { extend: "csv", text: '<i class="fa fa-file-csv"></i>', className: 'dt-btn' },
+          { extend: "excel", text: '<i class="fa fa-file-excel"></i>', className: 'dt-btn' },
+          { extend: "pdf", text: '<i class="fa fa-file-pdf"></i>', className: 'dt-btn' },
+          { extend: "print", text: '<i class="fa fa-print"></i>', className: 'dt-btn',
             action: function (e, dt, node, config) {
               dt.buttons.info('Print Preview', 'Press ESC or click "Close" when finished.');
               setTimeout(() => {
                 window.print();
                 dt.buttons.info(false);
-                dt.destroy(); // Fix buttons not working after print
-                initializeTable(table); // Reinitialize DataTable after print
+                dt.destroy();
+                initializeTable(table);
               }, 100);
             }
           },
-          { extend: "colvis", text: '<i class="fa fa-columns"></i> Columns' },
+          { extend: "colvis", text: '<i class="fa fa-columns"></i>', className: 'dt-btn' },
           {
-            text: '<i class="fa fa-ban"></i> Close Table',
+            text: '<i class="fa fa-ban"></i>',
+            className: 'dt-btn',
             action: function () {
               dt.destroy();
               table.innerHTML = table.getAttribute("data-original-html");
@@ -95,6 +96,18 @@ export const TurboTable = ({ children }) => {
             },
           },
         ],
+        initComplete: function () {
+          document.querySelectorAll(".dt-btn").forEach((btn) => {
+            btn.style.border = "none";
+            btn.style.padding = "4px 6px";
+            btn.style.fontSize = "0.75rem";
+            btn.style.background = "#f8f9fa";
+            btn.style.color = "#333";
+            btn.style.margin = "2px";
+            btn.style.borderRadius = "3px";
+            btn.style.minWidth = "30px";
+          });
+        },
       });
       table.setAttribute("data-filter-enabled", "true");
       trigger.style.display = "none";
