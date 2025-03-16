@@ -38,12 +38,9 @@ export const PageBannerAdvanced = ({
 
   // Update header height
   const updateHeaderHeight = () => {
-    requestAnimationFrame(() => {
-      const header = document.querySelector("header.rm-Header");
-      if (header) setHeaderHeight(header.offsetHeight);
-    });
+    const header = document.querySelector("header.rm-Header");
+    if (header) setHeaderHeight(header.offsetHeight);
   };
-  
 
   useLayoutEffect(() => {
     updateHeaderHeight();
@@ -324,7 +321,7 @@ export const PageBannerAdvanced = ({
         .content-body.grid-75.blurred .generator-ui { filter: none; }
       `}</style>
       {/* Banner Injection Content */}
-      <div id="custom-banner-content" style={{ width: "100%" }}>
+      <div id="custom-banner-content" style={{ display: "none", width: "100%" }}>
         <div
           style={{
             display: "flex",
