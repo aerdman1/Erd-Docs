@@ -63,7 +63,7 @@ export const DataTable = ({ children }) => {
     const loadDependencies = async () => {
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
         await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
-        loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
+        await loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
 
         // Additional DataTable plugins and export libraries
         const dependencies = [
@@ -215,7 +215,7 @@ export const DataTable = ({ children }) => {
     );
 };
 
-export default DataTable; 
+export default DataTable;
 
 
 | Endpoint        | Method | Description                           | Parameters                         | Response Format |
