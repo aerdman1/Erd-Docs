@@ -62,10 +62,15 @@ export const TableTools = ({ children }) => {
     table.setAttribute("data-dt-processed", "true");
     table.setAttribute("data-original-html", table.innerHTML);
 
+    // Ensure the table has an ID for ARIA association
+    if (!table.id) {
+      table.id = "data-table-" + Math.floor(Math.random() * 1000000);
+    }
+
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
     if (!wrapper) return;
 
-    // Create the blue toggle button with custom styles
+    // Create the blue toggle button with custom styles and ARIA attributes
     const trigger = document.createElement("button");
     trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
     Object.assign(trigger, {
@@ -76,6 +81,10 @@ export const TableTools = ({ children }) => {
       border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
       filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
     });
+    // Link the button to the table for accessibility
+    trigger.setAttribute("aria-controls", table.id);
+    trigger.setAttribute("aria-expanded", "false");
+
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
     trigger.onclick = () => {
@@ -85,39 +94,73 @@ export const TableTools = ({ children }) => {
         dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
-          { extend: "copy", text: '<i class="fa fa-copy"></i>', className: "dt-btn" },
-          { extend: "csv", text: '<i class="fa fa-file-csv"></i>', className: "dt-btn" },
-          { extend: "excel", text: '<i class="fa fa-file-excel"></i>', className: "dt-btn" },
-          { extend: "pdf", text: '<i class="fa fa-file-pdf"></i>', className: "dt-btn" },
+          {
+            extend: "copy",
+            text: '<i class="fa fa-copy"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Copy table data" },
+          },
+          {
+            extend: "csv",
+            text: '<i class="fa fa-file-csv"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Export table as CSV" },
+          },
+          {
+            extend: "excel",
+            text: '<i class="fa fa-file-excel"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Export table as Excel" },
+          },
+          {
+            extend: "pdf",
+            text: '<i class="fa fa-file-pdf"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Export table as PDF" },
+          },
           {
             extend: "print",
             text: '<i class="fa fa-print"></i>',
             className: "dt-btn",
+            attr: { "aria-label": "Print table" },
             action: function () {
               setTimeout(() => {
                 window.print();
               }, 100);
             },
           },
-          { extend: "colvis", text: '<i class="fa fa-columns"></i>', className: "dt-btn" },
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-columns"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Toggle column visibility" },
+          },
           {
             text: '<i class="fa fa-ban"></i>',
             className: "dt-btn",
+            attr: { "aria-label": "Disable filtering" },
             action: function () {
               dt.destroy();
               table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
               table.removeAttribute("data-dt-processed");
               table.removeAttribute("data-filter-enabled");
-              // Instead of removing the blue toggle button, show it again
+              // Show the toggle button again and update its aria-expanded attribute
               trigger.style.display = "block";
+              trigger.setAttribute("aria-expanded", "false");
             },
           },
         ],
         initComplete: function () {
-          // No custom styles applied here
+          // Update the search input with an aria-label for accessibility
+          const searchInput = document.querySelector(".dataTables_filter input");
+          if (searchInput) {
+            searchInput.setAttribute("aria-label", "Search table");
+          }
         },
       });
       table.setAttribute("data-filter-enabled", "true");
+      // Update toggle button state to indicate filtering is active
+      trigger.setAttribute("aria-expanded", "true");
       // Hide the toggle button once filtering is enabled
       trigger.style.display = "none";
     };
@@ -140,7 +183,6 @@ export const TableTools = ({ children }) => {
 };
 
 export default TableTools;
-
 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
