@@ -19,7 +19,8 @@ export const DataTable = ({ children }) => {
       display: flex;
       gap: 5px;
     }
-    div.dt-buttons>.dt-button:focus:not(.disabled), div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
+    div.dt-buttons>.dt-button:focus:not(.disabled), 
+    div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
       outline: none;
     } 
     .dataTables_wrapper .dataTables_filter input {
@@ -102,7 +103,8 @@ export const DataTable = ({ children }) => {
       title: "Enable Filter",
       "aria-label": "Enable filtering options",
       style: `position:absolute;top:0;right:0;cursor:pointer;z-index:9999;
-              border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
+              border-radius:0 0 0 1px;color:#fff;
+              background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
               filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
     });
     // Associate the button with the table for accessibility
