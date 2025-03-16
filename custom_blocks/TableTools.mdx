@@ -8,7 +8,6 @@ export const TableTools = ({ children }) => {
 
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
-      // Fixed query selector syntax using template literals
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
       const script = Object.assign(document.createElement("script"), {
         src,
@@ -30,7 +29,7 @@ export const TableTools = ({ children }) => {
   const loadDependencies = async () => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
-    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"); 
+    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
     const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
@@ -63,7 +62,7 @@ export const TableTools = ({ children }) => {
       style:
         "position:absolute;top:0;right:0;cursor:pointer;z-index:9999;" +
         "border-radius:0 0 0 2px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));" +
-        "filter:saturate(1.15);display:block;border-block-width: 0;border:0;",
+        "filter:saturate(1.15);display:block;border:0;",
     });
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
@@ -123,6 +122,8 @@ export const TableTools = ({ children }) => {
           },
         ],
         initComplete: function () {
+          // The inline styles below are redundant if our <style> tag is injected,
+          // but they serve as a fallback if the inline styles don't apply.
           document.querySelectorAll(".dt-btn").forEach((btn) => {
             btn.style.border = "none";
             btn.style.padding = "4px 6px";
@@ -147,6 +148,19 @@ export const TableTools = ({ children }) => {
     };
   };
 
+  // Inline styles to ensure preview consistency.
+  const inlineButtonStyles = `
+    .dt-btn {
+      border: none !important;
+      padding: 4px 6px !important;
+      font-size: 0.75rem !important;
+      background: #f8f9fa !important;
+      margin: 2px !important;
+      border-radius: 3px !important;
+      min-width: 30px !important;
+    }
+  `;
+
   useEffect(() => {
     loadDependencies().then(() => {
       containerRef.current?.querySelectorAll("table").forEach(initializeTable);
@@ -154,10 +168,16 @@ export const TableTools = ({ children }) => {
     });
   }, []);
 
-  return <div ref={containerRef}>{children}</div>;
+  return (
+    <div ref={containerRef}>
+      <style>{inlineButtonStyles}</style>
+      {children}
+    </div>
+  );
 };
 
-export default TableTools;
+export default TableTools; 
+
 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
