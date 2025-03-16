@@ -7,11 +7,6 @@ import React, { useEffect, useRef } from "react";
 export const DataTable = ({ children }) => {
   const containerRef = useRef(null);
 
-  // Custom inline styles (you may remove these if you fully adopt Tailwind)
-  const customStyles = `
-
-  `;
-
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
@@ -181,7 +176,6 @@ export const DataTable = ({ children }) => {
   return (
     <div ref={containerRef}>
       {/* Inline styles (optional if you migrate fully to Tailwind) */}
-      <style>{customStyles}</style>
       {children}
     </div>
   );
