@@ -1,0 +1,71 @@
+---
+name: DataTable
+---
+import React, { useEffect, useRef } from "react";
+
+export const DataTable = ({ children }) => {
+  const containerRef = useRef(null);
+
+  const loadScript = (src) =>
+    new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) return resolve();
+      const script = Object.assign(document.createElement("script"), {
+        src,
+        async: true,
+        onload: resolve,
+        onerror: () => reject(new Error(`Failed to load: ${src}`)),
+      });
+      document.body.appendChild(script);
+    });
+
+  const loadCSS = (href) => {
+    if (!document.querySelector(`link[href="${href}"]`)) {
+      document.head.appendChild(
+        Object.assign(document.createElement("link"), { rel: "stylesheet", href })
+      );
+    }
+  };
+
+  const loadDependencies = async () => {
+    await loadScript("https://cdn.datatables.net/2.2.2/js/dataTables.min.js");
+    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
+    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
+    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
+    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js");
+    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js");
+    
+    loadCSS("https://cdn.datatables.net/2.2.2/css/dataTables.tailwindcss.css");
+    loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.tailwindcss.css");
+  };
+
+  const initializeTable = (table) => {
+    if (table.getAttribute("data-dt-processed")) return;
+    table.setAttribute("data-dt-processed", "true");
+
+    if (!table.id) {
+      table.id = "data-table-" + Math.floor(Math.random() * 1000000);
+    }
+
+    const dataTable = new DataTable(table, {
+      responsive: true,
+      searchable: true,
+      layout: {
+        topStart: "search",
+        topEnd: "buttons",
+      },
+      buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+    });
+  };
+
+  useEffect(() => {
+    loadDependencies().then(() => {
+      containerRef.current?.querySelectorAll("table").forEach(initializeTable);
+    });
+  }, []);
+
+  return <div ref={containerRef}>{children}</div>;
+};
+
+export default DataTable;
