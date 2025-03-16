@@ -3,7 +3,7 @@ name: TableTools
 ---
 import React, { useEffect, useRef } from "react";
 
-export const TurboTable = ({ children }) => {
+export const TableTools = ({ children }) => {
   const containerRef = useRef(null);
 
   const loadScript = (src) =>
@@ -129,7 +129,7 @@ export const TurboTable = ({ children }) => {
   return <div ref={containerRef}>{children}</div>;
 };
 
-export default TurboTable;
+export default TableTools;
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
