@@ -43,6 +43,7 @@ export const DataTable = ({ children }) => {
   const initializeTable = (table) => {
     if (table.getAttribute("data-dt-processed")) return;
     table.setAttribute("data-dt-processed", "true");
+    table.setAttribute("data-original-html", table.innerHTML);
 
     if (!table.id) {
       table.id = "data-table-" + Math.floor(Math.random() * 1000000);
@@ -67,7 +68,7 @@ export const DataTable = ({ children }) => {
 
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
-      const dataTable = new DataTable(table, {
+      const dt = new DataTable(table, {
         responsive: true,
         searchable: true,
         layout: {
@@ -79,12 +80,26 @@ export const DataTable = ({ children }) => {
       table.setAttribute("data-filter-enabled", "true");
       trigger.setAttribute("aria-expanded", "true");
       trigger.style.display = "none";
+
+      dt.button().add(null, {
+        text: '<i class="fa fa-ban"></i>',
+        className: "dt-btn",
+        attr: { "aria-label": "Disable filtering" },
+        action: function () {
+          dt.destroy();
+          table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
+          table.removeAttribute("data-dt-processed");
+          table.removeAttribute("data-filter-enabled");
+          trigger.style.display = "block";
+          trigger.setAttribute("aria-expanded", "false");
+        },
+      });  
     };
   };
 
   useEffect(() => {
     loadDependencies().then(() => {
-      containerRef.current?.querySelectorAll("table").forEach(initializeTable);
+      document.querySelectorAll(".rdmd-table table, table").forEach(initializeTable);
     });
   }, []);
 
