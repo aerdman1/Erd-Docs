@@ -9,8 +9,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in nisi in tortor 
 
 <br />
 
-<TableToolsComponent />
-
 | Endpoint         | Method   | Description                              | Parameters                            | Response Format |
 | ---------------- | -------- | ---------------------------------------- | ------------------------------------- | --------------- |
 | `/users`         | `GET`    | Retrieves a list of users                | `limit` (int), `offset` (int)         | JSON            |
