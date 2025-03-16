@@ -1,5 +1,5 @@
 ---
-title: Netflix Plugins
+title: Plugins
 deprecated: false
 hidden: false
 metadata:
