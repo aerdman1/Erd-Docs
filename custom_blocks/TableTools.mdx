@@ -18,6 +18,9 @@ export const TableTools = ({ children }) => {
       display: flex;
       gap: 5px;
     }
+    div.dt-buttons>.dt-button:focus:not(.disabled), div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
+    outline: none;
+    }
   `;
 
   const loadScript = (src) =>
