@@ -65,7 +65,7 @@ export const TableTools = ({ children }) => {
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
       const dt = window.jQuery(table).DataTable({
-        dom: "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
+        dom: "''<'col-sm-6'f><'col-sm-6'B>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
           { extend: "copy", text: '<i class="fa fa-copy" style="font-size: 12px;"></i>', className: 'dt-btn' },
