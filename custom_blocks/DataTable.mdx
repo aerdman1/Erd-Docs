@@ -3,7 +3,7 @@ name: DataTable
 ---
 import React, { useEffect, useRef } from "react";
 
-export const DataTable = ({ children }) => {
+export const DataTables = ({ children }) => {
   const containerRef = useRef(null);
 
   // Custom Styles
@@ -21,7 +21,6 @@ export const DataTable = ({ children }) => {
     div.dt-buttons>.dt-button:focus:not(.disabled), div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
     outline: none;
     } 
-    
   `;
 
   const loadScript = (src) =>
@@ -186,7 +185,7 @@ export const DataTable = ({ children }) => {
   );
 };
 
-export default DataTable;
+export default DataTables;
 
 | Endpoint          | Method | Description                                      | Parameters                         | Response Format |
 |------------------|--------|--------------------------------------------------|------------------------------------|----------------|
