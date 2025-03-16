@@ -160,22 +160,6 @@ export const TableTools = ({ children }) => {
   // Inline styles using Tailwind selectors.
   // In this example, we reverse the flex order on the container that wraps the table controls.
   const inlineStyles = `
-    .dt-btn {
-      border: none !important;
-      padding: 4px 6px !important;
-      font-size: 0.75rem !important;
-      background: #f8f9fa !important;
-      margin: 2px !important;
-      border-radius: 3px !important;
-      min-width: 30px !important;
-    }
-    /* Reverse the order for flex containers (if needed) */
-    .readme-tailwind .dt-nav {
-      flex-direction: row-reverse;
-    }
-    .dataTables_filter {
-      text-align: right !important;
-    }
   `;
 
   // Use an async function with a MutationObserver to process any new tables
