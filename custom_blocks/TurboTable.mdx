@@ -73,13 +73,9 @@ export const TurboTable = ({ children }) => {
           { extend: "excel", text: '<i class="fa fa-file-excel"></i>', className: 'dt-btn' },
           { extend: "pdf", text: '<i class="fa fa-file-pdf"></i>', className: 'dt-btn' },
           { extend: "print", text: '<i class="fa fa-print"></i>', className: 'dt-btn',
-            action: function (e, dt, node, config) {
-              dt.buttons.info('Print Preview', 'Press ESC or click "Close" when finished.');
+            action: function () {
               setTimeout(() => {
                 window.print();
-                dt.buttons.info(false);
-                dt.destroy();
-                initializeTable(table);
               }, 100);
             }
           },
@@ -93,25 +89,10 @@ export const TurboTable = ({ children }) => {
               table.removeAttribute("data-original-html");
               table.removeAttribute("data-filter-enabled");
               trigger.style.display = "block";
+              initializeTable(table); // Ensure reinitialization after closing
             },
           },
         ],
-        initComplete: function () {
-          document.querySelectorAll(".dt-btn").forEach((btn) => {
-            btn.style.border = "none";
-            btn.style.padding = "4px 6px";
-            btn.style.fontSize = "0.75rem";
-            btn.style.background = "#f8f9fa";
-            btn.style.color = "#333";
-            btn.style.margin = "2px";
-            btn.style.borderRadius = "3px";
-            btn.style.minWidth = "30px";
-          });
-          const controls = document.querySelector(".dt-nav");
-          if (controls) {
-            controls.style.marginBottom = "8px";
-          }
-        },
       });
       table.setAttribute("data-filter-enabled", "true");
       trigger.style.display = "none";
@@ -128,8 +109,7 @@ export const TurboTable = ({ children }) => {
   return <div ref={containerRef}>{children}</div>;
 };
 
-export default TurboTable; 
-
+export default TurboTable;
 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
