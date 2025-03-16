@@ -11,7 +11,7 @@ export const TableTools = ({ children }) => {
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
       const script = Object.assign(document.createElement("script"), {
         src,
-        async: true, 
+        async: true,
         onload: resolve,
         onerror: () => reject(new Error(`Failed to load: ${src}`)),
       });
@@ -29,7 +29,7 @@ export const TableTools = ({ children }) => {
   const loadDependencies = async () => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
-    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"); 
+    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
     const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
@@ -131,7 +131,6 @@ export const TableTools = ({ children }) => {
             btn.style.borderRadius = "3px";
             btn.style.minWidth = "30px";
           });
-          // Fallback for search input margin
           const searchInput = document.querySelector(".dataTables_filter input");
           if (searchInput) {
             searchInput.style.marginRight = "10px";
@@ -147,7 +146,7 @@ export const TableTools = ({ children }) => {
     };
   };
 
-  // Inline styles to enforce button styling and swap the order of the search and button columns.
+  // Inline styles to enforce button styling and ordering as seen in preview
   const inlineStyles = `
     .dt-btn {
       border: none !important;
@@ -158,14 +157,12 @@ export const TableTools = ({ children }) => {
       border-radius: 3px !important;
       min-width: 30px !important;
     }
-    /* Swap the order of the two columns within .dt-nav */
-    .dt-nav > .col-sm-6:first-child {
+    .rdmd-table .dt-nav > .col-sm-6:first-child {
       order: 2 !important;
     }
-    .dt-nav > .col-sm-6:last-child {
+    .rdmd-table .dt-nav > .col-sm-6:last-child {
       order: 1 !important;
     }
-    /* Optional: force the search filter to align right within its container */
     .dataTables_filter {
       text-align: right !important;
     }
@@ -179,14 +176,18 @@ export const TableTools = ({ children }) => {
   }, []);
 
   return (
-    <div ref={containerRef}>
-      <style>{inlineStyles}</style>
-      {children}
+    // Wrap in the "readme-tailwind" container to match the preview structure.
+    <div className="readme-tailwind">
+      <div ref={containerRef}>
+        <style>{inlineStyles}</style>
+        {children}
+      </div>
     </div>
   );
 };
 
-export default TableTools;
+export default TableTools; 
+
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
