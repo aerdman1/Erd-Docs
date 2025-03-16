@@ -19,16 +19,9 @@ export const TableTools = ({ children }) => {
       gap: 5px;
     }
     div.dt-buttons>.dt-button:focus:not(.disabled), div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
-      outline: none;
+    outline: none;
     } 
-    .dataTables_wrapper .dataTables_filter input{
-      margin:0;   
-    }
-    /* New rule: make the DataTable buttons smaller */
-    .dt-buttons .dt-btn {
-      font-size: 12px;
-      padding: 2px 6px;
-    }
+    
   `;
 
   const loadScript = (src) =>
@@ -55,7 +48,7 @@ export const TableTools = ({ children }) => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
     loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
-    const dependencies = [ 
+    const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js",
@@ -105,12 +98,12 @@ export const TableTools = ({ children }) => {
         dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
-          {
-            extend: "colvis",
-            text: '<i class="fa fa-columns"></i>',
-            className: "dt-btn",
-            attr: { "aria-label": "Toggle column visibility" },
-          },
+            {
+                extend: "colvis",
+                text: '<i class="fa fa-columns"></i>',
+                className: "dt-btn",
+                attr: { "aria-label": "Toggle column visibility" },
+              },
           {
             extend: "copy",
             text: '<i class="fa fa-copy"></i>',
@@ -195,12 +188,12 @@ export const TableTools = ({ children }) => {
 
 export default TableTools;
 
-
 | Endpoint          | Method | Description                                      | Parameters                         | Response Format |
 |------------------|--------|--------------------------------------------------|------------------------------------|----------------|
 | `/users`        | `GET`   | Retrieves a list of users                        | `limit` (int), `offset` (int)     | JSON           |
 | `/users/{id}`   | `GET`   | Retrieves details of a specific user             | `id` (UUID)                       | JSON           |
 | `/users`        | `POST`  | Creates a new user                               | `name` (string), `email` (string) | JSON           |
  
+
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
