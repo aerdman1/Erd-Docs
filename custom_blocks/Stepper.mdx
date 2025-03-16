@@ -1,9 +1,9 @@
 ---
-name: Stepper
+name: StepperAdvanced
 ---
 import React, { useState, useEffect, useMemo } from "react";
 
-export function StepperComponent({ steps, verticalTrue, backgroundTheme }) {
+export function StepperAdvanced({ steps, verticalTrue, backgroundTheme }) {
   const themes = {
     purple: {
       background: "radial-gradient(circle at top, #835db9 20%, #4a2a8f 80%)",
@@ -458,7 +458,7 @@ export function StepperComponent({ steps, verticalTrue, backgroundTheme }) {
   );
 }
 
-<StepperComponent
+<StepperAdvanced
   verticalFalse
   backgroundTheme="purple"
   steps={[
