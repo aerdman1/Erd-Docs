@@ -70,7 +70,7 @@ export const TableTools = ({ children }) => {
       if (table.getAttribute("data-filter-enabled")) return;
       const dt = window.jQuery(table).DataTable({
         dom:
-          "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
+          "<'dt-nav row flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
           {
@@ -166,6 +166,12 @@ export const TableTools = ({ children }) => {
     .dataTables_filter {
       text-align: right !important;
     }
+    .rm-Guides .row {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: space-between;
+}
   `;
 
   useEffect(() => {
