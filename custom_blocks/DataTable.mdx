@@ -38,7 +38,7 @@ export const DataTable = ({ children }) => {
     await loadScript("https://cdn.datatables.net/2.2.2/js/dataTables.tailwindcss.js");
     loadCSS("https://cdn.datatables.net/2.2.2/css/dataTables.tailwindcss.css");
 
-    // Load Buttons extension dependencies
+    // Load Buttons extension dependencies using Promise.all to ensure all are loaded
     const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js", 
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
@@ -48,7 +48,7 @@ export const DataTable = ({ children }) => {
       "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js",
       "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js",
     ];
-    dependencies.forEach(loadScript);
+    await Promise.all(dependencies.map(loadScript));
     loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
   };
 
@@ -87,9 +87,9 @@ export const DataTable = ({ children }) => {
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
 
-      // Initialize DataTables with a Tailwind-friendly DOM layout.
+      // Initialize DataTables with a Tailwind-friendly DOM layout including the buttons container (B)
       const dt = window.jQuery(table).DataTable({
-        dom: "<'flex justify-between items-center'<'flex-1'l><'flex-1'f>r>t<'flex justify-between items-center'<'flex-1'i><'flex-1'p>>",
+        dom: "<'flex justify-between items-center'<'flex-1'l><'flex-1'f>B>t<'flex justify-between items-center'<'flex-1'i><'flex-1'p>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
           {
@@ -172,12 +172,14 @@ export const DataTable = ({ children }) => {
       containerRef.current?.querySelectorAll("table").forEach(initializeTable);
       document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
     });
-  }, []);
+  }, []); 
 
   return <div ref={containerRef}>{children}</div>;
-}; 
+};
 
 export default DataTable;
+
+
  
 
 
