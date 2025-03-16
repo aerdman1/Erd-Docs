@@ -50,15 +50,17 @@ export const TableTools = ({ children }) => {
 
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
     if (!wrapper) return;
-    // Removed custom style: wrapper.style.position = "relative";
 
+    // Create the toggle button with its custom styles reintroduced
     const trigger = document.createElement("button");
-    trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
+    trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
     Object.assign(trigger, {
       type: "button",
       title: "Enable Filter",
       "aria-label": "Enable filtering options",
-      // Removed custom styles for trigger
+      style: `position:absolute;top:0;right:0;cursor:pointer;z-index:9999;
+      border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
+      filter:saturate(1.15);display:block;border-block-width: 0;`,
     });
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
@@ -97,7 +99,7 @@ export const TableTools = ({ children }) => {
           },
         ],
         initComplete: function () {
-          // Removed custom style modifications
+          // No custom styles applied here
         },
       });
       table.setAttribute("data-filter-enabled", "true");
@@ -116,6 +118,7 @@ export const TableTools = ({ children }) => {
 };
 
 export default TableTools;
+
 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
