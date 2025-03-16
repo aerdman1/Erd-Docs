@@ -24,10 +24,6 @@ export const PageBannerAdvanced = ({
   }
   const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
 
-  // Check if on /custom-components/ page
-  const isCustomComponentsPage =
-    typeof window !== "undefined" && window.location.pathname.includes("/custom-components/");
-
   // Initialize state from props
   const [message, setMessage] = useState(propMessage),
     [bannerColor, setBannerColor] = useState(propBannerColor),
@@ -37,17 +33,13 @@ export const PageBannerAdvanced = ({
     [preset, setPreset] = useState("custom"), // 'critical', 'warning', 'standard', 'custom'
     [placement, setPlacement] = useState("bottom"), // 'top' or 'bottom'
     [copied, setCopied] = useState(false),
-    // For non-custom-components pages, admin toggle controls showing the generator UI.
-    // For /custom-components/ pages, we'll show the generator UI regardless.
-    [showGenerator, setShowGenerator] = useState(isCustomComponentsPage ? true : false),
+    [showGenerator, setShowGenerator] = useState(false),
     [headerHeight, setHeaderHeight] = useState(0);
 
   // Update header height
   const updateHeaderHeight = () => {
-    requestAnimationFrame(() => {
-      const header = document.querySelector("header.rm-Header");
-      if (header) setHeaderHeight(header.offsetHeight);
-    });
+    const header = document.querySelector("header.rm-Header");
+    if (header) setHeaderHeight(header.offsetHeight);
   };
 
   useLayoutEffect(() => {
@@ -307,29 +299,19 @@ export const PageBannerAdvanced = ({
   }, []);
 
   // Dynamic generator styles using headerHeight
-  const generatorStyles = isCustomComponentsPage
-    ? {
-        position: "relative",
-        borderRadius: "12px",
-        width: "600px",
-        zIndex: 1000,
-        background: "#2C303B",
-        overflowY: "auto",
-        boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
-      }
-    : {
-        position: "fixed",
-        top: `${headerHeight + 50}px`,
-        right: "20px",
-        borderRadius: "12px",
-        width: "600px",
-        zIndex: 1000,
-        background: "#2C303B",
-        overflowY: "auto",
-        boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
-        transform: "scale(0.8)",
-        transformOrigin: "top right",
-      };
+  const generatorStyles = {
+    position: "fixed",
+    top: `${headerHeight + 50}px`,
+    right: "20px",
+    borderRadius: "12px",
+    width: "600px",
+    zIndex: 1000,
+    background: "#2C303B",
+    overflowY: "auto",
+    boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
+    transform: "scale(0.8)",
+    transformOrigin: "top right",
+  };
 
   return (
     <>
@@ -349,10 +331,8 @@ export const PageBannerAdvanced = ({
           }}
         >
           <div style={containerStyles}>{message || defaults.message}</div>
-          {/* Only show the Banner Edit button if admin and NOT on /custom-components/ page */}
-          {isAdmin && !isCustomComponentsPage && (
+          {isAdmin && (
             <button
-              type="button"
               style={uiStyles.toggleButton}
               onClick={() => {
                 updateHeaderHeight();
@@ -374,8 +354,8 @@ export const PageBannerAdvanced = ({
           )}
         </div>
       </div>
-      {/* Admin Generator UI - force display on /custom-components/ pages */}
-      {(isCustomComponentsPage || showGenerator) && (
+      {/* Admin Generator UI */}
+      {showGenerator && (
         <div className="generator-ui" style={generatorStyles}>
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
