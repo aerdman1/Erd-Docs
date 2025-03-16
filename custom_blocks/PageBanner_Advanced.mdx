@@ -333,6 +333,7 @@ export const PageBannerAdvanced = ({
           <div style={containerStyles}>{message || defaults.message}</div>
           {isAdmin && (
             <button
+              type="button"
               style={uiStyles.toggleButton}
               onClick={() => {
                 updateHeaderHeight();
