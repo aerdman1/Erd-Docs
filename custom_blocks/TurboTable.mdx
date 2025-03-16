@@ -53,7 +53,7 @@ export const TurboTable = ({ children }) => {
     const trigger = document.createElement("button");
     trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true"></i>';
     Object.assign(trigger, {
-      type: "button", // Prevent unintended form submission
+      type: "button",
       title: "Enable Filter",
       "aria-label": "Enable filtering options",
       style: `position:absolute;top:0;right:0;padding:4px 6px;cursor:pointer;z-index:9999;
@@ -64,7 +64,6 @@ export const TurboTable = ({ children }) => {
 
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
-      
       window.jQuery(table).DataTable({
         dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
         language: { search: "", searchPlaceholder: "Search Table:" },
@@ -75,16 +74,6 @@ export const TurboTable = ({ children }) => {
           { extend: "pdf", text: '<button type="button"><i class="fa fa-file-pdf"></i> PDF</button>' },
           { extend: "print", text: '<button type="button"><i class="fa fa-print"></i> Print</button>' },
           { extend: "colvis", text: '<button type="button"><i class="fa fa-columns"></i> Columns</button>' },
-          {
-            text: '<button type="button"><i class="fa fa-ban"></i> Close</button>',
-            action: (_, dt) => {
-              dt.destroy();
-              table.innerHTML = table.getAttribute("data-original-html");
-              table.removeAttribute("data-original-html");
-              table.removeAttribute("data-filter-enabled");
-              trigger.style.display = "block";
-            },
-          },
         ],
       });
       table.setAttribute("data-filter-enabled", "true");
@@ -94,7 +83,11 @@ export const TurboTable = ({ children }) => {
 
   useEffect(() => {
     loadDependencies().then(() => {
+      // Enhance tables inside the component
       containerRef.current?.querySelectorAll("table").forEach(initializeTable);
+      
+      // Also scan for tables across the entire ReadMe.io page
+      document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
     });
   }, []);
 
@@ -102,7 +95,6 @@ export const TurboTable = ({ children }) => {
 };
 
 export default TurboTable; 
- 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
