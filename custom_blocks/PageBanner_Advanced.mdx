@@ -220,7 +220,7 @@ export const PageBannerAdvanced = ({
       transition: "transform 0.2s ease, box-shadow 0.2s ease",
     },
     toggleButton: {
-      display: "none",
+      display: "flex",
       opacity: 0.8,
       padding: "6px 12px",
       fontSize: "11px",
@@ -321,7 +321,7 @@ export const PageBannerAdvanced = ({
         .content-body.grid-75.blurred .generator-ui { filter: none; }
       `}</style>
       {/* Banner Injection Content */}
-      <div id="custom-banner-content" style={{ width: "100%" }}>
+      <div id="custom-banner-content" style={{ display: "none", width: "100%" }}>
         <div
           style={{
             display: "flex",
