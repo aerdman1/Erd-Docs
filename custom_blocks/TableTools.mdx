@@ -6,7 +6,6 @@ import React, { useEffect, useRef } from "react";
 export const TableTools = ({ children }) => {
   const containerRef = useRef(null);
 
-  // Helper to load a script
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
@@ -19,7 +18,6 @@ export const TableTools = ({ children }) => {
       document.body.appendChild(script);
     });
 
-  // Helper to load a CSS file
   const loadCSS = (href) => {
     if (!document.querySelector(`link[href="${href}"]`)) {
       document.head.appendChild(
@@ -28,12 +26,11 @@ export const TableTools = ({ children }) => {
     }
   };
 
-  // Load all external dependencies
   const loadDependencies = async () => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
     loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
-    const deps = [
+    const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js",
@@ -42,23 +39,19 @@ export const TableTools = ({ children }) => {
       "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js",
       "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js",
     ];
-    deps.forEach(loadScript);
+    dependencies.forEach(loadScript);
     loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
   };
 
-  // Function to initialize a table (attach trigger button and DataTable functionality)
   const initializeTable = (table) => {
-    // Avoid re-processing tables that have been processed
     if (table.getAttribute("data-dt-processed")) return;
     table.setAttribute("data-dt-processed", "true");
     table.setAttribute("data-original-html", table.innerHTML);
 
-    // Use the closest wrapper if available, otherwise the table's parent element
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
     if (!wrapper) return;
     wrapper.style.position = "relative";
 
-    // Create the trigger button
     const trigger = document.createElement("button");
     trigger.innerHTML =
       '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
@@ -73,11 +66,10 @@ export const TableTools = ({ children }) => {
     });
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
-    // On click, initialize DataTables for this table
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
       const dt = window.jQuery(table).DataTable({
-        // Using Tailwind CSS classes for a flex layout
+        // Use Tailwind classes for flex layout
         dom:
           "<'dt-nav flex items-center justify-between'<'w-1/2'f><'w-1/2 text-right'B>>rtip",
         language: { search: "", searchPlaceholder: "Search Table:" },
@@ -131,7 +123,7 @@ export const TableTools = ({ children }) => {
           },
         ],
         initComplete: function () {
-          // Fallback inline styling for the buttons
+          // Apply button styles as a fallback
           document.querySelectorAll(".dt-btn").forEach((btn) => {
             btn.style.border = "none";
             btn.style.padding = "4px 6px";
@@ -141,14 +133,13 @@ export const TableTools = ({ children }) => {
             btn.style.borderRadius = "3px";
             btn.style.minWidth = "30px";
           });
-          // Adjust the search input margin
           const searchInput = document.querySelector(".dataTables_filter input");
           if (searchInput) {
             searchInput.style.marginRight = "10px";
           }
-          const nav = document.querySelector(".dt-nav");
-          if (nav) {
-            nav.style.marginBottom = "12px";
+          const controls = document.querySelector(".dt-nav");
+          if (controls) {
+            controls.style.marginBottom = "12px";
           }
         },
       });
@@ -157,8 +148,7 @@ export const TableTools = ({ children }) => {
     };
   };
 
-  // Inline styles using Tailwind selectors.
-  // In this example, we reverse the flex order on the container that wraps the table controls.
+  // Inline styles using Tailwind selectors and ordering for the new structure.
   const inlineStyles = `
     .dt-btn {
       border: none !important;
@@ -169,45 +159,22 @@ export const TableTools = ({ children }) => {
       border-radius: 3px !important;
       min-width: 30px !important;
     }
-    /* Reverse the order for flex containers (if needed) */
-    .readme-tailwind .dt-nav {
-      flex-direction: row-reverse;
+    .rdmd-table .dt-nav > .w-1/2:first-child {
+      order: 2 !important;
+    }
+    .rdmd-table .dt-nav > .w-1/2:last-child {
+      order: 1 !important;
     }
     .dataTables_filter {
       text-align: right !important;
     }
   `;
 
-  // Use an async function with a MutationObserver to process any new tables
   useEffect(() => {
-    async function initTables() {
-      await loadDependencies();
-      const processTables = (container) => {
-        const tables = container.querySelectorAll("table:not([data-dt-processed])");
-        tables.forEach(initializeTable);
-      };
-      if (containerRef.current) {
-        processTables(containerRef.current);
-        const observer = new MutationObserver((mutationsList) => {
-          for (const mutation of mutationsList) {
-            mutation.addedNodes.forEach((node) => {
-              if (node.nodeType === 1) {
-                if (node.matches("table:not([data-dt-processed])")) {
-                  initializeTable(node);
-                }
-                // Also check for any nested tables
-                node.querySelectorAll &&
-                  node.querySelectorAll("table:not([data-dt-processed])").forEach(initializeTable);
-              }
-            });
-          }
-        });
-        observer.observe(containerRef.current, { childList: true, subtree: true });
-        // Clean up observer on unmount
-        return () => observer.disconnect();
-      }
-    }
-    initTables();
+    loadDependencies().then(() => {
+      containerRef.current?.querySelectorAll("table").forEach(initializeTable);
+      document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
+    });
   }, []);
 
   return (
@@ -218,7 +185,8 @@ export const TableTools = ({ children }) => {
   );
 };
 
-export default TableTools; 
+export default TableTools;
+
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
