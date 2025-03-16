@@ -108,6 +108,10 @@ export const TurboTable = ({ children }) => {
           if (searchInput) {
             searchInput.style.marginRight = "10px";
           }
+          const controls = document.querySelector(".dt-nav");
+          if (controls) {
+            controls.style.marginBottom = "12px";
+          }
         },
       });
       table.setAttribute("data-filter-enabled", "true");
