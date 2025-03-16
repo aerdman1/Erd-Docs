@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-<PageBannerAdvanced />
+<PageBanner_Advanced />
 
 <br />
 
