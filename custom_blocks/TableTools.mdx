@@ -169,9 +169,15 @@ export const TableTools = ({ children }) => {
       border-radius: 3px !important;
       min-width: 30px !important;
     }
-
+    /* Reverse the order for flex containers (if needed) */
+    .readme-tailwind .dt-nav {
+      flex-direction: row-reverse;
+    }
+    .dataTables_filter {
+      text-align: right !important;
+    }
   `;
-
+ 
   // Use an async function with a MutationObserver to process any new tables
   useEffect(() => {
     async function initTables() {
@@ -212,7 +218,7 @@ export const TableTools = ({ children }) => {
   );
 };
 
-export default TableTools; 
+export default TableTools;  
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
