@@ -108,8 +108,8 @@ export const TableTools = ({ children }) => {
               table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
               table.removeAttribute("data-dt-processed");
               table.removeAttribute("data-filter-enabled");
-              // Remove the blue toggle button permanently
-              trigger.remove();
+              // Instead of removing the blue toggle button, show it again
+              trigger.style.display = "block";
             },
           },
         ],
@@ -140,6 +140,7 @@ export const TableTools = ({ children }) => {
 };
 
 export default TableTools;
+
 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
