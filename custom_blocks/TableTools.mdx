@@ -104,8 +104,6 @@ export const TableTools = ({ children }) => {
 
 export default TableTools; 
 
-
-
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
 | Endpoint          | Method | Description                                      | Parameters                         | Response Format |
@@ -113,27 +111,3 @@ export default TableTools;
 | `/users`        | `GET`   | Retrieves a list of users                        | `limit` (int), `offset` (int)     | JSON           |
 | `/users/{id}`   | `GET`   | Retrieves details of a specific user             | `id` (UUID)                       | JSON           |
 | `/users`        | `POST`  | Creates a new user                               | `name` (string), `email` (string) | JSON           |
-  
-  <HTMLBlock>{`
-<style>
-  .dt-btn {
-    border: none !important;
-    padding: 4px 6px !important;
-    font-size: 0.75rem !important;
-    background: #f8f9fa !important;
-    margin: 2px !important;
-    border-radius: 3px !important;
-    min-width: 30px !important;
-  }
-  .rdmd-table .dt-nav > .w-1/2:first-child {
-    order: 2 !important;
-  }
-  .rdmd-table .dt-nav > .w-1/2:last-child {
-    order: 1 !important;
-  }
-  .dataTables_filter {
-    text-align: right !important;
-  }
-</style>
-
-`}</HTMLBlock>
