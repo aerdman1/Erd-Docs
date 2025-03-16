@@ -3,7 +3,7 @@ name: TableTools
 ---
 import React, { useEffect, useRef } from "react";
 
-export const TableTools = ({ children }) => {
+export const TurboTable = ({ children }) => {
   const containerRef = useRef(null);
 
   const loadScript = (src) =>
@@ -20,9 +20,7 @@ export const TableTools = ({ children }) => {
 
   const loadCSS = (href) => {
     if (!document.querySelector(`link[href="${href}"]`)) {
-      document.head.appendChild(
-        Object.assign(document.createElement("link"), { rel: "stylesheet", href })
-      );
+      document.head.appendChild(Object.assign(document.createElement("link"), { rel: "stylesheet", href }));
     }
   };
 
@@ -52,30 +50,39 @@ export const TableTools = ({ children }) => {
     if (!wrapper) return;
     wrapper.style.position = "relative";
 
-    // Create a simple toggle button using default styling.
     const trigger = document.createElement("button");
-    trigger.textContent = "Enable DataTables";
-    trigger.type = "button";
-    trigger.title = "Enable DataTables";
-    trigger.setAttribute("aria-label", "Enable DataTables");
+    trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
+    Object.assign(trigger, {
+      type: "button",
+      title: "Enable Filter",
+      "aria-label": "Enable filtering options",
+      style: `position:absolute;top:0;right:0;cursor:pointer;z-index:9999;
+      border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
+      filter:saturate(1.15);display:block;border-block-width: 0;`,
+    });
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
       const dt = window.jQuery(table).DataTable({
-        // This dom setting ensures the buttons container is rendered.
-        dom: "Bfrtip",
-        paging: true,
-        autoWidth: true,
+        dom: "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
+        language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
-          "colvis",
-          "copyHtml5",
-          "csvHtml5",
-          "excelHtml5",
-          "pdfHtml5",
-          "print",
+          { extend: "copy", text: '<i class="fa fa-copy" style="font-size: 12px;"></i>', className: 'dt-btn' },
+          { extend: "csv", text: '<i class="fa fa-file-csv" style="font-size: 12px;"></i>', className: 'dt-btn' },
+          { extend: "excel", text: '<i class="fa fa-file-excel" style="font-size: 12px;"></i>', className: 'dt-btn' },
+          { extend: "pdf", text: '<i class="fa fa-file-pdf" style="font-size: 12px;"></i>', className: 'dt-btn' },
+          { extend: "print", text: '<i class="fa fa-print" style="font-size: 12px;"></i>', className: 'dt-btn',
+            action: function () {
+              setTimeout(() => {
+                window.print();
+              }, 100);
+            }
+          },
+          { extend: "colvis", text: '<i class="fa fa-columns" style="font-size: 12px;"></i>', className: 'dt-btn' },
           {
-            text: "Disable DataTables",
+            text: '<i class="fa fa-ban" style="font-size: 12px;"></i>',
+            className: 'dt-btn',
             action: function () {
               dt.destroy();
               table.innerHTML = table.getAttribute("data-original-html");
@@ -86,6 +93,26 @@ export const TableTools = ({ children }) => {
             },
           },
         ],
+        initComplete: function () {
+          document.querySelectorAll(".dt-btn").forEach((btn) => {
+            btn.style.border = "none";
+            btn.style.padding = "4px 6px";
+            btn.style.fontSize = "0.75rem";
+            btn.style.background = "#f8f9fa";
+            btn.style.color = "#333";
+            btn.style.margin = "2px";
+            btn.style.borderRadius = "3px";
+            btn.style.minWidth = "30px";
+          });
+          const searchInput = document.querySelector(".dataTables_filter input");
+          if (searchInput) {
+            searchInput.style.marginRight = "10px";
+          }
+          const controls = document.querySelector(".dt-nav");
+          if (controls) {
+            controls.style.marginBottom = "12px";
+          }
+        },
       });
       table.setAttribute("data-filter-enabled", "true");
       trigger.style.display = "none";
@@ -102,7 +129,7 @@ export const TableTools = ({ children }) => {
   return <div ref={containerRef}>{children}</div>;
 };
 
-export default TableTools; 
+export default TurboTable;
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
