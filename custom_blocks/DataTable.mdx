@@ -48,15 +48,38 @@ export const DataTable = ({ children }) => {
       table.id = "data-table-" + Math.floor(Math.random() * 1000000);
     }
 
-    const dataTable = new DataTable(table, {
-      responsive: true,
-      searchable: true,
-      layout: {
-        topStart: "search",
-        topEnd: "buttons",
-      },
-      buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+    const wrapper = table.closest(".rdmd-table") || table.parentElement;
+    if (!wrapper) return;
+
+    const trigger = document.createElement("button");
+    trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
+    Object.assign(trigger, {
+      type: "button",
+      title: "Enable Filter",
+      "aria-label": "Enable filtering options",
+      style: `position:absolute;top:0;right:0;cursor:pointer;z-index:9999;
+      border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
+      filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
     });
+    trigger.setAttribute("aria-controls", table.id);
+    trigger.setAttribute("aria-expanded", "false");
+    wrapper.insertBefore(trigger, wrapper.firstChild);
+
+    trigger.onclick = () => {
+      if (table.getAttribute("data-filter-enabled")) return;
+      const dataTable = new DataTable(table, {
+        responsive: true,
+        searchable: true,
+        layout: {
+          topStart: "search",
+          topEnd: "buttons",
+        },
+        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+      });
+      table.setAttribute("data-filter-enabled", "true");
+      trigger.setAttribute("aria-expanded", "true");
+      trigger.style.display = "none";
+    };
   };
 
   useEffect(() => {
