@@ -38,9 +38,12 @@ export const PageBannerAdvanced = ({
 
   // Update header height
   const updateHeaderHeight = () => {
-    const header = document.querySelector("header.rm-Header");
-    if (header) setHeaderHeight(header.offsetHeight);
+    requestAnimationFrame(() => {
+      const header = document.querySelector("header.rm-Header");
+      if (header) setHeaderHeight(header.offsetHeight);
+    });
   };
+  
 
   useLayoutEffect(() => {
     updateHeaderHeight();
@@ -549,4 +552,4 @@ export const PageBannerAdvanced = ({
   );
 };
 
-export default PageBannerAdvanced; 
+export default PageBannerAdvanced;
