@@ -20,7 +20,9 @@ export const TurboTable = ({ children }) => {
 
   const loadCSS = (href) => {
     if (!document.querySelector(`link[href="${href}"]`)) {
-      document.head.appendChild(Object.assign(document.createElement("link"), { rel: "stylesheet", href }));
+      document.head.appendChild(
+        Object.assign(document.createElement("link"), { rel: "stylesheet", href })
+      );
     }
   };
 
@@ -65,7 +67,8 @@ export const TurboTable = ({ children }) => {
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
       const dt = window.jQuery(table).DataTable({
-        dom: "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
+        // Changed the order: buttons (B) now appear in the left column and search filter (f) in the right column.
+        dom: "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'B><'col-sm-6 text-right'f>>rtip",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
           { extend: "copy", text: '<i class="fa fa-copy" style="font-size: 12px;"></i>', className: 'dt-btn' },
@@ -94,33 +97,33 @@ export const TurboTable = ({ children }) => {
           },
         ],
         initComplete: function () {
-            document.querySelectorAll(".dt-btn").forEach((btn) => {
-              btn.style.border = "none";
-              btn.style.padding = "4px 6px";
-              btn.style.fontSize = "0.75rem";
-              btn.style.background = "#f8f9fa";
-              btn.style.margin = "2px";
-              btn.style.borderRadius = "3px";
-              btn.style.minWidth = "30px";
-            });
+          document.querySelectorAll(".dt-btn").forEach((btn) => {
+            btn.style.border = "none";
+            btn.style.padding = "4px 6px";
+            btn.style.fontSize = "0.75rem";
+            btn.style.background = "#f8f9fa";
+            btn.style.margin = "2px";
+            btn.style.borderRadius = "3px";
+            btn.style.minWidth = "30px";
+          });
+
+          // Update search bar alignment to be on the right
+          const searchContainer = document.querySelector(".dataTables_filter");
+          if (searchContainer) {
+            searchContainer.style.textAlign = "right";
+            searchContainer.style.float = "right";
+          }
           
-            // Force search bar alignment to the left
-            const searchContainer = document.querySelector(".dataTables_filter");
-            if (searchContainer) {
-              searchContainer.style.textAlign = "left"; // Ensures alignment is consistent
-              searchContainer.style.float = "left"; // Forces left positioning in case Bootstrap applies `float: right`
-            }
+          const searchInput = document.querySelector(".dataTables_filter input");
+          if (searchInput) {
+            searchInput.style.marginRight = "10px";
+          }
           
-            const searchInput = document.querySelector(".dataTables_filter input");
-            if (searchInput) {
-              searchInput.style.marginRight = "10px";
-            }
-          
-            const controls = document.querySelector(".dt-nav");
-            if (controls) {
-              controls.style.marginBottom = "12px";
-            }
-          },          
+          const controls = document.querySelector(".dt-nav");
+          if (controls) {
+            controls.style.marginBottom = "12px";
+          }
+        },
       });
       table.setAttribute("data-filter-enabled", "true");
       trigger.style.display = "none";
