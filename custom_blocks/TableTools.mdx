@@ -28,7 +28,7 @@ export const TableToolsComponent = () => {
 
     // Load required dependencies using newer CDN links.
     const loadDependencies = async () => {
-      if (!window.jQuery) {
+      if (!window.jQuery) { 
         await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
       }
       if (!window.jQuery.fn.DataTable) {
