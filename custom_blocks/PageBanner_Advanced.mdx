@@ -10,6 +10,16 @@ export const PageBannerAdvanced = ({
   fontSize: propFontSize = "16px",
   fontWeight: propFontWeight = "normal",
 }) => {
+  // Check if we're in preview mode by looking for "/content/" in the URL.
+  const isPreview =
+    typeof window !== "undefined" && window.location.href.includes("/contentNEW/");
+
+  useEffect(() => {
+    if (isPreview) {
+      console.log("Preview mode detected");
+    }
+  }, [isPreview]);
+
   // Determine admin status from hub-me script data
   let isAdmin = false;
   if (typeof document !== "undefined") {
@@ -24,7 +34,7 @@ export const PageBannerAdvanced = ({
   }
   const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
 
-  // Initialize state from props
+  // State initialization
   const [message, setMessage] = useState(propMessage),
     [bannerColor, setBannerColor] = useState(propBannerColor),
     [bannerTextColor, setBannerTextColor] = useState(propBannerTextColor),
@@ -36,7 +46,7 @@ export const PageBannerAdvanced = ({
     [showGenerator, setShowGenerator] = useState(false),
     [headerHeight, setHeaderHeight] = useState(0);
 
-  // Update header height (for production mode)
+  // Update header height (used in production mode)
   const updateHeaderHeight = () => {
     const header = document.querySelector("header.rm-Header");
     if (header) setHeaderHeight(header.offsetHeight);
@@ -77,7 +87,10 @@ export const PageBannerAdvanced = ({
 
   const generateBannerProps = () => {
     let props = `message="${message}"`;
-    props += preset !== "custom" ? ` ${preset}={true}` : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
+    props +=
+      preset !== "custom"
+        ? ` ${preset}={true}`
+        : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
     props += ` fontSize="${fontSize}" fontWeight="${fontWeight}" placement="${placement}"`;
     return props;
   };
@@ -116,7 +129,7 @@ export const PageBannerAdvanced = ({
   },
     defaults = defaultPresets[preset];
 
-  // Compute banner styles for public banner
+  // Compute banner styles
   const bannerStyles = {
     background: bannerColor || defaults.bannerColor,
     color: bannerTextColor || defaults.bannerTextColor,
@@ -254,22 +267,7 @@ export const PageBannerAdvanced = ({
     transformOrigin: "top right",
   };
 
-  // Determine preview mode by checking for a preview container class
-  const isPreview =
-    typeof document !== "undefined" &&
-    document.querySelector('[class*="ComponentEditor-preview"]') !== null;
-
-  useEffect(() => {
-    // In preview mode, force the banner container to be visible.
-    if (isPreview) {
-      const bannerContent = document.getElementById("custom-banner-content");
-      if (bannerContent) {
-        bannerContent.style.display = "block";
-      }
-    }
-  }, [isPreview]);
-
-  // If in preview mode, render inline without "display: none"
+  // PREVIEW MODE: Render the banner and full generator UI without any toggle.
   if (isPreview) {
     return (
       <>
@@ -279,155 +277,145 @@ export const PageBannerAdvanced = ({
         `}</style>
         <div style={{ padding: "1rem", background: "#f5f5f5" }}>
           <div id="custom-banner-content" style={{ width: "100%" }}>
-            <div style={bannerStyles}>{message || defaults.message}</div>
-            {isAdmin && (
-              <button
-                style={uiStyles.toggleButton}
-                onClick={() => {
-                  updateHeaderHeight();
-                  setShowGenerator((prev) => !prev);
-                }}
-              >
-                {showGenerator ? (
-                  <>
-                    <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>
-                    Banner
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>
-                    Banner
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-          {showGenerator && (
-            <div className="generator-ui" style={generatorStyles}>
-              <div style={uiStyles.container}>
-                <div style={uiStyles.headerRow}>
-                  <h3 style={uiStyles.heading}>ReadMe Banner Generator!</h3>
-                  <img
-                    src="https://owlbertsio-resized.s3.amazonaws.com/Traffic.psd.png"
-                    alt="Owlbert"
-                    style={uiStyles.image}
-                  />
-                </div>
-                <label style={uiStyles.label}>
-                  Message:
-                  <textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    style={uiStyles.input}
-                  />
-                </label>
-                <div style={uiStyles.row}>
-                  <label style={uiStyles.label}>
-                    Preset:
-                    <select value={preset} onChange={handlePresetChange} style={uiStyles.select}>
-                      <option value="custom">Custom (you choose colors)</option>
-                      <option value="critical">Critical (Red)</option>
-                      <option value="warning">Warning (Yellow)</option>
-                      <option value="standard">Standard (Blue)</option>
-                    </select>
-                  </label>
-                  <label style={uiStyles.label}>
-                    Banner Placement:
-                    <select value={placement} onChange={(e) => setPlacement(e.target.value)} style={uiStyles.select}>
-                      <option value="top">Top (first in header)</option>
-                      <option value="bottom">Bottom (default)</option>
-                    </select>
-                  </label>
-                </div>
-                {preset === "custom" ? (
-                  <div style={uiStyles.fourColumnRow}>
-                    <div>
-                      <label style={uiStyles.label}>BG Color 🎨</label>
-                      <input
-                        type="color"
-                        value={bannerColor}
-                        onChange={(e) => setBannerColor(e.target.value)}
-                        style={uiStyles.colorInput}
-                      />
-                    </div>
-                    <div>
-                      <label style={uiStyles.label}>Text Color 🎨</label>
-                      <input
-                        type="color"
-                        value={bannerTextColor}
-                        onChange={(e) => setBannerTextColor(e.target.value)}
-                        style={uiStyles.colorInput}
-                      />
-                    </div>
-                    <div>
-                      <label style={uiStyles.label}>Font Size</label>
-                      <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={uiStyles.select}>
-                        {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
-                          <option key={size} value={size}>
-                            {size}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label style={uiStyles.label}>Font Weight</label>
-                      <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} style={uiStyles.select}>
-                        <option value="300">Light</option>
-                        <option value="400">Normal</option>
-                        <option value="700">Bold</option>
-                      </select>
-                    </div>
-                  </div>
-                ) : (
-                  <div style={uiStyles.row}>
-                    <div>
-                      <label style={uiStyles.label}>Font Size</label>
-                      <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={uiStyles.select}>
-                        {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
-                          <option key={size} value={size}>
-                            {size}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label style={uiStyles.label}>Font Weight</label>
-                      <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} style={uiStyles.select}>
-                        <option value="300">Light</option>
-                        <option value="400">Normal</option>
-                        <option value="700">Bold</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-                <h4 style={uiStyles.sectionHeading}>Generated Code:</h4>
-                <pre style={uiStyles.code}>{generatedSnippet}</pre>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(generatedSnippet);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    style={uiStyles.button}
-                  >
-                    Copy to Clipboard
-                  </button>
-                  <div style={uiStyles.note}>
-                    <span style={{ marginRight: "0.95rem" }}>ℹ️</span>
-                    <span>Save this code snippet into your ReadMe page to make it public!</span>
-                  </div>
-                </div>
-                {copied && <div style={{ textAlign: "center", marginTop: "1rem", color: "#ffffff" }}>Copied!</div>}
-              </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "1px 10px",
+              }}
+            >
+              <div style={containerStyles}>{message || defaults.message}</div>
             </div>
-          )}
+          </div>
+          <div className="generator-ui" style={generatorStyles}>
+            <div style={uiStyles.container}>
+              <div style={uiStyles.headerRow}>
+                <h3 style={uiStyles.heading}>ReadMe Banner Generator!</h3>
+                <img
+                  src="https://owlbertsio-resized.s3.amazonaws.com/Traffic.psd.png"
+                  alt="Owlbert"
+                  style={uiStyles.image}
+                />
+              </div>
+              <label style={uiStyles.label}>
+                Message:
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  style={uiStyles.input}
+                />
+              </label>
+              <div style={uiStyles.row}>
+                <label style={uiStyles.label}>
+                  Preset:
+                  <select value={preset} onChange={handlePresetChange} style={uiStyles.select}>
+                    <option value="custom">Custom (you choose colors)</option>
+                    <option value="critical">Critical (Red)</option>
+                    <option value="warning">Warning (Yellow)</option>
+                    <option value="standard">Standard (Blue)</option>
+                  </select>
+                </label>
+                <label style={uiStyles.label}>
+                  Banner Placement:
+                  <select value={placement} onChange={(e) => setPlacement(e.target.value)} style={uiStyles.select}>
+                    <option value="top">Top (first in header)</option>
+                    <option value="bottom">Bottom (default)</option>
+                  </select>
+                </label>
+              </div>
+              {preset === "custom" ? (
+                <div style={uiStyles.fourColumnRow}>
+                  <div>
+                    <label style={uiStyles.label}>BG Color 🎨</label>
+                    <input
+                      type="color"
+                      value={bannerColor}
+                      onChange={(e) => setBannerColor(e.target.value)}
+                      style={uiStyles.colorInput}
+                    />
+                  </div>
+                  <div>
+                    <label style={uiStyles.label}>Text Color 🎨</label>
+                    <input
+                      type="color"
+                      value={bannerTextColor}
+                      onChange={(e) => setBannerTextColor(e.target.value)}
+                      style={uiStyles.colorInput}
+                    />
+                  </div>
+                  <div>
+                    <label style={uiStyles.label}>Font Size</label>
+                    <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={uiStyles.select}>
+                      {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={uiStyles.label}>Font Weight</label>
+                    <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} style={uiStyles.select}>
+                      <option value="300">Light</option>
+                      <option value="400">Normal</option>
+                      <option value="700">Bold</option>
+                    </select>
+                  </div>
+                </div>
+              ) : (
+                <div style={uiStyles.row}>
+                  <div>
+                    <label style={uiStyles.label}>Font Size</label>
+                    <select value={fontSize} onChange={(e) => setFontSize(e.target.value)} style={uiStyles.select}>
+                      {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={uiStyles.label}>Font Weight</label>
+                    <select value={fontWeight} onChange={(e) => setFontWeight(e.target.value)} style={uiStyles.select}>
+                      <option value="300">Light</option>
+                      <option value="400">Normal</option>
+                      <option value="700">Bold</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+              <h4 style={uiStyles.sectionHeading}>Generated Code:</h4>
+              <pre style={uiStyles.code}>{generatedSnippet}</pre>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedSnippet);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  style={uiStyles.button}
+                >
+                  Copy to Clipboard
+                </button>
+                <div style={uiStyles.note}>
+                  <span style={{ marginRight: "0.95rem" }}>ℹ️</span>
+                  <span>Save this code snippet into your ReadMe page to make it public!</span>
+                </div>
+              </div>
+              {copied && (
+                <div style={{ textAlign: "center", marginTop: "1rem", color: "#ffffff" }}>
+                  Copied!
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </>
     );
   }
 
-  // Production mode: inject the banner into the header element
+  // PRODUCTION MODE: Inject the banner into the header element (unchanged)
   return (
     <>
       <style>{`
@@ -436,17 +424,32 @@ export const PageBannerAdvanced = ({
       `}</style>
       {/* Banner Injection Content */}
       <div id="custom-banner-content" style={{ display: "none", width: "100%" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "1px 10px" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "1px 10px",
+          }}
+        >
           <div style={containerStyles}>{message || defaults.message}</div>
           {isAdmin && (
-            <button style={uiStyles.toggleButton} onClick={() => { updateHeaderHeight(); setShowGenerator((prev) => !prev); }}>
+            <button
+              style={uiStyles.toggleButton}
+              onClick={() => {
+                updateHeaderHeight();
+                setShowGenerator((prev) => !prev);
+              }}
+            >
               {showGenerator ? (
                 <>
-                  <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>Banner
+                  <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>
+                  Banner
                 </>
               ) : (
                 <>
-                  <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>Banner
+                  <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>
+                  Banner
                 </>
               )}
             </button>
@@ -459,11 +462,19 @@ export const PageBannerAdvanced = ({
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
               <h3 style={uiStyles.heading}>ReadMe Banner Generator!</h3>
-              <img src="https://owlbertsio-resized.s3.amazonaws.com/Traffic.psd.png" alt="Owlbert" style={uiStyles.image} />
+              <img
+                src="https://owlbertsio-resized.s3.amazonaws.com/Traffic.psd.png"
+                alt="Owlbert"
+                style={uiStyles.image}
+              />
             </div>
             <label style={uiStyles.label}>
               Message:
-              <textarea value={message} onChange={(e) => setMessage(e.target.value)} style={uiStyles.input} />
+              <textarea
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                style={uiStyles.input}
+              />
             </label>
             <div style={uiStyles.row}>
               <label style={uiStyles.label}>
@@ -560,4 +571,5 @@ export const PageBannerAdvanced = ({
   );
 };
 
-export default PageBannerAdvanced
+
+export default PageBannerAdvanced;
