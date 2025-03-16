@@ -7,7 +7,7 @@ export const DataTables = ({ children }) => {
   const containerRef = useRef(null);
 
   // Custom Styles
-  const customStyles = `
+  const dtCustomStyles = `
     .dt-flex-container { 
       display: flex;
       justify-content: space-between;
@@ -21,6 +21,14 @@ export const DataTables = ({ children }) => {
     div.dt-buttons>.dt-button:focus:not(.disabled), div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
     outline: none;
     } 
+    .dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    padding: 5px;
+    background-color: transparent;
+    color: inherit;
+    margin-left: 0;
+}
   `;
 
   const loadScript = (src) =>
@@ -179,7 +187,7 @@ export const DataTables = ({ children }) => {
   return (
     <div ref={containerRef}>
       {/* Inline CSS for flexbox layout */}
-      <style>{customStyles}</style>
+      <style>{dtCustomStyles}</style>
       {children}
     </div>
   );
