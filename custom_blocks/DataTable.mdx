@@ -4,9 +4,10 @@ name: DataTable
 import React, { useEffect, useRef } from "react";
 
 export const DataTables = ({ children }) => {
+  // Reference to the container div
   const containerRef = useRef(null);
 
-  // Custom Styles
+  // Custom styles for DataTable elements
   const dtCustomStyles = `
     .dt-flex-container { 
       display: flex;
@@ -19,20 +20,22 @@ export const DataTables = ({ children }) => {
       gap: 5px;
     }
     div.dt-buttons>.dt-button:focus:not(.disabled), div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
-    outline: none;
+      outline: none;
     } 
     .dataTables_wrapper .dataTables_filter input {
-    border: 1px solid #aaa;
-    border-radius: 3px;
-    padding: 5px;
-    background-color: transparent;
-    color: inherit;
-    margin-left: 0;
-}
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      padding: 5px;
+      background-color: transparent;
+      color: inherit;
+      margin-left: 0;
+    }
   `;
 
+  // Dynamically load an external script
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
+      // Check if script is already loaded
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
       const script = Object.assign(document.createElement("script"), {
         src,
@@ -43,18 +46,25 @@ export const DataTables = ({ children }) => {
       document.body.appendChild(script);
     });
 
+  // Dynamically load an external CSS file
   const loadCSS = (href) => {
     if (!document.querySelector(`link[href="${href}"]`)) {
       document.head.appendChild(
-        Object.assign(document.createElement("link"), { rel: "stylesheet", href })
+        Object.assign(document.createElement("link"), {
+          rel: "stylesheet",
+          href,
+        })
       );
     }
   };
 
+  // Load all necessary DataTable dependencies
   const loadDependencies = async () => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
     loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
+
+    // Additional DataTable plugins and export libraries
     const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js", 
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
@@ -68,20 +78,23 @@ export const DataTables = ({ children }) => {
     loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
   };
 
+  // Initialize the DataTable for a given table element
   const initializeTable = (table) => {
+    // Prevent re-initializing a table
     if (table.getAttribute("data-dt-processed")) return;
     table.setAttribute("data-dt-processed", "true");
     table.setAttribute("data-original-html", table.innerHTML);
 
-    // Ensure the table has an ID for ARIA association
+    // Ensure the table has a unique ID for accessibility
     if (!table.id) {
       table.id = "data-table-" + Math.floor(Math.random() * 1000000);
     }
 
+    // Find the wrapper element around the table
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
     if (!wrapper) return;
 
-    // Create the blue toggle button with custom styles and ARIA attributes
+    // Create a toggle button for enabling filtering options
     const trigger = document.createElement("button");
     trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
     Object.assign(trigger, {
@@ -89,28 +102,31 @@ export const DataTables = ({ children }) => {
       title: "Enable Filter",
       "aria-label": "Enable filtering options",
       style: `position:absolute;top:0;right:0;cursor:pointer;z-index:9999;
-      border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
-      filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
+              border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
+              filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
     });
-    // Link the button to the table for accessibility
+    // Associate the button with the table for accessibility
     trigger.setAttribute("aria-controls", table.id);
     trigger.setAttribute("aria-expanded", "false");
 
+    // Insert the toggle button at the beginning of the wrapper
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
+    // Define button click behavior for enabling filtering
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
+
       const dt = window.jQuery(table).DataTable({
-        // Use Flexbox layout for the search bar and buttons
+        // Set custom layout for the search bar and buttons
         dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
-            {
-                extend: "colvis",
-                text: '<i class="fa fa-columns"></i>',
-                className: "dt-btn",
-                attr: { "aria-label": "Toggle column visibility" },
-              },
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-columns"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Toggle column visibility" },
+          },
           {
             extend: "copy",
             text: '<i class="fa fa-copy"></i>',
@@ -155,38 +171,42 @@ export const DataTables = ({ children }) => {
               table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
               table.removeAttribute("data-dt-processed");
               table.removeAttribute("data-filter-enabled");
-              // Show the toggle button again and update its aria-expanded attribute
+              // Re-display the toggle button when filtering is disabled
               trigger.style.display = "block";
               trigger.setAttribute("aria-expanded", "false");
             },
           },
         ],
+        // Accessibility improvements after table initialization
         initComplete: function () {
-          // Update the search input with an aria-label for accessibility
           const searchInput = document.querySelector(".dataTables_filter input");
           if (searchInput) {
             searchInput.setAttribute("aria-label", "Search table");
           }
         },
       });
+
+      // Mark the table as having filtering enabled
       table.setAttribute("data-filter-enabled", "true");
-      // Update toggle button state to indicate filtering is active
       trigger.setAttribute("aria-expanded", "true");
-      // Hide the toggle button once filtering is enabled
+      // Hide the toggle button when filtering is active
       trigger.style.display = "none";
     };
   };
 
+  // Load dependencies and initialize tables on component mount
   useEffect(() => {
     loadDependencies().then(() => {
+      // Initialize tables within the component container
       containerRef.current?.querySelectorAll("table").forEach(initializeTable);
+      // Also initialize tables in elements with class 'rdmd-table'
       document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
     });
   }, []);
 
   return (
     <div ref={containerRef}>
-      {/* Inline CSS for flexbox layout */}
+      {/* Inject inline CSS for DataTable layout */}
       <style>{dtCustomStyles}</style>
       {children}
     </div>
@@ -194,6 +214,7 @@ export const DataTables = ({ children }) => {
 };
 
 export default DataTables;
+
 
 | Endpoint        | Method | Description                                      | Parameters                        | Response Format |
 |-----------------|--------|--------------------------------------------------|-----------------------------------|-----------------|
