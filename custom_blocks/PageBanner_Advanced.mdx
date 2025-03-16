@@ -10,7 +10,7 @@ export const PageBannerAdvanced = ({
   fontSize: propFontSize = "16px",
   fontWeight: propFontWeight = "normal",
 }) => {
-  // Determine if we're in preview mode by checking if the URL contains "/content/"
+  // Detect preview mode by checking if the URL contains "/content/"
   const isPreview =
     typeof window !== "undefined" && window.location.href.includes("/content/");
 
@@ -129,7 +129,7 @@ export const PageBannerAdvanced = ({
   },
     defaults = defaultPresets[preset];
 
-  // Compute banner styles (the banner should update live as settings change)
+  // Compute banner styles (live updates as generator settings change)
   const bannerStyles = {
     background: bannerColor || defaults.bannerColor,
     color: bannerTextColor || defaults.bannerTextColor,
@@ -258,7 +258,7 @@ export const PageBannerAdvanced = ({
     sectionHeading: { fontSize: "1.25rem", marginBottom: "1rem", textAlign: "center", color: "#ffffff" },
   };
 
-  // Generator styles for production (live) mode – unchanged
+  // Generator styles for production (live site) – unchanged from your original code.
   const generatorStyles = {
     position: "fixed",
     top: `${headerHeight + 50}px`,
@@ -273,7 +273,7 @@ export const PageBannerAdvanced = ({
     transformOrigin: "top right",
   };
 
-  // Generator styles for preview mode – use relative positioning so it flows naturally
+  // Generator styles for preview mode – use relative positioning
   const previewGeneratorStyles = {
     position: "relative",
     borderRadius: "12px",
@@ -284,7 +284,7 @@ export const PageBannerAdvanced = ({
     marginTop: "1rem",
   };
 
-  // PREVIEW MODE: Render banner and full generator UI (without toggle button) with relative positioning
+  // PREVIEW MODE: Render the banner and full generator UI (always visible, relative positioning)
   if (isPreview) {
     return (
       <>
@@ -432,7 +432,7 @@ export const PageBannerAdvanced = ({
     );
   }
 
-  // PRODUCTION MODE: Inject the banner into the header element as before.
+  // PRODUCTION MODE: Return the original behavior unchanged.
   return (
     <>
       <style>{`
