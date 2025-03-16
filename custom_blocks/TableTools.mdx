@@ -19,8 +19,16 @@ export const TableTools = ({ children }) => {
       gap: 5px;
     }
     div.dt-buttons>.dt-button:focus:not(.disabled), div.dt-buttons>div.dt-button-split .dt-button:focus:not(.disabled) {
-    outline: none;
+      outline: none;
     } 
+    .dataTables_wrapper .dataTables_filter input{
+      margin:0;   
+    }
+    /* New rule: make the DataTable buttons smaller */
+    .dt-buttons .dt-btn {
+      font-size: 12px;
+      padding: 2px 6px;
+    }
   `;
 
   const loadScript = (src) =>
@@ -97,12 +105,12 @@ export const TableTools = ({ children }) => {
         dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
-            {
-                extend: "colvis",
-                text: '<i class="fa fa-columns"></i>',
-                className: "dt-btn",
-                attr: { "aria-label": "Toggle column visibility" },
-              },
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-columns"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Toggle column visibility" },
+          },
           {
             extend: "copy",
             text: '<i class="fa fa-copy"></i>',
@@ -186,6 +194,7 @@ export const TableTools = ({ children }) => {
 };
 
 export default TableTools;
+
 
 | Endpoint          | Method | Description                                      | Parameters                         | Response Format |
 |------------------|--------|--------------------------------------------------|------------------------------------|----------------|
