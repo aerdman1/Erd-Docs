@@ -6,6 +6,23 @@ import React, { useEffect, useRef } from "react";
 export const TableTools = ({ children }) => {
   const containerRef = useRef(null);
 
+  // Inline flexbox CSS for DataTables search and buttons
+  const flexStyles = `
+    .dt-flex-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .dt-search {
+      flex-grow: 1;
+    }
+    .dt-buttons {
+      display: flex;
+      gap: 5px;
+    }
+  `;
+
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
@@ -51,7 +68,7 @@ export const TableTools = ({ children }) => {
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
     if (!wrapper) return;
 
-    // Create the toggle button with its custom styles reintroduced
+    // Create the blue toggle button with custom styles
     const trigger = document.createElement("button");
     trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
     Object.assign(trigger, {
@@ -60,14 +77,15 @@ export const TableTools = ({ children }) => {
       "aria-label": "Enable filtering options",
       style: `position:absolute;top:0;right:0;cursor:pointer;z-index:9999;
       border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
-      filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
+      filter:saturate(1.15);display:block;border-block-width: 0;`,
     });
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
       const dt = window.jQuery(table).DataTable({
-        dom: "''<'col-sm-6'f><'col-sm-6'B>",
+        // Use Flexbox layout for the search bar and buttons
+        dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
           { extend: "copy", text: '<i class="fa fa-copy"></i>', className: "dt-btn" },
@@ -93,7 +111,7 @@ export const TableTools = ({ children }) => {
               table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
               table.removeAttribute("data-dt-processed");
               table.removeAttribute("data-filter-enabled");
-              // Remove the blue toggle button permanently instead of re-showing it
+              // Remove the blue toggle button permanently
               trigger.remove();
             },
           },
@@ -103,6 +121,7 @@ export const TableTools = ({ children }) => {
         },
       });
       table.setAttribute("data-filter-enabled", "true");
+      // Hide the toggle button once filtering is enabled
       trigger.style.display = "none";
     };
   };
@@ -114,10 +133,17 @@ export const TableTools = ({ children }) => {
     });
   }, []);
 
-  return <div ref={containerRef}>{children}</div>;
+  return (
+    <div ref={containerRef}>
+      {/* Inline CSS for flexbox layout */}
+      <style>{flexStyles}</style>
+      {children}
+    </div>
+  );
 };
 
 export default TableTools;
+
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
