@@ -65,16 +65,34 @@ export const TurboTable = ({ children }) => {
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
       window.jQuery(table).DataTable({
-        dom: "<'dt-nav row'<'col-sm-12 d-flex align-items-center justify-content-between'fB>>rtip",
+        dom: "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
         language: { search: "", searchPlaceholder: "Search Table:" },
         buttons: [
-          { extend: "copy", text: '<button type="button"><i class="fa fa-copy"></i> Copy</button>' },
-          { extend: "csv", text: '<button type="button"><i class="fa fa-file-csv"></i> CSV</button>' },
-          { extend: "excel", text: '<button type="button"><i class="fa fa-file-excel"></i> Excel</button>' },
-          { extend: "pdf", text: '<button type="button"><i class="fa fa-file-pdf"></i> PDF</button>' },
-          { extend: "print", text: '<button type="button"><i class="fa fa-print"></i> Print</button>' },
-          { extend: "colvis", text: '<button type="button"><i class="fa fa-columns"></i> Columns</button>' },
+          { extend: "copy", text: '<i class="fa fa-copy"></i> Copy' },
+          { extend: "csv", text: '<i class="fa fa-file-csv"></i> CSV' },
+          { extend: "excel", text: '<i class="fa fa-file-excel"></i> Excel' },
+          { extend: "pdf", text: '<i class="fa fa-file-pdf"></i> PDF' },
+          { extend: "print", text: '<i class="fa fa-print"></i> Print' },
+          { extend: "colvis", text: '<i class="fa fa-columns"></i> Columns' },
         ],
+        initComplete: function () {
+          document.querySelectorAll(".dt-buttons button").forEach((btn) => {
+            btn.style.border = "none";
+            btn.style.padding = "6px 10px";
+            btn.style.fontSize = "0.85rem";
+            btn.style.background = "#f8f9fa";
+            btn.style.color = "#333";
+            btn.style.margin = "2px";
+            btn.style.borderRadius = "4px";
+          });
+          const searchInput = document.querySelector(".dataTables_filter input");
+          if (searchInput) {
+            searchInput.style.width = "200px";
+            searchInput.style.padding = "5px";
+            searchInput.style.fontSize = "0.85rem";
+            searchInput.style.marginLeft = "8px";
+          }
+        },
       });
       table.setAttribute("data-filter-enabled", "true");
       trigger.style.display = "none";
@@ -83,10 +101,7 @@ export const TurboTable = ({ children }) => {
 
   useEffect(() => {
     loadDependencies().then(() => {
-      // Enhance tables inside the component
       containerRef.current?.querySelectorAll("table").forEach(initializeTable);
-      
-      // Also scan for tables across the entire ReadMe.io page
       document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
     });
   }, []);
@@ -94,7 +109,7 @@ export const TurboTable = ({ children }) => {
   return <div ref={containerRef}>{children}</div>;
 };
 
-export default TurboTable; 
+export default TurboTable;
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
