@@ -32,8 +32,6 @@ metadata:
 | `/reviews`         | `GET`    | Retrieves all reviews                | `product_id`, `limit`             | JSON            |
 | `/reviews/{id}`    | `GET`    | Retrieves a review's details         | `id` (UUID)                       | JSON            |
 
-
-
 | Endpoint           | Method   | Description                          | Parameters                        | Response Format |
 | ------------------ | -------- | ------------------------------------ | --------------------------------- | --------------- |
 | `/users`           | `GET`    | Retrieves a list of users            | `limit` (int), `offset` (int)     | JSON            |
@@ -58,8 +56,6 @@ metadata:
 | `/categories/{id}` | `DELETE` | Deletes a category                   | `id` (UUID)                       | JSON            |
 | `/reviews`         | `GET`    | Retrieves all reviews                | `product_id`, `limit`             | JSON            |
 | `/reviews/{id}`    | `GET`    | Retrieves a review's details         | `id` (UUID)                       | JSON            |
-
-
 
 | Endpoint           | Method   | Description                          | Parameters                        | Response Format |
 | ------------------ | -------- | ------------------------------------ | --------------------------------- | --------------- |
