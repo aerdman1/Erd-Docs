@@ -5,10 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-<TableTools />
-
-<br />
-
 ### **Table 1: API Endpoints**
 
 | Endpoint      | Method | Description                          | Parameters                        | Response Format |
