@@ -29,7 +29,7 @@ export const TableTools = ({ children }) => {
   const loadDependencies = async () => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
-    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
+    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"); 
     const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
@@ -76,7 +76,7 @@ export const TableTools = ({ children }) => {
           {
             extend: "copy",
             text: '<i class="fa fa-copy" style="font-size: 12px;"></i>',
-            className: "dt-btn", 
+            className: "dt-btn",
           },
           {
             extend: "csv",
@@ -122,8 +122,7 @@ export const TableTools = ({ children }) => {
           },
         ],
         initComplete: function () {
-          // The inline styles below are redundant if our <style> tag is injected,
-          // but they serve as a fallback if the inline styles don't apply.
+          // These inline styles serve as a fallback
           document.querySelectorAll(".dt-btn").forEach((btn) => {
             btn.style.border = "none";
             btn.style.padding = "4px 6px";
@@ -133,6 +132,7 @@ export const TableTools = ({ children }) => {
             btn.style.borderRadius = "3px";
             btn.style.minWidth = "30px";
           });
+          // Optionally ensure the search input has some right margin
           const searchInput = document.querySelector(".dataTables_filter input");
           if (searchInput) {
             searchInput.style.marginRight = "10px";
@@ -148,8 +148,8 @@ export const TableTools = ({ children }) => {
     };
   };
 
-  // Inline styles to ensure preview consistency.
-  const inlineButtonStyles = `
+  // Inline styles to force both the button styles and right-aligned search.
+  const inlineStyles = `
     .dt-btn {
       border: none !important;
       padding: 4px 6px !important;
@@ -158,6 +158,9 @@ export const TableTools = ({ children }) => {
       margin: 2px !important;
       border-radius: 3px !important;
       min-width: 30px !important;
+    }
+    .dataTables_filter {
+      text-align: right !important;
     }
   `;
 
@@ -170,13 +173,14 @@ export const TableTools = ({ children }) => {
 
   return (
     <div ref={containerRef}>
-      <style>{inlineButtonStyles}</style>
+      <style>{inlineStyles}</style>
       {children}
     </div>
   );
 };
 
 export default TableTools; 
+
 
 
 
