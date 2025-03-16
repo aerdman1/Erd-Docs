@@ -37,14 +37,17 @@ export const PageBannerAdvanced = ({
     [preset, setPreset] = useState("custom"), // 'critical', 'warning', 'standard', 'custom'
     [placement, setPlacement] = useState("bottom"), // 'top' or 'bottom'
     [copied, setCopied] = useState(false),
-    // Automatically show generator UI if on /custom-components/ page
+    // For non-custom-components pages, admin toggle controls showing the generator UI.
+    // For /custom-components/ pages, we'll show the generator UI regardless.
     [showGenerator, setShowGenerator] = useState(isCustomComponentsPage ? true : false),
     [headerHeight, setHeaderHeight] = useState(0);
 
   // Update header height
   const updateHeaderHeight = () => {
-    const header = document.querySelector("header.rm-Header");
-    if (header) setHeaderHeight(header.offsetHeight);
+    requestAnimationFrame(() => {
+      const header = document.querySelector("header.rm-Header");
+      if (header) setHeaderHeight(header.offsetHeight);
+    });
   };
 
   useLayoutEffect(() => {
@@ -371,8 +374,8 @@ export const PageBannerAdvanced = ({
           )}
         </div>
       </div>
-      {/* Admin Generator UI */}
-      {showGenerator && (
+      {/* Admin Generator UI - force display on /custom-components/ pages */}
+      {(isCustomComponentsPage || showGenerator) && (
         <div className="generator-ui" style={generatorStyles}>
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
@@ -565,5 +568,5 @@ export const PageBannerAdvanced = ({
     </>
   );
 };
-  
-export default PageBannerAdvanced;
+
+export default PageBannerAdvanced; 
