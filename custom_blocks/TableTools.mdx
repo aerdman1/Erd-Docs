@@ -8,7 +8,6 @@ export const TableTools = ({ children }) => {
 
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
-      // Fixed query selector syntax using template literals
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
       const script = Object.assign(document.createElement("script"), {
         src,
@@ -30,7 +29,8 @@ export const TableTools = ({ children }) => {
   const loadDependencies = async () => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
-    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"); 
+    loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
+
     const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
@@ -53,98 +53,83 @@ export const TableTools = ({ children }) => {
     if (!wrapper) return;
     wrapper.style.position = "relative";
 
-    const trigger = document.createElement("button");
-    trigger.innerHTML =
-      '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
-    Object.assign(trigger, {
-      type: "button",
-      title: "Enable Filter",
-      "aria-label": "Enable filtering options",
-      style:
-        "position:absolute;top:0;right:0;cursor:pointer;z-index:9999;" +
-        "border-radius:0 0 0 2px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));" +
-        "filter:saturate(1.15);display:block;border-block-width: 0;border:0;",
-    });
-    wrapper.insertBefore(trigger, wrapper.firstChild);
-
-    trigger.onclick = () => {
-      if (table.getAttribute("data-filter-enabled")) return;
-      const dt = window.jQuery(table).DataTable({
-        dom:
-          "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
-        language: { search: "", searchPlaceholder: "Search Table:" },
-        buttons: [
-          {
-            extend: "copy",
-            text: '<i class="fa fa-copy" style="font-size: 12px;"></i>',
-            className: "dt-btn",
-          },
-          {
-            extend: "csv",
-            text: '<i class="fa fa-file-csv" style="font-size: 12px;"></i>',
-            className: "dt-btn",
-          },
-          {
-            extend: "excel",
-            text: '<i class="fa fa-file-excel" style="font-size: 12px;"></i>',
-            className: "dt-btn",
-          },
-          {
-            extend: "pdf",
-            text: '<i class="fa fa-file-pdf" style="font-size: 12px;"></i>',
-            className: "dt-btn",
-          },
-          {
-            extend: "print",
-            text: '<i class="fa fa-print" style="font-size: 12px;"></i>',
-            className: "dt-btn",
-            action: function () {
-              setTimeout(() => {
-                window.print();
-              }, 100);
-            },
-          },
-          {
-            extend: "colvis",
-            text: '<i class="fa fa-columns" style="font-size: 12px;"></i>',
-            className: "dt-btn",
-          },
-          {
-            text: '<i class="fa fa-ban" style="font-size: 12px;"></i>',
-            className: "dt-btn",
-            action: function () {
-              dt.destroy();
-              table.innerHTML = table.getAttribute("data-original-html");
-              table.removeAttribute("data-original-html");
-              table.removeAttribute("data-filter-enabled");
-              trigger.style.display = "block";
-              initializeTable(table);
-            },
-          },
-        ],
-        initComplete: function () {
-          document.querySelectorAll(".dt-btn").forEach((btn) => {
-            btn.style.border = "none";
-            btn.style.padding = "4px 6px";
-            btn.style.fontSize = "0.75rem";
-            btn.style.background = "#f8f9fa";
-            btn.style.margin = "2px";
-            btn.style.borderRadius = "3px";
-            btn.style.minWidth = "30px";
-          });
-          const searchInput = document.querySelector(".dataTables_filter input");
-          if (searchInput) {
-            searchInput.style.marginRight = "10px";
-          }
-          const controls = document.querySelector(".dt-nav");
-          if (controls) {
-            controls.style.marginBottom = "12px";
-          }
+    // DataTables configuration
+    const dtConfig = {
+      dom:
+        "<'dt-nav row d-flex align-items-center justify-content-between'<'col-sm-6'f><'col-sm-6 text-right'B>>rtip",
+      language: { search: "", searchPlaceholder: "Search Table:" },
+      buttons: [
+        {
+          extend: "copy",
+          text: '<i class="fa fa-copy" style="font-size: 12px;"></i>',
+          className: "dt-btn",
         },
-      });
-      table.setAttribute("data-filter-enabled", "true");
-      trigger.style.display = "none";
+        {
+          extend: "csv",
+          text: '<i class="fa fa-file-csv" style="font-size: 12px;"></i>',
+          className: "dt-btn",
+        },
+        {
+          extend: "excel",
+          text: '<i class="fa fa-file-excel" style="font-size: 12px;"></i>',
+          className: "dt-btn",
+        },
+        {
+          extend: "pdf",
+          text: '<i class="fa fa-file-pdf" style="font-size: 12px;"></i>',
+          className: "dt-btn",
+        },
+        {
+          extend: "print",
+          text: '<i class="fa fa-print" style="font-size: 12px;"></i>',
+          className: "dt-btn",
+          action: function () {
+            setTimeout(() => {
+              window.print();
+            }, 100);
+          },
+        },
+        {
+          extend: "colvis",
+          text: '<i class="fa fa-columns" style="font-size: 12px;"></i>',
+          className: "dt-btn",
+        },
+        {
+          text: '<i class="fa fa-ban" style="font-size: 12px;"></i>',
+          className: "dt-btn",
+          action: function () {
+            dt.destroy();
+            table.innerHTML = table.getAttribute("data-original-html");
+            table.removeAttribute("data-original-html");
+            table.removeAttribute("data-filter-enabled");
+            initializeTable(table);
+          },
+        },
+      ],
+      initComplete: function () {
+        document.querySelectorAll(".dt-btn").forEach((btn) => {
+          btn.style.border = "none";
+          btn.style.padding = "4px 6px";
+          btn.style.fontSize = "0.75rem";
+          btn.style.background = "#f8f9fa";
+          btn.style.margin = "2px";
+          btn.style.borderRadius = "3px";
+          btn.style.minWidth = "30px";
+        });
+        const searchInput = document.querySelector(".dataTables_filter input");
+        if (searchInput) {
+          searchInput.style.marginRight = "10px";
+        }
+        const controls = document.querySelector(".dt-nav");
+        if (controls) {
+          controls.style.marginBottom = "12px";
+        }
+      },
     };
+
+    // Initialize DataTable immediately
+    const dt = window.jQuery(table).DataTable(dtConfig);
+    table.setAttribute("data-filter-enabled", "true");
   };
 
   useEffect(() => {
