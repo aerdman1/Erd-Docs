@@ -50,10 +50,9 @@ export const TableTools = ({ children }) => {
 
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
     if (!wrapper) return;
-    // Ensure the wrapper is positioned relatively.
     wrapper.style.position = "relative";
 
-    // Create a simple toggle button with default browser styling.
+    // Create a simple toggle button using default styling.
     const trigger = document.createElement("button");
     trigger.textContent = "Enable DataTables";
     trigger.type = "button";
@@ -64,18 +63,19 @@ export const TableTools = ({ children }) => {
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
       const dt = window.jQuery(table).DataTable({
+        // This dom setting ensures the buttons container is rendered.
+        dom: "Bfrtip",
         paging: true,
         autoWidth: true,
-        // Using default DOM layout and styling by omitting custom options.
         buttons: [
-          'colvis',
-          'copyHtml5',
-          'csvHtml5',
-          'excelHtml5',
-          'pdfHtml5',
-          'print',
+          "colvis",
+          "copyHtml5",
+          "csvHtml5",
+          "excelHtml5",
+          "pdfHtml5",
+          "print",
           {
-            text: 'Disable DataTables',
+            text: "Disable DataTables",
             action: function () {
               dt.destroy();
               table.innerHTML = table.getAttribute("data-original-html");
@@ -102,7 +102,7 @@ export const TableTools = ({ children }) => {
   return <div ref={containerRef}>{children}</div>;
 };
 
-export default TableTools;
+export default TableTools; 
 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
