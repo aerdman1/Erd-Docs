@@ -1,10 +1,16 @@
 ---
 name: DataTable
 ---
+
 import React, { useEffect, useRef } from "react";
 
 export const DataTable = ({ children }) => {
   const containerRef = useRef(null);
+
+  // Custom inline styles (you may remove these if you fully adopt Tailwind)
+  const customStyles = `
+
+  `;
 
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
@@ -27,24 +33,38 @@ export const DataTable = ({ children }) => {
   };
 
   const loadDependencies = async () => {
-    await loadScript("https://cdn.datatables.net/2.2.2/js/dataTables.min.js");
-    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js");
-    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js");
-    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js");
-    await loadScript("https://cdn.datatables.net/buttons/2.3.6/js/buttons.colVis.min.js");
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js");
-    await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js");
-    
+    // Load jQuery (using the updated version)
+    await loadScript("https://code.jquery.com/jquery-3.7.1.js");
+
+    // Load Tailwind CSS via its CDN
+    await loadScript("https://cdn.tailwindcss.com");
+
+    // Upgrade to DataTables 2.x with Tailwind integration
+    await loadScript("https://cdn.datatables.net/2.2.2/js/dataTables.js");
+    await loadScript("https://cdn.datatables.net/2.2.2/js/dataTables.tailwindcss.js");
     loadCSS("https://cdn.datatables.net/2.2.2/css/dataTables.tailwindcss.css");
-    loadCSS("https://cdn.datatables.net/buttons/2.3.6/css/buttons.tailwindcss.css");
+
+    // Load Buttons extension dependencies
+    const dependencies = [
+      "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js", 
+      "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
+      "https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js",
+      "https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js",
+    ];
+    dependencies.forEach(loadScript);
+    loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
   };
 
   const initializeTable = (table) => {
+    // If the table has already been processed, skip re-initialization.
     if (table.getAttribute("data-dt-processed")) return;
     table.setAttribute("data-dt-processed", "true");
     table.setAttribute("data-original-html", table.innerHTML);
 
+    // Ensure the table has an ID (for ARIA purposes)
     if (!table.id) {
       table.id = "data-table-" + Math.floor(Math.random() * 1000000);
     }
@@ -52,6 +72,7 @@ export const DataTable = ({ children }) => {
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
     if (!wrapper) return;
 
+    // Create the toggle button for enabling filtering options
     const trigger = document.createElement("button");
     trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
     Object.assign(trigger, {
@@ -60,50 +81,110 @@ export const DataTable = ({ children }) => {
       "aria-label": "Enable filtering options",
       style: `position:absolute;top:0;right:0;cursor:pointer;z-index:9999;
       border-radius:0 0 0 1px;color:#fff;background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
-      filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
+      filter:saturate(1.15);display:block;border:0;`,
     });
     trigger.setAttribute("aria-controls", table.id);
     trigger.setAttribute("aria-expanded", "false");
+
+    // Insert the toggle button at the top of the table wrapper.
     wrapper.insertBefore(trigger, wrapper.firstChild);
 
     trigger.onclick = () => {
       if (table.getAttribute("data-filter-enabled")) return;
-      const dt = new DataTable(table, {
-        responsive: true,
-        searchable: true,
-        layout: {
-          topStart: "search",
-          topEnd: "buttons",
+
+      // Initialize DataTables with a Tailwind-friendly DOM layout.
+      const dt = window.jQuery(table).DataTable({
+        dom: "<'flex justify-between items-center'<'flex-1'l><'flex-1'f>r>t<'flex justify-between items-center'<'flex-1'i><'flex-1'p>>",
+        language: { search: "", searchPlaceholder: "Search Table:" },
+        buttons: [
+          {
+            extend: "colvis",
+            text: '<i class="fa fa-columns"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Toggle column visibility" },
+          },
+          {
+            extend: "copy",
+            text: '<i class="fa fa-copy"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Copy table data" },
+          },
+          {
+            extend: "csv",
+            text: '<i class="fa fa-file-csv"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Export table as CSV" },
+          },
+          {
+            extend: "excel",
+            text: '<i class="fa fa-file-excel"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Export table as Excel" },
+          },
+          {
+            extend: "pdf",
+            text: '<i class="fa fa-file-pdf"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Export table as PDF" },
+          },
+          {
+            extend: "print",
+            text: '<i class="fa fa-print"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Print table" },
+            action: function () {
+              setTimeout(() => {
+                window.print();
+              }, 100);
+            },
+          },
+          {
+            text: '<i class="fa fa-ban"></i>',
+            className: "dt-btn",
+            attr: { "aria-label": "Disable filtering" },
+            action: function () {
+              dt.destroy();
+              table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
+              table.removeAttribute("data-dt-processed");
+              table.removeAttribute("data-filter-enabled");
+              // Reset the toggle button state
+              trigger.style.display = "block";
+              trigger.setAttribute("aria-expanded", "false");
+            },
+          },
+        ],
+        initComplete: function () {
+          // Update the search input for accessibility and add Tailwind styling
+          const searchInput = document.querySelector(".dataTables_filter input");
+          if (searchInput) {
+            searchInput.setAttribute("aria-label", "Search table");
+            searchInput.classList.add("border", "rounded", "px-2", "py-1");
+          }
         },
-        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
       });
+
       table.setAttribute("data-filter-enabled", "true");
       trigger.setAttribute("aria-expanded", "true");
+      // Hide the toggle button once filtering is enabled.
       trigger.style.display = "none";
-
-      dt.button().add(null, {
-        text: '<i class="fa fa-ban"></i>',
-        className: "dt-btn",
-        attr: { "aria-label": "Disable filtering" },
-        action: function () {
-          dt.destroy();
-          table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
-          table.removeAttribute("data-dt-processed");
-          table.removeAttribute("data-filter-enabled");
-          trigger.style.display = "block";
-          trigger.setAttribute("aria-expanded", "false");
-        },
-      });  
     };
   };
 
   useEffect(() => {
     loadDependencies().then(() => {
-      document.querySelectorAll(".rdmd-table table, table").forEach(initializeTable);
+      // Initialize all tables found within the component
+      containerRef.current?.querySelectorAll("table").forEach(initializeTable);
+      document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
     });
   }, []);
 
-  return <div ref={containerRef}>{children}</div>;
+  return (
+    <div ref={containerRef}>
+      {/* Inline styles (optional if you migrate fully to Tailwind) */}
+      <style>{customStyles}</style>
+      {children}
+    </div>
+  );
 };
 
 export default DataTable;
