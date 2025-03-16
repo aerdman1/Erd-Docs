@@ -90,8 +90,9 @@ export const TableTools = ({ children }) => {
             className: "dt-btn",
             action: function () {
               dt.destroy();
-              table.innerHTML = table.getAttribute("data-original-html");
-              table.removeAttribute("data-original-html");
+              table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
+              // Remove processed attribute to allow reinitialization
+              table.removeAttribute("data-dt-processed");
               table.removeAttribute("data-filter-enabled");
               trigger.style.display = "block";
               initializeTable(table);
