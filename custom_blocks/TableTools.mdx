@@ -11,7 +11,7 @@ export const TableTools = ({ children }) => {
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
       const script = Object.assign(document.createElement("script"), {
         src,
-        async: true,
+        async: true, 
         onload: resolve,
         onerror: () => reject(new Error(`Failed to load: ${src}`)),
       });
