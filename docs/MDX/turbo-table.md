@@ -7,6 +7,8 @@ metadata:
 ---
 <TableTools />
 
+<br />
+
 | Endpoint           | Method   | Description                          | Parameters                        | Response Format |
 | ------------------ | -------- | ------------------------------------ | --------------------------------- | --------------- |
 | `/users`           | `GET`    | Retrieves a list of users            | `limit` (int), `offset` (int)     | JSON            |
