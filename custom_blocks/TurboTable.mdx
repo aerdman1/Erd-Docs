@@ -107,6 +107,10 @@ export const TurboTable = ({ children }) => {
             btn.style.borderRadius = "3px";
             btn.style.minWidth = "30px";
           });
+          const controls = document.querySelector(".dt-nav");
+          if (controls) {
+            controls.style.marginBottom = "8px";
+          }
         },
       });
       table.setAttribute("data-filter-enabled", "true");
@@ -125,6 +129,7 @@ export const TurboTable = ({ children }) => {
 };
 
 export default TurboTable; 
+
 
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
