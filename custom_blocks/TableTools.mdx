@@ -3,7 +3,7 @@ name: TableTools
 ---
 import React, { useEffect, useRef } from "react";
 
-export const TableTools = ({ children }) => {
+export const TurboTable = ({ children }) => {
   const containerRef = useRef(null);
 
   const loadScript = (src) =>
@@ -94,24 +94,33 @@ export const TableTools = ({ children }) => {
           },
         ],
         initComplete: function () {
-          document.querySelectorAll(".dt-btn").forEach((btn) => {
-            btn.style.border = "none";
-            btn.style.padding = "4px 6px";
-            btn.style.fontSize = "0.75rem";
-            btn.style.background = "#f8f9fa";
-            btn.style.margin = "2px";
-            btn.style.borderRadius = "3px";
-            btn.style.minWidth = "30px";
-          });
-          const searchInput = document.querySelector(".dataTables_filter input");
-          if (searchInput) {
-            searchInput.style.marginRight = "10px";
-          }
-          const controls = document.querySelector(".dt-nav");
-          if (controls) {
-            controls.style.marginBottom = "12px";
-          }
-        },
+            document.querySelectorAll(".dt-btn").forEach((btn) => {
+              btn.style.border = "none";
+              btn.style.padding = "4px 6px";
+              btn.style.fontSize = "0.75rem";
+              btn.style.background = "#f8f9fa";
+              btn.style.margin = "2px";
+              btn.style.borderRadius = "3px";
+              btn.style.minWidth = "30px";
+            });
+          
+            // Force search bar alignment to the left
+            const searchContainer = document.querySelector(".dataTables_filter");
+            if (searchContainer) {
+              searchContainer.style.textAlign = "left"; // Ensures alignment is consistent
+              searchContainer.style.float = "left"; // Forces left positioning in case Bootstrap applies `float: right`
+            }
+          
+            const searchInput = document.querySelector(".dataTables_filter input");
+            if (searchInput) {
+              searchInput.style.marginRight = "10px";
+            }
+          
+            const controls = document.querySelector(".dt-nav");
+            if (controls) {
+              controls.style.marginBottom = "12px";
+            }
+          },          
       });
       table.setAttribute("data-filter-enabled", "true");
       trigger.style.display = "none";
@@ -128,7 +137,7 @@ export const TableTools = ({ children }) => {
   return <div ref={containerRef}>{children}</div>;
 };
 
-export default TableTools;
+export default TurboTable;
 
 ***NOTE: This is a preview table and will not be visible when the component is added to your live page.***
   
