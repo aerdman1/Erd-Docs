@@ -6,8 +6,8 @@ import React, { useEffect, useRef } from "react";
 export const TableTools = ({ children }) => {
   const containerRef = useRef(null);
 
-  // Inline flexbox CSS for DataTables search and buttons
-  const flexStyles = `
+  // Custom Styles
+  const customStyles = `
     .dt-flex-container {
       display: flex;
       justify-content: space-between;
@@ -179,7 +179,7 @@ export const TableTools = ({ children }) => {
   return (
     <div ref={containerRef}>
       {/* Inline CSS for flexbox layout */}
-      <style>{flexStyles}</style>
+      <style>{customStyles}</style>
       {children}
     </div>
   );
