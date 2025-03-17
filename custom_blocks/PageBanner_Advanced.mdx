@@ -154,6 +154,7 @@ export const PageBanner_Advanced = ({
     fontFamily: "Inter, sans-serif",
   };
 
+  // Removed the 'note' CSS since it is no longer needed.
   const uiStyles = {
     container: {
       maxWidth: "800px",
@@ -249,18 +250,6 @@ export const PageBanner_Advanced = ({
       maxWidth: "80px",
       border: "1px solid #80808096",
     },
-    note: {
-      marginTop: "1rem",
-      padding: "1rem",
-      borderLeft: "4px solid #1DB954",
-      backgroundColor: "#000000",
-      color: "#ffffff",
-      fontSize: "0.9rem",
-      display: "flex",
-      alignItems: "center",
-      maxWidth: "200px",
-    },
-    sectionHeading: { fontSize: "1.25rem", marginBottom: "1rem", textAlign: "center", color: "#ffffff" },
   };
 
   // Toggle blur effect when generator is shown (only in admin view)
@@ -526,12 +515,6 @@ export const PageBanner_Advanced = ({
               >
                 Copy to Clipboard
               </button>
-              <div style={uiStyles.note}>
-                <span style={{ marginRight: "0.95rem" }}>ℹ️</span>
-                <span>
-                  Add this code snippet directly to your page!
-                </span>
-              </div>
             </div>
             {copied && (
               <div style={{ textAlign: "center", marginTop: "1rem", color: "#ffffff" }}>
@@ -545,4 +528,4 @@ export const PageBanner_Advanced = ({
   );
 };
 
-<PageBanner_Advanced />
+<PageBanner_Advanced isPublic={false} />
