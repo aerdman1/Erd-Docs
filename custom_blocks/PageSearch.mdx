@@ -13,12 +13,12 @@ export default function PageSearchHighlight() {
       return;
     }
 
-    // Store original content once (if not already stored)
+    // Store the original content once (prevents duplication issues)
     if (!contentElement.dataset.originalText) {
       contentElement.dataset.originalText = contentElement.innerHTML;
     }
 
-    // Function to restore and highlight text
+    // Function to highlight text
     function applyHighlight() {
       if (!searchTerm || searchTerm.length < 3) {
         contentElement.innerHTML = contentElement.dataset.originalText;
@@ -34,37 +34,24 @@ export default function PageSearchHighlight() {
       );
     }
 
-    // Apply highlight on search term change
     applyHighlight();
-
-    // **Detect Page Rehydration** and reapply highlights
-    const observer = new MutationObserver(() => {
-      console.log("🔄 Page content updated, reapplying highlights...");
-      applyHighlight();
-    });
-
-    observer.observe(contentElement, { childList: true, subtree: true });
-
-    return () => observer.disconnect(); // Cleanup observer on unmount
   }, [searchTerm]);
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", fontFamily: "Arial, sans-serif" }}>
-      <input
-        type="text"
-        placeholder="Search page content..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px",
-          fontSize: "16px",
-          border: "1px solid #ccc",
-          borderRadius: "5px",
-          marginBottom: "10px",
-        }}
-      />
-    </div>
+    <input
+      type="text"
+      placeholder="Search page content..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      style={{
+        width: "100%",
+        padding: "8px",
+        fontSize: "16px",
+        border: "1px solid #ccc",
+        borderRadius: "4px",
+        marginBottom: "10px",
+      }}
+    />
   );
 }
 
