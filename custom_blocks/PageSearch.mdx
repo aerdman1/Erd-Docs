@@ -11,6 +11,7 @@ export default function PageSearchHighlight() {
   const [keywordCounts, setKeywordCounts] = useState({});
 
   useEffect(() => {
+    // Extract keywords from <meta property="keywords">
     const metaKeywords = document.querySelector('meta[property="keywords"]');
     if (metaKeywords) {
       const keywordList = metaKeywords.content.split(",").map((word) => word.trim());
@@ -21,6 +22,7 @@ export default function PageSearchHighlight() {
     const contentElement = document.querySelector(".content-body");
     if (!contentElement) return;
 
+    // Get only the paragraphs inside .content-body (EXCLUDES search & keyword buttons)
     const paragraphs = contentElement.querySelectorAll("p");
 
     paragraphs.forEach((p) => {
