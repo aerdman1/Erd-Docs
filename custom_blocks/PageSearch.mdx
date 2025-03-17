@@ -8,12 +8,14 @@ export default function PageSearchHighlight() {
   const [keywords, setKeywords] = useState([]);
   const [matchCount, setMatchCount] = useState(0);
   const [currentMatch, setCurrentMatch] = useState(0);
+  const [keywordCounts, setKeywordCounts] = useState({});
 
   useEffect(() => {
     const metaKeywords = document.querySelector('meta[property="keywords"]');
     if (metaKeywords) {
       const keywordList = metaKeywords.content.split(",").map((word) => word.trim());
       setKeywords(keywordList);
+      countKeywordOccurrences(keywordList);
     }
 
     const contentElement = document.querySelector(".content-body");
@@ -58,6 +60,22 @@ export default function PageSearchHighlight() {
     applyHighlight();
   }, [searchTerm]);
 
+  function countKeywordOccurrences(keywordList) {
+    const contentElement = document.querySelector(".content-body");
+    if (!contentElement) return;
+
+    let counts = {};
+    const textContent = contentElement.innerText.toLowerCase();
+
+    keywordList.forEach((keyword) => {
+      const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, "g");
+      const matches = textContent.match(regex);
+      counts[keyword] = matches ? matches.length : 0;
+    });
+
+    setKeywordCounts(counts);
+  }
+
   function scrollToMatch(index, elements) {
     if (elements.length > 0 && elements[index]) {
       elements[index].scrollIntoView({ behavior: "smooth", block: "center" });
@@ -88,7 +106,6 @@ export default function PageSearchHighlight() {
 
   return (
     <div className="space-y-3">
-      {/* Search Input + Buttons */}
       <div className="flex items-center gap-2 max-w-[500px]">
         <input
           type="text"
@@ -118,7 +135,6 @@ export default function PageSearchHighlight() {
         )}
       </div>
 
-      {/* Keyword Bubbles */}
       {keywords.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {keywords.map((keyword, index) => (
@@ -127,7 +143,7 @@ export default function PageSearchHighlight() {
               onClick={() => setSearchTerm(keyword)}
               className="px-3 py-1 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
             >
-              {keyword}
+              {keyword} {keywordCounts[keyword] > 0 ? `(${keywordCounts[keyword]})` : ""}
             </button>
           ))}
         </div>
