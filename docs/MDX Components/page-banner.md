@@ -1,5 +1,5 @@
 ---
-title: Page Banner
+title: Page Banner (Advanced)
 deprecated: false
 hidden: false
 metadata:
