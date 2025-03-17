@@ -1,95 +1,54 @@
 ---
 name: PageSearch
 ---
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
-export const PageSearching = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const originalContentRef = useRef(null);
-
-  // Helper to get the content element
-  const getContentArea = () => document.querySelector('.content-body.grid-75');
-
-  // Try capturing original content once the component mounts (or shortly after)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const contentArea = getContentArea();
-      if (contentArea && !originalContentRef.current) {
-        originalContentRef.current = contentArea.innerHTML;
-      }
-    }, 300); // Adjust the timeout if your content loads later
-    return () => clearTimeout(timer);
-  }, []);
+const PageSearchHighlight = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const contentRef = useRef(null);
 
   useEffect(() => {
-    const contentArea = getContentArea();
-    if (!contentArea) {
-      console.warn('No .content-body.grid-75 found in DOM.');
+    if (!contentRef.current) return;
+
+    const originalHTML = contentRef.current.getAttribute("data-original-html");
+    if (!originalHTML) {
+      contentRef.current.setAttribute("data-original-html", contentRef.current.innerHTML);
+    }
+
+    // If the search term is less than 3 characters, reset content
+    if (searchTerm.trim().length < 3) {
+      contentRef.current.innerHTML = contentRef.current.getAttribute("data-original-html");
       return;
     }
 
-    // Reset contentArea to original if available
-    if (originalContentRef.current) {
-      contentArea.innerHTML = originalContentRef.current;
-    }
+    // Escape special regex characters
+    const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regex = new RegExp(`(${safeTerm})`, "gi");
 
-    // If search term is less than 2 characters, exit early
-    if (searchTerm.length < 2) {
-      return;
-    }
+    // Replace matches with highlighted span
+    const newHTML = contentRef.current.getAttribute("data-original-html").replace(
+      regex,
+      '<span style="background-color: yellow; font-weight: bold;">$1</span>'
+    );
 
-    // Create a safe regex from the search term
-    const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${safeTerm})`, 'gi');
-
-    // Recursively traverse and highlight matching text nodes
-    const highlightTextNodes = (node) => {
-      if (node.nodeType === 3) {
-        if (node.nodeValue.match(regex)) {
-          const wrapper = document.createElement('span');
-          wrapper.innerHTML = node.nodeValue.replace(
-            regex,
-            `<span style="background-color: yellow; font-weight: bold;">$1</span>`
-          );
-          const parent = node.parentNode;
-          if (parent) {
-            parent.replaceChild(wrapper, node);
-          }
-        }
-      } else if (
-        node.nodeType === 1 &&
-        node.childNodes &&
-        !['SCRIPT', 'STYLE'].includes(node.nodeName)
-      ) {
-        node.childNodes.forEach(highlightTextNodes);
-      }
-    };
-
-    highlightTextNodes(contentArea);
+    contentRef.current.innerHTML = newHTML;
   }, [searchTerm]);
 
-  const handleClear = () => {
-    setSearchTerm('');
-  };
-
   return (
-    <div style={{ margin: '1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+    <div>
       <input
         type="text"
-        style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '0.5rem', flex: '1' }}
-        placeholder="Search (min 2 chars)"
+        placeholder="Search (min 3 chars)"
         value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ marginBottom: "1rem", padding: "0.5rem", width: "100%" }}
       />
-      <button
-        style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '0.5rem 1rem' }}
-        onClick={handleClear}
-      >
-        Clear
-      </button>
+      <div ref={contentRef}>
+        <p>This is some example text. Try searching for a word here!</p>
+        <p>Highlighting words dynamically in ReadMe MDX can be tricky.</p>
+      </div>
     </div>
   );
 };
 
-
-<PageSearching />
+<PageSearchHighlight />
