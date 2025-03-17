@@ -17,10 +17,10 @@ export const PageBanner_Simple = ({
   useEffect(() => {
     const header = document.querySelector("header.rm-Header");
     if (header) {
-      let container = document.getElementById("advanced-banner-container");
+      let container = document.getElementById("simple-banner-container");
       if (!container) {
         container = document.createElement("div");
-        container.id = "advanced-banner-container";
+        container.id = "simple-banner-container";
         // Insert based on placement prop
         if (placement === "top") {
           header.insertBefore(container, header.firstChild);
