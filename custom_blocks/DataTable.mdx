@@ -199,12 +199,25 @@ export const DataTable = ({ children }) => {
     // Load dependencies and initialize tables on component mount
     useEffect(() => {
         loadDependencies().then(() => {
-            // Initialize tables within the component container
-            containerRef.current?.querySelectorAll("table").forEach(initializeTable);
-            // Also initialize tables in elements with class 'rdmd-table'
-            document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
+            const initializeAllTables = () => {
+                containerRef.current?.querySelectorAll("table").forEach(initializeTable);
+                document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
+            };
+    
+            // Run once initially
+            initializeAllTables();
+    
+            // Use a MutationObserver to detect dynamically added tables
+            const observer = new MutationObserver(() => {
+                initializeAllTables();
+            });
+    
+            observer.observe(document.body, { childList: true, subtree: true });
+    
+            return () => observer.disconnect(); // Cleanup
         });
     }, []);
+    
 
     return (
         <div ref={containerRef}>
