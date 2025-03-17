@@ -1,20 +1,56 @@
 ---
 name: PageSearch
 ---
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
-export default function SearchInput() {
+export default function PageSearchHighlight() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [pageText, setPageText] = useState("");
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      // Extract the visible text from the page
+      setPageText(contentRef.current.innerText);
+    }
+  }, []);
+
+  function highlightText(text, search) {
+    if (!search || search.length < 3) return text;
+
+    const regex = new RegExp(`(${search})`, "gi");
+    const parts = text.split(regex);
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === search.toLowerCase() ? (
+        <span key={index} style={{ backgroundColor: "#ffeb3b", fontWeight: "bold", padding: "2px", borderRadius: "4px" }}>
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  }
 
   return (
-    <div>
+    <div style={{ maxWidth: "600px", margin: "auto", fontFamily: "Arial, sans-serif" }}>
       <input
         type="text"
-        placeholder="Search..."
+        placeholder="Search page content..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        style={{
+          width: "100%",
+          padding: "10px",
+          fontSize: "16px",
+          border: "1px solid #ccc",
+          borderRadius: "5px",
+          marginBottom: "10px",
+        }}
       />
+      <div ref={contentRef}>
+        <p>{highlightText(pageText, searchTerm)}</p>
+      </div>
     </div>
   );
 }
- 
