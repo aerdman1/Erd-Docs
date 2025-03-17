@@ -27,7 +27,7 @@ export default function PageSearchHighlight() {
   }, []);
 
   useEffect(() => {
-    if (!searchTerm.trim()) {
+    if (searchTerm.length < 3) {
       restoreOriginalText();
       setMatchCount(0);
       return;
