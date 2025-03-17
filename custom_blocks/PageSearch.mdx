@@ -1,11 +1,12 @@
 ---
 name: PageSearch
 ---
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const PageSearching = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [highlightedElements, setHighlightedElements] = useState([]);
+  const originalContentRef = useRef(null);
 
   // Clears existing highlight <span> wrappers
   const clearHighlights = () => {
@@ -16,68 +17,72 @@ export const PageSearching = () => {
   };
 
   useEffect(() => {
+    const contentArea = document.querySelector('.content-body.grid-75');
+    if (contentArea && !originalContentRef.current) {
+      // Store original content only once
+      originalContentRef.current = contentArea.innerHTML;
+    }
+  }, []);
+
+  useEffect(() => {
+    const contentArea = document.querySelector('.content-body.grid-75');
+    if (!contentArea) {
+      console.warn('No .content-body.grid-75 found in DOM.');
+      return;
+    }
+
     // If below 2 characters, just clear any old highlights and exit
     if (searchTerm.length < 2) {
+      if (originalContentRef.current) {
+        contentArea.innerHTML = originalContentRef.current;
+      }
       clearHighlights();
       return;
     }
 
-    // Clear old highlights first
+    // Reset content to original before applying new highlights
+    if (originalContentRef.current) {
+      contentArea.innerHTML = originalContentRef.current;
+    }
     clearHighlights();
 
-    const searchAndHighlight = () => {
-      const contentArea = document.querySelector('.content-body.grid-75');
-      if (!contentArea) {
-        console.warn('No .content-body.grid-75 found in DOM.');
-        return;
-      }
+    const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${safeTerm})`, 'gi');
+    const elementsToHighlight = [];
 
-      // Escape special regex chars in searchTerm, then create "global + case-insensitive" regex
-      const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`(${safeTerm})`, 'gi');
-      const elementsToHighlight = [];
-
-      // Recursively traverse text nodes and highlight matches
-      const highlightTextNodes = node => {
-        if (node.nodeType === 3) {
-          // It's a text node
-          if (node.nodeValue.match(regex)) {
-            // Create wrapper span
-            const wrapper = document.createElement('span');
-            // Replace matches with inline styled highlights
-            wrapper.innerHTML = node.nodeValue.replace(
-              regex,
-              `<span style="background-color: yellow; font-weight: bold;">$1</span>`
-            );
-            // Replace the old text node with our new wrapped node
-            const parent = node.parentNode;
-            if (parent) {
-              parent.replaceChild(wrapper, node);
-              // Push each highlighted <span> for future removal
-              elementsToHighlight.push(...wrapper.querySelectorAll('span[style]'));
-            }
+    const highlightTextNodes = node => {
+      if (node.nodeType === 3) {
+        if (node.nodeValue.match(regex)) {
+          const wrapper = document.createElement('span');
+          wrapper.innerHTML = node.nodeValue.replace(
+            regex,
+            `<span style="background-color: yellow; font-weight: bold;">$1</span>`
+          );
+          const parent = node.parentNode;
+          if (parent) {
+            parent.replaceChild(wrapper, node);
+            elementsToHighlight.push(...wrapper.querySelectorAll('span[style]'));
           }
-        } else if (
-          node.nodeType === 1 &&
-          node.childNodes &&
-          !['SCRIPT', 'STYLE'].includes(node.nodeName)
-        ) {
-          // Dive deeper into child nodes
-          node.childNodes.forEach(highlightTextNodes);
         }
-      };
-
-      highlightTextNodes(contentArea);
-      setHighlightedElements(elementsToHighlight);
+      } else if (
+        node.nodeType === 1 &&
+        node.childNodes &&
+        !['SCRIPT', 'STYLE'].includes(node.nodeName)
+      ) {
+        node.childNodes.forEach(highlightTextNodes);
+      }
     };
 
-    // Defer the search slightly to ensure content loads
-    const timer = setTimeout(searchAndHighlight, 200);
+    highlightTextNodes(contentArea);
+    setHighlightedElements(elementsToHighlight);
+
+    // Defer search slightly to ensure content loads (if needed)
+    const timer = setTimeout(() => {}, 200);
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
   const handleClear = () => {
-    setSearchTerm(''); // triggers highlight clearing in effect
+    setSearchTerm('');
   };
 
   return (
@@ -98,6 +103,5 @@ export const PageSearching = () => {
     </div>
   );
 };
-
 
 <PageSearching />
