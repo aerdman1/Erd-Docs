@@ -15,31 +15,34 @@ export default function PageSearchHighlight() {
     }
     console.log("✅ Found .content-body");
 
-    // Store the original content only once
-    if (!contentElement.dataset.originalText) {
-      contentElement.dataset.originalText = contentElement.innerHTML;
-      console.log("📌 Stored original text:", contentElement.dataset.originalText);
-    }
+    // Find all <p> tags inside content-body (avoids affecting the search bar)
+    const paragraphs = contentElement.querySelectorAll("p");
+
+    paragraphs.forEach((p) => {
+      // Store original paragraph text only once
+      if (!p.dataset.originalText) {
+        p.dataset.originalText = p.innerHTML;
+        console.log("📌 Stored original text for:", p.innerText);
+      }
+    });
 
     function applyHighlight() {
       console.log("🔍 Searching for:", searchTerm);
 
-      if (!searchTerm || searchTerm.length < 3) {
-        console.log("ℹ️ Search term too short, restoring original text.");
-        contentElement.innerHTML = contentElement.dataset.originalText;
-        return;
-      }
+      paragraphs.forEach((p) => {
+        if (!searchTerm || searchTerm.length < 3) {
+          p.innerHTML = p.dataset.originalText; // Restore original content
+          return;
+        }
 
-      const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const regex = new RegExp(`(${safeTerm})`, "gi");
+        const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(`(${safeTerm})`, "gi");
 
-      const modifiedText = contentElement.dataset.originalText.replace(
-        regex,
-        `<span style="background-color: yellow; font-weight: bold;">$1</span>`
-      );
-
-      console.log("🖍 Applying modified text:", modifiedText);
-      contentElement.innerHTML = modifiedText;
+        p.innerHTML = p.dataset.originalText.replace(
+          regex,
+          `<span style="background-color: yellow; font-weight: bold;">$1</span>`
+        );
+      });
     }
 
     applyHighlight();
@@ -65,5 +68,6 @@ export default function PageSearchHighlight() {
     />
   );
 }
+
 
 <PageSearchHighlight />
