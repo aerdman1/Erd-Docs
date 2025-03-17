@@ -5,52 +5,45 @@ import { useState, useEffect, useRef } from 'react';
 
 export const PageSearching = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [highlightedElements, setHighlightedElements] = useState([]);
   const originalContentRef = useRef(null);
 
-  // Clears existing highlight <span> wrappers
-  const clearHighlights = () => {
-    highlightedElements.forEach(el => {
-      el.replaceWith(...el.childNodes);
-    });
-    setHighlightedElements([]);
-  };
+  // Helper to get the content element
+  const getContentArea = () => document.querySelector('.content-body.grid-75');
 
+  // Try capturing original content once the component mounts (or shortly after)
   useEffect(() => {
-    const contentArea = document.querySelector('.content-body.grid-75');
-    if (contentArea && !originalContentRef.current) {
-      // Store original content only once
-      originalContentRef.current = contentArea.innerHTML;
-    }
+    const timer = setTimeout(() => {
+      const contentArea = getContentArea();
+      if (contentArea && !originalContentRef.current) {
+        originalContentRef.current = contentArea.innerHTML;
+      }
+    }, 300); // Adjust the timeout if your content loads later
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    const contentArea = document.querySelector('.content-body.grid-75');
+    const contentArea = getContentArea();
     if (!contentArea) {
       console.warn('No .content-body.grid-75 found in DOM.');
       return;
     }
 
-    // If below 2 characters, just clear any old highlights and exit
-    if (searchTerm.length < 2) {
-      if (originalContentRef.current) {
-        contentArea.innerHTML = originalContentRef.current;
-      }
-      clearHighlights();
-      return;
-    }
-
-    // Reset content to original before applying new highlights
+    // Reset contentArea to original if available
     if (originalContentRef.current) {
       contentArea.innerHTML = originalContentRef.current;
     }
-    clearHighlights();
 
+    // If search term is less than 2 characters, exit early
+    if (searchTerm.length < 2) {
+      return;
+    }
+
+    // Create a safe regex from the search term
     const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(`(${safeTerm})`, 'gi');
-    const elementsToHighlight = [];
 
-    const highlightTextNodes = node => {
+    // Recursively traverse and highlight matching text nodes
+    const highlightTextNodes = (node) => {
       if (node.nodeType === 3) {
         if (node.nodeValue.match(regex)) {
           const wrapper = document.createElement('span');
@@ -61,7 +54,6 @@ export const PageSearching = () => {
           const parent = node.parentNode;
           if (parent) {
             parent.replaceChild(wrapper, node);
-            elementsToHighlight.push(...wrapper.querySelectorAll('span[style]'));
           }
         }
       } else if (
@@ -74,11 +66,6 @@ export const PageSearching = () => {
     };
 
     highlightTextNodes(contentArea);
-    setHighlightedElements(elementsToHighlight);
-
-    // Defer search slightly to ensure content loads (if needed)
-    const timer = setTimeout(() => {}, 200);
-    return () => clearTimeout(timer);
   }, [searchTerm]);
 
   const handleClear = () => {
