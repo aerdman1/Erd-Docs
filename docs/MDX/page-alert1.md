@@ -6,7 +6,7 @@ metadata:
   robots: index
 ---
 <PopUpAlert>
-  <PopUpContent title="Your Title Goes Here">
+  <PopUpContent title="Edit your Componen Title">
     This is a custom message that you can control
   </PopUpContent>
 </PopUpAlert>
