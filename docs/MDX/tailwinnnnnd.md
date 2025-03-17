@@ -6,17 +6,6 @@ metadata:
   robots: index
 ---
 <HTMLBlock>{`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tailwind Test</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://kit.fontawesome.com/YOUR_FA_KIT.js" crossorigin="anonymous"></script>
-</head>
-<body class="bg-gray-100">
-
   <div class="readme-tailwind">
     <div class="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-6">
       <div class="bg-white rounded-2xl p-8 m-6 max-w-xl shadow-2xl border border-gray-200 transform transition-all duration-300 hover:scale-105 hover:shadow-3xl">
@@ -52,8 +41,5 @@ metadata:
         </div>
       </div>
     </div>
-  </div>
-
-</body>
-</html>
+</div>
 `}</HTMLBlock>
