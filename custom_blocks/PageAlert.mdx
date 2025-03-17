@@ -1,66 +1,38 @@
 ---
 name: PageAlert
 ---
-import React, { useState, useEffect, useMemo } from "react";
+import React from "react";
 
-export const PopUpAlertNew = ({ children }) => {
-  const [showAlert, setShowAlert] = useState(false);
-  const [remindNextTime, setRemindNextTime] = useState(true);
-
-  // Store the popup content but don't render it directly
-  const popupContent = useMemo(() => children, [children]);
-
-  useEffect(() => {
-    const pageKey = `popup_reminder_${window.location.pathname}`;
-    if (localStorage.getItem(pageKey) !== "false") {
-      setShowAlert(true);
-    }
-  }, []);
-
-  const handleClose = () => {
-    const pageKey = `popup_reminder_${window.location.pathname}`;
-    localStorage.setItem(pageKey, remindNextTime ? "true" : "false");
-    setShowAlert(false);
-  };
-
+export const PageModal_Simple = ({
+  message = "Hello! 👋 This is your page-specific announcement modal — customize it to share updates, reminders, or anything important.",
+  modalColor = "#00bcff",
+  modalTextColor = "#ffffff",
+  fontSize = "16px",
+  fontWeight = "400"
+}) => {
   return (
-    <>
-      {showAlert && (
-        <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
-            {popupContent}
-            <div className="mt-4 flex items-center justify-center">
-              <input
-                type="checkbox"
-                id="remindNextTime"
-                checked={remindNextTime}
-                onChange={(e) => setRemindNextTime(e.target.checked)}
-                className="mr-2"
-              />
-              <label htmlFor="remindNextTime" className="text-gray-600">
-                Remind me next time
-              </label>
-            </div>
-            <button
-              onClick={handleClose}
-              className="mt-4 px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-800"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </>
+    <div
+      style={{
+        background: modalColor,
+        color: modalTextColor,
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        padding: "8px",
+        textAlign: "center",
+        borderRadius: "6px",
+        marginBottom: "20px"
+      }}
+    >
+      {message}
+    </div>
   );
 };
 
-export const PopUpContent = ({ title, children }) => (
-  <div>
-    <h2 className="text-gray-800 text-lg mb-2 font-semibold">{title}</h2>
-    <p className="text-gray-600 text-sm">{children}</p>
-  </div>
-);
 
-
-<PopUpAlertNew /> 
- test
+<PageModal_Simple 
+  message="This modal is displayed inline." 
+  modalColor="#00bcff" 
+  modalTextColor="#ffffff" 
+  fontSize="14px" 
+  fontWeight="bold" 
+/>
