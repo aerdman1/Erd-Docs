@@ -7,28 +7,45 @@ export default function PageSearchHighlight() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    if (!searchTerm || searchTerm.length < 3) return;
-
     const contentElement = document.querySelector(".content-body");
     if (!contentElement) {
       console.warn("❌ Could not find .content-body!");
       return;
     }
 
-    // Restore original content first
-    if (contentElement.dataset.originalText) {
-      contentElement.innerHTML = contentElement.dataset.originalText;
-    } else {
+    // Store original content once (if not already stored)
+    if (!contentElement.dataset.originalText) {
       contentElement.dataset.originalText = contentElement.innerHTML;
     }
 
-    const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(`(${safeTerm})`, "gi");
+    // Function to restore and highlight text
+    function applyHighlight() {
+      if (!searchTerm || searchTerm.length < 3) {
+        contentElement.innerHTML = contentElement.dataset.originalText;
+        return;
+      }
 
-    contentElement.innerHTML = contentElement.innerHTML.replace(
-      regex,
-      `<span style="background-color: yellow; font-weight: bold;">$1</span>`
-    );
+      const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(${safeTerm})`, "gi");
+
+      contentElement.innerHTML = contentElement.dataset.originalText.replace(
+        regex,
+        `<span style="background-color: yellow; font-weight: bold;">$1</span>`
+      );
+    }
+
+    // Apply highlight on search term change
+    applyHighlight();
+
+    // **Detect Page Rehydration** and reapply highlights
+    const observer = new MutationObserver(() => {
+      console.log("🔄 Page content updated, reapplying highlights...");
+      applyHighlight();
+    });
+
+    observer.observe(contentElement, { childList: true, subtree: true });
+
+    return () => observer.disconnect(); // Cleanup observer on unmount
   }, [searchTerm]);
 
   return (
@@ -50,5 +67,5 @@ export default function PageSearchHighlight() {
     </div>
   );
 }
- 
+
 <PageSearchHighlight />
