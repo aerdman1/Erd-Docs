@@ -4,30 +4,35 @@ name: PageBanner_Simple
 import React, { useEffect, useState } from "react";
 
 export const PageBanner_Simple = ({
-  message = "Here is my banner message - hope you enjoy!",
-  bannerColor = "#00BCFF",
+  message = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
+  bannerColor = "#381D71",
   bannerTextColor = "#ffffff",
-  fontSize = "14px",
-  fontWeight = "bold"
+  fontSize = "16px",
+  fontWeight = "400",
+  placement = "bottom"
 }) => {
   const [bannerContainer, setBannerContainer] = useState(null);
 
-  // Create or retrieve the banner container in the header on mount
+  // On mount, find the header element and create or reuse the banner container
   useEffect(() => {
     const header = document.querySelector("header.rm-Header");
     if (header) {
-      let container = document.getElementById("simple-banner-container");
+      let container = document.getElementById("advanced-banner-container");
       if (!container) {
         container = document.createElement("div");
-        container.id = "simple-banner-container";
-        // Append to the bottom of the header
-        header.appendChild(container);
+        container.id = "advanced-banner-container";
+        // Insert based on placement prop
+        if (placement === "top") {
+          header.insertBefore(container, header.firstChild);
+        } else {
+          header.appendChild(container);
+        }
       }
       setBannerContainer(container);
     }
-  }, []);
+  }, [placement]);
 
-  // Update the container whenever the banner props change
+  // Update container styles and content whenever props change
   useEffect(() => {
     if (bannerContainer) {
       bannerContainer.style.background = bannerColor;
@@ -37,13 +42,14 @@ export const PageBanner_Simple = ({
       bannerContainer.style.padding = "8px";
       bannerContainer.style.textAlign = "center";
       bannerContainer.style.borderRadius = "6px";
-      bannerContainer.style.marginTop = "20px"; // spacing from other header content
+      // Adjust margin if needed; here we're adding top margin if placed at the bottom
+      bannerContainer.style.marginTop = placement === "bottom" ? "20px" : "0px";
       bannerContainer.textContent = message;
     }
-  }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
+  }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight, placement]);
 
-  // Nothing is rendered by this component, all DOM manipulation is done in useEffect
+  // Since we manipulate the DOM directly, nothing is rendered here
   return null;
 };
 
-<PageBanner_Simple /> 
+<PageBanner_Simple />
