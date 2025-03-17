@@ -4,6 +4,7 @@ name: PageBanner_Simple
 import React, { useEffect, useState } from "react";
 
 export const PageBanner_Simple = ({
+  isActive = false,
   message = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor = "#381D71",
   bannerTextColor = "#ffffff",
@@ -12,22 +13,27 @@ export const PageBanner_Simple = ({
 }) => {
   const [bannerContainer, setBannerContainer] = useState(null);
 
-  // On mount, find the header element and create or reuse the banner container
+  // When active, find the header element and create/reuse the banner container.
   useEffect(() => {
-    const header = document.querySelector("header.rm-Header");
-    if (header) {
-      let container = document.getElementById("simple-banner-container");
-      if (!container) {
-        container = document.createElement("div");
-        container.id = "simple-banner-container";
-        // Always append the container to the bottom of the header
-        header.appendChild(container);
+    if (isActive) {
+      const header = document.querySelector("header.rm-Header");
+      if (header) {
+        let container = document.getElementById("simple-banner-container");
+        if (!container) {
+          container = document.createElement("div");
+          container.id = "simple-banner-container";
+          // Always append the container to the bottom of the header
+          header.appendChild(container);
+        }
+        setBannerContainer(container);
       }
-      setBannerContainer(container);
+    } else {
+      // If not active, clear any existing container reference
+      setBannerContainer(null);
     }
-  }, []);
+  }, [isActive]);
 
-  // Update container styles and content whenever props change
+  // When using the header container, update its styles and content.
   useEffect(() => {
     if (bannerContainer) {
       bannerContainer.style.background = bannerColor;
@@ -41,11 +47,32 @@ export const PageBanner_Simple = ({
     }
   }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
 
-  // Since we manipulate the DOM directly, nothing is rendered here
+  // When isActive is false, just render the banner inline.
+  if (!isActive) {
+    return (
+      <div
+        style={{
+          background: bannerColor,
+          color: bannerTextColor,
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+          padding: "8px",
+          textAlign: "center",
+          borderRadius: "6px",
+          marginBottom: "20px"
+        }}
+      >
+        {message}
+      </div>
+    );
+  }
+
+  // If isActive is true, we've injected the banner into the header so nothing is rendered inline.
   return null;
 };
 
 <PageBanner_Simple 
+  isActive={false}
   message="Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important." 
   bannerColor="#5100ff" 
   bannerTextColor="#ffffff" 
