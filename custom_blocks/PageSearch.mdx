@@ -106,13 +106,12 @@ export default function PageSearchHighlight() {
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
+          width: "100%",
           gap: "10px",
         }}
       >
-        {/* Search Input */}
-        <div style={{ flex: "1 1 0%", maxWidth: "300px" }}>
+        {/* Search Input (20% width) */}
+        <div style={{ flex: "1 1 20%", maxWidth: "20%" }}>
           <input
             type="text"
             placeholder="Search page content..."
@@ -128,8 +127,19 @@ export default function PageSearchHighlight() {
           />
         </div>
 
-        {/* Keyword Buttons */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", justifyContent: "flex-end" }}>
+        {/* Keyword Buttons (80% width) */}
+        <div
+          style={{
+            flex: "1 1 80%",
+            maxWidth: "80%",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "5px",
+            justifyContent: "flex-start",
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+          }}
+        >
           {keywords.map((keyword) => (
             <button
               key={keyword}
