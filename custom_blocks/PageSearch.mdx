@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 export default function PageSearchHighlight() {
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
@@ -43,13 +44,15 @@ export default function PageSearchHighlight() {
     }
 
     let matchCounter = 0;
+    let matches = [];
     const regex = new RegExp(`(${searchTerm})`, "gi");
 
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
         const modifiedText = p.dataset.originalText.replace(regex, (match) => {
+          matches.push({ element: p });
           matchCounter++;
-          return `<span class="bg-yellow-300 font-bold px-1 rounded">${match}</span>`;
+          return `<span class="bg-yellow-300 font-bold px-1 rounded ring-2 ring-red-500">${match}</span>`;
         });
 
         p.innerHTML = modifiedText;
@@ -57,7 +60,13 @@ export default function PageSearchHighlight() {
     });
 
     setMatchCount(matchCounter);
+    setCurrentMatchIndex(0);
     console.log(`✅ Total matches found: ${matchCounter}`);
+
+    // Scroll to the first match
+    if (matchCounter > 0) {
+      setTimeout(() => scrollToMatch(0), 300);
+    }
   }, [searchTerm]);
 
   useEffect(() => {
@@ -87,6 +96,40 @@ export default function PageSearchHighlight() {
     });
   };
 
+  const scrollToMatch = (index) => {
+    const matches = document.querySelectorAll(".highlighted-match");
+    if (matches.length > 0 && matches[index]) {
+      matches[index].scrollIntoView({ behavior: "smooth", block: "center" });
+      matches.forEach((el) => el.classList.remove("ring-2", "ring-red-500"));
+      matches[index].classList.add("ring-2", "ring-red-500");
+      console.log(`📍 Scrolled to match ${index + 1}`);
+    }
+  };
+
+  const goToNextMatch = () => {
+    const matches = document.querySelectorAll(".highlighted-match");
+    if (matches.length === 0) return;
+
+    let newIndex = currentMatchIndex + 1;
+    if (newIndex >= matches.length) newIndex = 0;
+    setCurrentMatchIndex(newIndex);
+    scrollToMatch(newIndex);
+  };
+
+  const goToPrevMatch = () => {
+    const matches = document.querySelectorAll(".highlighted-match");
+    if (matches.length === 0) return;
+
+    let newIndex = currentMatchIndex - 1;
+    if (newIndex < 0) newIndex = matches.length - 1;
+    setCurrentMatchIndex(newIndex);
+    scrollToMatch(newIndex);
+  };
+
+  const handleKeywordClick = (keyword) => {
+    setSearchTerm(keyword);
+  };
+
   return (
     <div className="w-full space-y-3">
       {/* Search Input */}
@@ -103,6 +146,22 @@ export default function PageSearchHighlight() {
         <span className="text-sm text-gray-600 whitespace-nowrap">
           {matchCount} {matchCount === 1 ? "result" : "results"}
         </span>
+        {matchCount > 0 && (
+          <div className="flex gap-2">
+            <button
+              onClick={goToPrevMatch}
+              className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700"
+            >
+              ⬅ Prev
+            </button>
+            <button
+              onClick={goToNextMatch}
+              className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700"
+            >
+              Next ➡
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Keyword Buttons */}
@@ -110,7 +169,7 @@ export default function PageSearchHighlight() {
         {keywords.map((keyword) => (
           <button
             key={keyword}
-            onClick={() => setSearchTerm(keyword)}
+            onClick={() => handleKeywordClick(keyword)}
             className="px-3 py-1 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
           >
             {keyword} ({keywordCounts[keyword] || 0})
@@ -120,6 +179,5 @@ export default function PageSearchHighlight() {
     </div>
   );
 }
-
 
 <PageSearchHighlight />  
