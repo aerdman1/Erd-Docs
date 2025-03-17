@@ -90,7 +90,7 @@ export default function PageSearchHighlight() {
   };
 
   const scrollToMatch = (index) => {
-    const matches = document.querySelectorAll("span[style*='background-color: yellow']");
+    const matches = document.querySelectorAll("span[style*='background-color: #fef3c7']");
     if (matches.length > 0 && matches[index]) {
       matches[index].scrollIntoView({ behavior: "smooth", block: "center" });
       console.log(`📍 Scrolled to match ${index + 1}`);
@@ -98,7 +98,7 @@ export default function PageSearchHighlight() {
   };
 
   const goToNextMatch = () => {
-    const matches = document.querySelectorAll("span[style*='background-color: yellow']");
+    const matches = document.querySelectorAll("span[style*='background-color: #fef3c7']");
     if (matches.length === 0) return;
 
     let newIndex = currentMatchIndex + 1;
@@ -108,7 +108,7 @@ export default function PageSearchHighlight() {
   };
 
   const goToPrevMatch = () => {
-    const matches = document.querySelectorAll("span[style*='background-color: yellow']");
+    const matches = document.querySelectorAll("span[style*='background-color: #fef3c7']");
     if (matches.length === 0) return;
 
     let newIndex = currentMatchIndex - 1;
@@ -143,17 +143,18 @@ export default function PageSearchHighlight() {
         <span style={{ fontSize: "14px", color: "#555", whiteSpace: "nowrap" }}>
           {matchCount} {matchCount === 1 ? "result" : "results"}
         </span>
-        {matchCount > 0 && (
-          <div style={{ display: "flex", gap: "10px" }}>
+        {matchCount > 1 && (
+          <div style={{ display: "flex", gap: "5px" }}>
             <button
               onClick={goToPrevMatch}
               style={{
-                padding: "5px 10px",
-                backgroundColor: "#666",
+                padding: "3px 6px",
+                backgroundColor: "#888",
                 color: "white",
-                borderRadius: "4px",
+                borderRadius: "3px",
                 cursor: "pointer",
-                fontSize: "14px",
+                fontSize: "12px",
+                opacity: "0.8",
               }}
             >
               ⬅ Prev
@@ -161,12 +162,13 @@ export default function PageSearchHighlight() {
             <button
               onClick={goToNextMatch}
               style={{
-                padding: "5px 10px",
-                backgroundColor: "#666",
+                padding: "3px 6px",
+                backgroundColor: "#888",
                 color: "white",
-                borderRadius: "4px",
+                borderRadius: "3px",
                 cursor: "pointer",
-                fontSize: "14px",
+                fontSize: "12px",
+                opacity: "0.8",
               }}
             >
               Next ➡
@@ -198,4 +200,4 @@ export default function PageSearchHighlight() {
   );
 }
 
-<PageSearchHighlight />  
+<PageSearchHighlight />
