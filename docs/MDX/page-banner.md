@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-<PageBanner_Advanced message="zzzzzzzzz is your page-specific announcement banner — customize it to share updates, reminders, or anything important." bannerColor="#eeff00" bannerTextColor="#000000" fontSize="18px" fontWeight="400" placement="top" />
+<PageBanner_Advanced />
 
 <br />
 
