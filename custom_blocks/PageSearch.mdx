@@ -13,7 +13,6 @@ export default function PageSearchHighlight() {
   useEffect(() => {
     console.log("🔍 Initializing Search Component...");
 
-    // Extract keywords from <meta property="keywords">
     const metaKeywords = document.querySelector('meta[property="keywords"]');
     if (metaKeywords) {
       const keywordList = metaKeywords.content.split(",").map((word) => word.trim());
@@ -29,7 +28,6 @@ export default function PageSearchHighlight() {
     }
     console.log("✅ Found .content-body!");
 
-    // Select only the paragraphs inside .content-body (EXCLUDES search bar & keyword buttons)
     const paragraphs = contentElement.querySelectorAll("p");
     console.log(`📝 Found ${paragraphs.length} paragraphs to scan.`);
 
@@ -40,45 +38,57 @@ export default function PageSearchHighlight() {
       }
     });
 
-    function applyHighlight() {
-      console.log("🔍 Searching for:", searchTerm);
-      let matchCounter = 0;
-      let highlightedElements = [];
+    setTimeout(() => {
+      applyHighlight();
+    }, 500); // Delay to check if ReadMe resets changes
+  }, [searchTerm]);
 
-      paragraphs.forEach((p, index) => {
-        if (!searchTerm || searchTerm.length < 3) {
-          p.innerHTML = p.dataset.originalText;
-          console.log(`⏪ Restored original text for paragraph ${index + 1}`);
-          return;
-        }
+  function applyHighlight() {
+    const contentElement = document.querySelector(".content-body");
+    if (!contentElement) return;
 
-        const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(`(${safeTerm})`, "gi");
+    const paragraphs = contentElement.querySelectorAll("p");
+    let matchCounter = 0;
+    let highlightedElements = [];
 
-        let modifiedText = p.dataset.originalText.replace(regex, (match) => {
-          matchCounter++;
-          return `<span class="highlighted-match bg-yellow-300 font-bold px-1 rounded">${match}</span>`;
-        });
+    console.log("🔍 Searching for:", searchTerm);
 
-        if (modifiedText !== p.dataset.originalText) {
-          console.log(`🎨 Highlighted ${matchCounter} occurrences in paragraph ${index + 1}`);
-        }
+    paragraphs.forEach((p, index) => {
+      if (!searchTerm || searchTerm.length < 3) {
+        p.innerHTML = p.dataset.originalText;
+        console.log(`⏪ Restored original text for paragraph ${index + 1}`);
+        return;
+      }
 
-        p.innerHTML = modifiedText;
-        highlightedElements = [...highlightedElements, ...p.querySelectorAll(".highlighted-match")];
+      const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(${safeTerm})`, "gi");
+
+      let modifiedText = p.dataset.originalText.replace(regex, (match) => {
+        matchCounter++;
+        return `<span class="highlighted-match bg-yellow-300 font-bold px-1 rounded">${match}</span>`;
       });
 
-      console.log(`✅ Total matches found: ${matchCounter}`);
-      setMatchCount(matchCounter);
-
-      if (matchCounter > 0) {
-        setCurrentMatch(0);
-        scrollToMatch(0, highlightedElements);
+      if (modifiedText !== p.dataset.originalText) {
+        console.log(`🎨 Highlighted ${matchCounter} occurrences in paragraph ${index + 1}`);
       }
+
+      p.innerHTML = modifiedText;
+      highlightedElements = [...highlightedElements, ...p.querySelectorAll(".highlighted-match")];
+    });
+
+    console.log(`✅ Total matches found: ${matchCounter}`);
+    setMatchCount(matchCounter);
+
+    if (matchCounter > 0) {
+      setCurrentMatch(0);
+      scrollToMatch(0, highlightedElements);
     }
 
-    applyHighlight();
-  }, [searchTerm]);
+    // Log final modified HTML
+    setTimeout(() => {
+      console.log("🛠 Final HTML of .content-body:", contentElement.innerHTML);
+    }, 1000); // Check if ReadMe overwrites it
+  }
 
   function countKeywordOccurrences(keywordList) {
     const contentElement = document.querySelector(".content-body");
@@ -177,6 +187,5 @@ export default function PageSearchHighlight() {
     </div>
   );
 }
-
 
 <PageSearchHighlight /> 
