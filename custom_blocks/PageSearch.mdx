@@ -5,69 +5,149 @@ import React, { useState, useEffect } from "react";
 
 export default function PageSearchHighlight() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [keywords, setKeywords] = useState([]);
+  const [matchCount, setMatchCount] = useState(0);
+  const [currentMatch, setCurrentMatch] = useState(0);
 
   useEffect(() => {
+    // Extract keywords from <meta property="keywords">
+    const metaKeywords = document.querySelector('meta[property="keywords"]');
+    if (metaKeywords) {
+      const keywordList = metaKeywords.content.split(",").map((word) => word.trim());
+      setKeywords(keywordList);
+      console.log("📌 Extracted Keywords:", keywordList);
+    }
+
     const contentElement = document.querySelector(".content-body");
-    
     if (!contentElement) {
       console.warn("❌ Could not find .content-body!");
       return;
     }
-    console.log("✅ Found .content-body");
 
-    // Find all <p> tags inside content-body (avoids affecting the search bar)
+    // Find all <p> tags inside content-body
     const paragraphs = contentElement.querySelectorAll("p");
 
     paragraphs.forEach((p) => {
-      // Store original paragraph text only once
       if (!p.dataset.originalText) {
         p.dataset.originalText = p.innerHTML;
-        console.log("📌 Stored original text for:", p.innerText);
       }
     });
 
     function applyHighlight() {
-      console.log("🔍 Searching for:", searchTerm);
+      let matchCounter = 0;
+      let highlightedElements = [];
 
-      paragraphs.forEach((p) => {
+      paragraphs.forEach((p, index) => {
         if (!searchTerm || searchTerm.length < 3) {
-          p.innerHTML = p.dataset.originalText; // Restore original content
+          p.innerHTML = p.dataset.originalText;
           return;
         }
 
         const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         const regex = new RegExp(`(${safeTerm})`, "gi");
 
-        p.innerHTML = p.dataset.originalText.replace(
-          regex,
-          `<span style="background-color: yellow; font-weight: bold;">$1</span>`
-        );
+        p.innerHTML = p.dataset.originalText.replace(regex, (match) => {
+          matchCounter++;
+          return `<span class="highlighted-match" style="background-color: yellow; font-weight: bold;">${match}</span>`;
+        });
+
+        // Collect all highlighted elements for navigation
+        highlightedElements = [...highlightedElements, ...p.querySelectorAll(".highlighted-match")];
       });
+
+      setMatchCount(matchCounter);
+      if (matchCounter > 0) {
+        setCurrentMatch(0);
+        scrollToMatch(0, highlightedElements);
+      }
     }
 
     applyHighlight();
   }, [searchTerm]);
 
+  // Scroll to a specific match
+  function scrollToMatch(index, elements) {
+    if (elements.length > 0 && elements[index]) {
+      elements[index].scrollIntoView({ behavior: "smooth", block: "center" });
+      elements.forEach((el) => (el.style.border = "none")); // Reset styles
+      elements[index].style.border = "2px solid red"; // Highlight the active match
+    }
+  }
+
+  // Navigate between matches
+  function goToNextMatch() {
+    const matches = document.querySelectorAll(".highlighted-match");
+    if (matches.length === 0) return;
+
+    let newIndex = currentMatch + 1;
+    if (newIndex >= matches.length) newIndex = 0;
+    setCurrentMatch(newIndex);
+    scrollToMatch(newIndex, matches);
+  }
+
+  function goToPrevMatch() {
+    const matches = document.querySelectorAll(".highlighted-match");
+    if (matches.length === 0) return;
+
+    let newIndex = currentMatch - 1;
+    if (newIndex < 0) newIndex = matches.length - 1;
+    setCurrentMatch(newIndex);
+    scrollToMatch(newIndex, matches);
+  }
+
   return (
-    <input
-      type="text"
-      placeholder="Search page content..."
-      value={searchTerm}
-      onChange={(e) => {
-        console.log("⌨️ User Typed:", e.target.value);
-        setSearchTerm(e.target.value);
-      }}
-      style={{
-        width: "100%",
-        padding: "8px",
-        fontSize: "16px",
-        border: "1px solid #ccc",
-        borderRadius: "4px",
-        marginBottom: "10px",
-      }}
-    />
+    <div>
+      <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "10px" }}>
+        <input
+          type="text"
+          placeholder="Search page content..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            flex: 1,
+            padding: "8px",
+            fontSize: "16px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+          }}
+        />
+        {matchCount > 0 && (
+          <span style={{ fontSize: "14px", color: "#555" }}>{matchCount} results found</span>
+        )}
+      </div>
+
+      {matchCount > 0 && (
+        <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+          <button onClick={goToPrevMatch} style={{ padding: "5px 10px", cursor: "pointer" }}>
+            ⬅ Previous
+          </button>
+          <button onClick={goToNextMatch} style={{ padding: "5px 10px", cursor: "pointer" }}>
+            Next ➡
+          </button>
+        </div>
+      )}
+
+      {/* Show Keyword Bubbles */}
+      {keywords.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginTop: "10px" }}>
+          {keywords.map((keyword, index) => (
+            <button
+              key={index}
+              onClick={() => setSearchTerm(keyword)}
+              style={{
+                backgroundColor: "#f0f0f0",
+                padding: "5px 10px",
+                borderRadius: "15px",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              {keyword}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
-
-
-<PageSearchHighlight />
