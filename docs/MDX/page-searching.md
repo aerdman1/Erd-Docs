@@ -1,5 +1,5 @@
 ---
-title: Page Searching
+title: Page Searching & Keywords
 deprecated: false
 hidden: false
 metadata:
