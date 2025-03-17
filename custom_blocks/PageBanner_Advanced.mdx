@@ -4,7 +4,7 @@ name: PageBanner_Advanced
 import React, { useState, useLayoutEffect, useEffect } from "react";
 
 export const PageBanner_Advanced = ({
-  isPublic = false,  
+  isPublic = false,
   message: propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor: propBannerColor = "#381D71",
   bannerTextColor: propBannerTextColor = "#ffffff",
@@ -341,8 +341,8 @@ export const PageBanner_Advanced = ({
           }}
         >
           <div style={containerStyles}>{message || defaults.message}</div>
-          {/* Render the admin toggle only if this is not a public banner */}
-          {!isPublic && (
+          {/* Always render the Edit Banner button for admin users */}
+          {isAdmin && (
             <button
               type="button"
               style={uiStyles.toggleButton}
@@ -366,8 +366,8 @@ export const PageBanner_Advanced = ({
           )}
         </div>
       </div>
-      {/* Render the generator UI only in admin view */}
-      {!isPublic && showGenerator && (
+      {/* Render the generator UI only for admin users */}
+      {isAdmin && showGenerator && (
         <div className="generator-ui" style={generatorStyles}>
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
