@@ -3,6 +3,9 @@ title: Page Searching (IN PROGRESS)
 deprecated: false
 hidden: false
 metadata:
+  keywords:
+    - erdman
+    - myKeywordTest
   robots: index
 ---
 <PageSearch />
