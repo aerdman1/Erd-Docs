@@ -12,7 +12,6 @@ export default function PageSearchHighlight() {
   useEffect(() => {
     console.log("🔍 Initializing Search Component...");
 
-    // Extract keywords from meta tag and store in state
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag) {
       const extracted = metaTag.content.split(",").map((kw) => kw.trim());
@@ -20,7 +19,6 @@ export default function PageSearchHighlight() {
       console.log("📌 Extracted Keywords:", extracted);
     }
 
-    // Store original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (!p.dataset.originalText) {
         p.dataset.originalText = p.innerHTML;
@@ -54,7 +52,6 @@ export default function PageSearchHighlight() {
     setMatchCount(matchCounter);
     console.log(`✅ Total matches found: ${matchCounter}`);
 
-    // Scroll to the first match
     if (matchCounter > 0) {
       setTimeout(() => scrollToFirstMatch(), 300);
     }
@@ -108,10 +105,28 @@ export default function PageSearchHighlight() {
           alignItems: "center",
           width: "100%",
           gap: "30px",
+          position: "relative",
         }}
       >
-        {/* Search Input (20% width) */}
-        <div style={{ flex: "1 1 25%", maxWidth: "25%" }}>
+        {/* Search Input (25% width) */}
+        <div style={{ flex: "1 1 25%", maxWidth: "25%", position: "relative" }}>
+          {/* Match Count (Positioned Above) */}
+          {matchCount > 0 && (
+            <span
+              style={{
+                position: "absolute",
+                top: "-18px",
+                left: "5px",
+                fontSize: "12px",
+                color: "#555",
+                opacity: "0.8",
+              }}
+            >
+              {matchCount} {matchCount === 1 ? "result" : "results"}
+            </span>
+          )}
+
+          {/* Input Box */}
           <input
             type="text"
             placeholder="Search Page..."
@@ -127,7 +142,7 @@ export default function PageSearchHighlight() {
           />
         </div>
 
-        {/* Keyword Buttons (80% width) */}
+        {/* Keyword Buttons (75% width) */}
         <div
           style={{
             flex: "1 1 75%",
@@ -159,13 +174,6 @@ export default function PageSearchHighlight() {
           ))}
         </div>
       </div>
-
-      {/* Match Count */}
-      {matchCount > 0 && (
-        <span style={{ fontSize: "14px", color: "#555" }}>
-          {matchCount} {matchCount === 1 ? "result" : "results"}
-        </span>
-      )}
     </div>
   );
 }
