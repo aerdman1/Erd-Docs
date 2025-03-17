@@ -4,7 +4,7 @@ name: PageBanner_Simple
 import React, { useEffect, useState } from "react";
 
 export const PageBanner_Simple = ({
-  isActive = false,
+  isHeader = false,
   message = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor = "#381D71",
   bannerTextColor = "#ffffff",
@@ -13,9 +13,9 @@ export const PageBanner_Simple = ({
 }) => {
   const [bannerContainer, setBannerContainer] = useState(null);
 
-  // When active, find the header element and create/reuse the banner container.
+  // When isHeader is true, find the header element and create/reuse the banner container.
   useEffect(() => {
-    if (isActive) {
+    if (isHeader) {
       const header = document.querySelector("header.rm-Header");
       if (header) {
         let container = document.getElementById("simple-banner-container");
@@ -28,12 +28,12 @@ export const PageBanner_Simple = ({
         setBannerContainer(container);
       }
     } else {
-      // If not active, clear any existing container reference
+      // If isHeader is false, clear any existing container reference.
       setBannerContainer(null);
     }
-  }, [isActive]);
+  }, [isHeader]);
 
-  // When using the header container, update its styles and content.
+  // Update container styles and content whenever props change.
   useEffect(() => {
     if (bannerContainer) {
       bannerContainer.style.background = bannerColor;
@@ -47,8 +47,8 @@ export const PageBanner_Simple = ({
     }
   }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
 
-  // When isActive is false, just render the banner inline.
-  if (!isActive) {
+  // When isHeader is false, render the banner inline.
+  if (!isHeader) {
     return (
       <div
         style={{
@@ -67,12 +67,12 @@ export const PageBanner_Simple = ({
     );
   }
 
-  // If isActive is true, we've injected the banner into the header so nothing is rendered inline.
+  // If isHeader is true, the banner is injected into the header, so nothing is rendered inline.
   return null;
 };
 
 <PageBanner_Simple 
-  isActive={false}
+  isHeader={false}
   message="Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important." 
   bannerColor="#5100ff" 
   bannerTextColor="#ffffff" 
