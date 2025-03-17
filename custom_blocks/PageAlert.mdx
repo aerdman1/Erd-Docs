@@ -3,7 +3,7 @@ name: PageAlert
 ---
 import React, { useState, useEffect } from "react";
 
-export const PopUpAlert = ({ children }) => {
+export const PopUpAlert = ({ title, children }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [remindNextTime, setRemindNextTime] = useState(true);
 
@@ -22,27 +22,20 @@ export const PopUpAlert = ({ children }) => {
 
   return (
     showAlert && (
-      <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
-          <div>{children}</div>
-          <div className="mt-4 flex items-center justify-center">
-            <input
-              type="checkbox"
-              id="remindNextTime"
-              checked={remindNextTime}
-              onChange={(e) => setRemindNextTime(e.target.checked)}
-              className="mr-2"
-            />
-            <label htmlFor="remindNextTime" className="text-gray-600">
-              Remind me next time
-            </label>
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-50">
+        <div className="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+          <div className="px-6 py-4 border-b">
+            <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
           </div>
-          <button
-            onClick={handleClose}
-            className="mt-4 px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-800"
-          >
-            Close
-          </button>
+          <div className="px-6 py-4 text-gray-700">{children}</div>
+          <div className="bg-gray-100 px-6 py-4 text-right">
+            <button
+              onClick={handleClose}
+              className="py-2 px-4 bg-blue-500 text-white rounded font-medium hover:bg-blue-700 transition duration-500"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -55,9 +48,8 @@ export const PopUpContent = ({ title, children }) => (
     <p className="text-gray-600 text-sm">{children}</p>
   </div>
 );
+ 
 
-<PopUpAlert> 
-  <PopUpContent title="Your Title Goes Here">
-    This is a custom message that you can control
-  </PopUpContent>
+<PopUpAlert title="Your Title Goes Here"> 
+  This is a custom message that you can control
 </PopUpAlert>
