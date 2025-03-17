@@ -164,7 +164,15 @@ export default function PageSearchHighlight() {
             <button
               key={keyword}
               onClick={() => handleKeywordClick(keyword)}
-              style={{ backgroundColor: "#f0f0f0", padding: "5px 10px", borderRadius: "15px", border: "1px solid #ccc", cursor: "pointer", fontSize: "12px", color: "#333" }}
+              style={{
+                backgroundColor: searchTerm === keyword ? "#e1e8ff" : "#f0f0f0", // Highlight if active
+                padding: "5px 10px",
+                borderRadius: "15px",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+                fontSize: "12px",
+                color: "#333"
+              }}
             >
               {keyword} ({keywordCounts[keyword] || 0})
             </button>
@@ -175,5 +183,6 @@ export default function PageSearchHighlight() {
   );
 }
 
- 
+<PageSearchHighlight />
+
 <PageSearchHighlight />
