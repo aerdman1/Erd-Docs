@@ -4,8 +4,8 @@ name: PageModal_Simple
 import React, { useState, useEffect, useRef } from "react";
 
 export const PageModal_Simple = ({
-  isActive = true,
-  title = "Notice",
+  isActive = false,
+  title = "Notice", 
   message = "This is your message. Customize it as needed.",
   onClose = () => {},
 }) => {
@@ -89,10 +89,9 @@ export const PageModal_Simple = ({
         </div>
       </div>
     </div>
-  );
+  ); 
 };
 
-// Example Usage
 <PageModal_Simple 
   title="System Update" 
   message="We will be performing scheduled maintenance at 12 AM UTC." 
