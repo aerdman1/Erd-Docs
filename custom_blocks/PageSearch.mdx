@@ -1,20 +1,21 @@
 ---
 name: PageSearch
 ---
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function PageSearchHighlight() {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageText, setPageText] = useState("");
-  const contentRef = useRef(null);
 
   useEffect(() => {
-    if (contentRef.current) {
-      const extractedText = contentRef.current.innerText;
-      console.log("Extracted Page Text:", extractedText); // 🔍 Debugging
+    // Try to grab the ReadMe page content
+    const contentElement = document.querySelector(".content-body");
+    if (contentElement) {
+      const extractedText = contentElement.innerText;
+      console.log("✅ Extracted Page Text:", extractedText); // Debugging
       setPageText(extractedText);
     } else {
-      console.log("❌ contentRef is null - No content found!");
+      console.log("❌ Could not find .content-body!");
     }
   }, []);
 
@@ -23,9 +24,6 @@ export default function PageSearchHighlight() {
 
     const regex = new RegExp(`(${search})`, "gi");
     const parts = text.split(regex);
-
-    console.log("🔍 Searching for:", search); // Debugging search term
-    console.log("📄 Original Text:", text); // Debugging original text
 
     return parts.map((part, index) =>
       part.toLowerCase() === search.toLowerCase() ? (
@@ -57,9 +55,7 @@ export default function PageSearchHighlight() {
           marginBottom: "10px",
         }}
       />
-      <div ref={contentRef}>
-        <p>{highlightText(pageText, searchTerm)}</p>
-      </div>
+      <p>{highlightText(pageText, searchTerm)}</p>
     </div>
   );
 }
