@@ -4,6 +4,7 @@ name: PageBanner_Advanced
 import React, { useState, useLayoutEffect, useEffect } from "react";
 
 export const PageBanner_Advanced = ({
+  isPublic = false,
   message: propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor: propBannerColor = "#381D71",
   bannerTextColor: propBannerTextColor = "#ffffff",
@@ -16,18 +17,19 @@ export const PageBanner_Advanced = ({
     const hubElem = document.getElementById("hub-me");
     if (hubElem) {
       try {
-        isAdmin = JSON.parse(hubElem.getAttribute("data-json")).isAdmin;
+        const hubData = JSON.parse(hubElem.getAttribute("data-json"));
+        isAdmin = hubData.isAdmin;
       } catch (e) {
         console.error("Error parsing hub-me data", e);
       }
     }
   }
-
-  // If not admin, do not render anything.
-  if (!isAdmin) {
+  
+  // For non-public instances, only admins should see the banner
+  if (!isPublic && !isAdmin) {
     return null;
   }
-
+  
   const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
 
   // Initialize state from props
@@ -54,7 +56,7 @@ export const PageBanner_Advanced = ({
     return () => window.removeEventListener("resize", updateHeaderHeight);
   }, []);
 
-  // Sync state with props changes
+  // Sync state with prop changes
   useEffect(() => {
     setMessage(propMessage);
     setBannerColor(propBannerColor);
@@ -82,10 +84,10 @@ export const PageBanner_Advanced = ({
   };
 
   const generateBannerProps = () => {
-    let props = `message="${message}"`;
-    props += preset !== "custom" ? ` ${preset}={true}` : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
-    props += ` fontSize="${fontSize}" fontWeight="${fontWeight}" placement="${placement}"`;
-    return props;
+    let propsStr = `message="${message}"`;
+    propsStr += preset !== "custom" ? ` ${preset}={true}` : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
+    propsStr += ` fontSize="${fontSize}" fontWeight="${fontWeight}" placement="${placement}"`;
+    return propsStr;
   };
 
   const generatedSnippet = `<PageBanner_Advanced ${generateBannerProps()} />`;
@@ -122,7 +124,7 @@ export const PageBanner_Advanced = ({
   };
   const defaults = defaultPresets[preset];
 
-  // Compute banner styles for public banner
+  // Compute banner styles
   const bannerStyles = {
     background: bannerColor || defaults.bannerColor,
     color: bannerTextColor || defaults.bannerTextColor,
@@ -252,15 +254,17 @@ export const PageBanner_Advanced = ({
     sectionHeading: { fontSize: "1.25rem", marginBottom: "1rem", textAlign: "center", color: "#ffffff" },
   };
 
-  // Toggle blur effect when generator is shown
+  // Toggle blur effect when generator is shown (only in admin view)
   useEffect(() => {
-    const contentBody = document.querySelector("div.content-body.grid-75");
-    if (contentBody) {
-      showGenerator
-        ? contentBody.classList.add("blurred")
-        : contentBody.classList.remove("blurred");
+    if (!isPublic) {
+      const contentBody = document.querySelector("div.content-body.grid-75");
+      if (contentBody) {
+        showGenerator
+          ? contentBody.classList.add("blurred")
+          : contentBody.classList.remove("blurred");
+      }
     }
-  }, [showGenerator]);
+  }, [showGenerator, isPublic]);
 
   // Create and remove banner container on mount/unmount
   useEffect(() => {
@@ -276,7 +280,7 @@ export const PageBanner_Advanced = ({
     };
   }, []);
 
-  // Update banner container styles, content and placement on changes
+  // Update banner container styles, content, and placement on changes
   useEffect(() => {
     const headerElement = document.querySelector("header.rm-Header"),
       bannerWrapper = document.getElementById("custom-banner-container");
@@ -304,7 +308,7 @@ export const PageBanner_Advanced = ({
     };
   }, []);
 
-  // Dynamic generator styles using headerHeight
+  // Dynamic generator styles using headerHeight (only for admin view)
   const generatorStyles = {
     position: "fixed",
     top: `${headerHeight + 50}px`,
@@ -321,7 +325,7 @@ export const PageBanner_Advanced = ({
 
   return (
     <>
-      {/* CSS in the component */}
+      {/* Inline CSS */}
       <style>{`
         .content-body.grid-75.blurred { filter: blur(5px) brightness(0.5); }
         .content-body.grid-75.blurred .generator-ui { filter: none; }
@@ -337,31 +341,33 @@ export const PageBanner_Advanced = ({
           }}
         >
           <div style={containerStyles}>{message || defaults.message}</div>
-          {/* Banner Edit button for admin */}
-          <button
-            type="button"
-            style={uiStyles.toggleButton}
-            onClick={() => {
-              updateHeaderHeight();
-              setShowGenerator((prev) => !prev);
-            }}
-          >
-            {showGenerator ? (
-              <>
-                <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>
-                Banner
-              </>
-            ) : (
-              <>
-                <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>
-                Banner
-              </>
-            )}
-          </button>
+          {/* Render the admin toggle only if this is not a public banner */}
+          {!isPublic && (
+            <button
+              type="button"
+              style={uiStyles.toggleButton}
+              onClick={() => {
+                updateHeaderHeight();
+                setShowGenerator((prev) => !prev);
+              }}
+            >
+              {showGenerator ? (
+                <>
+                  <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>
+                  Banner
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>
+                  Banner
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
-      {/* Admin Generator UI */}
-      {showGenerator && (
+      {/* Render the generator UI only in admin view */}
+      {!isPublic && showGenerator && (
         <div className="generator-ui" style={generatorStyles}>
           <div style={uiStyles.container}>
             <div style={uiStyles.headerRow}>
@@ -522,7 +528,3 @@ export const PageBanner_Advanced = ({
 };
 
 export default PageBanner_Advanced;
-
-
-<PageBanner_Advanced /> 
- 
