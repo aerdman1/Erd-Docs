@@ -3,7 +3,7 @@ name: PageAlert
 ---
 import React, { useState, useEffect, useMemo } from "react";
 
-export const PopUpAlert = ({ children }) => {
+export const PopUpAlertNew = ({ children }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [remindNextTime, setRemindNextTime] = useState(true);
 
@@ -62,13 +62,13 @@ export const PopUpContent = ({ title, children }) => (
 );
 
 // Usage
-const PopUpAlert = () => (
+const PopUpAlertNew = () => (
   <PopUpAlert>
     <PopUpContent title="Your Title Goes Here">
-      This is a custom message that you can control.
+      This is a custom message that you can control. 
     </PopUpContent>
   </PopUpAlert>
 );
 
-export default PopUpAlert;
+export default PopUpAlertNew;
  
