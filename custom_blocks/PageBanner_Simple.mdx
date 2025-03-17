@@ -13,7 +13,7 @@ export const PageBanner_Simple = ({
 }) => {
   const [bannerContainer, setBannerContainer] = useState(null);
 
-  // Function to remove the banner on navigation
+  // Function to remove the banner element from the DOM
   const removeBanner = () => {
     const container = document.getElementById("simple-banner-container");
     if (container) {
@@ -21,7 +21,7 @@ export const PageBanner_Simple = ({
     }
   };
 
-  // When isHeader is true, find the header element and create/reuse the banner container.
+  // Effect to handle header-based banner creation and cleanup
   useEffect(() => {
     if (isHeader) {
       const header = document.querySelector("header.rm-Header");
@@ -30,17 +30,24 @@ export const PageBanner_Simple = ({
         if (!container) {
           container = document.createElement("div");
           container.id = "simple-banner-container";
-          // Always append the container to the bottom of the header
+          // Append container to the bottom of the header
           header.appendChild(container);
         }
         setBannerContainer(container);
       }
     } else {
+      // If switching from header to inline, ensure any header banner is removed.
+      removeBanner();
       setBannerContainer(null);
     }
+
+    // Cleanup: always remove the banner when the component unmounts.
+    return () => {
+      removeBanner();
+    };
   }, [isHeader]);
 
-  // Update container styles and content whenever props change.
+  // Update the banner container's styles and content when props change.
   useEffect(() => {
     if (bannerContainer) {
       bannerContainer.style.background = bannerColor;
@@ -54,9 +61,9 @@ export const PageBanner_Simple = ({
     }
   }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
 
-  // Ensure the banner is removed on navigation
+  // Ensure the banner is removed on route change (for SPAs)
   useEffect(() => {
-    let lastPath = window.location.pathname; // Track current path
+    let lastPath = window.location.pathname;
 
     const checkRouteChange = () => {
       if (window.location.pathname !== lastPath) {
@@ -65,7 +72,7 @@ export const PageBanner_Simple = ({
       }
     };
 
-    // Override history methods
+    // Override history methods to catch route changes.
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
@@ -79,20 +86,20 @@ export const PageBanner_Simple = ({
       removeBanner();
     };
 
-    // Set up route checking interval (backup for SPAs that don't trigger events)
+    // Backup interval to check for route changes
     const routeCheckInterval = setInterval(checkRouteChange, 500);
-
     window.addEventListener("popstate", removeBanner);
 
+    // Cleanup on effect teardown.
     return () => {
-      clearInterval(routeCheckInterval); // Clean up interval
+      clearInterval(routeCheckInterval);
       history.pushState = originalPushState;
       history.replaceState = originalReplaceState;
       window.removeEventListener("popstate", removeBanner);
     };
   }, []);
 
-  // When isHeader is false, render the banner inline.
+  // Render inline banner if not in header mode.
   if (!isHeader) {
     return (
       <div
@@ -112,7 +119,7 @@ export const PageBanner_Simple = ({
     );
   }
 
-  // If isHeader is true, the banner is injected into the header, so nothing is rendered inline.
+  // If isHeader is true, nothing is rendered inline since the banner is injected.
   return null;
 };
 
@@ -133,5 +140,3 @@ export const PageBanner_Simple = ({
   fontSize="14px" 
   fontWeight="bold" 
 />
-
-
