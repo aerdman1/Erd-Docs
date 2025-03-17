@@ -1,7 +1,7 @@
 ---
 title: NF Plugins
 deprecated: false
-hidden: false
+hidden: true
 metadata:
   robots: index
 ---
