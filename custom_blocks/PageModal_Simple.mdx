@@ -4,9 +4,9 @@ name: PageModal_Simple
 import React, { useState, useEffect, useRef } from "react";
 
 export const PageModal_Simple = ({
-  isActive = '',
-  title = "", 
-  message = "",
+  isActive = false, // Default to closed
+  title,
+  message,
   onClose = () => {},
 }) => {
   const [isOpen, setIsOpen] = useState(isActive);
@@ -21,14 +21,14 @@ export const PageModal_Simple = ({
     onClose();
   };
 
-  // Accessibility: Focus on the modal when it opens
+  // Accessibility: Focus on modal when opened
   useEffect(() => {
     if (isOpen && modalRef.current) {
       modalRef.current.focus();
     }
   }, [isOpen]);
 
-  // Close modal on Escape key press
+  // Close modal when Escape key is pressed
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -59,9 +59,11 @@ export const PageModal_Simple = ({
         >
           {/* Modal Header */}
           <div className="flex items-center justify-between p-5 border-b border-gray-200">
-            <h3 id="modal-title" className="text-xl font-semibold text-gray-800">
-              {title}
-            </h3>
+            {title && (
+              <h3 id="modal-title" className="text-xl font-semibold text-gray-800">
+                {title}
+              </h3>
+            )}
             <button
               type="button"
               onClick={closeModal}
@@ -73,9 +75,11 @@ export const PageModal_Simple = ({
           </div>
 
           {/* Modal Body */}
-          <div id="modal-desc" className="p-6 text-gray-600 text-center">
-            {message}
-          </div>
+          {message && (
+            <div id="modal-desc" className="p-6 text-gray-600 text-center">
+              {message}
+            </div>
+          )}
 
           {/* Modal Footer */}
           <div className="flex justify-center p-4 border-t border-gray-200">
@@ -92,7 +96,9 @@ export const PageModal_Simple = ({
   ); 
 };
 
+// Example Usage
 <PageModal_Simple 
+  isActive={true}
   title="System Update" 
   message="We will be performing scheduled maintenance at 12 AM UTC." 
 />
