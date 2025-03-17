@@ -6,12 +6,20 @@ import React, { useEffect, useState } from "react";
 export const PageBanner_Simple = ({
   isHeader = false,
   message = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
-  bannerColor = "#381D71",
+  bannerColor = "#006fff",
   bannerTextColor = "#ffffff",
   fontSize = "16px",
   fontWeight = "400"
 }) => {
   const [bannerContainer, setBannerContainer] = useState(null);
+
+  // Function to remove the banner on navigation
+  const removeBanner = () => {
+    const container = document.getElementById("simple-banner-container");
+    if (container) {
+      container.remove();
+    }
+  };
 
   // When isHeader is true, find the header element and create/reuse the banner container.
   useEffect(() => {
@@ -28,7 +36,6 @@ export const PageBanner_Simple = ({
         setBannerContainer(container);
       }
     } else {
-      // If isHeader is false, clear any existing container reference.
       setBannerContainer(null);
     }
   }, [isHeader]);
@@ -47,23 +54,28 @@ export const PageBanner_Simple = ({
     }
   }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
 
-  // Remove the banner when navigating to a different page
+  // Remove the banner when navigating to another page
   useEffect(() => {
-    const handleRouteChange = () => {
-      const container = document.getElementById("simple-banner-container");
-      if (container) {
-        container.remove();
-      }
+    // Override history methods to detect navigation
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+
+    history.pushState = function () {
+      originalPushState.apply(history, arguments);
+      removeBanner();
     };
 
-    window.addEventListener("popstate", handleRouteChange);
-    window.addEventListener("pushState", handleRouteChange);
-    window.addEventListener("replaceState", handleRouteChange);
+    history.replaceState = function () {
+      originalReplaceState.apply(history, arguments);
+      removeBanner();
+    };
+
+    window.addEventListener("popstate", removeBanner);
 
     return () => {
-      window.removeEventListener("popstate", handleRouteChange);
-      window.removeEventListener("pushState", handleRouteChange);
-      window.removeEventListener("replaceState", handleRouteChange);
+      history.pushState = originalPushState;
+      history.replaceState = originalReplaceState;
+      window.removeEventListener("popstate", removeBanner);
     };
   }, []);
 
@@ -94,7 +106,7 @@ export const PageBanner_Simple = ({
 <PageBanner_Simple 
   isHeader={false}
   message="Hello! 👋 This is your page-specific banner — customize it to share updates, reminders, or anything important." 
-  bannerColor="#5100ff" 
+  bannerColor="#006fff" 
   bannerTextColor="#ffffff" 
   fontSize="16px" 
   fontWeight="400" 
