@@ -5,9 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-```
-```
-
 <HTMLBlock>{`
 <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-6">
       <div className="bg-white rounded-2xl p-8 m-6 max-w-xl shadow-2xl border border-gray-200 transform transition-all duration-300 hover:scale-105 hover:shadow-3xl">
