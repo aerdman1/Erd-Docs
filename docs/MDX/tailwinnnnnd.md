@@ -51,3 +51,7 @@ metadata:
       </div>
     </div>
 `}</HTMLBlock>
+
+<br />
+
+<FetchCheck />
