@@ -10,8 +10,11 @@ export default function PageSearchHighlight() {
 
   useEffect(() => {
     if (contentRef.current) {
-      // Extract the visible text from the page
-      setPageText(contentRef.current.innerText);
+      const extractedText = contentRef.current.innerText;
+      console.log("Extracted Page Text:", extractedText); // 🔍 Debugging
+      setPageText(extractedText);
+    } else {
+      console.log("❌ contentRef is null - No content found!");
     }
   }, []);
 
@@ -20,6 +23,9 @@ export default function PageSearchHighlight() {
 
     const regex = new RegExp(`(${search})`, "gi");
     const parts = text.split(regex);
+
+    console.log("🔍 Searching for:", search); // Debugging search term
+    console.log("📄 Original Text:", text); // Debugging original text
 
     return parts.map((part, index) =>
       part.toLowerCase() === search.toLowerCase() ? (
@@ -38,7 +44,10 @@ export default function PageSearchHighlight() {
         type="text"
         placeholder="Search page content..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={(e) => {
+          console.log("⌨️ User Typed:", e.target.value); // Debugging input
+          setSearchTerm(e.target.value);
+        }}
         style={{
           width: "100%",
           padding: "10px",
@@ -54,3 +63,5 @@ export default function PageSearchHighlight() {
     </div>
   );
 }
+
+<PageSearchHighlight />
