@@ -1,0 +1,49 @@
+---
+name: PageBanner_Simple
+---
+import React, { useEffect, useState } from "react";
+
+export const PageBanner_Simple = ({
+  message = "Here is my banner message - hope you enjoy!",
+  bannerColor = "#00BCFF",
+  bannerTextColor = "#ffffff",
+  fontSize = "14px",
+  fontWeight = "bold"
+}) => {
+  const [bannerContainer, setBannerContainer] = useState(null);
+
+  // Create or retrieve the banner container in the header on mount
+  useEffect(() => {
+    const header = document.querySelector("header.rm-Header");
+    if (header) {
+      let container = document.getElementById("simple-banner-container");
+      if (!container) {
+        container = document.createElement("div");
+        container.id = "simple-banner-container";
+        // Append to the bottom of the header
+        header.appendChild(container);
+      }
+      setBannerContainer(container);
+    }
+  }, []);
+
+  // Update the container whenever the banner props change
+  useEffect(() => {
+    if (bannerContainer) {
+      bannerContainer.style.background = bannerColor;
+      bannerContainer.style.color = bannerTextColor;
+      bannerContainer.style.fontSize = fontSize;
+      bannerContainer.style.fontWeight = fontWeight;
+      bannerContainer.style.padding = "8px";
+      bannerContainer.style.textAlign = "center";
+      bannerContainer.style.borderRadius = "6px";
+      bannerContainer.style.marginTop = "20px"; // spacing from other header content
+      bannerContainer.textContent = message;
+    }
+  }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
+
+  // Nothing is rendered by this component, all DOM manipulation is done in useEffect
+  return null;
+};
+
+<PageBanner_Simple /> 
