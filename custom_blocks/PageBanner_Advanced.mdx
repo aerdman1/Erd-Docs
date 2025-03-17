@@ -4,7 +4,7 @@ name: PageBanner_Advanced
 import React, { useState, useLayoutEffect, useEffect } from "react";
 
 export const PageBanner_Advanced = ({
-  isPublic = true,
+  isPublic = false,
   message: propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor: propBannerColor = "#381D71",
   bannerTextColor: propBannerTextColor = "#ffffff",
@@ -31,6 +31,9 @@ export const PageBanner_Advanced = ({
   }
   
   const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
+  
+  // Introduce a state for the public flag in the generator UI
+  const [bannerIsPublic, setBannerIsPublic] = useState(isPublic);
 
   // Initialize state from props
   const [message, setMessage] = useState(propMessage),
@@ -83,9 +86,15 @@ export const PageBanner_Advanced = ({
     }
   };
 
+  // Include isPublic in the generated snippet if bannerIsPublic is true.
   const generateBannerProps = () => {
     let propsStr = `message="${message}"`;
-    propsStr += preset !== "custom" ? ` ${preset}={true}` : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
+    if (bannerIsPublic) {
+      propsStr += ` isPublic={true}`;
+    }
+    propsStr += preset !== "custom" 
+      ? ` ${preset}={true}` 
+      : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
     propsStr += ` fontSize="${fontSize}" fontWeight="${fontWeight}" placement="${placement}"`;
     return propsStr;
   };
@@ -498,6 +507,15 @@ export const PageBanner_Advanced = ({
                 alignItems: "center",
               }}
             >
+              <label style={{ display: "flex", alignItems: "center", color: "#adb4c1", fontSize: "0.9rem" }}>
+                <input
+                  type="checkbox"
+                  checked={bannerIsPublic}
+                  onChange={(e) => setBannerIsPublic(e.target.checked)}
+                  style={{ marginRight: "0.5rem" }}
+                />
+                Public Banner
+              </label>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(generatedSnippet);
@@ -527,4 +545,4 @@ export const PageBanner_Advanced = ({
   );
 };
 
-<PageBanner_Advanced /> 
+<PageBanner_Advanced />
