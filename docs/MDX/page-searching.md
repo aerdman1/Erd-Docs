@@ -10,8 +10,6 @@ metadata:
 ---
 <PageSearch />
 
-<br />
-
 APIs (Application Programming Interfaces) allow software systems to communicate with each other. REST APIs are the most common type, utilizing HTTP methods such as GET, POST, PUT, and DELETE to interact with resources. A well-documented API provides clear request parameters, authentication methods, and response formats.
 
 Authentication is a crucial aspect of API security. Many APIs use API keys, OAuth 2.0, or JWT (JSON Web Tokens) for authentication. Proper error handling ensures that API consumers receive meaningful error messages, such as HTTP 400 for bad requests or HTTP 401 for unauthorized access.
