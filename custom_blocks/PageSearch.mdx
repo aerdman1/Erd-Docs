@@ -45,7 +45,7 @@ export default function PageSearchHighlight() {
         const modifiedText = p.dataset.originalText.replace(regex, (match) => {
           matches.push({ element: p });
           matchCounter++;
-          return `<span style="background-color: #e1e8ff; font-weight: 600; border:1px solid #c6d3ff; border-radius: 4px;padding: 2px;">${match}</span>`;
+          return `<span class="highlighted-match" style="background-color: #e1e8ff; font-weight: 600; border:1px solid #c6d3ff; border-radius: 4px; padding: 2px;">${match}</span>`;
         });
 
         p.innerHTML = modifiedText;
@@ -90,15 +90,17 @@ export default function PageSearchHighlight() {
   };
 
   const scrollToMatch = (index) => {
-    const matches = document.querySelectorAll("span[style*='background-color: #fef3c7']");
+    const matches = document.querySelectorAll(".highlighted-match");
     if (matches.length > 0 && matches[index]) {
       matches[index].scrollIntoView({ behavior: "smooth", block: "center" });
+      matches.forEach((el) => el.classList.remove("current-highlight"));
+      matches[index].classList.add("current-highlight");
       console.log(`📍 Scrolled to match ${index + 1}`);
     }
   };
 
   const goToNextMatch = () => {
-    const matches = document.querySelectorAll("span[style*='background-color: #fef3c7']");
+    const matches = document.querySelectorAll(".highlighted-match");
     if (matches.length === 0) return;
 
     let newIndex = currentMatchIndex + 1;
@@ -108,7 +110,7 @@ export default function PageSearchHighlight() {
   };
 
   const goToPrevMatch = () => {
-    const matches = document.querySelectorAll("span[style*='background-color: #fef3c7']");
+    const matches = document.querySelectorAll(".highlighted-match");
     if (matches.length === 0) return;
 
     let newIndex = currentMatchIndex - 1;
