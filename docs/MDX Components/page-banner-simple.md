@@ -5,4 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-<PageBanner_Simple isHeader={false} message="Display this banner inline or set isHeader to true to seamlessly insert it into your site's header!" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="14px" fontWeight="bold" />
+<PageBanner_Simple isHeader={false} message="This banner is displayed inline. Set isHeader to true to move it seamlessly into your site's header!" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="14px" fontWeight="bold" />
+
+<PageBanner_Simple isHeader={true} message="isHeader is set to true, so this banner is now integrated into your site's header!" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="14px" fontWeight="bold" />
