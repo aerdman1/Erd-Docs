@@ -1,54 +1,20 @@
 ---
 name: PageSearch
 ---
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 
-const PageSearchHighlight = () => {
+export default function SearchInput() {
   const [searchTerm, setSearchTerm] = useState("");
-  const contentRef = useRef(null);
-
-  useEffect(() => {
-    if (!contentRef.current) return;
-
-    const originalHTML = contentRef.current.getAttribute("data-original-html");
-    if (!originalHTML) {
-      contentRef.current.setAttribute("data-original-html", contentRef.current.innerHTML);
-    }
-
-    // If the search term is less than 3 characters, reset content
-    if (searchTerm.trim().length < 3) {
-      contentRef.current.innerHTML = contentRef.current.getAttribute("data-original-html");
-      return;
-    }
-
-    // Escape special regex characters
-    const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(`(${safeTerm})`, "gi");
-
-    // Replace matches with highlighted span
-    const newHTML = contentRef.current.getAttribute("data-original-html").replace(
-      regex,
-      '<span style="background-color: yellow; font-weight: bold;">$1</span>'
-    );
-
-    contentRef.current.innerHTML = newHTML;
-  }, [searchTerm]);
 
   return (
     <div>
       <input
         type="text"
-        placeholder="Search (min 3 chars)"
+        placeholder="Search..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{ marginBottom: "1rem", padding: "0.5rem", width: "100%" }}
       />
-      <div ref={contentRef}>
-        <p>This is some example text. Try searching for a word here!</p>
-        <p>Highlighting words dynamically in ReadMe MDX can be tricky.</p>
-      </div>
     </div>
   );
-};
-
-<PageSearchHighlight />
+}
+ 
