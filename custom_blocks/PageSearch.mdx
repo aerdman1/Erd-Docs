@@ -45,7 +45,7 @@ export default function PageSearchHighlight() {
         const modifiedText = p.dataset.originalText.replace(regex, (match) => {
           matches.push({ element: p });
           matchCounter++;
-          return `<span style="background-color: #fef3c7; font-weight: 600; border:1px solid white; border-radius: 4px;">${match}</span>`;
+          return `<span style="background-color: #fef3c7; font-weight: 600; border:1px solid red; border-radius: 4px;">${match}</span>`;
         });
 
         p.innerHTML = modifiedText;
