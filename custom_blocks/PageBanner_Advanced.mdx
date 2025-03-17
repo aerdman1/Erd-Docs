@@ -86,12 +86,10 @@ export const PageBanner_Advanced = ({
     }
   };
 
-  // Include isPublic in the generated snippet if bannerIsPublic is true.
+  // Always include isPublic in the generated snippet
   const generateBannerProps = () => {
     let propsStr = `message="${message}"`;
-    if (bannerIsPublic) {
-      propsStr += ` isPublic={true}`;
-    }
+    propsStr += ` isPublic={${bannerIsPublic ? "true" : "false"}}`;
     propsStr += preset !== "custom" 
       ? ` ${preset}={true}` 
       : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
@@ -154,7 +152,7 @@ export const PageBanner_Advanced = ({
     fontFamily: "Inter, sans-serif",
   };
 
-  // Removed the 'note' CSS since it is no longer needed.
+  // Removed the note CSS and its related UI
   const uiStyles = {
     container: {
       maxWidth: "800px",
