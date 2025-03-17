@@ -12,7 +12,6 @@ export const PageModal_Simple = ({
   const [isOpen, setIsOpen] = useState(isActive);
   const modalRef = useRef(null);
 
-  // Sync internal state with isActive prop
   useEffect(() => {
     setIsOpen(isActive);
   }, [isActive]);
@@ -22,14 +21,14 @@ export const PageModal_Simple = ({
     onClose();
   };
 
-  // Set focus to the modal when it opens for accessibility.
+  // Accessibility: Focus on the modal when it opens
   useEffect(() => {
     if (isOpen && modalRef.current) {
       modalRef.current.focus();
     }
   }, [isOpen]);
 
-  // Close the modal when Escape key is pressed.
+  // Close modal on Escape key press
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -44,43 +43,30 @@ export const PageModal_Simple = ({
 
   if (!isOpen) return null;
 
-  // Inline style for the close button.
-  const closeButtonStyle = {
-    background: "transparent",
-    border: "none",
-    fontSize: "1.5rem",
-    color: "#4a5568",
-    cursor: "pointer",
-    transition: "color 0.2s ease-in-out",
-  };
-
   return (
-    <>
-      <div
-        className="fixed inset-0 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        aria-describedby="modal-desc"
-      >
+    <div className="readme-tailwind">
+      {/* Modal Background Overlay */}
+      <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/40 backdrop-blur-sm">
+        {/* Modal Content */}
         <div
-          className="bg-white shadow-lg w-full max-w-md rounded-md transition-all duration-300 focus:outline-none"
+          className="bg-white shadow-xl w-full max-w-md rounded-lg transition-all duration-300 focus:outline-none"
           ref={modalRef}
           tabIndex="-1"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+          aria-describedby="modal-desc"
         >
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-5">
-            <h3 id="modal-title" className="text-xl font-bold text-gray-800">
+          <div className="flex items-center justify-between p-5 border-b border-gray-200">
+            <h3 id="modal-title" className="text-xl font-semibold text-gray-800">
               {title}
             </h3>
             <button
               type="button"
               onClick={closeModal}
-              style={closeButtonStyle}
-              onMouseOver={(e) => (e.currentTarget.style.color = "#2d3748")}
-              onMouseOut={(e) => (e.currentTarget.style.color = "#4a5568")}
               aria-label="Close modal"
-              className="close-button focus:outline-none"
+              className="text-gray-500 hover:text-gray-700 transition-all text-2xl font-bold focus:outline-none"
             >
               &times;
             </button>
@@ -90,12 +76,23 @@ export const PageModal_Simple = ({
           <div id="modal-desc" className="p-6 text-gray-600 text-center">
             {message}
           </div>
+
+          {/* Modal Footer */}
+          <div className="flex justify-center p-4 border-t border-gray-200">
+            <button
+              onClick={closeModal}
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md transition-all hover:bg-blue-700 active:scale-95"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
+// Example Usage
 <PageModal_Simple 
   title="System Update" 
   message="We will be performing scheduled maintenance at 12 AM UTC." 
