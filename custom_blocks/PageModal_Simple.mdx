@@ -16,8 +16,8 @@ export const PageModal_Simple = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/40 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all border border-gray-200">
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50 bg-black/40 backdrop-blur-sm transition-all">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md border border-gray-200 transition-all">
         
         {/* Modal Header */}
         <div className="flex items-center justify-between p-5 border-b">
@@ -42,6 +42,7 @@ export const PageModal_Simple = ({
     </div>
   );
 };
+
 
 
 <PageModal_Simple 
