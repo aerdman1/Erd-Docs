@@ -47,6 +47,26 @@ export const PageBanner_Simple = ({
     }
   }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
 
+  // Remove the banner when navigating to a different page
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const container = document.getElementById("simple-banner-container");
+      if (container) {
+        container.remove();
+      }
+    };
+
+    window.addEventListener("popstate", handleRouteChange);
+    window.addEventListener("pushState", handleRouteChange);
+    window.addEventListener("replaceState", handleRouteChange);
+
+    return () => {
+      window.removeEventListener("popstate", handleRouteChange);
+      window.removeEventListener("pushState", handleRouteChange);
+      window.removeEventListener("replaceState", handleRouteChange);
+    };
+  }, []);
+
   // When isHeader is false, render the banner inline.
   if (!isHeader) {
     return (
