@@ -1,5 +1,5 @@
 ---
-title: Simple Stepper
+title: Stepper (Simple)
 deprecated: false
 hidden: false
 metadata:
