@@ -54,9 +54,18 @@ export const PageBanner_Simple = ({
     }
   }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
 
-  // Remove the banner when navigating to another page
+  // Ensure the banner is removed on navigation
   useEffect(() => {
-    // Override history methods to detect navigation
+    let lastPath = window.location.pathname; // Track current path
+
+    const checkRouteChange = () => {
+      if (window.location.pathname !== lastPath) {
+        lastPath = window.location.pathname;
+        removeBanner();
+      }
+    };
+
+    // Override history methods
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
 
@@ -70,9 +79,13 @@ export const PageBanner_Simple = ({
       removeBanner();
     };
 
+    // Set up route checking interval (backup for SPAs that don't trigger events)
+    const routeCheckInterval = setInterval(checkRouteChange, 500);
+
     window.addEventListener("popstate", removeBanner);
 
     return () => {
+      clearInterval(routeCheckInterval); // Clean up interval
       history.pushState = originalPushState;
       history.replaceState = originalReplaceState;
       window.removeEventListener("popstate", removeBanner);
@@ -102,7 +115,6 @@ export const PageBanner_Simple = ({
   // If isHeader is true, the banner is injected into the header, so nothing is rendered inline.
   return null;
 };
-
 
 <PageBanner_Simple 
   isHeader={false} 
