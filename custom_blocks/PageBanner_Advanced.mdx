@@ -25,28 +25,33 @@ export const PageBanner_Advanced = ({
       }
     }
   }
-  
+
   // For non-public instances, only admins should see the banner
   if (!isPublic && !isAdmin) {
     return null;
   }
-  
+
   const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
-  
+
   // Introduce a state for the public flag in the generator UI
   const [bannerIsPublic, setBannerIsPublic] = useState(isPublic);
 
-  // Initialize state from props
+  // Initialize state from props (including placement)
   const [message, setMessage] = useState(propMessage),
     [bannerColor, setBannerColor] = useState(propBannerColor),
     [bannerTextColor, setBannerTextColor] = useState(propBannerTextColor),
     [fontSize, setFontSize] = useState(propFontSize),
     [fontWeight, setFontWeight] = useState(initialFontWeight),
     [preset, setPreset] = useState("custom"), // 'critical', 'warning', 'standard', 'custom'
-    [placement, setPlacement] = useState("bottom"), // 'top' or 'bottom'
+    [placement, setPlacement] = useState(propPlacement),
     [copied, setCopied] = useState(false),
     [showGenerator, setShowGenerator] = useState(false),
     [headerHeight, setHeaderHeight] = useState(0);
+
+  // Sync placement prop changes
+  useEffect(() => {
+    setPlacement(propPlacement);
+  }, [propPlacement]);
 
   // Update header height
   const updateHeaderHeight = () => {
@@ -87,12 +92,12 @@ export const PageBanner_Advanced = ({
     }
   };
 
-  // Always include isPublic in the generated snippet
+  // Always include isPublic in the generated snippet explicitly
   const generateBannerProps = () => {
     let propsStr = `message="${message}"`;
     propsStr += ` isPublic={${bannerIsPublic ? "true" : "false"}}`;
-    propsStr += preset !== "custom" 
-      ? ` ${preset}={true}` 
+    propsStr += preset !== "custom"
+      ? ` ${preset}={true}`
       : ` bannerColor="${bannerColor}" bannerTextColor="${bannerTextColor}"`;
     propsStr += ` fontSize="${fontSize}" fontWeight="${fontWeight}" placement="${placement}"`;
     return propsStr;
