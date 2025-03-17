@@ -12,7 +12,7 @@ export const PageBannerAdvanced = ({
   placement: propPlacement = "bottom", // Added placement prop here
 }) => {
   // Determine admin status from hub-me script data
-  let isAdmin = false;
+  let isAdmin = true; 
   if (typeof document !== "undefined") {
     const hubElem = document.getElementById("hub-me");
     if (hubElem) {
