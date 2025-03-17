@@ -4,8 +4,16 @@ deprecated: false
 hidden: false
 metadata:
   keywords:
-    - erdman
-    - myKeywordTest
+    - API
+    - Authentication
+    - REST API
+    - GraphQL
+    - Webhooks
+    - Rate Limiting
+    - Versioning
+    - Pagination
+    - Error Handling
+    - WebSockets
   robots: index
 ---
 <PageSearch />
