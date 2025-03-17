@@ -5,187 +5,121 @@ import React, { useState, useEffect } from "react";
 
 export default function PageSearchHighlight() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [keywords, setKeywords] = useState([]);
   const [matchCount, setMatchCount] = useState(0);
-  const [currentMatch, setCurrentMatch] = useState(0);
+  const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
   useEffect(() => {
     console.log("🔍 Initializing Search Component...");
 
-    const metaKeywords = document.querySelector('meta[property="keywords"]');
-    if (metaKeywords) {
-      const keywordList = metaKeywords.content.split(",").map((word) => word.trim());
-      setKeywords(keywordList);
-      countKeywordOccurrences(keywordList);
-      console.log("📌 Extracted Keywords:", keywordList);
+    // Extract keywords from meta tag and store in state
+    const metaTag = document.querySelector('meta[property="keywords"]');
+    if (metaTag) {
+      const extracted = metaTag.content.split(",").map((kw) => kw.trim());
+      setKeywords(extracted);
+      console.log("📌 Extracted Keywords:", extracted);
     }
 
-    const contentElement = document.querySelector(".content-body");
-    if (!contentElement) {
-      console.warn("❌ Could not find .content-body!");
-      return;
+    // Wrap content-body in Tailwind class
+    const contentBody = document.querySelector(".content-body");
+    if (contentBody && !contentBody.classList.contains("readme-tailwind")) {
+      contentBody.classList.add("readme-tailwind");
+      console.log("✅ Wrapped .content-body in .readme-tailwind");
     }
-    console.log("✅ Found .content-body!");
 
-    const paragraphs = contentElement.querySelectorAll("p");
-    console.log(`📝 Found ${paragraphs.length} paragraphs to scan.`);
-
-    paragraphs.forEach((p, index) => {
+    // Store original text for paragraphs
+    document.querySelectorAll(".content-body p").forEach((p) => {
       if (!p.dataset.originalText) {
         p.dataset.originalText = p.innerHTML;
-        console.log(`📌 Stored original text for paragraph ${index + 1}:`, p.innerText);
       }
     });
+  }, []);
 
-    setTimeout(() => {
-      applyHighlight();
-    }, 500); // Delay to check if ReadMe resets changes
-  }, [searchTerm]);
-
-  function applyHighlight() {
-    const contentElement = document.querySelector(".content-body");
-    if (!contentElement) return;
-
-    const paragraphs = contentElement.querySelectorAll("p");
-    let matchCounter = 0;
-    let highlightedElements = [];
-
-    console.log("🔍 Searching for:", searchTerm);
-
-    paragraphs.forEach((p, index) => {
-      if (!searchTerm || searchTerm.length < 3) {
-        p.innerHTML = p.dataset.originalText;
-        console.log(`⏪ Restored original text for paragraph ${index + 1}`);
-        return;
-      }
-
-      const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const regex = new RegExp(`(${safeTerm})`, "gi");
-
-      let modifiedText = p.dataset.originalText.replace(regex, (match) => {
-        matchCounter++;
-        return `<span class="highlighted-match bg-yellow-300 font-bold px-1 rounded">${match}</span>`;
-      });
-
-      if (modifiedText !== p.dataset.originalText) {
-        console.log(`🎨 Highlighted ${matchCounter} occurrences in paragraph ${index + 1}`);
-      }
-
-      p.innerHTML = modifiedText;
-      highlightedElements = [...highlightedElements, ...p.querySelectorAll(".highlighted-match")];
-    });
-
-    console.log(`✅ Total matches found: ${matchCounter}`);
-    setMatchCount(matchCounter);
-
-    if (matchCounter > 0) {
-      setCurrentMatch(0);
-      scrollToMatch(0, highlightedElements);
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      restoreOriginalText();
+      setMatchCount(0);
+      return;
     }
 
-    // Log final modified HTML
-    setTimeout(() => {
-      console.log("🛠 Final HTML of .content-body:", contentElement.innerHTML);
-    }, 1000); // Check if ReadMe overwrites it
-  }
+    let matchCounter = 0;
+    const regex = new RegExp(`(${searchTerm})`, "gi");
 
-  function countKeywordOccurrences(keywordList) {
-    const contentElement = document.querySelector(".content-body");
-    if (!contentElement) return;
+    document.querySelectorAll(".content-body p").forEach((p) => {
+      if (p.dataset.originalText) {
+        const modifiedText = p.dataset.originalText.replace(regex, (match) => {
+          matchCounter++;
+          return `<span class="bg-yellow-300 font-bold px-1 rounded">${match}</span>`;
+        });
 
-    let counts = {};
-    const textContent = contentElement.innerText.toLowerCase();
+        p.innerHTML = modifiedText;
+      }
+    });
 
-    keywordList.forEach((keyword) => {
-      const regex = new RegExp(`\\b${keyword.toLowerCase()}\\b`, "g");
-      const matches = textContent.match(regex);
-      counts[keyword] = matches ? matches.length : 0;
+    setMatchCount(matchCounter);
+    console.log(`✅ Total matches found: ${matchCounter}`);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (keywords.length === 0) return;
+
+    const counts = {};
+    document.querySelectorAll(".content-body p").forEach((p) => {
+      const text = p.innerText;
+      keywords.forEach((keyword) => {
+        const regex = new RegExp(`\\b${keyword}\\b`, "gi");
+        const matches = text.match(regex);
+        if (matches) {
+          counts[keyword] = (counts[keyword] || 0) + matches.length;
+        }
+      });
     });
 
     setKeywordCounts(counts);
     console.log("📊 Keyword Counts:", counts);
-  }
+  }, [keywords]);
 
-  function scrollToMatch(index, elements) {
-    if (elements.length > 0 && elements[index]) {
-      elements[index].scrollIntoView({ behavior: "smooth", block: "center" });
-      elements.forEach((el) => el.classList.remove("ring-2", "ring-red-500"));
-      elements[index].classList.add("ring-2", "ring-red-500");
-      console.log(`📍 Scrolled to match ${index + 1}`);
-    }
-  }
-
-  function goToNextMatch() {
-    const matches = document.querySelectorAll(".highlighted-match");
-    if (matches.length === 0) return;
-
-    let newIndex = currentMatch + 1;
-    if (newIndex >= matches.length) newIndex = 0;
-    setCurrentMatch(newIndex);
-    scrollToMatch(newIndex, matches);
-  }
-
-  function goToPrevMatch() {
-    const matches = document.querySelectorAll(".highlighted-match");
-    if (matches.length === 0) return;
-
-    let newIndex = currentMatch - 1;
-    if (newIndex < 0) newIndex = matches.length - 1;
-    setCurrentMatch(newIndex);
-    scrollToMatch(newIndex, matches);
-  }
+  const restoreOriginalText = () => {
+    document.querySelectorAll(".content-body p").forEach((p) => {
+      if (p.dataset.originalText) {
+        p.innerHTML = p.dataset.originalText;
+      }
+    });
+  };
 
   return (
     <div className="w-full space-y-3">
-      {/* Search Input + Buttons */}
+      {/* Search Input */}
       <div className="flex items-center gap-2 w-full">
         <div className="flex-1 max-w-[500px]">
           <input
             type="text"
             placeholder="Search page content..."
+            className="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        {matchCount > 0 && (
-          <span className="text-sm text-gray-600 whitespace-nowrap">{matchCount} results</span>
-        )}
-        {matchCount > 0 && (
-          <div className="flex gap-2">
-            <button
-              onClick={goToPrevMatch}
-              className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700"
-            >
-              ⬅ Prev
-            </button>
-            <button
-              onClick={goToNextMatch}
-              className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700"
-            >
-              Next ➡
-            </button>
-          </div>
-        )}
+        <span className="text-sm text-gray-600 whitespace-nowrap">
+          {matchCount} {matchCount === 1 ? "result" : "results"}
+        </span>
       </div>
 
-      {/* Keyword Bubbles */}
-      {keywords.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {keywords.map((keyword, index) => (
-            <button
-              key={index}
-              onClick={() => setSearchTerm(keyword)}
-              className="px-3 py-1 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
-            >
-              {keyword} {keywordCounts[keyword] > 0 ? `(${keywordCounts[keyword]})` : ""}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Keyword Buttons */}
+      <div className="flex flex-wrap gap-2">
+        {keywords.map((keyword) => (
+          <button
+            key={keyword}
+            onClick={() => setSearchTerm(keyword)}
+            className="px-3 py-1 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
+          >
+            {keyword} ({keywordCounts[keyword] || 0})
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
 
-<PageSearchHighlight /> 
+
+<PageSearchHighlight />  
