@@ -21,13 +21,6 @@ export default function PageSearchHighlight() {
       console.log("📌 Extracted Keywords:", extracted);
     }
 
-    // Wrap content-body in Tailwind class
-    const contentBody = document.querySelector(".content-body");
-    if (contentBody && !contentBody.classList.contains("readme-tailwind")) {
-      contentBody.classList.add("readme-tailwind");
-      console.log("✅ Wrapped .content-body in .readme-tailwind");
-    }
-
     // Store original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (!p.dataset.originalText) {
@@ -52,7 +45,7 @@ export default function PageSearchHighlight() {
         const modifiedText = p.dataset.originalText.replace(regex, (match) => {
           matches.push({ element: p });
           matchCounter++;
-          return `<span class="bg-yellow-300 font-bold px-1 rounded ring-2 ring-red-500">${match}</span>`;
+          return `<span style="background-color: yellow; font-weight: bold; padding: 2px 4px; border-radius: 4px; border: 2px solid red;">${match}</span>`;
         });
 
         p.innerHTML = modifiedText;
@@ -97,17 +90,15 @@ export default function PageSearchHighlight() {
   };
 
   const scrollToMatch = (index) => {
-    const matches = document.querySelectorAll(".highlighted-match");
+    const matches = document.querySelectorAll("span[style*='background-color: yellow']");
     if (matches.length > 0 && matches[index]) {
       matches[index].scrollIntoView({ behavior: "smooth", block: "center" });
-      matches.forEach((el) => el.classList.remove("ring-2", "ring-red-500"));
-      matches[index].classList.add("ring-2", "ring-red-500");
       console.log(`📍 Scrolled to match ${index + 1}`);
     }
   };
 
   const goToNextMatch = () => {
-    const matches = document.querySelectorAll(".highlighted-match");
+    const matches = document.querySelectorAll("span[style*='background-color: yellow']");
     if (matches.length === 0) return;
 
     let newIndex = currentMatchIndex + 1;
@@ -117,7 +108,7 @@ export default function PageSearchHighlight() {
   };
 
   const goToPrevMatch = () => {
-    const matches = document.querySelectorAll(".highlighted-match");
+    const matches = document.querySelectorAll("span[style*='background-color: yellow']");
     if (matches.length === 0) return;
 
     let newIndex = currentMatchIndex - 1;
@@ -131,32 +122,52 @@ export default function PageSearchHighlight() {
   };
 
   return (
-    <div className="w-full space-y-3">
+    <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
       {/* Search Input */}
-      <div className="flex items-center gap-2 w-full">
-        <div className="flex-1 max-w-[500px]">
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", width: "100%" }}>
+        <div style={{ flex: "1 1 0%", maxWidth: "500px" }}>
           <input
             type="text"
             placeholder="Search page content..."
-            className="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{
+              width: "100%",
+              padding: "8px",
+              fontSize: "16px",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+            }}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <span className="text-sm text-gray-600 whitespace-nowrap">
+        <span style={{ fontSize: "14px", color: "#555", whiteSpace: "nowrap" }}>
           {matchCount} {matchCount === 1 ? "result" : "results"}
         </span>
         {matchCount > 0 && (
-          <div className="flex gap-2">
+          <div style={{ display: "flex", gap: "10px" }}>
             <button
               onClick={goToPrevMatch}
-              className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700"
+              style={{
+                padding: "5px 10px",
+                backgroundColor: "#666",
+                color: "white",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
             >
               ⬅ Prev
             </button>
             <button
               onClick={goToNextMatch}
-              className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700"
+              style={{
+                padding: "5px 10px",
+                backgroundColor: "#666",
+                color: "white",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
             >
               Next ➡
             </button>
@@ -165,12 +176,19 @@ export default function PageSearchHighlight() {
       </div>
 
       {/* Keyword Buttons */}
-      <div className="flex flex-wrap gap-2">
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
         {keywords.map((keyword) => (
           <button
             key={keyword}
             onClick={() => handleKeywordClick(keyword)}
-            className="px-3 py-1 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
+            style={{
+              backgroundColor: "#f0f0f0",
+              padding: "5px 10px",
+              borderRadius: "15px",
+              border: "1px solid #ccc",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
           >
             {keyword} ({keywordCounts[keyword] || 0})
           </button>
