@@ -1,5 +1,5 @@
 ---
-title: Advanced Stepper
+title: Stepper (Advanced)
 deprecated: false
 hidden: false
 metadata:
