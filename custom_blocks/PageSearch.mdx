@@ -11,48 +11,66 @@ export default function PageSearchHighlight() {
   const [keywordCounts, setKeywordCounts] = useState({});
 
   useEffect(() => {
+    console.log("🔍 Initializing Search Component...");
+
     // Extract keywords from <meta property="keywords">
     const metaKeywords = document.querySelector('meta[property="keywords"]');
     if (metaKeywords) {
       const keywordList = metaKeywords.content.split(",").map((word) => word.trim());
       setKeywords(keywordList);
       countKeywordOccurrences(keywordList);
+      console.log("📌 Extracted Keywords:", keywordList);
     }
 
     const contentElement = document.querySelector(".content-body");
-    if (!contentElement) return;
+    if (!contentElement) {
+      console.warn("❌ Could not find .content-body!");
+      return;
+    }
+    console.log("✅ Found .content-body!");
 
-    // Get only the paragraphs inside .content-body (EXCLUDES search & keyword buttons)
+    // Select only the paragraphs inside .content-body (EXCLUDES search bar & keyword buttons)
     const paragraphs = contentElement.querySelectorAll("p");
+    console.log(`📝 Found ${paragraphs.length} paragraphs to scan.`);
 
-    paragraphs.forEach((p) => {
+    paragraphs.forEach((p, index) => {
       if (!p.dataset.originalText) {
         p.dataset.originalText = p.innerHTML;
+        console.log(`📌 Stored original text for paragraph ${index + 1}:`, p.innerText);
       }
     });
 
     function applyHighlight() {
+      console.log("🔍 Searching for:", searchTerm);
       let matchCounter = 0;
       let highlightedElements = [];
 
-      paragraphs.forEach((p) => {
+      paragraphs.forEach((p, index) => {
         if (!searchTerm || searchTerm.length < 3) {
           p.innerHTML = p.dataset.originalText;
+          console.log(`⏪ Restored original text for paragraph ${index + 1}`);
           return;
         }
 
         const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         const regex = new RegExp(`(${safeTerm})`, "gi");
 
-        p.innerHTML = p.dataset.originalText.replace(regex, (match) => {
+        let modifiedText = p.dataset.originalText.replace(regex, (match) => {
           matchCounter++;
           return `<span class="highlighted-match bg-yellow-300 font-bold px-1 rounded">${match}</span>`;
         });
 
+        if (modifiedText !== p.dataset.originalText) {
+          console.log(`🎨 Highlighted ${matchCounter} occurrences in paragraph ${index + 1}`);
+        }
+
+        p.innerHTML = modifiedText;
         highlightedElements = [...highlightedElements, ...p.querySelectorAll(".highlighted-match")];
       });
 
+      console.log(`✅ Total matches found: ${matchCounter}`);
       setMatchCount(matchCounter);
+
       if (matchCounter > 0) {
         setCurrentMatch(0);
         scrollToMatch(0, highlightedElements);
@@ -76,6 +94,7 @@ export default function PageSearchHighlight() {
     });
 
     setKeywordCounts(counts);
+    console.log("📊 Keyword Counts:", counts);
   }
 
   function scrollToMatch(index, elements) {
@@ -83,6 +102,7 @@ export default function PageSearchHighlight() {
       elements[index].scrollIntoView({ behavior: "smooth", block: "center" });
       elements.forEach((el) => el.classList.remove("ring-2", "ring-red-500"));
       elements[index].classList.add("ring-2", "ring-red-500");
+      console.log(`📍 Scrolled to match ${index + 1}`);
     }
   }
 
