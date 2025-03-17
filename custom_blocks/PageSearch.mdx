@@ -13,6 +13,7 @@ export default function PageSearchHighlight() {
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
 
+    // Always update keywords from the meta tag on initialization
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag) {
       const extracted = metaTag.content.split(",").map((kw) => kw.trim());
@@ -20,10 +21,9 @@ export default function PageSearchHighlight() {
       console.log("📌 Extracted Keywords:", extracted);
     }
 
+    // Always update the original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
-      if (!p.dataset.originalText) {
-        p.dataset.originalText = p.innerHTML;
-      }
+      p.dataset.originalText = p.innerHTML;
     });
   };
 
@@ -50,6 +50,8 @@ export default function PageSearchHighlight() {
     const handleUrlChange = () => {
       // Delay slightly to let new content load if needed
       setTimeout(() => {
+        // Clear search term to remove any lingering highlights
+        setSearchTerm("");
         initializeSearchComponent();
       }, 300);
     };
@@ -62,7 +64,6 @@ export default function PageSearchHighlight() {
       window.removeEventListener("popstate", handleUrlChange);
       window.removeEventListener("pushState", handleUrlChange);
       window.removeEventListener("replaceState", handleUrlChange);
-      // Optionally, restore original history methods if needed
     };
   }, []);
 
@@ -165,7 +166,7 @@ export default function PageSearchHighlight() {
               key={keyword}
               onClick={() => handleKeywordClick(keyword)}
               style={{
-                backgroundColor: searchTerm === keyword ? "#e1e8ff" : "#f0f0f0", // Highlight if active
+                backgroundColor: searchTerm === keyword ? "#e1e8ff" : "#f0f0f0",
                 padding: "5px 10px",
                 borderRadius: "15px",
                 border: "1px solid #ccc",
@@ -183,5 +184,4 @@ export default function PageSearchHighlight() {
   );
 }
 
-<PageSearchHighlight />
- 
+<PageSearchHighlight /> 
