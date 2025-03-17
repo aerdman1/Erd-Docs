@@ -24,10 +24,10 @@ export const PageModal_Simple = ({
           <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
           <button 
             onClick={closeModal} 
-            className="text-gray-500 hover:text-gray-700 transition p-2 rounded-full hover:bg-gray-100"
+            className="p-2 rounded-full hover:bg-gray-200 transition"
             aria-label="Close"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-black" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -42,7 +42,6 @@ export const PageModal_Simple = ({
     </div>
   );
 };
-
 
 
 <PageModal_Simple 
