@@ -4,11 +4,11 @@ name: SmallBanner
 import React from "react";
 
 export const PageBanner = ({
-  message = "Here is my banner message - hope you enjoy!",
-  bannerColor = "#00BCFF",
-  bannerTextColor = "#ffffff",
-  fontSize = "14px",
-  fontWeight = "bold"
+  message,
+  bannerColor,
+  bannerTextColor,
+  fontSize,
+  fontWeight,
 }) => {
   const inlineStyles = {
     background: bannerColor,
@@ -31,5 +31,3 @@ export const PageBanner = ({
 };
 
 <PageBanner message="this is my default" />
-
-testing
