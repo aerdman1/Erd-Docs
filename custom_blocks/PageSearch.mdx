@@ -8,19 +8,24 @@ export default function PageSearchHighlight() {
 
   useEffect(() => {
     const contentElement = document.querySelector(".content-body");
+    
     if (!contentElement) {
       console.warn("❌ Could not find .content-body!");
       return;
     }
+    console.log("✅ Found .content-body");
 
-    // Store the original content once (prevents duplication issues)
+    // Store the original content only once
     if (!contentElement.dataset.originalText) {
       contentElement.dataset.originalText = contentElement.innerHTML;
+      console.log("📌 Stored original text:", contentElement.dataset.originalText);
     }
 
-    // Function to highlight text
     function applyHighlight() {
+      console.log("🔍 Searching for:", searchTerm);
+
       if (!searchTerm || searchTerm.length < 3) {
+        console.log("ℹ️ Search term too short, restoring original text.");
         contentElement.innerHTML = contentElement.dataset.originalText;
         return;
       }
@@ -28,10 +33,13 @@ export default function PageSearchHighlight() {
       const safeTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const regex = new RegExp(`(${safeTerm})`, "gi");
 
-      contentElement.innerHTML = contentElement.dataset.originalText.replace(
+      const modifiedText = contentElement.dataset.originalText.replace(
         regex,
         `<span style="background-color: yellow; font-weight: bold;">$1</span>`
       );
+
+      console.log("🖍 Applying modified text:", modifiedText);
+      contentElement.innerHTML = modifiedText;
     }
 
     applyHighlight();
@@ -42,7 +50,10 @@ export default function PageSearchHighlight() {
       type="text"
       placeholder="Search page content..."
       value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
+      onChange={(e) => {
+        console.log("⌨️ User Typed:", e.target.value);
+        setSearchTerm(e.target.value);
+      }}
       style={{
         width: "100%",
         padding: "8px",
