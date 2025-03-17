@@ -42,11 +42,9 @@ export const PageBanner_Simple = ({
       bannerContainer.style.padding = "8px";
       bannerContainer.style.textAlign = "center";
       bannerContainer.style.borderRadius = "6px";
-      // Adjust margin if needed; here we're adding top margin if placed at the bottom
-      bannerContainer.style.marginTop = placement === "bottom" ? "20px" : "0px";
       bannerContainer.textContent = message;
     }
-  }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight, placement]);
+  }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
 
   // Since we manipulate the DOM directly, nothing is rendered here
   return null;
