@@ -1,13 +1,22 @@
 ---
 name: PageModal_Simple
 ---
-import React from "react";
+import React, { useState } from "react";
 
 export const PageModal_Simple = ({ 
   title = "Notice", 
-  message = "This is your message. Customize it as needed.", 
-  closeModal 
+  message = "This is your message. Customize it as needed." 
 }) => {
+  const [isOpen, setIsOpen] = useState(true);
+
+  // Function to close modal
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  // If modal is closed, don't render anything
+  if (!isOpen) return null;
+
   return (
     <div className="fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md transform transition-all">
@@ -32,3 +41,9 @@ export const PageModal_Simple = ({
     </div>
   );
 };
+
+<PageModal_Simple 
+  title="System Update" 
+  message="We will be performing scheduled maintenance at 12 AM UTC." 
+/>
+
