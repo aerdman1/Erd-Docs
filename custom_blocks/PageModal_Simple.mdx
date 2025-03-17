@@ -82,13 +82,8 @@ export const PageModal_Simple = ({
           )}
 
           {/* Modal Footer */}
-          <div className="flex justify-center p-4 border-t border-gray-200">
-            <button
-              onClick={closeModal}
-              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md transition-all hover:bg-blue-700 active:scale-95"
-            >
-              Close
-            </button>
+          <div className="flex justify-centr p-4 border-t border-gray-200">
+
           </div>
         </div>
       </div>
@@ -98,7 +93,7 @@ export const PageModal_Simple = ({
 
 // Example Usage
 <PageModal_Simple 
-  isActive={true}
+  isActive={false}
   title="System Update" 
   message="We will be performing scheduled maintenance at 12 AM UTC." 
 />
