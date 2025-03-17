@@ -6,7 +6,6 @@ import React, { useState, useEffect } from "react";
 export default function PageSearchHighlight() {
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
-  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
@@ -53,12 +52,11 @@ export default function PageSearchHighlight() {
     });
 
     setMatchCount(matchCounter);
-    setCurrentMatchIndex(0);
     console.log(`✅ Total matches found: ${matchCounter}`);
 
     // Scroll to the first match
     if (matchCounter > 0) {
-      setTimeout(() => scrollToMatch(0), 300);
+      setTimeout(() => scrollToFirstMatch(), 300);
     }
   }, [searchTerm]);
 
@@ -89,34 +87,12 @@ export default function PageSearchHighlight() {
     });
   };
 
-  const scrollToMatch = (index) => {
+  const scrollToFirstMatch = () => {
     const matches = document.querySelectorAll(".highlighted-match");
-    if (matches.length > 0 && matches[index]) {
-      matches[index].scrollIntoView({ behavior: "smooth", block: "center" });
-      matches.forEach((el) => el.classList.remove("current-highlight"));
-      matches[index].classList.add("current-highlight");
-      console.log(`📍 Scrolled to match ${index + 1}`);
+    if (matches.length > 0) {
+      matches[0].scrollIntoView({ behavior: "smooth", block: "center" });
+      console.log(`📍 Scrolled to first match`);
     }
-  };
-
-  const goToNextMatch = () => {
-    const matches = document.querySelectorAll(".highlighted-match");
-    if (matches.length === 0) return;
-
-    let newIndex = currentMatchIndex + 1;
-    if (newIndex >= matches.length) newIndex = 0;
-    setCurrentMatchIndex(newIndex);
-    scrollToMatch(newIndex);
-  };
-
-  const goToPrevMatch = () => {
-    const matches = document.querySelectorAll(".highlighted-match");
-    if (matches.length === 0) return;
-
-    let newIndex = currentMatchIndex - 1;
-    if (newIndex < 0) newIndex = matches.length - 1;
-    setCurrentMatchIndex(newIndex);
-    scrollToMatch(newIndex);
   };
 
   const handleKeywordClick = (keyword) => {
@@ -145,38 +121,6 @@ export default function PageSearchHighlight() {
         <span style={{ fontSize: "14px", color: "#555", whiteSpace: "nowrap" }}>
           {matchCount} {matchCount === 1 ? "result" : "results"}
         </span>
-        {matchCount > 1 && (
-          <div style={{ display: "flex", gap: "5px" }}>
-            <button
-              onClick={goToPrevMatch}
-              style={{
-                padding: "3px 6px",
-                backgroundColor: "#888",
-                color: "white",
-                borderRadius: "3px",
-                cursor: "pointer",
-                fontSize: "12px",
-                opacity: "0.8",
-              }}
-            >
-              ⬅ Prev
-            </button>
-            <button
-              onClick={goToNextMatch}
-              style={{
-                padding: "3px 6px",
-                backgroundColor: "#888",
-                color: "white",
-                borderRadius: "3px",
-                cursor: "pointer",
-                fontSize: "12px",
-                opacity: "0.8",
-              }}
-            >
-              Next ➡
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Keyword Buttons */}
