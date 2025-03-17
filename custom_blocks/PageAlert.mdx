@@ -58,5 +58,10 @@ export const PopUpContent = ({ title, children }) => (
   </div>
 );
 
-<PopUpContent />
+  <PopUpAlert>
+    <PopUpContent title="Your Title Goes Here">
+      This is a custom message that you can control
+    </PopUpContent>
+  </PopUpAlert>
+
 
