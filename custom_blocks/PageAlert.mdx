@@ -32,7 +32,7 @@ export default function AutoPopUpAlert() {
     const pageKey = getPageKey()
     if (pageKey && !localStorage.getItem(pageKey)) {
       setShowAlert(true)
-      localStorage.setItem(pageKey, 'true')
+      localStorage.setItem(pageKey, 'false')
     }
   }, [])
 
