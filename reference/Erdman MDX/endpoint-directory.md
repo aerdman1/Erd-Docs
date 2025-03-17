@@ -16,5 +16,11 @@ header.headline-container21aRBSn8Bqg6.headline-container_basic1DFntTggitfX{
   .field-description a[href], .field-description a:not([href=""]), .markdown-body a[href], .markdown-body a:not([href=""]) {
     text-decoration: none;
 }
+  
+section.content-toc.grid-25 {display:none !important;}
+
+.rm-Article {
+    max-width: 100% !important;
+}
 </style>
 `}</HTMLBlock>
