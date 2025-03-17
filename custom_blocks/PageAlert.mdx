@@ -8,9 +8,7 @@ export const PopUpAlert = ({ children }) => {
   const [remindNextTime, setRemindNextTime] = useState(true);
 
   useEffect(() => {
-    const getPageKey = () => `popup_reminder_${window.location.pathname}`;
-    const pageKey = getPageKey();
-
+    const pageKey = `popup_reminder_${window.location.pathname}`;
     if (localStorage.getItem(pageKey) !== "false") {
       setShowAlert(true);
     }
@@ -23,74 +21,44 @@ export const PopUpAlert = ({ children }) => {
   };
 
   return (
-    <>
-      {showAlert && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(255, 255, 255, 0.6)",
-            backdropFilter: "blur(5px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
-              textAlign: "center",
-              maxWidth: "400px",
-            }}
-          >
-            <div>{children}</div>
-            <div style={{ marginTop: "15px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <input
-                type="checkbox"
-                id="remindNextTime"
-                checked={remindNextTime}
-                onChange={(e) => setRemindNextTime(e.target.checked)}
-                style={{ marginRight: "8px" }}
-              />
-              <label htmlFor="remindNextTime" style={{ color: "#555" }}>
-                Remind me next time
-              </label>
-            </div>
-            <button
-              onClick={handleClose}
-              style={{
-                marginTop: "10px",
-                padding: "8px 16px",
-                backgroundColor: "#5A3E8B",
-                color: "white",
-                borderRadius: "5px",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              Close
-            </button>
+    showAlert && (
+      <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
+          <div>{children}</div>
+          <div className="mt-4 flex items-center justify-center">
+            <input
+              type="checkbox"
+              id="remindNextTime"
+              checked={remindNextTime}
+              onChange={(e) => setRemindNextTime(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="remindNextTime" className="text-gray-600">
+              Remind me next time
+            </label>
           </div>
+          <button
+            onClick={handleClose}
+            className="mt-4 px-4 py-2 bg-purple-700 text-white rounded-md hover:bg-purple-800"
+          >
+            Close
+          </button>
         </div>
-      )}
-    </>
+      </div>
+    )
   );
 };
 
 export const PopUpContent = ({ title, children }) => (
   <div>
-    <h2 style={{ color: "#333", fontSize: "18px", marginBottom: "10px" }}>{title}</h2>
-    <p style={{ color: "#555", fontSize: "14px" }}>{children}</p>
+    <h2 className="text-gray-800 text-lg mb-2 font-semibold">{title}</h2>
+    <p className="text-gray-600 text-sm">{children}</p>
   </div>
 );
 
 <PopUpAlert> 
-  <PopUpContent title="Important Notice">
-    This is a custom alert message. Adjust content as needed!
+  <PopUpContent>
+    #Your Title Goes Here
+    This is a custom message that you can conrol
   </PopUpContent>
-</PopUpAlert> 
- 
+</PopUpAlert>
