@@ -4,9 +4,9 @@ name: PageModal_Simple
 import React, { useState, useEffect, useRef } from "react";
 
 export const PageModal_Simple = ({
-  isActive = false,
-  title = "Notice", 
-  message = "This is your message. Customize it as needed.",
+  isActive = '',
+  title = "", 
+  message = "",
   onClose = () => {},
 }) => {
   const [isOpen, setIsOpen] = useState(isActive);
