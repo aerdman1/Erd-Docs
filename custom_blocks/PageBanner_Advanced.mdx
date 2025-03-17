@@ -2,7 +2,7 @@
 name: PageBanner_Advanced
 ---
 import React, { useState, useLayoutEffect, useEffect } from "react";
-// Page Banner + Editor (3/16/25)
+
 export const PageBanner_Advanced = ({
   message: propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor: propBannerColor = "#381D71",
@@ -22,11 +22,13 @@ export const PageBanner_Advanced = ({
       }
     }
   }
-  const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
 
-  // Check if on /custom-components/ page
-  const isCustomComponentsPage =
-    typeof window !== "undefined" && window.location.pathname.includes("/custom-components/");
+  // If not admin, do not render anything.
+  if (!isAdmin) {
+    return null;
+  }
+
+  const initialFontWeight = propFontWeight === "normal" ? "400" : propFontWeight;
 
   // Initialize state from props
   const [message, setMessage] = useState(propMessage),
@@ -37,8 +39,7 @@ export const PageBanner_Advanced = ({
     [preset, setPreset] = useState("custom"), // 'critical', 'warning', 'standard', 'custom'
     [placement, setPlacement] = useState("bottom"), // 'top' or 'bottom'
     [copied, setCopied] = useState(false),
-    // Automatically show generator UI if on /custom-components/ page
-    [showGenerator, setShowGenerator] = useState(isCustomComponentsPage ? true : false),
+    [showGenerator, setShowGenerator] = useState(false),
     [headerHeight, setHeaderHeight] = useState(0);
 
   // Update header height
@@ -304,29 +305,19 @@ export const PageBanner_Advanced = ({
   }, []);
 
   // Dynamic generator styles using headerHeight
-  const generatorStyles = isCustomComponentsPage
-    ? {
-        position: "relative",
-        borderRadius: "12px",
-        width: "600px",
-        zIndex: 1000,
-        background: "#2C303B",
-        overflowY: "auto",
-        boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
-      }
-    : {
-        position: "fixed",
-        top: `${headerHeight + 50}px`,
-        right: "20px",
-        borderRadius: "12px",
-        width: "600px",
-        zIndex: 1000,
-        background: "#2C303B",
-        overflowY: "auto",
-        boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
-        transform: "scale(0.8)",
-        transformOrigin: "top right",
-      };
+  const generatorStyles = {
+    position: "fixed",
+    top: `${headerHeight + 50}px`,
+    right: "20px",
+    borderRadius: "12px",
+    width: "600px",
+    zIndex: 1000,
+    background: "#2C303B",
+    overflowY: "auto",
+    boxShadow: "-5px 0 10px rgba(0,0,0,0.2)",
+    transform: "scale(0.8)",
+    transformOrigin: "top right",
+  };
 
   return (
     <>
@@ -336,38 +327,37 @@ export const PageBanner_Advanced = ({
         .content-body.grid-75.blurred .generator-ui { filter: none; }
       `}</style>
       {/* Banner Injection Content */}
-      <div id="custom-banner-content" style={{ display: "none", width: "100%" }}>
+      <div id="custom-banner-content" style={{ width: "100%" }}>
         <div
           style={{
+            display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             padding: "1px 10px",
           }}
         >
           <div style={containerStyles}>{message || defaults.message}</div>
-          {/* Only show the Banner Edit button if admin and NOT on /custom-components/ page */}
-          {isAdmin && !isCustomComponentsPage && (
-            <button
-              type="button"
-              style={uiStyles.toggleButton}
-              onClick={() => {
-                updateHeaderHeight();
-                setShowGenerator((prev) => !prev);
-              }}
-            >
-              {showGenerator ? (
-                <>
-                  <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>
-                  Banner
-                </>
-              ) : (
-                <>
-                  <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>
-                  Banner
-                </>
-              )}
-            </button>
-          )}
+          {/* Banner Edit button for admin */}
+          <button
+            type="button"
+            style={uiStyles.toggleButton}
+            onClick={() => {
+              updateHeaderHeight();
+              setShowGenerator((prev) => !prev);
+            }}
+          >
+            {showGenerator ? (
+              <>
+                <i className="fas fa-times" style={{ marginRight: "0.5rem" }}></i>
+                Banner
+              </>
+            ) : (
+              <>
+                <i className="fas fa-edit" style={{ marginRight: "0.5rem" }}></i>
+                Banner
+              </>
+            )}
+          </button>
         </div>
       </div>
       {/* Admin Generator UI */}
@@ -398,18 +388,10 @@ export const PageBanner_Advanced = ({
                   onChange={handlePresetChange}
                   style={uiStyles.select}
                 >
-                  <option value="custom">
-                    Custom (you choose colors)
-                  </option>
-                  <option value="critical">
-                    Critical (Red)
-                  </option>
-                  <option value="warning">
-                    Warning (Yellow)
-                  </option>
-                  <option value="standard">
-                    Standard (Blue)
-                  </option>
+                  <option value="custom">Custom (you choose colors)</option>
+                  <option value="critical">Critical (Red)</option>
+                  <option value="warning">Warning (Yellow)</option>
+                  <option value="standard">Standard (Blue)</option>
                 </select>
               </label>
               <label style={uiStyles.label}>
@@ -419,21 +401,15 @@ export const PageBanner_Advanced = ({
                   onChange={(e) => setPlacement(e.target.value)}
                   style={uiStyles.select}
                 >
-                  <option value="top">
-                    Top (first in header)
-                  </option>
-                  <option value="bottom">
-                    Bottom (default)
-                  </option>
+                  <option value="top">Top (first in header)</option>
+                  <option value="bottom">Bottom (default)</option>
                 </select>
               </label>
             </div>
             {preset === "custom" ? (
               <div style={uiStyles.fourColumnRow}>
                 <div>
-                  <label style={uiStyles.label}>
-                    BG Color 🎨
-                  </label>
+                  <label style={uiStyles.label}>BG Color 🎨</label>
                   <input
                     type="color"
                     value={bannerColor}
@@ -442,9 +418,7 @@ export const PageBanner_Advanced = ({
                   />
                 </div>
                 <div>
-                  <label style={uiStyles.label}>
-                    Text Color 🎨
-                  </label>
+                  <label style={uiStyles.label}>Text Color 🎨</label>
                   <input
                     type="color"
                     value={bannerTextColor}
@@ -453,27 +427,21 @@ export const PageBanner_Advanced = ({
                   />
                 </div>
                 <div>
-                  <label style={uiStyles.label}>
-                    Font Size
-                  </label>
+                  <label style={uiStyles.label}>Font Size</label>
                   <select
                     value={fontSize}
                     onChange={(e) => setFontSize(e.target.value)}
                     style={uiStyles.select}
                   >
-                    {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map(
-                      (size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
-                      )
-                    )}
+                    {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label style={uiStyles.label}>
-                    Font Weight
-                  </label>
+                  <label style={uiStyles.label}>Font Weight</label>
                   <select
                     value={fontWeight}
                     onChange={(e) => setFontWeight(e.target.value)}
@@ -488,27 +456,21 @@ export const PageBanner_Advanced = ({
             ) : (
               <div style={uiStyles.row}>
                 <div>
-                  <label style={uiStyles.label}>
-                    Font Size
-                  </label>
+                  <label style={uiStyles.label}>Font Size</label>
                   <select
                     value={fontSize}
                     onChange={(e) => setFontSize(e.target.value)}
                     style={uiStyles.select}
                   >
-                    {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map(
-                      (size) => (
-                        <option key={size} value={size}>
-                          {size}
-                        </option>
-                      )
-                    )}
+                    {["12px", "13px", "14px", "15px", "16px", "17px", "18px"].map((size) => (
+                      <option key={size} value={size}>
+                        {size}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
-                  <label style={uiStyles.label}>
-                    Font Weight
-                  </label>
+                  <label style={uiStyles.label}>Font Weight</label>
                   <select
                     value={fontWeight}
                     onChange={(e) => setFontWeight(e.target.value)}
@@ -548,13 +510,7 @@ export const PageBanner_Advanced = ({
               </div>
             </div>
             {copied && (
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: "1rem",
-                  color: "#ffffff",
-                }}
-              >
+              <div style={{ textAlign: "center", marginTop: "1rem", color: "#ffffff" }}>
                 Copied!
               </div>
             )}
@@ -562,7 +518,7 @@ export const PageBanner_Advanced = ({
         </div>
       )}
     </>
-  ); 
+  );
 };
 
 <PageBanner_Advanced /> 
