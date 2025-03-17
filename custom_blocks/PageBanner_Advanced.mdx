@@ -3,7 +3,7 @@ name: PageBanner_Advanced
 ---
 import React, { useState, useLayoutEffect, useEffect } from "react";
 // Page Banner + Editor (3/16/25)
-export const BannerMessage = ({
+export const PageBanner_Advanced = ({
   message: propMessage = "Hello! 👋 This is your page-specific announcement banner — customize it to share updates, reminders, or anything important.",
   bannerColor: propBannerColor = "#381D71",
   bannerTextColor: propBannerTextColor = "#ffffff",
@@ -566,4 +566,5 @@ export const BannerMessage = ({
   ); 
 };
 
-export default BannerMessage;
+<PageBanner_Advanced propMessage/>
+ 
