@@ -10,21 +10,15 @@ export default function PageSearchHighlight() {
   const [currentMatch, setCurrentMatch] = useState(0);
 
   useEffect(() => {
-    // Extract keywords from <meta property="keywords">
     const metaKeywords = document.querySelector('meta[property="keywords"]');
     if (metaKeywords) {
       const keywordList = metaKeywords.content.split(",").map((word) => word.trim());
       setKeywords(keywordList);
-      console.log("📌 Extracted Keywords:", keywordList);
     }
 
     const contentElement = document.querySelector(".content-body");
-    if (!contentElement) {
-      console.warn("❌ Could not find .content-body!");
-      return;
-    }
+    if (!contentElement) return;
 
-    // Find all <p> tags inside content-body
     const paragraphs = contentElement.querySelectorAll("p");
 
     paragraphs.forEach((p) => {
@@ -37,7 +31,7 @@ export default function PageSearchHighlight() {
       let matchCounter = 0;
       let highlightedElements = [];
 
-      paragraphs.forEach((p, index) => {
+      paragraphs.forEach((p) => {
         if (!searchTerm || searchTerm.length < 3) {
           p.innerHTML = p.dataset.originalText;
           return;
@@ -48,10 +42,9 @@ export default function PageSearchHighlight() {
 
         p.innerHTML = p.dataset.originalText.replace(regex, (match) => {
           matchCounter++;
-          return `<span class="highlighted-match" style="background-color: yellow; font-weight: bold;">${match}</span>`;
+          return `<span class="highlighted-match bg-yellow-300 font-bold px-1 rounded">${match}</span>`;
         });
 
-        // Collect all highlighted elements for navigation
         highlightedElements = [...highlightedElements, ...p.querySelectorAll(".highlighted-match")];
       });
 
@@ -65,16 +58,14 @@ export default function PageSearchHighlight() {
     applyHighlight();
   }, [searchTerm]);
 
-  // Scroll to a specific match
   function scrollToMatch(index, elements) {
     if (elements.length > 0 && elements[index]) {
       elements[index].scrollIntoView({ behavior: "smooth", block: "center" });
-      elements.forEach((el) => (el.style.border = "none")); // Reset styles
-      elements[index].style.border = "2px solid red"; // Highlight the active match
+      elements.forEach((el) => el.classList.remove("ring-2", "ring-red-500"));
+      elements[index].classList.add("ring-2", "ring-red-500");
     }
   }
 
-  // Navigate between matches
   function goToNextMatch() {
     const matches = document.querySelectorAll(".highlighted-match");
     if (matches.length === 0) return;
@@ -96,52 +87,36 @@ export default function PageSearchHighlight() {
   }
 
   return (
-    <div>
-      <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "10px" }}>
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
         <input
           type="text"
           placeholder="Search page content..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "8px",
-            fontSize: "16px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-          }}
+          className="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        {matchCount > 0 && (
-          <span style={{ fontSize: "14px", color: "#555" }}>{matchCount} results found</span>
-        )}
+        {matchCount > 0 && <span className="text-sm text-gray-600">{matchCount} results found</span>}
       </div>
 
       {matchCount > 0 && (
-        <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-          <button onClick={goToPrevMatch} style={{ padding: "5px 10px", cursor: "pointer" }}>
+        <div className="flex gap-2">
+          <button onClick={goToPrevMatch} className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">
             ⬅ Previous
           </button>
-          <button onClick={goToNextMatch} style={{ padding: "5px 10px", cursor: "pointer" }}>
+          <button onClick={goToNextMatch} className="px-3 py-2 text-sm font-semibold text-white bg-gray-600 rounded-md hover:bg-gray-700">
             Next ➡
           </button>
         </div>
       )}
 
-      {/* Show Keyword Bubbles */}
       {keywords.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", marginTop: "10px" }}>
+        <div className="flex flex-wrap gap-2">
           {keywords.map((keyword, index) => (
             <button
               key={index}
               onClick={() => setSearchTerm(keyword)}
-              style={{
-                backgroundColor: "#f0f0f0",
-                padding: "5px 10px",
-                borderRadius: "15px",
-                border: "1px solid #ccc",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
+              className="px-3 py-1 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
             >
               {keyword}
             </button>
@@ -151,3 +126,6 @@ export default function PageSearchHighlight() {
     </div>
   );
 }
+
+
+<PageSearchHighlight />
