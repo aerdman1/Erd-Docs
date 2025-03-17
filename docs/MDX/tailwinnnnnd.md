@@ -6,6 +6,38 @@ metadata:
   robots: index
 ---
 <HTMLBlock>{`
+<style>
+/* styles.css or tailwind.css */
+.btn-primary {
+  @apply bg-blue-600 text-white px-4 py-2 rounded-full font-semibold shadow-md transition-all duration-300 hover:bg-blue-700 hover:shadow-lg active:scale-95;
+}
+
+.btn-secondary {
+  @apply bg-green-600 text-white px-4 py-2 rounded-full font-semibold shadow-md transition-all duration-300 hover:bg-green-700 hover:shadow-lg active:scale-95;
+}
+
+.btn-tertiary {
+  @apply bg-yellow-500 text-white px-4 py-2 rounded-full font-semibold shadow-md transition-all duration-300 hover:bg-yellow-600 hover:shadow-lg active:scale-95;
+}
+
+.container-style {
+  @apply flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-6;
+}
+
+.card-style {
+  @apply bg-white rounded-2xl p-8 m-6 max-w-xl shadow-2xl border border-gray-200 transform transition-all duration-300 hover:scale-105 hover:shadow-3xl;
+}
+
+.header-style {
+  @apply text-2xl font-extrabold text-gray-800 mb-6 flex items-center gap-2;
+}
+
+.text-style {
+  @apply space-y-4 text-gray-700 text-lg;
+}
+  
+</style>
+
 <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 p-6">
       <div className="bg-white rounded-2xl p-8 m-6 max-w-xl shadow-2xl border border-gray-200 transform transition-all duration-300 hover:scale-105 hover:shadow-3xl">
         <h2 className="text-2xl font-extrabold text-gray-800 mb-6 flex items-center gap-2">
