@@ -117,9 +117,8 @@ export const DataTable = ({ children }) => {
         // Define button click behavior for enabling filtering
         trigger.onclick = () => {
             if (table.getAttribute("data-filter-enabled")) return;
-
+        
             const dt = window.jQuery(table).DataTable({
-                // Set custom layout for the search bar and buttons
                 dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
                 language: { search: "", searchPlaceholder: "Search Table:" },
                 buttons: [
@@ -179,7 +178,6 @@ export const DataTable = ({ children }) => {
                         },
                     },
                 ],
-                // Accessibility improvements after table initialization
                 initComplete: function () {
                     const searchInput = document.querySelector(".dataTables_filter input");
                     if (searchInput) {
@@ -187,13 +185,17 @@ export const DataTable = ({ children }) => {
                     }
                 },
             });
-
-            // Mark the table as having filtering enabled
+        
+            // Ensure the table is marked as active
             table.setAttribute("data-filter-enabled", "true");
             trigger.setAttribute("aria-expanded", "true");
-            // Hide the toggle button when filtering is active
-            trigger.style.display = "none";
+        
+            // **Force-hide the button every time filtering is enabled**
+            setTimeout(() => {
+                trigger.style.display = "none";
+            }, 50);
         };
+        
     };
 
     // Load dependencies and initialize tables on component mount
@@ -225,7 +227,7 @@ export const DataTable = ({ children }) => {
             <style>{dtCustomStyles}</style>
             {children}
         </div>
-    );
+    ); 
 };
 
 export default DataTable;
