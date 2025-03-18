@@ -13,37 +13,21 @@ export default function PageSearchHighlight() {
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
 
-    // Use meta tag with name="keywords" (adjust if your pages use a different attribute)
-    const metaTag = document.querySelector('meta[name="keywords"]');
+    // Always update keywords from the meta tag on initialization
+    const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag) {
       const extracted = metaTag.content.split(",").map((kw) => kw.trim());
       setKeywords(extracted);
       console.log("📌 Extracted Keywords:", extracted);
-    } else {
-      console.log("📌 No meta tag found for keywords");
-      setKeywords([]);
     }
 
-    // Reset and store the original text for paragraphs
+    // Always update the original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
-      // Restore original text if it exists (to remove any prior highlights)
-      if (p.dataset.originalText) {
-        p.innerHTML = p.dataset.originalText;
-      } else {
-        p.dataset.originalText = p.innerHTML;
-      }
+      p.dataset.originalText = p.innerHTML;
     });
   };
 
-  // Handler to run initialization on URL changes
-  const handleUrlChange = () => {
-    // Increase delay to 500ms to allow new content to load
-    setTimeout(() => {
-      setSearchTerm(""); // Clear any lingering search term/highlights
-      initializeSearchComponent();
-    }, 500);
-  };
-
+  // Setup initialization and URL change listeners
   useEffect(() => {
     // Run on initial mount
     initializeSearchComponent();
@@ -62,17 +46,24 @@ export default function PageSearchHighlight() {
       window.dispatchEvent(new Event("replaceState"));
     };
 
-    // Listen for route changes via different events
+    // Handler to call initialization logic on URL changes
+    const handleUrlChange = () => {
+      // Delay slightly to let new content load if needed
+      setTimeout(() => {
+        // Clear search term to remove any lingering highlights
+        setSearchTerm("");
+        initializeSearchComponent();
+      }, 300);
+    };
+
     window.addEventListener("popstate", handleUrlChange);
     window.addEventListener("pushState", handleUrlChange);
     window.addEventListener("replaceState", handleUrlChange);
-    window.addEventListener("hashchange", handleUrlChange);
 
     return () => {
       window.removeEventListener("popstate", handleUrlChange);
       window.removeEventListener("pushState", handleUrlChange);
       window.removeEventListener("replaceState", handleUrlChange);
-      window.removeEventListener("hashchange", handleUrlChange);
     };
   }, []);
 
@@ -125,7 +116,7 @@ export default function PageSearchHighlight() {
     console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
-  // Restore paragraphs to their original text
+  // Restore paragraphs to original text
   const restoreOriginalText = () => {
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
@@ -139,7 +130,7 @@ export default function PageSearchHighlight() {
     const matches = document.querySelectorAll(".highlighted-match");
     if (matches.length > 0) {
       matches[0].scrollIntoView({ behavior: "smooth", block: "center" });
-      console.log("📍 Scrolled to first match");
+      console.log(`📍 Scrolled to first match`);
     }
   };
 
@@ -152,7 +143,7 @@ export default function PageSearchHighlight() {
     <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
       {/* Search & Keywords Container */}
       <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "30px", position: "relative" }}>
-        {/* Search Input */}
+        {/* Search Input (25% width) */}
         <div style={{ flex: "1 1 25%", maxWidth: "25%", position: "relative" }}>
           {matchCount > 0 && (
             <span style={{ position: "absolute", top: "-18px", left: "5px", fontSize: "12px", color: "#555", opacity: "0.8" }}>
@@ -168,7 +159,7 @@ export default function PageSearchHighlight() {
           />
         </div>
 
-        {/* Keyword Buttons */}
+        {/* Keyword Buttons (75% width) */}
         <div style={{ flex: "1 1 75%", maxWidth: "75%", display: "flex", flexWrap: "wrap", gap: "5px", justifyContent: "flex-start", overflow: "hidden", whiteSpace: "nowrap" }}>
           {keywords.map((keyword) => (
             <button
