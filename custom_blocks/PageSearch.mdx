@@ -24,11 +24,27 @@ export default function PageSearchHighlight() {
     }
   };
 
-  // Function to initialize/reinitialize keywords and store original text
+  // Poll for meta tag content until it's non-empty, but stop after maxAttempts.
+  const pollForMetaTagContent = (attempt = 0) => {
+    const maxAttempts = 30; // 30 * 100ms = 3000ms (3 seconds)
+    const metaTag = document.querySelector('meta[property="keywords"]');
+    if (metaTag && metaTag.content.trim() !== "") {
+      updateKeywords();
+    } else {
+      if (attempt < maxAttempts) {
+        console.log(`Polling: meta tag content is still empty, attempt ${attempt + 1}`);
+        setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
+      } else {
+        console.log("Polling: maximum attempts reached. Stopping polling.");
+      }
+    }
+  };
+
+  // Initialize/reinitialize component (keywords & paragraphs)
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
-    updateKeywords();
-    // Store or restore original text for paragraphs.
+    pollForMetaTagContent();
+    // Reset or store original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
         p.innerHTML = p.dataset.originalText;
@@ -38,8 +54,12 @@ export default function PageSearchHighlight() {
     });
   };
 
-  // Use a MutationObserver to watch for changes on the meta tag.
+  // Set up observers and URL change listeners
   useEffect(() => {
+    // Run on initial mount
+    initializeSearchComponent();
+
+    // Set up a MutationObserver for the meta tag to detect future changes
     const metaTag = document.querySelector('meta[property="keywords"]');
     let observer;
     if (metaTag) {
@@ -53,22 +73,15 @@ export default function PageSearchHighlight() {
       });
       observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
     }
-    return () => {
-      if (observer) observer.disconnect();
+
+    // Handler to run initialization on URL changes
+    const handleUrlChange = () => {
+      // Delay allows new content/meta to load
+      setTimeout(() => {
+        setSearchTerm(""); // Clear any lingering search term/highlights
+        initializeSearchComponent();
+      }, 500);
     };
-  }, []);
-
-  // Handler for URL changes to reinitialize component
-  const handleUrlChange = () => {
-    setTimeout(() => {
-      setSearchTerm(""); // Clear lingering search term and highlights
-      initializeSearchComponent();
-    }, 500);
-  };
-
-  useEffect(() => {
-    // Run on initial mount
-    initializeSearchComponent();
 
     // Monkey-patch pushState and replaceState to dispatch events
     const originalPushState = history.pushState;
@@ -82,13 +95,13 @@ export default function PageSearchHighlight() {
       window.dispatchEvent(new Event("replaceState"));
     };
 
-    // Listen for route changes via different events
     window.addEventListener("popstate", handleUrlChange);
     window.addEventListener("pushState", handleUrlChange);
     window.addEventListener("replaceState", handleUrlChange);
     window.addEventListener("hashchange", handleUrlChange);
 
     return () => {
+      if (observer) observer.disconnect();
       window.removeEventListener("popstate", handleUrlChange);
       window.removeEventListener("pushState", handleUrlChange);
       window.removeEventListener("replaceState", handleUrlChange);
@@ -96,7 +109,7 @@ export default function PageSearchHighlight() {
     };
   }, []);
 
-  // Effect for highlighting search matches
+  // Highlight search matches in paragraphs
   useEffect(() => {
     if (searchTerm.length < 3) {
       restoreOriginalText();
@@ -125,7 +138,7 @@ export default function PageSearchHighlight() {
     }
   }, [searchTerm]);
 
-  // Effect to count keyword occurrences in paragraphs
+  // Count keyword occurrences in paragraphs
   useEffect(() => {
     if (keywords.length === 0) return;
 
@@ -145,7 +158,7 @@ export default function PageSearchHighlight() {
     console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
-  // Restore paragraphs to their original text (remove highlights)
+  // Restore paragraphs to original text (remove highlights)
   const restoreOriginalText = () => {
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
