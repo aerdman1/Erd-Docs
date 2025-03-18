@@ -5,6 +5,8 @@ hidden: false
 metadata:
   robots: index
 ---
+<DataTable />
+
 ### **Table 1: API Endpoints**
 
 | Endpoint      | Method | Description                          | Parameters                        | Response Format |
