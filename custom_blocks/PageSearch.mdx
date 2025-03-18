@@ -9,24 +9,27 @@ export default function PageSearchHighlight() {
   const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
+  // Update keywords from meta tag if content is available.
+  const updateKeywords = () => {
+    const metaTag = document.querySelector('meta[property="keywords"]');
+    if (metaTag) {
+      const content = metaTag.content;
+      if (content.trim() !== "") {
+        const extracted = content.split(",").map((kw) => kw.trim());
+        setKeywords(extracted);
+        console.log("📌 Extracted Keywords:", extracted);
+      } else {
+        console.log("Meta tag content is empty.");
+      }
+    }
+  };
+
   // Function to initialize/reinitialize keywords and store original text
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
-
-    // Use meta tag with property="keywords" (matches your site's implementation)
-    const metaTag = document.querySelector('meta[property="keywords"]');
-    if (metaTag) {
-      const extracted = metaTag.content.split(",").map((kw) => kw.trim());
-      setKeywords(extracted);
-      console.log("📌 Extracted Keywords:", extracted);
-    } else {
-      console.log("📌 No meta tag found for keywords");
-      setKeywords([]);
-    }
-
-    // Reset and store the original text for paragraphs
+    updateKeywords();
+    // Store or restore original text for paragraphs.
     document.querySelectorAll(".content-body p").forEach((p) => {
-      // Restore original text if it exists (to remove any prior highlights)
       if (p.dataset.originalText) {
         p.innerHTML = p.dataset.originalText;
       } else {
@@ -35,11 +38,30 @@ export default function PageSearchHighlight() {
     });
   };
 
-  // Handler to run initialization on URL changes
+  // Use a MutationObserver to watch for changes on the meta tag.
+  useEffect(() => {
+    const metaTag = document.querySelector('meta[property="keywords"]');
+    let observer;
+    if (metaTag) {
+      observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (mutation.type === "attributes" && mutation.attributeName === "content") {
+            console.log("Meta tag content changed:", metaTag.content);
+            updateKeywords();
+          }
+        }
+      });
+      observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
+    }
+    return () => {
+      if (observer) observer.disconnect();
+    };
+  }, []);
+
+  // Handler for URL changes to reinitialize component
   const handleUrlChange = () => {
-    // Increase delay (500ms) to allow new content to load
     setTimeout(() => {
-      setSearchTerm(""); // Clear any lingering search term/highlights
+      setSearchTerm(""); // Clear lingering search term and highlights
       initializeSearchComponent();
     }, 500);
   };
@@ -51,12 +73,10 @@ export default function PageSearchHighlight() {
     // Monkey-patch pushState and replaceState to dispatch events
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
-
     history.pushState = function () {
       originalPushState.apply(history, arguments);
       window.dispatchEvent(new Event("pushState"));
     };
-
     history.replaceState = function () {
       originalReplaceState.apply(history, arguments);
       window.dispatchEvent(new Event("replaceState"));
@@ -105,7 +125,7 @@ export default function PageSearchHighlight() {
     }
   }, [searchTerm]);
 
-  // Effect to count keyword occurrences
+  // Effect to count keyword occurrences in paragraphs
   useEffect(() => {
     if (keywords.length === 0) return;
 
@@ -125,7 +145,7 @@ export default function PageSearchHighlight() {
     console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
-  // Restore paragraphs to their original text
+  // Restore paragraphs to their original text (remove highlights)
   const restoreOriginalText = () => {
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
@@ -143,7 +163,7 @@ export default function PageSearchHighlight() {
     }
   };
 
-  // Handle clicking on keyword buttons
+  // Handle clicking on a keyword button
   const handleKeywordClick = (keyword) => {
     setSearchTerm(keyword);
   };
