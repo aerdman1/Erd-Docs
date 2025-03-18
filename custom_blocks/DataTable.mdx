@@ -190,10 +190,8 @@ export const DataTable = ({ children }) => {
             table.setAttribute("data-filter-enabled", "true");
             trigger.setAttribute("aria-expanded", "true");
         
-            // **Force-hide the button every time filtering is enabled**
-            setTimeout(() => {
-                trigger.style.display = "none";
-            }, 50);
+            // Force-hide the button every time filtering is enabled
+            trigger.style.display = "none";
         };
         
     };
