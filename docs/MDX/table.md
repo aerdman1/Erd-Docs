@@ -131,7 +131,7 @@ metadata:
 }
 
 .rdmd-table th, .rdmd-table td {
-  max-width: 200px; /* Restrict column width */
+  width: 200px; /* Restrict column width */
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
