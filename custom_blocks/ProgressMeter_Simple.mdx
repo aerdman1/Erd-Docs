@@ -3,7 +3,7 @@ name: ProgressMeter_Simple
 ---
 import React, { useEffect, useState } from "react";
 
-export const MeterGroup = ({ values = [], max = 100, labelPosition = "below", showCards = false }) => {
+export const ProgressMeter_Simple = ({ values = [], max = 100, labelPosition = "below", showCards = false }) => {
   const [animatedValues, setAnimatedValues] = useState(values.map(() => 0));
   const [showLabels, setShowLabels] = useState(false);
 
@@ -82,7 +82,7 @@ export const MeterGroup = ({ values = [], max = 100, labelPosition = "below", sh
   );
 };
 
-<MeterGroup  
+<ProgressMeter_Simple  
   values={[
     { label: "GET", cardLabel: "GET Requests", value: 30, meterBackgroundColor: "#4285F4", cardBackgroundColor: "#D2E3FC", textColor: "#fff", cardTextColor: "#174EA6", icon: "fas fa-arrow-down" },
     { label: "POST", cardLabel: "POST Requests", value: 27, meterBackgroundColor: "#34A853", cardBackgroundColor: "#DFF6DD", textColor: "#fff", cardTextColor: "#0D652D", icon: "fas fa-arrow-up" },
