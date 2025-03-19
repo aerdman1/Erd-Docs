@@ -124,6 +124,7 @@ metadata:
 </Table>
 
 <HTMLBlock>{`
+<style>
 .rdmd-table table {
   display: block;
   overflow-x: auto;
@@ -147,5 +148,5 @@ metadata:
   display: flex; /* Instead of block, use flex to keep natural width */
   flex-direction: column;
 }
-
+</style>
 `}</HTMLBlock>
