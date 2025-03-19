@@ -131,5 +131,11 @@ table {
   white-space: nowrap;
   max-width: 100%;
 }
+
+table th, table td {
+  max-width: 200px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 </style>
 `}</HTMLBlock>
