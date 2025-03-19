@@ -140,13 +140,13 @@ metadata:
 
 /* Enable ONLY vertical scrolling on long cells */
 .scrollable-cell {
-  max-height: 100px; /* Adjust based on needs */
-  overflow-y: auto;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  display: inline-block; /* Keeps natural width while allowing scrolling */
-  width: 100%; /* Ensures it doesn’t overflow */
-  white-space: normal; /* Allows text wrapping */
-  padding-right: 5px; /* Prevents cutoff */
+    max-height: 100px;
+    overflow-y: auto;
+    overflow-x: inherit;
+    display: block;
+    width: 100% !important;
+    white-space: normal;
+}
 
 </style>
 `}</HTMLBlock>
