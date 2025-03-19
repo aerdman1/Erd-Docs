@@ -124,16 +124,14 @@ metadata:
 </Table>
 
 <HTMLBlock>{`
-<style>
-table {
+.rdmd-table table {
   display: block;
   overflow-x: auto;
   white-space: nowrap;
   max-width: 100%;
 }
 
-/* Ensure all table cells have a max width */
-table th, table td {
+.rdmd-table th, .rdmd-table td {
   max-width: 200px;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -141,13 +139,13 @@ table th, table td {
   vertical-align: top;
 }
 
-/* Scrollable effect ONLY on Description column - VERTICAL ONLY */
+/* Fix for extra space issue - make only inner content scrollable */
 .scrollable-cell {
-  max-height: 100px; /* Adjust height as needed */
-  overflow-y: auto;  /* Vertical scrolling */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  display: block; /* Needed for vertical scrolling */
-  padding-right: 10px; /* Avoid cutting off text */
+  max-height: 100px; /* Adjust this value as needed */
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex; /* Instead of block, use flex to keep natural width */
+  flex-direction: column;
 }
-</style>
+
 `}</HTMLBlock>
