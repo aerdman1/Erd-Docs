@@ -36,34 +36,40 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
               delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" }
             };
 
-            const parsedEndpoints = Array.from(endpointItems)
-              .map(endpoint => {
-                const methodElement = endpoint.querySelector(".rm-APIMethod");
-                const labelElement = endpoint.closest(".Sidebar-item23D-2Kd61_k3").querySelector(".Sidebar-link-text_label1gCT_uPnx7Gu");
+            const counts = { get: 0, post: 0, patch: 0, delete: 0 };
 
-                const method = methodElement ? methodElement.textContent.trim().toLowerCase() : "unknown";
-                const label = labelElement ? labelElement.textContent.trim() : "Unnamed Endpoint";
+            const parsedEndpoints = Array.from(endpointItems).forEach(endpoint => {
+              const methodElement = endpoint.querySelector(".rm-APIMethod");
+              const labelElement = endpoint.closest(".Sidebar-item23D-2Kd61_k3").querySelector(".Sidebar-link-text_label1gCT_uPnx7Gu");
 
-                if (!colorMap[method]) return null;
+              const method = methodElement ? methodElement.textContent.trim().toLowerCase() : "unknown";
+              const label = labelElement ? labelElement.textContent.trim() : "Unnamed Endpoint";
 
-                return {
-                  label: method.toUpperCase(),
-                  cardLabel: label,
-                  value: Math.floor(Math.random() * 30) + 10,
-                  meterBackgroundColor: colorMap[method].meter,
-                  cardBackgroundColor: colorMap[method].card,
-                  textColor: "#fff",
-                  cardTextColor: colorMap[method].text,
-                  icon: colorMap[method].icon
-                };
-              })
-              .filter(Boolean);
+              if (colorMap[method]) {
+                counts[method] += 1; // Count total occurrences of each method
+              }
+            });
 
-            setDynamicValues(parsedEndpoints);
+            const totalRequests = Object.values(counts).reduce((sum, val) => sum + val, 0) || 1;
+
+            const finalValues = Object.entries(counts)
+              .filter(([method, count]) => count > 0)
+              .map(([method, count]) => ({
+                label: method.toUpperCase(),
+                cardLabel: `${method.toUpperCase()} Requests`,
+                value: Math.round((count / totalRequests) * 100), // Adjust % based on count
+                meterBackgroundColor: colorMap[method].meter,
+                cardBackgroundColor: colorMap[method].card,
+                textColor: "#fff",
+                cardTextColor: colorMap[method].text,
+                icon: colorMap[method].icon
+              }));
+
+            setDynamicValues(finalValues);
           }
         }
       }
-    }, 500); // Give ReadMe.io time to fully render the sidebar before querying
+    }, 500);
   }, [apiCategory, apiGroup]);
 
   useEffect(() => {
@@ -91,11 +97,11 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
           {dynamicValues.map((item, index) => (
             <div 
               key={index} 
-              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border bg-opacity-90"
+              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border"
               style={{ backgroundColor: item.cardBackgroundColor }}
             >
               <span className="text-sm font-medium" style={{ color: item.cardTextColor }}>
-                {item.cardLabel || item.label}
+                {item.cardLabel}
               </span>
               <span className="text-lg font-bold" style={{ color: item.cardTextColor }}>
                 {item.value}%
@@ -120,7 +126,7 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
         {dynamicValues.map((item, index) => (
           <div 
             key={index} 
-            className="h-full transition-all duration-500 flex items-center justify-center relative bg-opacity-90" 
+            className="h-full transition-all duration-500 flex items-center justify-center relative" 
             style={{ width: `${(animatedValues[index] / max) * 100}%`, backgroundColor: item.meterBackgroundColor }}
           >
             {labelPosition === "inside" && showLabels && (
@@ -146,7 +152,7 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
     </div>
   );
 };
- 
+
 <ProgressMeter_Automatic 
   apiCategory="Erdman API Test 1" 
   apiGroup="pet" 
