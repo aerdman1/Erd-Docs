@@ -8,7 +8,7 @@ export const MeterGroup = ({
   max = 100, 
   labelPosition = "below", 
   showCards = false, 
-  apiReference = false, 
+  apiReference = true,
   apiData = [] 
 }) => {
   const [animatedValues, setAnimatedValues] = useState([]);
@@ -92,4 +92,3 @@ export const MeterGroup = ({
   labelPosition="overlay"  
   showCards={true}  
 />
-
