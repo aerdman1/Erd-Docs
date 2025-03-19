@@ -141,6 +141,7 @@ metadata:
 /* Enable ONLY vertical scrolling on long cells */
 .scrollable-cell {
     max-height: 100px;
+display:block;
     overflow-y: auto;
     overflow-x: inherit;
     width: 100% !important;
