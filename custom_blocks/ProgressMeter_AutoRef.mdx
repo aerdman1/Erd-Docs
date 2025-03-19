@@ -9,59 +9,61 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
   const [dynamicValues, setDynamicValues] = useState([]);
 
   useEffect(() => {
-    const sidebarSections = document.querySelectorAll(".Sidebar-listWrapper6Q9_yUrG906C");
+    setTimeout(() => {
+      const sidebarSections = document.querySelectorAll(".Sidebar-listWrapper6Q9_yUrG906C");
 
-    let selectedCategory = null;
-    sidebarSections.forEach(section => {
-      const heading = section.querySelector(".Sidebar-headingTRQyOa2pk0gh");
-      if (heading && heading.textContent.trim() === apiCategory) {
-        selectedCategory = section;
-      }
-    });
+      let selectedCategory = null;
+      sidebarSections.forEach(section => {
+        const heading = section.querySelector(".Sidebar-headingTRQyOa2pk0gh");
+        if (heading && heading.textContent.trim() === apiCategory) {
+          selectedCategory = section;
+        }
+      });
 
-    if (selectedCategory) {
-      const groupElements = Array.from(selectedCategory.querySelectorAll(".Sidebar-link-text_label1gCT_uPnx7Gu"));
-      const targetGroup = groupElements.find(el => el.textContent.trim() === apiGroup);
+      if (selectedCategory) {
+        const groupElements = Array.from(selectedCategory.querySelectorAll(".Sidebar-link-text_label1gCT_uPnx7Gu"));
+        const targetGroup = groupElements.find(el => el.textContent.trim() === apiGroup);
 
-      if (targetGroup) {
-        const parentItem = targetGroup.closest(".Sidebar-item23D-2Kd61_k3");
-        if (parentItem) {
-          const endpointItems = parentItem.querySelectorAll(".Sidebar-method-container2yBYD-KB_IfC");
+        if (targetGroup) {
+          const parentItem = targetGroup.closest(".Sidebar-item23D-2Kd61_k3");
+          if (parentItem) {
+            const endpointItems = parentItem.querySelectorAll(".Sidebar-method-container2yBYD-KB_IfC");
 
-          const colorMap = {
-            get: { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-arrow-down" },
-            post: { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-arrow-up" },
-            patch: { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-edit" },
-            delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" }
-          };
+            const colorMap = {
+              get: { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-arrow-down" },
+              post: { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-arrow-up" },
+              patch: { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-edit" },
+              delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" }
+            };
 
-          const parsedEndpoints = Array.from(endpointItems)
-            .map(endpoint => {
-              const methodElement = endpoint.querySelector(".rm-APIMethod");
-              const labelElement = endpoint.closest(".Sidebar-item23D-2Kd61_k3").querySelector(".Sidebar-link-text_label1gCT_uPnx7Gu");
+            const parsedEndpoints = Array.from(endpointItems)
+              .map(endpoint => {
+                const methodElement = endpoint.querySelector(".rm-APIMethod");
+                const labelElement = endpoint.closest(".Sidebar-item23D-2Kd61_k3").querySelector(".Sidebar-link-text_label1gCT_uPnx7Gu");
 
-              const method = methodElement ? methodElement.textContent.trim().toLowerCase() : "unknown";
-              const label = labelElement ? labelElement.textContent.trim() : "Unnamed Endpoint";
+                const method = methodElement ? methodElement.textContent.trim().toLowerCase() : "unknown";
+                const label = labelElement ? labelElement.textContent.trim() : "Unnamed Endpoint";
 
-              if (!colorMap[method]) return null;
+                if (!colorMap[method]) return null;
 
-              return {
-                label: method.toUpperCase(),
-                cardLabel: label,
-                value: Math.floor(Math.random() * 30) + 10,
-                meterBackgroundColor: colorMap[method].meter,
-                cardBackgroundColor: colorMap[method].card,
-                textColor: "#fff",
-                cardTextColor: colorMap[method].text,
-                icon: colorMap[method].icon
-              };
-            })
-            .filter(Boolean);
+                return {
+                  label: method.toUpperCase(),
+                  cardLabel: label,
+                  value: Math.floor(Math.random() * 30) + 10,
+                  meterBackgroundColor: colorMap[method].meter,
+                  cardBackgroundColor: colorMap[method].card,
+                  textColor: "#fff",
+                  cardTextColor: colorMap[method].text,
+                  icon: colorMap[method].icon
+                };
+              })
+              .filter(Boolean);
 
-          setDynamicValues(parsedEndpoints);
+            setDynamicValues(parsedEndpoints);
+          }
         }
       }
-    }
+    }, 500); // Give ReadMe.io time to fully render the sidebar before querying
   }, [apiCategory, apiGroup]);
 
   useEffect(() => {
@@ -89,7 +91,7 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
           {dynamicValues.map((item, index) => (
             <div 
               key={index} 
-              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border"
+              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border bg-opacity-90"
               style={{ backgroundColor: item.cardBackgroundColor }}
             >
               <span className="text-sm font-medium" style={{ color: item.cardTextColor }}>
@@ -118,7 +120,7 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
         {dynamicValues.map((item, index) => (
           <div 
             key={index} 
-            className="h-full transition-all duration-500 flex items-center justify-center relative" 
+            className="h-full transition-all duration-500 flex items-center justify-center relative bg-opacity-90" 
             style={{ width: `${(animatedValues[index] / max) * 100}%`, backgroundColor: item.meterBackgroundColor }}
           >
             {labelPosition === "inside" && showLabels && (
@@ -144,7 +146,7 @@ export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labe
     </div>
   );
 };
-
+ 
 <ProgressMeter_Automatic 
   apiCategory="Erdman API Test 1" 
   apiGroup="pet" 
