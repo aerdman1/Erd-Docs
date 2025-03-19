@@ -32,7 +32,7 @@ metadata:
         Authorization
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td class="scrollable-cell">
         Authorization security header
       </td>
 
@@ -50,7 +50,7 @@ metadata:
         X-Client-Id
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td class="scrollable-cell">
         Client ID
       </td>
 
@@ -68,7 +68,7 @@ metadata:
         Content-Type
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td class="scrollable-cell">
         Format of the request body
       </td>
 
@@ -86,7 +86,7 @@ metadata:
         sca-token
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td class="scrollable-cell">
         SCA JWT bearer token:
 
         In the sandbox environment, you can use a predefined test SCA JWT Bearer token (see the Prerequisites section).
@@ -108,7 +108,7 @@ metadata:
         Accept
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td class="scrollable-cell">
         Format of the response body
       </td>
 
@@ -132,6 +132,7 @@ table {
   max-width: 100%;
 }
 
+/* Ensure all table cells have a max width */
 table th, table td {
   max-width: 200px;
   word-wrap: break-word;
@@ -140,11 +141,11 @@ table th, table td {
   vertical-align: top;
 }
 
-/* Ensures that tall cells have a scrollbar */
-table td {
-  max-height: 150px; /* Adjust based on needs */
+/* Scrollable effect ONLY on Description column */
+.scrollable-cell {
+  max-height: 100px; /* Adjust this value as needed */
   overflow-y: auto;
-  display: block; /* Required for vertical scrolling inside cells */
+  display: block; /* Needed to enable vertical scrolling */
 }
 </style>
 `}</HTMLBlock>
