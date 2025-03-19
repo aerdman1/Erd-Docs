@@ -87,11 +87,7 @@ metadata:
       </td>
 
       <td class="scrollable-cell">
-        SCA JWT bearer token:
-
-        In the sandbox environment, you can use a predefined test SCA JWT Bearer token (see the Prerequisites section).
-
-        In the live environment, you must create the token based on the message body (whose details are described below) and sign it with your private key. For more information on the token details, see the Appendix in Authentication guide.
+        SCA JWT bearer token:In the sandbox environment, you can use a predefined test SCA JWT Bearer token (see the Prerequisites section).In the live environment, you must create the token based on the message body (whose details are described below) and sign it with your private key. For more information on the token details, see the Appendix in Authentication guide.
       </td>
 
       <td style={{ textAlign: "left" }}>
