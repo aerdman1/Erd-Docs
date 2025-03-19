@@ -136,6 +136,15 @@ table th, table td {
   max-width: 200px;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  word-break: break-word;
+  vertical-align: top;
+}
+
+/* Ensures that tall cells have a scrollbar */
+table td {
+  max-height: 150px; /* Adjust based on needs */
+  overflow-y: auto;
+  display: block; /* Required for vertical scrolling inside cells */
 }
 </style>
 `}</HTMLBlock>
