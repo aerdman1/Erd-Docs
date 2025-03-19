@@ -141,11 +141,13 @@ table th, table td {
   vertical-align: top;
 }
 
-/* Scrollable effect ONLY on Description column */
+/* Scrollable effect ONLY on Description column - VERTICAL ONLY */
 .scrollable-cell {
-  max-height: 100px; /* Adjust this value as needed */
-  overflow-y: auto;
-  display: block; /* Needed to enable vertical scrolling */
+  max-height: 100px; /* Adjust height as needed */
+  overflow-y: auto;  /* Vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  display: block; /* Needed for vertical scrolling */
+  padding-right: 10px; /* Avoid cutting off text */
 }
 </style>
 `}</HTMLBlock>
