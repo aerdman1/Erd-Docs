@@ -126,25 +126,27 @@ metadata:
 <HTMLBlock>{`
 <style>
 .rdmd-table table {
-  display: block;
-  overflow-x: auto;
-  white-space: nowrap;
-  max-width: 100%;
+  table-layout: fixed; /* Fix column widths */
+  width: 100%; /* Ensure the table does not expand beyond its container */
 }
 
 .rdmd-table th, .rdmd-table td {
-  max-width: 200px;
+  max-width: 200px; /* Restrict column width */
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
   vertical-align: top;
 }
 
-/* Fix scrolling without cut-off issues */
+/* Enable ONLY vertical scrolling on long cells */
 .scrollable-cell {
   max-height: 100px; /* Adjust based on needs */
   overflow-y: auto;
-  overflow-x: 
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  display: inline-block; /* Keeps natural width while allowing scrolling */
+  width: 100%; /* Ensures it doesn’t overflow */
+  white-space: normal; /* Allows text wrapping */
+  padding-right: 5px; /* Prevents cutoff */
 
 </style>
 `}</HTMLBlock>
