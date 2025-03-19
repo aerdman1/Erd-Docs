@@ -143,7 +143,7 @@ metadata:
     max-height: 100px;
     overflow-y: auto;
     overflow-x: inherit;
-    display: block;
+    display: table-cell;
     width: 100% !important;
     white-space: normal;
 }
