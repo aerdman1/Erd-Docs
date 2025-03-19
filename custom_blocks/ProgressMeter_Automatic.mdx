@@ -4,11 +4,12 @@ name: ProgressMeter_Automatic
 import React, { useEffect, useState } from "react";
 
 export const MeterGroup = ({ 
-  values = [], 
   max = 100, 
   labelPosition = "below", 
   showCards = false, 
-  apiReference = false 
+  apiReference = false, 
+  apiCategory = "", 
+  apiGroup = "" 
 }) => {
   const [animatedValues, setAnimatedValues] = useState([]);
   const [showLabels, setShowLabels] = useState(false);
@@ -16,38 +17,63 @@ export const MeterGroup = ({
 
   useEffect(() => {
     if (apiReference) {
-      // Find all API request types in the sidebar
-      const apiMethods = Array.from(document.querySelectorAll(".rm-APIMethod"))
-        .map(el => el.innerText.toUpperCase())  // Extract the request method (GET, POST, etc.)
-        .filter(method => ["GET", "POST", "PATCH", "DELETE", "PUT"].includes(method));  // Filter valid methods
+      const sidebarSections = document.querySelectorAll(".Sidebar-listWrapper6Q9_yUrG906C");
 
-      // Count occurrences of each method
-      const methodCounts = apiMethods.reduce((acc, method) => {
-        acc[method] = (acc[method] || 0) + 1;
-        return acc;
-      }, {});
+      let selectedCategory = null;
+      sidebarSections.forEach(section => {
+        const heading = section.querySelector(".Sidebar-headingTRQyOa2pk0gh");
+        if (heading && heading.textContent.trim() === apiCategory) {
+          selectedCategory = section;
+        }
+      });
 
-      // Convert to a format that MeterGroup understands
-      const newValues = [
-        { label: "GET", value: methodCounts.GET || 0, meterBackgroundColor: "#4285F4", cardBackgroundColor: "#D2E3FC", textColor: "#fff", cardTextColor: "#174EA6", icon: "fas fa-arrow-down" },
-        { label: "POST", value: methodCounts.POST || 0, meterBackgroundColor: "#34A853", cardBackgroundColor: "#DFF6DD", textColor: "#fff", cardTextColor: "#0D652D", icon: "fas fa-arrow-up" },
-        { label: "PATCH", value: methodCounts.PATCH || 0, meterBackgroundColor: "#FBBC05", cardBackgroundColor: "#FEF7E0", textColor: "#fff", cardTextColor: "#B06000", icon: "fas fa-edit" },
-        { label: "DELETE", value: methodCounts.DELETE || 0, meterBackgroundColor: "#EA4335", cardBackgroundColor: "#FCE8E6", textColor: "#fff", cardTextColor: "#A50E0E", icon: "fas fa-trash" },
-        { label: "PUT", value: methodCounts.PUT || 0, meterBackgroundColor: "#A142F4", cardBackgroundColor: "#EADCFD", textColor: "#fff", cardTextColor: "#5E35B1", icon: "fas fa-sync-alt" }
-      ].filter(item => item.value > 0);  // Remove items with 0 value
+      if (selectedCategory) {
+        const groupElements = Array.from(selectedCategory.querySelectorAll(".Sidebar-link-text_label1gCT_uPnx7Gu"));
+        const targetGroup = groupElements.find(el => el.textContent.trim() === apiGroup);
 
-      setDynamicValues(newValues);
+        if (targetGroup) {
+          const parentItem = targetGroup.closest(".Sidebar-item23D-2Kd61_k3");
+          if (parentItem) {
+            const endpointItems = parentItem.querySelectorAll(".Sidebar-method-container2yBYD-KB_IfC");
+
+            const parsedEndpoints = Array.from(endpointItems).map(endpoint => {
+              const methodElement = endpoint.querySelector(".rm-APIMethod");
+              const labelElement = endpoint.closest(".Sidebar-item23D-2Kd61_k3").querySelector(".Sidebar-link-text_label1gCT_uPnx7Gu");
+
+              const method = methodElement ? methodElement.textContent.trim().toLowerCase() : "unknown";
+              const label = labelElement ? labelElement.textContent.trim() : "Unnamed Endpoint";
+              
+              const colorMap = {
+                get: { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-arrow-down" },
+                post: { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-arrow-up" },
+                patch: { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-edit" },
+                delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" }
+              };
+
+              return {
+                label: method.toUpperCase(),
+                cardLabel: label,
+                value: Math.floor(Math.random() * 30) + 10, // Random % (since ReadMe doesn't expose request counts)
+                meterBackgroundColor: colorMap[method]?.meter || "#999",
+                cardBackgroundColor: colorMap[method]?.card || "#EEE",
+                textColor: "#fff",
+                cardTextColor: colorMap[method]?.text || "#333",
+                icon: colorMap[method]?.icon || "fas fa-question-circle"
+              };
+            });
+
+            setDynamicValues(parsedEndpoints);
+          }
+        }
+      }
     }
-  }, [apiReference]);
-
-  // Select either the provided values OR the dynamically generated ones
-  const meterValues = apiReference ? dynamicValues : values;
+  }, [apiReference, apiCategory, apiGroup]);
 
   useEffect(() => {
-    setAnimatedValues(meterValues.map(() => 0));
+    setAnimatedValues(dynamicValues.map(() => 0));
 
     const interval = setInterval(() => {
-      setAnimatedValues(prev => prev.map((val, i) => Math.min(val + 2, meterValues[i]?.value || 0)));
+      setAnimatedValues(prev => prev.map((val, i) => Math.min(val + 2, dynamicValues[i].value)));
     }, 50);
 
     const labelTimeout = setTimeout(() => {
@@ -58,27 +84,39 @@ export const MeterGroup = ({
       clearInterval(interval);
       clearTimeout(labelTimeout);
     };
-  }, [meterValues]);
+  }, [dynamicValues]);
 
   return (
     <div className="w-full flex flex-col items-start">
+      {/* Optional Cards */}
       {showCards && (
         <div className="flex gap-4 mb-3 w-full">
-          {meterValues.map((item, index) => (
+          {dynamicValues.map((item, index) => (
             <div 
               key={index} 
               className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border"
-              style={{ backgroundColor: item.cardBackgroundColor || item.meterBackgroundColor }}
+              style={{ backgroundColor: item.cardBackgroundColor }}
             >
-              <span className="text-sm" style={{ color: item.cardTextColor || item.textColor }}>{item.cardLabel || item.label}</span>
-              <span className="text-lg font-bold" style={{ color: item.cardTextColor || item.textColor }}>{item.value}%</span>
-              {item.icon && <i className={`${item.icon} text-2xl mt-2`} style={{ color: item.cardTextColor || item.textColor }}></i>}
+              <span className="text-sm" style={{ color: item.cardTextColor }}>{item.cardLabel || item.label}</span>
+              <span className="text-lg font-bold" style={{ color: item.cardTextColor }}>{item.value}%</span>
+              {item.icon && <i className={`${item.icon} text-2xl mt-2`} style={{ color: item.cardTextColor }}></i>}
             </div>
           ))}
         </div>
       )}
+
+      {/* Labels Above */}
+      {labelPosition === "above" && (
+        <div className="flex justify-between w-full mb-1 transition-opacity duration-500" style={{ opacity: showLabels ? 1 : 0 }}>
+          {dynamicValues.map((item, index) => (
+            <span key={index} className="text-sm font-medium" style={{ color: item.textColor }}>{item.label}</span>
+          ))}
+        </div>
+      )}
+
+      {/* Progress Bar */}
       <div className="relative w-full bg-gray-200 rounded-md overflow-hidden h-6 flex items-center">
-        {meterValues.map((item, index) => (
+        {dynamicValues.map((item, index) => (
           <div 
             key={index} 
             className="h-full transition-all duration-500 flex items-center justify-center relative" 
@@ -95,8 +133,33 @@ export const MeterGroup = ({
           </div>
         ))}
       </div>
+
+      {/* Labels Below */}
+      {labelPosition === "below" && (
+        <div className="flex justify-between w-full mt-1 transition-opacity duration-500" style={{ opacity: showLabels ? 1 : 0 }}>
+          {dynamicValues.map((item, index) => (
+            <span key={index} className="text-sm font-medium" style={{ color: item.textColor }}>{item.label} ({item.value}%)</span>
+          ))}
+        </div>
+      )}
+
+      {/* Labels Side */}
+      {labelPosition === "side" && (
+        <div className="flex flex-col items-start mt-2 transition-opacity duration-500" style={{ opacity: showLabels ? 1 : 0 }}>
+          {dynamicValues.map((item, index) => (
+            <span key={index} className="text-sm font-medium" style={{ color: item.textColor }}>{item.label}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
-
-<MeterGroup apiReference={true} showCards={true} max={100} labelPosition="overlay" />
+ 
+<MeterGroup  
+  apiReference={true} 
+  apiCategory="Erdman API Test 1" 
+  apiGroup="pet" 
+  max={100} 
+  labelPosition="overlay"
+  showCards={true}
+/>
