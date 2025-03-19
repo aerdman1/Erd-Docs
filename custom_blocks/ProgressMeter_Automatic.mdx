@@ -3,71 +3,66 @@ name: ProgressMeter_Automatic
 ---
 import React, { useEffect, useState } from "react";
 
-export const MeterGroup = ({ 
-  max = 100, 
-  labelPosition = "below", 
-  showCards = false, 
-  apiReference = false, 
-  apiCategory = "", 
-  apiGroup = "" 
-}) => {
+export const ProgressMeter_Automatic = ({ apiCategory, apiGroup, max = 100, labelPosition = "below", showCards = false }) => {
   const [animatedValues, setAnimatedValues] = useState([]);
   const [showLabels, setShowLabels] = useState(false);
   const [dynamicValues, setDynamicValues] = useState([]);
 
   useEffect(() => {
-    if (apiReference) {
-      const sidebarSections = document.querySelectorAll(".Sidebar-listWrapper6Q9_yUrG906C");
+    const sidebarSections = document.querySelectorAll(".Sidebar-listWrapper6Q9_yUrG906C");
 
-      let selectedCategory = null;
-      sidebarSections.forEach(section => {
-        const heading = section.querySelector(".Sidebar-headingTRQyOa2pk0gh");
-        if (heading && heading.textContent.trim() === apiCategory) {
-          selectedCategory = section;
-        }
-      });
+    let selectedCategory = null;
+    sidebarSections.forEach(section => {
+      const heading = section.querySelector(".Sidebar-headingTRQyOa2pk0gh");
+      if (heading && heading.textContent.trim() === apiCategory) {
+        selectedCategory = section;
+      }
+    });
 
-      if (selectedCategory) {
-        const groupElements = Array.from(selectedCategory.querySelectorAll(".Sidebar-link-text_label1gCT_uPnx7Gu"));
-        const targetGroup = groupElements.find(el => el.textContent.trim() === apiGroup);
+    if (selectedCategory) {
+      const groupElements = Array.from(selectedCategory.querySelectorAll(".Sidebar-link-text_label1gCT_uPnx7Gu"));
+      const targetGroup = groupElements.find(el => el.textContent.trim() === apiGroup);
 
-        if (targetGroup) {
-          const parentItem = targetGroup.closest(".Sidebar-item23D-2Kd61_k3");
-          if (parentItem) {
-            const endpointItems = parentItem.querySelectorAll(".Sidebar-method-container2yBYD-KB_IfC");
+      if (targetGroup) {
+        const parentItem = targetGroup.closest(".Sidebar-item23D-2Kd61_k3");
+        if (parentItem) {
+          const endpointItems = parentItem.querySelectorAll(".Sidebar-method-container2yBYD-KB_IfC");
 
-            const parsedEndpoints = Array.from(endpointItems).map(endpoint => {
+          const colorMap = {
+            get: { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-arrow-down" },
+            post: { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-arrow-up" },
+            patch: { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-edit" },
+            delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" }
+          };
+
+          const parsedEndpoints = Array.from(endpointItems)
+            .map(endpoint => {
               const methodElement = endpoint.querySelector(".rm-APIMethod");
               const labelElement = endpoint.closest(".Sidebar-item23D-2Kd61_k3").querySelector(".Sidebar-link-text_label1gCT_uPnx7Gu");
 
               const method = methodElement ? methodElement.textContent.trim().toLowerCase() : "unknown";
               const label = labelElement ? labelElement.textContent.trim() : "Unnamed Endpoint";
-              
-              const colorMap = {
-                get: { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-arrow-down" },
-                post: { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-arrow-up" },
-                patch: { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-edit" },
-                delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" }
-              };
+
+              if (!colorMap[method]) return null;
 
               return {
                 label: method.toUpperCase(),
                 cardLabel: label,
-                value: Math.floor(Math.random() * 30) + 10, // Random % (since ReadMe doesn't expose request counts)
-                meterBackgroundColor: colorMap[method]?.meter || "#999",
-                cardBackgroundColor: colorMap[method]?.card || "#EEE",
+                value: Math.floor(Math.random() * 30) + 10,
+                meterBackgroundColor: colorMap[method].meter,
+                cardBackgroundColor: colorMap[method].card,
                 textColor: "#fff",
-                cardTextColor: colorMap[method]?.text || "#333",
-                icon: colorMap[method]?.icon || "fas fa-question-circle"
+                cardTextColor: colorMap[method].text,
+                icon: colorMap[method].icon
               };
-            });
+            })
+            .filter(Boolean);
 
-            setDynamicValues(parsedEndpoints);
-          }
+          setDynamicValues(parsedEndpoints);
         }
       }
     }
-  }, [apiReference, apiCategory, apiGroup]);
+  }, [apiCategory, apiGroup]);
 
   useEffect(() => {
     setAnimatedValues(dynamicValues.map(() => 0));
@@ -88,7 +83,7 @@ export const MeterGroup = ({
 
   return (
     <div className="w-full flex flex-col items-start">
-      {/* Optional Cards */}
+      {/* Cards Section */}
       {showCards && (
         <div className="flex gap-4 mb-3 w-full">
           {dynamicValues.map((item, index) => (
@@ -97,8 +92,12 @@ export const MeterGroup = ({
               className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border"
               style={{ backgroundColor: item.cardBackgroundColor }}
             >
-              <span className="text-sm" style={{ color: item.cardTextColor }}>{item.cardLabel || item.label}</span>
-              <span className="text-lg font-bold" style={{ color: item.cardTextColor }}>{item.value}%</span>
+              <span className="text-sm font-medium" style={{ color: item.cardTextColor }}>
+                {item.cardLabel || item.label}
+              </span>
+              <span className="text-lg font-bold" style={{ color: item.cardTextColor }}>
+                {item.value}%
+              </span>
               {item.icon && <i className={`${item.icon} text-2xl mt-2`} style={{ color: item.cardTextColor }}></i>}
             </div>
           ))}
@@ -142,21 +141,11 @@ export const MeterGroup = ({
           ))}
         </div>
       )}
-
-      {/* Labels Side */}
-      {labelPosition === "side" && (
-        <div className="flex flex-col items-start mt-2 transition-opacity duration-500" style={{ opacity: showLabels ? 1 : 0 }}>
-          {dynamicValues.map((item, index) => (
-            <span key={index} className="text-sm font-medium" style={{ color: item.textColor }}>{item.label}</span>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
- 
-<MeterGroup  
-  apiReference={true} 
+
+<ProgressMeter_Automatic 
   apiCategory="Erdman API Test 1" 
   apiGroup="pet" 
   max={100} 
