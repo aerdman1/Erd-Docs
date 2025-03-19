@@ -140,13 +140,11 @@ metadata:
   vertical-align: top;
 }
 
-/* Fix for extra space issue - make only inner content scrollable */
+/* Fix scrolling without cut-off issues */
 .scrollable-cell {
-  max-height: 100px; /* Adjust this value as needed */
+  max-height: 100px; /* Adjust based on needs */
   overflow-y: auto;
-  overflow-x: hidden;
-  display: flex; /* Instead of block, use flex to keep natural width */
-  flex-direction: column;
-}
+  overflow-x: 
+
 </style>
 `}</HTMLBlock>
