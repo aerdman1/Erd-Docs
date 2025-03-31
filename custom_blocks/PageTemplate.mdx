@@ -1,22 +1,47 @@
 ---
 name: PageTemplate
 ---
-export function PageTemplate({ productName, featureName, image1Url, image2Url, children }) {
+export function PageTemplate({ project = "default", children }) {
+  // Centralized defaults for each project
+  const projectDefaults = {
+    projectA: {
+      productName: "Product Name A",
+      featureName: "Feature Name A",
+      image1Url: "https://example.com/projectA-image1.png",
+      image2Url: "https://example.com/projectA-image2.png",
+    },
+    projectB: {
+      productName: "Product Name B",
+      featureName: "Feature Name B",
+      image1Url: "https://example.com/projectB-image1.png",
+      image2Url: "https://example.com/projectB-image2.png",
+    },
+    // other projects can be added here...
+    default: {
+      productName: "Default Product Name",
+      featureName: "Default Feature Name",
+      image1Url: "https://sb-biodatacatalyst.readme.io/path/to/your-image1.png",
+      image2Url: "https://sb-biodatacatalyst.readme.io/path/to/your-image2.png",
+    },
+  };
+
+  const {
+    productName,
+    featureName,
+    image1Url,
+    image2Url,
+  } = projectDefaults[project] || projectDefaults.default;
+
   return (
     <>
-      {/* Dynamic Header Section */}
+      {/* Dynamic Header Section using central defaults */}
       <h1>Create a Project in {productName}</h1>
       <p>The {featureName} tool makes it easy to set up new workspaces.</p>
-
-      {/* Render any additional content passed as children */}
+      
+      {/* Editable content provided in the MDX page */}
       {children}
     </>
   );
 }
 
-<PageTemplate
-  productName="XXXXXXXX"
-  featureName="ZZZZZZZZZZ"
-  image1Url="https://sb-biodatacatalyst.readme.io/path/to/your-image1.png"
-  image2Url="https://sb-biodatacatalyst.readme.io/path/to/your-image2.png"
-/>
+<PageTemplate project="projectA" />
