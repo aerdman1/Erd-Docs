@@ -1,5 +1,5 @@
 ---
-title: Project C
+title: Project C - Cavatica
 deprecated: false
 hidden: false
 metadata:
