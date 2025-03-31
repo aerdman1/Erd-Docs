@@ -8,12 +8,6 @@ export function PageTemplate({ productName, featureName, image1Url, image2Url, c
       <h1>Create a Project in {productName}</h1>
       <p>The {featureName} tool makes it easy to set up new workspaces.</p>
 
-      {/* Static content */}
-      <p>
-        Data analyses are project-specific on the Seven Bridges Platform. Before you can start your analysis,
-        you need to create a project.
-      </p>
-
       {/* Render any additional content passed as children */}
       {children}
     </>
@@ -26,6 +20,3 @@ export function PageTemplate({ productName, featureName, image1Url, image2Url, c
   image1Url="https://sb-biodatacatalyst.readme.io/path/to/your-image1.png"
   image2Url="https://sb-biodatacatalyst.readme.io/path/to/your-image2.png"
 />
-
-
-
