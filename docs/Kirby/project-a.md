@@ -6,3 +6,5 @@ metadata:
   robots: index
 ---
 <PageTemplate project="projectA" />
+
+<ProjectASevenBridges />
