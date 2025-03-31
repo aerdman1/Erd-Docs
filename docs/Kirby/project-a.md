@@ -5,6 +5,8 @@ hidden: false
 metadata:
   robots: index
 ---
+<PageTemplate project="projectA" />
+
 Data analyses are project-specific on the Seven Bridges Platform. Before you can start your analysis, you need to create a project.
 
 1. Click **Projects** in the top navigation bar and select **Create a project**.
