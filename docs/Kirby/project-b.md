@@ -1,5 +1,5 @@
 ---
-title: Project B
+title: Project B - Cancer Genomics
 deprecated: false
 hidden: false
 metadata:
