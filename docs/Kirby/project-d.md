@@ -1,5 +1,5 @@
 ---
-title: Project D
+title: 'Project D - BioData Catalyst '
 deprecated: false
 hidden: false
 metadata:
