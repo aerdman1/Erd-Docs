@@ -5,6 +5,12 @@ hidden: false
 metadata:
   robots: index
 ---
+<PageTemplate project="projectD" />
+
+# $productName$
+
+## $featureName$
+
 Before you can start analyzing your data, you need to create a project. There are two types of projects on the Platform, **Open** and **Controlled Data Projects**.
 
 [Controlled Data Projects](https://sb-biodatacatalyst.readme.io/docs/projects-on-the-platform#controlled-data-projects) protect Controlled Data by restricting access to users with dbGaP access permissions to Controlled Data.
