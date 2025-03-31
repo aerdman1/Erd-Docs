@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-<PageTemplate />
+<PageTemplate project="projectA" />
 
 # Create a Project in $productName$
 
