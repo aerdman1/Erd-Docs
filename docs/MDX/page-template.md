@@ -5,9 +5,9 @@ hidden: false
 metadata:
   robots: index
 ---
-<PageTemplate productName="XXXXXX" featureName="XXXXXXX" image1Url="https://sb-biodatacatalyst.readme.io/path/to/your-image1.png" image2Url="https://sb-biodatacatalyst.readme.io/path/to/your-image2.png" />
+<PageTemplate project="projectA" />
 
-<br />
+# Create a Project in \[\[productName]]
 
 Data analyses are project-specific on the Seven Bridges Platform. Before you can start your analysis, you need to create a project.
 
