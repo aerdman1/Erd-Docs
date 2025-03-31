@@ -1,22 +1,126 @@
 ---
 name: PageTemplate
 ---
-
-export function PageTemplate ({ productName, featureName, image1Url, image2Url }) {
+export function PageTemplate({ productName, featureName, image1Url, image2Url }) {
   return (
     <>
+      {/* Dynamic Header Section */}
       <h1>Create a Project in {productName}</h1>
       <p>The {featureName} tool makes it easy to set up new workspaces.</p>
       <img src={image1Url} alt="image 1" />
       <img src={image2Url} alt="image 2" />
-      {/* Add additional content or images as needed */}
+
+      {/* Injected Markdown Content */}
+      <p>
+        Data analyses are project-specific on the Seven Bridges Platform. Before you can start your analysis,
+        you need to create a project.
+      </p>
+
+      <ol>
+        <li>
+          Click <strong>Projects</strong> in the top navigation bar and select <strong>Create a project</strong>.
+          <br />
+          <img
+            src="https://files.readme.io/89602f1-create-a-project.png"
+            alt="Create a project screenshot"
+          />
+        </li>
+        <li>
+          Name your project.
+          <blockquote>
+            <p>👍 Project URL</p>
+            <p>
+              Your project will be assigned a <strong>short name</strong> based on the name that you give it.
+              While you may re-name your project from the project <strong>Settings</strong>, you cannot change the
+              short name after your project is created.
+            </p>
+            <p>
+              The <strong>short name</strong> is used as an ID to refer to the project when you access the Platform via
+              the API. It also appears in the URL for the project when you access the Platform via the visual
+              interface.
+            </p>
+          </blockquote>
+        </li>
+        <li>
+          Set general information:
+          <ol type="a">
+            <li>
+              Set the{' '}
+              <a href="doc:payments">
+                <strong>billing group</strong>
+              </a>{' '}
+              (note: for Enterprise users, the billing group is set per Division by the Division administrator).
+            </li>
+            <li>
+              Select the{' '}
+              <a href="doc:project-and-file-locations">project location</a>. The default location is AWS region{' '}
+              <strong>us-east-1</strong>.
+            </li>
+            <li>
+              (Optional) Change your{' '}
+              <a href="doc:about-spot-instances">spot instance</a> preference. The default setting is{' '}
+              <strong>On</strong>.
+            </li>
+            <li>(Optional) Enable <a href="doc:about-memoization">Reuse (Memoization)</a>.</li>
+          </ol>
+        </li>
+        <li>
+          Manage advanced settings:
+          <ol type="a">
+            <li>
+              <strong>Network access</strong> - see{' '}
+              <a href="doc:manage-network-access-control">Manage Network Access Control</a>
+            </li>
+            <li>
+              <strong>File download restriction</strong> - see{' '}
+              <a href="doc:define-download-restriction">Set file download restriction</a>
+            </li>
+          </ol>
+        </li>
+      </ol>
+
+      <div style={{ textAlign: 'center', margin: '2em 0' }}>
+        {/* Emulating a ReadMe.io [block:image] syntax */}
+        <pre style={{ background: '#f6f8fa', padding: '1em' }}>
+{`[block:image]
+{
+  "images": [
+    {
+      "image": [
+        "https://files.readme.io/287284d-create-a-project-sbg.png",
+        null,
+        ""
+      ],
+      "align": "center"
+    }
+  ]
+}
+[/block]`}
+        </pre>
+      </div>
+
+      <blockquote>
+        <p>📘 Change the Project URL</p>
+        <p>
+          Note that before you click <strong>Create</strong>, you can edit your project's URL and, by association,
+          its <strong>short name</strong>.
+        </p>
+      </blockquote>
+
+      <ol start="5">
+        <li>
+          Click <strong>Create</strong> to finish creating the project.
+        </li>
+      </ol>
     </>
   );
 }
 
-<PageTemplate
-  productName="BioData Catalyst"
-  featureName="BDC Project Manager"
-  image1Url="https://sb-biodatacatalyst.readme.io/path/to/your-image1.png"
-  image2Url="https://sb-biodatacatalyst.readme.io/path/to/your-image2.png"
-/>
+export default () => (
+  <PageTemplate
+    productName="BioData Catalyst"
+    featureName="BDC Project Manager"
+    image1Url="https://sb-biodatacatalyst.readme.io/path/to/your-image1.png"
+    image2Url="https://sb-biodatacatalyst.readme.io/path/to/your-image2.png"
+  />
+);
