@@ -1,5 +1,5 @@
 ---
-title: Project A
+title: Project A - Seven Bridges
 deprecated: false
 hidden: false
 metadata:
