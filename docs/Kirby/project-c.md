@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-<PageTemplate project="projectB" />
+<PageTemplate project="projectC" />
 
 # $productName$
 
