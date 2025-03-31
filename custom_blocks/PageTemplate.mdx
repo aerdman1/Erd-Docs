@@ -3,7 +3,7 @@ name: PageTemplate
 ---
 import * as React from "react";
 
-export function PageTemplate({ project = "default", children }) {
+export function PageTemplate({ project = "default" }) {
   // Centralized defaults for each project
   const projectDefaults = {
     projectA: {
@@ -26,43 +26,64 @@ export function PageTemplate({ project = "default", children }) {
     },
   };
 
+  // Extract replacement values for the selected project
   const { productName, featureName, image1Url, image2Url } =
     projectDefaults[project] || projectDefaults.default;
 
   // Map tokens to their replacement values
   const replacements = { productName, featureName, image1Url, image2Url };
 
-  // Recursive function to process children and replace tokens
-  function replaceTokens(node) {
-    if (typeof node === "string") {
-      return node.replace(/\$([a-zA-Z0-9]+)\$/g, (_, token) => {
-        return replacements[token] || `$${token}$`;
-      });
+  React.useEffect(() => {
+    // Recursive function to walk the DOM and replace tokens in text nodes and attributes
+    function walk(node) {
+      // Process text nodes
+      if (node.nodeType === Node.TEXT_NODE) {
+        const replacedText = node.nodeValue.replace(/\$([a-zA-Z0-9]+)\$/g, (_, token) => {
+          return replacements[token] || `$${token}$`;
+        });
+        if (replacedText !== node.nodeValue) {
+          node.nodeValue = replacedText;
+        }
+      }
+      // Process element nodes (including attributes)
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        // Check and update attributes if they contain tokens
+        if (node.attributes && node.attributes.length > 0) {
+          for (let i = 0; i < node.attributes.length; i++) {
+            const attr = node.attributes[i];
+            const replacedValue = attr.value.replace(/\$([a-zA-Z0-9]+)\$/g, (_, token) => {
+              return replacements[token] || `$${token}$`;
+            });
+            if (replacedValue !== attr.value) {
+              attr.value = replacedValue;
+            }
+          }
+        }
+        // Recursively process child nodes
+        node.childNodes.forEach(child => walk(child));
+      }
     }
-    if (React.isValidElement(node) && node.props && node.props.children) {
-      return React.cloneElement(node, {
-        children: React.Children.map(node.props.children, replaceTokens),
-      });
-    }
-    if (Array.isArray(node)) {
-      return node.map(replaceTokens);
-    }
-    return node;
-  }
 
-  return <>{replaceTokens(children)}</>;
+    // Adjust the selector to match the container that holds your MDX content.
+    // In your case, it might be the element with the class "rm-Markdown"
+    const container = document.querySelector(".rm-Markdown");
+    if (container) {
+      walk(container);
+    } else {
+      console.warn("Markdown container not found. Token replacement was not applied.");
+    }
+  }, [replacements]);
+
+  // This component only performs side effects, so it doesn't render anything itself.
+  return null;
 }
 
-export default function Preview() {
-  return (
-    <PageTemplate project="projectA">
-      <h1>Create a Project in $productName$</h1>
-      <p>
-        The $featureName$ tool makes it easy to set up new workspaces.
-      </p>
-      <img src="$image1Url$" alt="Project preview" />
-    </PageTemplate>
-  );
-}
+<PageTemplate project="projectA">
+  <h1>Create a Project in $productName$</h1>
+  <p>
+    The $featureName$ tool makes it easy to set up new workspaces.
+  </p>
+  <img src="$image1Url$" alt="Image 1 Example" />
+  <img src="$image2Url$" alt="Image 2 Example preview" />
+</PageTemplate> 
 
-<PageTemplate />
