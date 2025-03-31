@@ -5,6 +5,8 @@ hidden: false
 metadata:
   robots: index
 ---
+<PageTemplate />
+
 # Create a Project in $productName$
 
 The $featureName$ tool makes it easy to set up new workspaces.
