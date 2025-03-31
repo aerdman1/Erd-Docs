@@ -7,7 +7,9 @@ metadata:
 ---
 <PageTemplate project="projectA" />
 
-# Create a Project in \[\[productName]]
+# Create a Project in $productName$
+
+The $featureName$ tool makes it easy to set up new workspaces.
 
 Data analyses are project-specific on the Seven Bridges Platform. Before you can start your analysis, you need to create a project.
 
