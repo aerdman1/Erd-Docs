@@ -15,7 +15,7 @@ Data analyses are project-specific on the Seven Bridges Platform. Before you can
 
 1. Click **Projects** in the top navigation bar and select **Create a project**.
 
-![694](https://files.readme.io/53fc958-create-a-project.png "create-a-project.png")
+![Screenshot]($image1Url$)
 
 2. Name your project.
 
@@ -34,7 +34,7 @@ Data analyses are project-specific on the Seven Bridges Platform. Before you can
    1. **Network access** - see [Manage Network Access Control](https://docs.cavatica.org/docs/manage-network-access-control)
    2. **File download restriction** - see [Set file download restriction](https://docs.cavatica.org/docs/define-download-restriction)
 
-![590](https://files.readme.io/b7ecef3-create-a-project.png "create-a-project-2.png")
+![Screenshot]($image2Url$)
 
 5. Click **Create**, and your new project will be created.
 
