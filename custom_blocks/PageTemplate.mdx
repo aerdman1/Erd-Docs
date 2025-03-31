@@ -18,6 +18,18 @@ export function PageTemplate({ project = "default" }) {
       image1Url: "https://example.com/projectB-image1.png",
       image2Url: "https://example.com/projectB-image2.png",
     },
+    projectC: {
+      productName: "**VARIABLE Product C**",
+      featureName: "**VARIABLE Feature C**",
+      image1Url: "https://example.com/projectC-image1.png",
+      image2Url: "https://example.com/projectC-image2.png",
+    },
+    projectD: {
+      productName: "**VARIABLE Product D**",
+      featureName: "**VARIABLE Feature D**",
+      image1Url: "https://example.com/projectD-image1.png",
+      image2Url: "https://example.com/projectD-image2.png",
+    },
     default: {
       productName: "Default Product Name",
       featureName: "Default Feature Name",
@@ -78,5 +90,4 @@ export function PageTemplate({ project = "default" }) {
   return null;
 }
 
-
-<PageTemplate project="projectA" />
+<PageTemplate project="projectX" />
