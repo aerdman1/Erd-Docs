@@ -6,7 +6,6 @@ metadata:
   robots: index
 ---
 <PageTemplate project="projectA" />
-
 # $productName$
 
 ## $featureName$
