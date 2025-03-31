@@ -15,7 +15,7 @@ Data analyses are project-specific on the Seven Bridges Platform. Before you can
 
 1. Click **Projects** in the top navigation bar and select **Create a project**.
 
-![](https://files.readme.io/89602f1-create-a-project.png)
+![Screenshot]($image1Url$)
 
 2. Name your project.
 
@@ -36,7 +36,7 @@ Data analyses are project-specific on the Seven Bridges Platform. Before you can
    1. **Network access** - see [Manage Network Access Control](https://docs.sevenbridges.com/docs/manage-network-access-control)
    2. **File download restriction** - see [Set file download restriction](https://docs.sevenbridges.com/docs/define-download-restriction)
 
-![](https://files.readme.io/287284d-create-a-project-sbg.png)
+![Screenshot]($image2Url$)
 
 > ## 📘
 >
