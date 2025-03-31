@@ -1,7 +1,7 @@
 ---
 name: ProjectASevenBridges
 ---
-test# $productName$
+## $productName$
 
 ## $featureName$
 
