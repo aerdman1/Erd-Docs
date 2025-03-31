@@ -19,9 +19,7 @@ Data analyses are project-specific on the Seven Bridges Platform. Before you can
 
 2. Name your project.
 
-> ## 👍
->
-> Project URL
+> 👍 Project URL
 >
 > Your project will be assigned a [**short name**](https://docs.sevenbridges.com/docs/the-api#section-project-short-names) based on the name that you give it. While you may re-name your project from the project [**Settings**](https://docs.sevenbridges.com/docs/project-settings), you cannot change the short name after your project is created.
 >
@@ -38,9 +36,7 @@ Data analyses are project-specific on the Seven Bridges Platform. Before you can
 
 ![Screenshot]($image2Url$)
 
-> ## 📘
->
-> Change the Project URL
+> 📘 Change the Project URL
 >
 > Note that before you click **Create**, you can edit your project's URL and, by association, its **[short name](https://docs.sevenbridges.com/docs/the-api#section-project-short-names)**.
 
