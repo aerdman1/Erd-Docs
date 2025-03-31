@@ -19,13 +19,13 @@ To create a project:
 
 1. Click the **Projects** tab on the top navigation bar and select **Create a project** from the drop-down menu.
 
-![771](https://files.readme.io/a29234d-create-a-project.png "Screenshot 2020-01-29 at 13.45.04.png")
+![Screenshot]($image1Url$)
 
 Create a project
 
 2. Name your project. Your project will be assigned a short name based on the name that you give it, which is used as an ID to refer to the project when using the API.
 
-![480](https://files.readme.io/94250ff-bdc-create-project.png "create-a-project-2.png")
+![Screenshot]($image2Url$)
 
 3. Define the project type if you have Controlled Data access. If you don't have Controlled Data access, all your projects are Open Data Projects by default.
 4. Set general information:
