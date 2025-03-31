@@ -4,15 +4,8 @@ name: PageTemplate
 export function PageTemplate({ productName, featureName, image1Url, image2Url, children }) {
   return (
     <>
-      {/* Dynamic Header Section */}
-      <h1>Create a Project in {productName}</h1>
-      <p>The {featureName} tool makes it easy to set up new workspaces.</p>
 
-      {/* Static content */}
-      <p>
-        Data analyses are project-specific on the Seven Bridges Platform. Before you can start your analysis,
-        you need to create a project.
-      </p>
+      {/* Static content here (if any) */}
 
       {/* Render any additional content passed as children */}
       {children}
