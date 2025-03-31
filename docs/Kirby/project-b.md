@@ -5,6 +5,12 @@ hidden: false
 metadata:
   robots: index
 ---
+<PageTemplate project="projectB" />
+
+# $productName$
+
+## $featureName$
+
 Before you can start analyzing your data, you need to create a project. There are two types of projects on the CGC, **Open** and **Controlled Data Projects**.
 
 > 📘 Protecting Controlled Data
