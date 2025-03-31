@@ -21,7 +21,7 @@ To create a project:
 
 1. Click the **Projects** tab on the top navigation bar and select **Create a project** from the drop-down menu.
 
-![526](https://files.readme.io/720b281-create-a-project.png "cgc-create-a-project-1.png")
+![Screenshot]($image1Url$)
 
 Create a project
 
