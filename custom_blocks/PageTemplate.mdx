@@ -79,24 +79,12 @@ export function PageTemplate({ productName, featureName, image1Url, image2Url })
         </li>
       </ol>
 
+      {/* Render the block image as an actual image */}
       <div style={{ textAlign: 'center', margin: '2em 0' }}>
-        {/* Emulating a ReadMe.io [block:image] syntax */}
-        <pre style={{ background: '#f6f8fa', padding: '1em' }}>
-{`[block:image]
-{
-  "images": [
-    {
-      "image": [
-        "https://files.readme.io/287284d-create-a-project-sbg.png",
-        null,
-        ""
-      ],
-      "align": "center"
-    }
-  ]
-}
-[/block]`}
-        </pre>
+        <img
+          src="https://files.readme.io/287284d-create-a-project-sbg.png"
+          alt="Create a Project (Block Image)"
+        />
       </div>
 
       <blockquote>
