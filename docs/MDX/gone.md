@@ -7,18 +7,21 @@ metadata:
 ---
 <Tabs>
   <Tab title="First Tab">
-    Welcome to the content that you can only see inside the first Tab.
-  </Tab>
-
-  <Tab title="Second Tab">
-    Here's content that's only inside the second Tab.
-  </Tab>
-
-  <Tab title="Third Tab">
-    Here's content that's only inside the third Tab.
-  </Tab>
-</Tabs>
-
 ```
 My code Here
 ```
+  </Tab>
+
+  <Tab title="Second Tab">
+```
+My other code Here
+```
+  </Tab>
+
+  <Tab title="Third Tab">
+```
+My code other tab code Here
+```
+  </Tab>
+</Tabs>
+
