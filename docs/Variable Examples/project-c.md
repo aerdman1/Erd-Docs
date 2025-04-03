@@ -5,6 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-<PageTemplate project="projectA" />
+<PageTemplate project="projectC" />
 
 <ProjectCCavatica />
