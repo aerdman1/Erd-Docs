@@ -10,6 +10,10 @@ export default function PageHighlight() {
   const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
+  // Define a selector that matches all the target elements
+  const searchSelector =
+    ".content-body p, .content-body details, .content-body code, .content-body table, .content-body th";
+
   // Update keywords from the meta tag if content is available
   const updateKeywords = () => {
     const metaTag = document.querySelector('meta[property="keywords"]');
@@ -41,16 +45,16 @@ export default function PageHighlight() {
     }
   };
 
-  // Initialize/reinitialize component (keywords & paragraphs)
+  // Initialize/reinitialize component (keywords & searchable elements)
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
     pollForMetaTagContent();
-    // Reset or store original text for paragraphs
-    document.querySelectorAll(".content-body p").forEach((p) => {
-      if (p.dataset.originalText) {
-        p.innerHTML = p.dataset.originalText;
+    // Reset or store original text for searchable elements
+    document.querySelectorAll(searchSelector).forEach((el) => {
+      if (el.dataset.originalText) {
+        el.innerHTML = el.dataset.originalText;
       } else {
-        p.dataset.originalText = p.innerHTML;
+        el.dataset.originalText = el.innerHTML;
       }
     });
   };
@@ -110,7 +114,7 @@ export default function PageHighlight() {
     };
   }, []);
 
-  // Highlight search matches in paragraphs
+  // Highlight search matches in searchable elements
   useEffect(() => {
     if (searchTerm.length < 3) {
       restoreOriginalText();
@@ -121,13 +125,13 @@ export default function PageHighlight() {
     let matchCounter = 0;
     const regex = new RegExp(`(${searchTerm})`, "gi");
 
-    document.querySelectorAll(".content-body p").forEach((p) => {
-      if (p.dataset.originalText) {
-        const modifiedText = p.dataset.originalText.replace(regex, (match) => {
+    document.querySelectorAll(searchSelector).forEach((el) => {
+      if (el.dataset.originalText) {
+        const modifiedText = el.dataset.originalText.replace(regex, (match) => {
           matchCounter++;
           return `<span class="highlighted-match" style="background-color: #e1e8ff; font-weight: 600; border-radius: 4px; padding: 2px 3px;">${match}</span>`;
         });
-        p.innerHTML = modifiedText;
+        el.innerHTML = modifiedText;
       }
     });
 
@@ -139,13 +143,13 @@ export default function PageHighlight() {
     }
   }, [searchTerm]);
 
-  // Count keyword occurrences in paragraphs
+  // Count keyword occurrences in searchable elements
   useEffect(() => {
     if (keywords.length === 0) return;
 
     const counts = {};
-    document.querySelectorAll(".content-body p").forEach((p) => {
-      const text = p.innerText;
+    document.querySelectorAll(searchSelector).forEach((el) => {
+      const text = el.innerText;
       keywords.forEach((keyword) => {
         const regex = new RegExp(`\\b${keyword}\\b`, "gi");
         const matches = text.match(regex);
@@ -159,11 +163,11 @@ export default function PageHighlight() {
     console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
-  // Restore paragraphs to original text (remove highlights)
+  // Restore searchable elements to original text (remove highlights)
   const restoreOriginalText = () => {
-    document.querySelectorAll(".content-body p").forEach((p) => {
-      if (p.dataset.originalText) {
-        p.innerHTML = p.dataset.originalText;
+    document.querySelectorAll(searchSelector).forEach((el) => {
+      if (el.dataset.originalText) {
+        el.innerHTML = el.dataset.originalText;
       }
     });
   };
