@@ -1,9 +1,9 @@
 ---
-name: PageBanner_Simple
+name: SimpleBanner
 ---
 import React, { useEffect, useState } from "react";
 
-export const PageBanner_Simple = ({
+export const SimpleBanner = ({
   isHeader = false,
   message,
   bannerColor,
@@ -123,7 +123,7 @@ export const PageBanner_Simple = ({
   return null;
 };
 
-<PageBanner_Simple 
+<SimpleBanner
   isHeader={false} 
   message="This banner is displayed inline. Set isHeader to true to move it seamlessly into your site's header!" 
   bannerColor="#00bcff" 
@@ -132,7 +132,7 @@ export const PageBanner_Simple = ({
   fontWeight="bold" 
 />
 
-<PageBanner_Simple 
+<SimpleBanner
   isHeader={true} 
   message="isHeader is set to true, so this banner is now integrated into your site's header!" 
   bannerColor="#00bcff" 
