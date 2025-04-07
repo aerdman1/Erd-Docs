@@ -4,12 +4,13 @@ name: PageSearchPlus
 import React, { useState, useEffect } from "react";
 
 export default function PageSearchPlus() {
+  // State declarations
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
   const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
-  // Update keywords from meta tag if content is available.
+  // Update keywords from the meta tag if content is available
   const updateKeywords = () => {
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag) {
@@ -17,14 +18,11 @@ export default function PageSearchPlus() {
       if (content.trim() !== "") {
         const extracted = content.split(",").map((kw) => kw.trim());
         setKeywords(extracted);
-        console.log("📌 Extracted Keywords:", extracted);
-      } else {
-        console.log("Meta tag content is empty.");
       }
     }
   };
 
-  // Poll for meta tag content until it's non-empty, but stop after maxAttempts.
+  // Poll for meta tag content until it's non-empty, stopping after maxAttempts
   const pollForMetaTagContent = (attempt = 0) => {
     const maxAttempts = 30; // 30 * 100ms = 3000ms (3 seconds)
     const metaTag = document.querySelector('meta[property="keywords"]');
@@ -32,17 +30,13 @@ export default function PageSearchPlus() {
       updateKeywords();
     } else {
       if (attempt < maxAttempts) {
-        console.log(`Polling: meta tag content is still empty, attempt ${attempt + 1}`);
         setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
-      } else {
-        console.log("Polling: maximum attempts reached. Stopping polling.");
       }
     }
   };
 
   // Initialize/reinitialize component (keywords & paragraphs)
   const initializeSearchComponent = () => {
-    console.log("🔍 Initializing Search Component for route:", window.location.pathname);
     pollForMetaTagContent();
     // Reset or store original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
@@ -66,7 +60,6 @@ export default function PageSearchPlus() {
       observer = new MutationObserver((mutationsList) => {
         for (const mutation of mutationsList) {
           if (mutation.type === "attributes" && mutation.attributeName === "content") {
-            console.log("Meta tag content changed:", metaTag.content);
             updateKeywords();
           }
         }
@@ -131,10 +124,9 @@ export default function PageSearchPlus() {
     });
 
     setMatchCount(matchCounter);
-    console.log(`✅ Total matches found: ${matchCounter}`);
 
     if (matchCounter > 0) {
-      setTimeout(() => scrollToFirstMatch(), 300);
+      setTimeout(scrollToFirstMatch, 300);
     }
   }, [searchTerm]);
 
@@ -155,7 +147,6 @@ export default function PageSearchPlus() {
     });
 
     setKeywordCounts(counts);
-    console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
   // Restore paragraphs to original text (remove highlights)
@@ -172,7 +163,6 @@ export default function PageSearchPlus() {
     const matches = document.querySelectorAll(".highlighted-match");
     if (matches.length > 0) {
       matches[0].scrollIntoView({ behavior: "smooth", block: "center" });
-      console.log("📍 Scrolled to first match");
     }
   };
 
@@ -181,41 +171,92 @@ export default function PageSearchPlus() {
     setSearchTerm(keyword);
   };
 
+  // Inline style objects for better readability
+  const containerStyle = {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  };
+
+  const searchContainerStyle = {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    gap: "30px",
+    position: "relative",
+  };
+
+  const inputContainerStyle = {
+    flex: "1 1 25%",
+    maxWidth: "25%",
+    position: "relative",
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "8px",
+    fontSize: "14px",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+  };
+
+  const matchCountStyle = {
+    position: "absolute",
+    top: "-18px",
+    left: "5px",
+    fontSize: "12px",
+    color: "#555",
+    opacity: "0.8",
+  };
+
+  const keywordContainerStyle = {
+    flex: "1 1 75%",
+    maxWidth: "75%",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "5px",
+    justifyContent: "flex-start",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+  };
+
+  const keywordButtonStyle = (isActive) => ({
+    backgroundColor: isActive ? "#e1e8ff" : "#f0f0f0",
+    padding: "5px 10px",
+    borderRadius: "15px",
+    border: "1px solid #ccc",
+    cursor: "pointer",
+    fontSize: "12px",
+    color: "#333",
+  });
+
   return (
-    <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "10px" }}>
+    <div style={containerStyle}>
       {/* Search & Keywords Container */}
-      <div style={{ display: "flex", alignItems: "center", width: "100%", gap: "30px", position: "relative" }}>
+      <div style={searchContainerStyle}>
         {/* Search Input */}
-        <div style={{ flex: "1 1 25%", maxWidth: "25%", position: "relative" }}>
+        <div style={inputContainerStyle}>
           {matchCount > 0 && (
-            <span style={{ position: "absolute", top: "-18px", left: "5px", fontSize: "12px", color: "#555", opacity: "0.8" }}>
+            <span style={matchCountStyle}>
               {matchCount} {matchCount === 1 ? "result" : "results"}
             </span>
           )}
           <input
             type="text"
             placeholder="Search Page..."
-            style={{ width: "100%", padding: "8px", fontSize: "14px", border: "1px solid #ccc", borderRadius: "4px" }}
+            style={inputStyle}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-
         {/* Keyword Buttons */}
-        <div style={{ flex: "1 1 75%", maxWidth: "75%", display: "flex", flexWrap: "wrap", gap: "5px", justifyContent: "flex-start", overflow: "hidden", whiteSpace: "nowrap" }}>
+        <div style={keywordContainerStyle}>
           {keywords.map((keyword) => (
             <button
               key={keyword}
               onClick={() => handleKeywordClick(keyword)}
-              style={{
-                backgroundColor: searchTerm === keyword ? "#e1e8ff" : "#f0f0f0",
-                padding: "5px 10px",
-                borderRadius: "15px",
-                border: "1px solid #ccc",
-                cursor: "pointer",
-                fontSize: "12px",
-                color: "#333"
-              }}
+              style={keywordButtonStyle(searchTerm === keyword)}
             >
               {keyword} ({keywordCounts[keyword] || 0})
             </button>
@@ -225,5 +266,3 @@ export default function PageSearchPlus() {
     </div>
   );
 }
-
-<PageSearchPlus />
