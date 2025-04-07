@@ -1,9 +1,9 @@
 ---
-name: DataTable
+name: DataTables
 ---
 import React, { useEffect, useRef } from "react";
 // DataTable component wraps tables with DataTable features for MDX integration.
-export const DataTable = ({ children }) => {
+export const DataTables = ({ children }) => {
   // Ref for the container element to scope table initialization.
   const containerRef = useRef(null);
 
@@ -231,7 +231,7 @@ export const DataTable = ({ children }) => {
   );
 };
 
-export default DataTable;
+export default DataTables;
 
 | Endpoint        | Method | Description                           | Parameters                         | Response Format |
 |-----------------|--------|---------------------------------------|------------------------------------|-----------------|
