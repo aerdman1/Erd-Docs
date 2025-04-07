@@ -16,7 +16,7 @@ metadata:
     - WebSockets
   robots: index
 ---
-<KeywordSearch isReadMeKeyword={true} />
+<KeywordSearch />
 
 ## Sample Heading
 
