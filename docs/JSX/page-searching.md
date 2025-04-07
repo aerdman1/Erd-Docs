@@ -52,14 +52,14 @@ GraphQL is an alternative to REST APIs, offering more flexibility by allowing cl
 
 ### **Table 1: API Endpoints**
 
-| Endpoint      | Method | Description                          | Parameters                        | Response Format |
-| ------------- | ------ | ------------------------------------ | --------------------------------- | --------------- |
-| `/users`      | `GET`  | Retrieves a list of users            | `limit` (int), `offset` (int)     | JSON            |
-| `/users/{id}` | `GET`  | Retrieves details of a specific user | `id` (UUID)                       | JSON            |
-| `/users`      | `POST` | Creates a new user                   | `name` (string), `email` (string) | JSON            |
+| Endpoint      | Method           | Description                          | Parameters                        | Response Format |
+| ------------- | ---------------- | ------------------------------------ | --------------------------------- | --------------- |
+| `/users`      | `GET`            | Authentication                       | `limit` (int), `offset` (int)     | JSON            |
+| `/users/{id}` | `Authentication` | Retrieves details of a specific user | `id` (UUID)                       | JSON            |
+| `/users`      | `POST`           | Creates a new user                   | `name` (string), `email` (string) | JSON            |
 
 ```
-Here is my codeblock 
+Authentication
 
 Blah Blah Blah
 ```
@@ -78,14 +78,14 @@ Blah Blah Blah
   </Tab>
 
   <Tab title="Third Tab">
-    Here's content that's only inside the third Tab.
+    Authentication
   </Tab>
 </Tabs>
 
 <HTMLBlock>{`
 Here is my custom html stuff
 
-<div>ERDMAN!</div>
+<div>Authentication</div>
 `}</HTMLBlock>
 
 ```
