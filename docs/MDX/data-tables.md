@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-<DataTables />
+test
 
 ### **Table 1: API Endpoints**
 
