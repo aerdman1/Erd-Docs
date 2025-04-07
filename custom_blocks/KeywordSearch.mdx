@@ -3,7 +3,7 @@ name: KeywordSearch
 ---
 import React, { useState, useEffect } from "react";
 
-export default function KeywordSearch() {
+export default function KeywordSearch({ isReadMeKeyword = true }) {
   // State declarations
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
@@ -44,7 +44,9 @@ export default function KeywordSearch() {
   // Initialize/reinitialize component (keywords & paragraphs)
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
-    pollForMetaTagContent();
+    if (isReadMeKeyword) {
+      pollForMetaTagContent();
+    }
     // Reset or store original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
@@ -60,19 +62,21 @@ export default function KeywordSearch() {
     // Run on initial mount
     initializeSearchComponent();
 
-    // Set up a MutationObserver for the meta tag to detect future changes
-    const metaTag = document.querySelector('meta[property="keywords"]');
+    // Set up a MutationObserver for the meta tag to detect future changes if enabled
     let observer;
-    if (metaTag) {
-      observer = new MutationObserver((mutationsList) => {
-        for (const mutation of mutationsList) {
-          if (mutation.type === "attributes" && mutation.attributeName === "content") {
-            console.log("Meta tag content changed:", metaTag.content);
-            updateKeywords();
+    if (isReadMeKeyword) {
+      const metaTag = document.querySelector('meta[property="keywords"]');
+      if (metaTag) {
+        observer = new MutationObserver((mutationsList) => {
+          for (const mutation of mutationsList) {
+            if (mutation.type === "attributes" && mutation.attributeName === "content") {
+              console.log("Meta tag content changed:", metaTag.content);
+              updateKeywords();
+            }
           }
-        }
-      });
-      observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
+        });
+        observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
+      }
     }
 
     // Handler to run initialization on URL changes
@@ -278,4 +282,4 @@ export default function KeywordSearch() {
   );
 }
 
-<KeywordSearch />
+ <KeywordSearch isReadMeKeyword={false} /> 
