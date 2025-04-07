@@ -77,3 +77,9 @@ Blah Blah Blah
     Here's content that's only inside the third Tab.
   </Tab>
 </Tabs>
+
+<HTMLBlock>{`
+Here is my custom html stuff
+
+<div>ERDMAN!</div>
+`}</HTMLBlock>
