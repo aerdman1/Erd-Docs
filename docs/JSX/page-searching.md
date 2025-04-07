@@ -16,6 +16,8 @@ metadata:
     - WebSockets
   robots: index
 ---
+<PageSearchPlus />
+
 ## Sample Heading
 
 APIs (Application Programming Interfaces) allow software systems to communicate with each other. REST APIs are the most common type, utilizing HTTP methods such as GET, POST, PUT, and DELETE to interact with resources. A well-documented API provides clear request parameters, authentication methods, and response formats.
