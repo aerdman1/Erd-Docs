@@ -3,7 +3,7 @@ name: KeywordSearch
 ---
 import React, { useState, useEffect } from "react";
 
-export default function KeywordSearch({ isReadMeKeyword = true }) {
+export default function KeywordSearch({ isReadMeKeyword = '' }) {
   // State declarations
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
@@ -44,7 +44,7 @@ export default function KeywordSearch({ isReadMeKeyword = true }) {
   // Initialize/reinitialize component (keywords & paragraphs)
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
-    if (isReadMeKeyword) {
+    if (isReadMeKeyword === true) {
       pollForMetaTagContent();
     }
     // Reset or store original text for paragraphs
@@ -64,7 +64,7 @@ export default function KeywordSearch({ isReadMeKeyword = true }) {
 
     // Set up a MutationObserver for the meta tag to detect future changes if enabled
     let observer;
-    if (isReadMeKeyword) {
+    if (isReadMeKeyword === true) {
       const metaTag = document.querySelector('meta[property="keywords"]');
       if (metaTag) {
         observer = new MutationObserver((mutationsList) => {
@@ -282,4 +282,4 @@ export default function KeywordSearch({ isReadMeKeyword = true }) {
   );
 }
 
- <KeywordSearch isReadMeKeyword={false} /> 
+ <KeywordSearch isReadMeKeyword={true} /> 
