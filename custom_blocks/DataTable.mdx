@@ -78,14 +78,14 @@ export const DataTable = ({ children }) => {
     await loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
   }; 
 
-  // Initialize the DataTable for a given table element
+  // Initialize a table element with DataTable functionality.
   const initializeTable = (table) => {
-    // Prevent re-initializing a table
+    // Skip if table has been processed before.
     if (table.getAttribute("data-dt-processed")) return;
     table.setAttribute("data-dt-processed", "true");
     table.setAttribute("data-original-html", table.innerHTML);
 
-    // Ensure the table has a unique ID for accessibility
+    // Ensure each table has a unique ID for accessibility.
     if (!table.id) {
       table.id = "data-table-" + Math.floor(Math.random() * 1000000);
     }
