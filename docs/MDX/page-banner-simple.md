@@ -1,5 +1,5 @@
 ---
-title: Page Banner (Simple)
+title: Simple Banner
 deprecated: false
 hidden: false
 metadata:
