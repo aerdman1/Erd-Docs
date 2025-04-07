@@ -87,3 +87,7 @@ Here is my custom html stuff
 
 <div>ERDMAN!</div>
 `}</HTMLBlock>
+
+```
+MY CODE BLOCK
+```
