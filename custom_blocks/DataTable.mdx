@@ -92,12 +92,12 @@ export const DataTable = ({ children }) => {
 
     // Locate the wrapper element for the table.
     const wrapper = table.closest(".rdmd-table") || table.parentElement;
-    if (!wrapper) return;
+    if (!wrapper) return; 
 
-    // If a toggle button for this table already exists, use it.
+    // Reuse existing toggle button if it exists.
     let trigger = wrapper.querySelector(`button[aria-controls="${table.id}"]`);
     if (!trigger) {
-      // Create a toggle button for enabling filtering options
+      // Create a toggle button to enable filtering options.
       trigger = document.createElement("button");
       trigger.innerHTML = '<i class="fa fa-ellipsis-v" aria-hidden="true" style="font-size: 12px;"></i>';
       Object.assign(trigger, {
@@ -109,18 +109,17 @@ export const DataTable = ({ children }) => {
                 background:linear-gradient(rgb(86,184,255),rgba(1,142,245,0.79));
                 filter:saturate(1.15);display:block;border-block-width: 0;border:0;`,
       });
-      // Associate the button with the table for accessibility
+      // Set accessibility attributes linking the button to the table.
       trigger.setAttribute("aria-controls", table.id);
       trigger.setAttribute("aria-expanded", "false");
       wrapper.insertBefore(trigger, wrapper.firstChild);
     }
 
-    // Define button click behavior for enabling filtering
+    // Toggle button click: hides button and initializes DataTable filtering.
     trigger.onclick = () => {
-      // Immediately hide THIS toggle button when clicked
-      trigger.style.display = "none";
+      trigger.style.display = "none"; // Hide toggle immediately
 
-      // If filtering is already enabled, do nothing further.
+      // Prevent re-initialization if filtering is already enabled.
       if (table.getAttribute("data-filter-enabled")) return;
 
       // Initialize the DataTable on this table
