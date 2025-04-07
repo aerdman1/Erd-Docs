@@ -3,29 +3,24 @@ name: KeywordSearch
 ---
 import React, { useState, useEffect } from "react";
 
-export default function KeywordSearch({
-  isReadMeKeyword = '', 
-  customKeyWords = []  // Pass an array of custom keywords
-}) {
+export default function KeywordSearch({ isReadMeKeyword = '' }) {
   // State declarations
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
-  const [metaKeywords, setMetaKeywords] = useState([]); // store meta keywords separately
   const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
-  // Update metaKeywords from the meta tag if content is available
+  // Update keywords from the meta tag if content is available
   const updateKeywords = () => {
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag) {
       const content = metaTag.content;
       if (content.trim() !== "") {
         const extracted = content.split(",").map((kw) => kw.trim());
-        setMetaKeywords(extracted);
-        console.log("📌 Extracted Meta Keywords:", extracted);
+        setKeywords(extracted);
+        console.log("📌 Extracted Keywords:", extracted);
       } else {
         console.log("Meta tag content is empty.");
-        setMetaKeywords([]);
       }
     }
   };
@@ -61,15 +56,6 @@ export default function KeywordSearch({
       }
     });
   };
-
-  // Merge metaKeywords and customKeyWords into the final keywords list.
-  useEffect(() => {
-    if (isReadMeKeyword === true) {
-      setKeywords([...metaKeywords, ...customKeyWords]);
-    } else {
-      setKeywords([...customKeyWords]);
-    }
-  }, [metaKeywords, customKeyWords, isReadMeKeyword]);
 
   // Set up observers and URL change listeners
   useEffect(() => {
