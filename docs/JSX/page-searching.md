@@ -64,13 +64,13 @@ Authentication
 Blah Blah Blah
 ```
 
-<Accordion title="My Accordion Title" icon="fa-info-circle">
-  Here is some accordian content
+<Accordion title="Authentication" icon="fa-info-circle">
+  Authentication
 </Accordion>
 
 <Tabs>
   <Tab title="First Tab">
-    Here is some tabbed content
+    Authentication
   </Tab>
 
   <Tab title="Second Tab">
