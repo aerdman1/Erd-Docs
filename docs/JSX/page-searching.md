@@ -44,12 +44,12 @@ Versioning an API ensures backward compatibility when introducing new features o
 
 GraphQL is an alternative to REST APIs, offering more flexibility by allowing clients to specify the exact data they need in a single request. WebSockets enable real-time communication by maintaining an open connection between clients and the server.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas auctor euismod felis, quis tincidunt risus porttitor at. Donec at risus nibh. Mauris volutpat nisi pharetra mattis tempor. Nunc ut neque euismod, luctus metus sed, pharetra lorem. Aenean nec facilisis mauris, eget viverra tortor. Pellentesque volutpat commodo arcu vitae finibus. Morbi malesuada odio sit amet nibh suscipit feugiat. Cras mi erat, pharetra ac cursus vitae, vulputate eget turpis. Nulla condimentum malesuada tortor quis hendrerit. Nunc auctor dapibus aliquam. In nec urna in eros egestas semper. Vestibulum ac nunc odio. Donec eu efficitur quam.
+<br />
 
-### Sample Heading
+### **Table 1: API Endpoints**
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas auctor euismod felis, quis tincidunt risus porttitor at. Donec at risus nibh. Mauris volutpat nisi pharetra mattis tempor. Nunc ut neque euismod, luctus metus sed, pharetra lorem. Aenean nec facilisis mauris, eget viverra tortor. Pellentesque volutpat commodo arcu vitae finibus. Morbi malesuada odio sit amet nibh suscipit feugiat. Cras mi erat, pharetra ac cursus vitae, vulputate eget turpis. Nulla condimentum malesuada tortor quis hendrerit. Nunc auctor dapibus aliquam. In nec urna in eros egestas semper. Vestibulum ac nunc odio. Donec eu efficitur quam.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas auctor euismod felis, quis tincidunt risus porttitor at. Donec at risus nibh. Mauris volutpat nisi pharetra mattis tempor. Nunc ut neque euismod, luctus metus sed, pharetra lorem. Aenean nec facilisis mauris, eget viverra tortor. Pellentesque volutpat commodo arcu vitae finibus. Morbi malesuada odio sit amet nibh suscipit feugiat. Cras mi erat, pharetra ac cursus vitae, vulputate eget turpis. Nulla condimentum malesuada tortor quis hendrerit. Nunc auctor dapibus aliquam. In nec urna in eros egestas semper. Vestibulum ac nunc odio. Donec eu efficitur quam.
-
-Comprehensive API documentation includes examples, response codes, guidelines, and best practices. Developers rely on well-structured API reference documentation to integrate APIs efficiently into their applications.
+| Endpoint      | Method | Description                          | Parameters                        | Response Format |
+| ------------- | ------ | ------------------------------------ | --------------------------------- | --------------- |
+| `/users`      | `GET`  | Retrieves a list of users            | `limit` (int), `offset` (int)     | JSON            |
+| `/users/{id}` | `GET`  | Retrieves details of a specific user | `id` (UUID)                       | JSON            |
+| `/users`      | `POST` | Creates a new user                   | `name` (string), `email` (string) | JSON            |
