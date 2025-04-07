@@ -2,12 +2,12 @@
 name: DataTable
 ---
 import React, { useEffect, useRef } from "react";
-//Data Table Add-On (3/16/25)
+// DataTable component wraps tables with DataTable features for MDX integration.
 export const DataTable = ({ children }) => {
-  // Reference to the container div
+  // Ref for the container element to scope table initialization.
   const containerRef = useRef(null);
 
-  // Custom styles for DataTable elements
+  // Inline CSS styles for custom DataTable layout and controls.
   const dtCustomStyles = `
     .dt-flex-container { 
       display: flex;
@@ -27,16 +27,15 @@ export const DataTable = ({ children }) => {
       border: 1px solid #aaa;
       border-radius: 3px;
       padding: 5px;
-      color:inherit;
+      color: inherit;
       background-color: transparent;
       margin-left: 0;
     }
   `;
 
-  // Dynamically load an external script
+  // Dynamically load an external script; resolves if already present.
   const loadScript = (src) =>
     new Promise((resolve, reject) => {
-      // Check if script is already loaded
       if (document.querySelector(`script[src="${src}"]`)) return resolve();
       const script = Object.assign(document.createElement("script"), {
         src,
@@ -47,7 +46,7 @@ export const DataTable = ({ children }) => {
       document.body.appendChild(script);
     });
 
-  // Dynamically load an external CSS file 
+  // Dynamically load an external CSS file if not already included.
   const loadCSS = (href) => {
     if (!document.querySelector(`link[href="${href}"]`)) {
       document.head.appendChild(
@@ -59,14 +58,14 @@ export const DataTable = ({ children }) => {
     }
   };
 
-  // Load all necessary DataTable dependencies
+  // Load all required dependencies for DataTable functionality.
   const loadDependencies = async () => {
     await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
     await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
     await loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
 
-    // Additional DataTable plugins and export libraries
-    const dependencies = [ 
+    // List of additional scripts (plugins/export libraries) to be loaded.
+    const dependencies = [
       "https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js",
       "https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js",
@@ -77,7 +76,7 @@ export const DataTable = ({ children }) => {
     ];
     await Promise.all(dependencies.map(loadScript));
     await loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
-  };
+  }; 
 
   // Initialize the DataTable for a given table element
   const initializeTable = (table) => {
@@ -231,8 +230,6 @@ export const DataTable = ({ children }) => {
 };
 
 export default DataTable;
- 
-
 
 | Endpoint        | Method | Description                           | Parameters                         | Response Format |
 |-----------------|--------|---------------------------------------|------------------------------------|-----------------|
