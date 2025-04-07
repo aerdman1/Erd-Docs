@@ -41,16 +41,16 @@ export default function PageHighlight() {
     }
   };
 
-  // Initialize/reinitialize component (keywords & elements)
+  // Initialize/reinitialize component (keywords & paragraphs)
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
     pollForMetaTagContent();
-    // Reset or store original text for all elements inside .content-body (except for script and style)
-    document.querySelectorAll(".content-body *:not(script):not(style)").forEach((el) => {
-      if (el.dataset.originalText) {
-        el.innerHTML = el.dataset.originalText;
+    // Reset or store original text for paragraphs
+    document.querySelectorAll(".content-body p").forEach((p) => {
+      if (p.dataset.originalText) {
+        p.innerHTML = p.dataset.originalText;
       } else {
-        el.dataset.originalText = el.innerHTML;
+        p.dataset.originalText = p.innerHTML;
       }
     });
   };
@@ -110,7 +110,7 @@ export default function PageHighlight() {
     };
   }, []);
 
-  // Highlight search matches in all elements within .content-body
+  // Highlight search matches in paragraphs
   useEffect(() => {
     if (searchTerm.length < 3) {
       restoreOriginalText();
@@ -121,13 +121,13 @@ export default function PageHighlight() {
     let matchCounter = 0;
     const regex = new RegExp(`(${searchTerm})`, "gi");
 
-    document.querySelectorAll(".content-body *:not(script):not(style)").forEach((el) => {
-      if (el.dataset.originalText) {
-        const modifiedText = el.dataset.originalText.replace(regex, (match) => {
+    document.querySelectorAll(".content-body p").forEach((p) => {
+      if (p.dataset.originalText) {
+        const modifiedText = p.dataset.originalText.replace(regex, (match) => {
           matchCounter++;
           return `<span class="highlighted-match" style="background-color: #e1e8ff; font-weight: 600; border-radius: 4px; padding: 2px 3px;">${match}</span>`;
         });
-        el.innerHTML = modifiedText;
+        p.innerHTML = modifiedText;
       }
     });
 
@@ -139,13 +139,13 @@ export default function PageHighlight() {
     }
   }, [searchTerm]);
 
-  // Count keyword occurrences in all elements within .content-body
+  // Count keyword occurrences in paragraphs
   useEffect(() => {
     if (keywords.length === 0) return;
 
     const counts = {};
-    document.querySelectorAll(".content-body *:not(script):not(style)").forEach((el) => {
-      const text = el.innerText;
+    document.querySelectorAll(".content-body p").forEach((p) => {
+      const text = p.innerText;
       keywords.forEach((keyword) => {
         const regex = new RegExp(`\\b${keyword}\\b`, "gi");
         const matches = text.match(regex);
@@ -159,11 +159,11 @@ export default function PageHighlight() {
     console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
-  // Restore all elements within .content-body to original text (remove highlights)
+  // Restore paragraphs to original text (remove highlights)
   const restoreOriginalText = () => {
-    document.querySelectorAll(".content-body *:not(script):not(style)").forEach((el) => {
-      if (el.dataset.originalText) {
-        el.innerHTML = el.dataset.originalText;
+    document.querySelectorAll(".content-body p").forEach((p) => {
+      if (p.dataset.originalText) {
+        p.innerHTML = p.dataset.originalText;
       }
     });
   };
