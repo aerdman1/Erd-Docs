@@ -122,7 +122,7 @@ export const DataTable = ({ children }) => {
       // Prevent re-initialization if filtering is already enabled.
       if (table.getAttribute("data-filter-enabled")) return;
 
-      // Initialize the DataTable on this table
+      // Initialize DataTable with custom configuration.
       const dt = window.jQuery(table).DataTable({
         dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
         language: { search: "", searchPlaceholder: "Search Table:" },
@@ -173,16 +173,18 @@ export const DataTable = ({ children }) => {
             className: "dt-btn",
             attr: { "aria-label": "Disable filtering" },
             action: function () {
+              // Remove DataTable enhancements and reset table state.
               dt.destroy();
               table.innerHTML = table.getAttribute("data-original-html") || table.innerHTML;
               table.removeAttribute("data-dt-processed");
               table.removeAttribute("data-filter-enabled");
-              // Re-display the toggle button when filtering is disabled
+              // Redisplay the toggle button to allow re-enabling.
               trigger.style.display = "block";
               trigger.setAttribute("aria-expanded", "false");
             },
           },
         ],
+        // After initialization, update the search input's accessibility label.
         initComplete: function () {
           const searchInput = document.querySelector(".dataTables_filter input");
           if (searchInput) {
@@ -191,31 +193,32 @@ export const DataTable = ({ children }) => {
         },
       });
 
-      // Mark the table as having filtering enabled
+      // Mark the table as having filtering enabled.
       table.setAttribute("data-filter-enabled", "true");
       trigger.setAttribute("aria-expanded", "true");
     };
   };
 
-  // Load dependencies and initialize tables on component mount
+  // On component mount, load dependencies and initialize tables.
   useEffect(() => {
     loadDependencies().then(() => {
+      // Function to initialize every table found within the component or in global .rdmd-table containers.
       const initializeAllTables = () => {
         containerRef.current?.querySelectorAll("table").forEach(initializeTable);
         document.querySelectorAll(".rdmd-table table").forEach(initializeTable);
       };
 
-      // Run once initially
+      // Initial table setup.
       initializeAllTables();
 
-      // Use a MutationObserver to detect dynamically added tables
+      // Observe the DOM for any new table elements and reinitialize as needed.
       const observer = new MutationObserver(() => {
         initializeAllTables();
       });
-
       observer.observe(document.body, { childList: true, subtree: true });
 
-      return () => observer.disconnect(); // Cleanup
+      // Disconnect the observer on component unmount.
+      return () => observer.disconnect();
     });
   }, []);
 
