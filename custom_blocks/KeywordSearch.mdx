@@ -1,43 +1,49 @@
 ---
 name: KeywordSearch
 ---
-import React, { useState, useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 
-export default function KeywordSearch() {
+export default function KeywordSearch({ customKeywords = [], enableReadMeKeywords = true }) {
   // State declarations
+  const [readmeKeywords, setReadmeKeywords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
-  const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
-  // Update keywords from the meta tag if content is available
-  const updateKeywords = () => {
+  // Combine keywords from ReadMe and custom props (ensuring no duplicates)
+  const finalKeywords = enableReadMeKeywords
+    ? [...new Set([...readmeKeywords, ...customKeywords])]
+    : customKeywords;
+
+  // Update ReadMe keywords from the meta tag if content is available
+  const updateReadMeKeywords = () => {
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag) {
       const content = metaTag.content;
       if (content.trim() !== "") {
         const extracted = content.split(",").map((kw) => kw.trim());
-        setKeywords(extracted);
+        setReadmeKeywords(extracted);
       }
     }
   };
 
   // Poll for meta tag content until it's non-empty, stopping after maxAttempts
   const pollForMetaTagContent = (attempt = 0) => {
+    if (!enableReadMeKeywords) return;
     const maxAttempts = 30; // 30 * 100ms = 3000ms (3 seconds)
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag && metaTag.content.trim() !== "") {
-      updateKeywords();
-    } else {
-      if (attempt < maxAttempts) {
-        setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
-      }
+      updateReadMeKeywords();
+    } else if (attempt < maxAttempts) {
+      setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
     }
   };
 
   // Initialize/reinitialize component (keywords & paragraphs)
   const initializeSearchComponent = () => {
-    pollForMetaTagContent();
+    if (enableReadMeKeywords) {
+      pollForMetaTagContent();
+    }
     // Reset or store original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
@@ -53,18 +59,19 @@ export default function KeywordSearch() {
     // Run on initial mount
     initializeSearchComponent();
 
-    // Set up a MutationObserver for the meta tag to detect future changes
-    const metaTag = document.querySelector('meta[property="keywords"]');
     let observer;
-    if (metaTag) {
-      observer = new MutationObserver((mutationsList) => {
-        for (const mutation of mutationsList) {
-          if (mutation.type === "attributes" && mutation.attributeName === "content") {
-            updateKeywords();
+    if (enableReadMeKeywords) {
+      const metaTag = document.querySelector('meta[property="keywords"]');
+      if (metaTag) {
+        observer = new MutationObserver((mutationsList) => {
+          for (const mutation of mutationsList) {
+            if (mutation.type === "attributes" && mutation.attributeName === "content") {
+              updateReadMeKeywords();
+            }
           }
-        }
-      });
-      observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
+        });
+        observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
+      }
     }
 
     // Handler to run initialization on URL changes
@@ -100,7 +107,7 @@ export default function KeywordSearch() {
       window.removeEventListener("replaceState", handleUrlChange);
       window.removeEventListener("hashchange", handleUrlChange);
     };
-  }, []);
+  }, [enableReadMeKeywords]);
 
   // Highlight search matches in paragraphs
   useEffect(() => {
@@ -130,14 +137,14 @@ export default function KeywordSearch() {
     }
   }, [searchTerm]);
 
-  // Count keyword occurrences in paragraphs
+  // Count keyword occurrences in paragraphs using finalKeywords
   useEffect(() => {
-    if (keywords.length === 0) return;
+    if (finalKeywords.length === 0) return;
 
     const counts = {};
     document.querySelectorAll(".content-body p").forEach((p) => {
       const text = p.innerText;
-      keywords.forEach((keyword) => {
+      finalKeywords.forEach((keyword) => {
         const regex = new RegExp(`\\b${keyword}\\b`, "gi");
         const matches = text.match(regex);
         if (matches) {
@@ -147,7 +154,7 @@ export default function KeywordSearch() {
     });
 
     setKeywordCounts(counts);
-  }, [keywords]);
+  }, [finalKeywords]);
 
   // Restore paragraphs to original text (remove highlights)
   const restoreOriginalText = () => {
@@ -252,7 +259,7 @@ export default function KeywordSearch() {
         </div>
         {/* Keyword Buttons */}
         <div style={keywordContainerStyle}>
-          {keywords.map((keyword) => (
+          {finalKeywords.map((keyword) => (
             <button
               key={keyword}
               onClick={() => handleKeywordClick(keyword)}
@@ -267,4 +274,8 @@ export default function KeywordSearch() {
   );
 }
 
-<KeywordSearch /> 
+// Use only custom keywords
+<KeywordSearch
+  customKeywords={["React", "JavaScript", "CSS"]}
+  enableReadMeKeywords={false}
+/> 
