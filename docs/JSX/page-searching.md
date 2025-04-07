@@ -46,8 +46,6 @@ Versioning an API ensures backward compatibility when introducing new features o
 
 GraphQL is an alternative to REST APIs, offering more flexibility by allowing clients to specify the exact data they need in a single request. WebSockets enable real-time communication by maintaining an open connection between clients and the server.
 
-<br />
-
 ### **Table 1: API Endpoints**
 
 | Endpoint      | Method | Description                          | Parameters                        | Response Format |
@@ -55,3 +53,27 @@ GraphQL is an alternative to REST APIs, offering more flexibility by allowing cl
 | `/users`      | `GET`  | Retrieves a list of users            | `limit` (int), `offset` (int)     | JSON            |
 | `/users/{id}` | `GET`  | Retrieves details of a specific user | `id` (UUID)                       | JSON            |
 | `/users`      | `POST` | Creates a new user                   | `name` (string), `email` (string) | JSON            |
+
+```
+Here is my codeblock 
+
+Blah Blah Blah
+```
+
+<Accordion title="My Accordion Title" icon="fa-info-circle">
+  Here is some accordian content
+</Accordion>
+
+<Tabs>
+  <Tab title="First Tab">
+    Here is some tabbed content
+  </Tab>
+
+  <Tab title="Second Tab">
+    Here's content that's only inside the second Tab.
+  </Tab>
+
+  <Tab title="Third Tab">
+    Here's content that's only inside the third Tab.
+  </Tab>
+</Tabs>
