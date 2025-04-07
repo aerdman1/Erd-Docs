@@ -3,47 +3,48 @@ name: KeywordSearch
 ---
 import React, { useState, useEffect } from "react";
 
-export default function KeywordSearch({ customKeywords = [], enableReadMeKeywords = true }) {
+export default function PageSearchPlus() {
   // State declarations
-  const [readmeKeywords, setReadmeKeywords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
+  const [keywords, setKeywords] = useState([]);
   const [keywordCounts, setKeywordCounts] = useState({});
 
-  // Combine keywords from ReadMe and custom props (ensuring no duplicates)
-  const finalKeywords = enableReadMeKeywords
-    ? [...new Set([...readmeKeywords, ...customKeywords])]
-    : customKeywords;
-
-  // Update ReadMe keywords from the meta tag if content is available
-  const updateReadMeKeywords = () => {
+  // Update keywords from the meta tag if content is available
+  const updateKeywords = () => {
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag) {
       const content = metaTag.content;
       if (content.trim() !== "") {
         const extracted = content.split(",").map((kw) => kw.trim());
-        setReadmeKeywords(extracted);
+        setKeywords(extracted);
+        console.log("📌 Extracted Keywords:", extracted);
+      } else {
+        console.log("Meta tag content is empty.");
       }
     }
   };
 
   // Poll for meta tag content until it's non-empty, stopping after maxAttempts
   const pollForMetaTagContent = (attempt = 0) => {
-    if (!enableReadMeKeywords) return;
     const maxAttempts = 30; // 30 * 100ms = 3000ms (3 seconds)
     const metaTag = document.querySelector('meta[property="keywords"]');
     if (metaTag && metaTag.content.trim() !== "") {
-      updateReadMeKeywords();
-    } else if (attempt < maxAttempts) {
-      setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
+      updateKeywords();
+    } else {
+      if (attempt < maxAttempts) {
+        console.log(`Polling: meta tag content is still empty, attempt ${attempt + 1}`);
+        setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
+      } else {
+        console.log("Polling: maximum attempts reached. Stopping polling.");
+      }
     }
   };
 
   // Initialize/reinitialize component (keywords & paragraphs)
   const initializeSearchComponent = () => {
-    if (enableReadMeKeywords) {
-      pollForMetaTagContent();
-    }
+    console.log("🔍 Initializing Search Component for route:", window.location.pathname);
+    pollForMetaTagContent();
     // Reset or store original text for paragraphs
     document.querySelectorAll(".content-body p").forEach((p) => {
       if (p.dataset.originalText) {
@@ -59,19 +60,19 @@ export default function KeywordSearch({ customKeywords = [], enableReadMeKeyword
     // Run on initial mount
     initializeSearchComponent();
 
+    // Set up a MutationObserver for the meta tag to detect future changes
+    const metaTag = document.querySelector('meta[property="keywords"]');
     let observer;
-    if (enableReadMeKeywords) {
-      const metaTag = document.querySelector('meta[property="keywords"]');
-      if (metaTag) {
-        observer = new MutationObserver((mutationsList) => {
-          for (const mutation of mutationsList) {
-            if (mutation.type === "attributes" && mutation.attributeName === "content") {
-              updateReadMeKeywords();
-            }
+    if (metaTag) {
+      observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (mutation.type === "attributes" && mutation.attributeName === "content") {
+            console.log("Meta tag content changed:", metaTag.content);
+            updateKeywords();
           }
-        });
-        observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
-      }
+        }
+      });
+      observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
     }
 
     // Handler to run initialization on URL changes
@@ -107,7 +108,7 @@ export default function KeywordSearch({ customKeywords = [], enableReadMeKeyword
       window.removeEventListener("replaceState", handleUrlChange);
       window.removeEventListener("hashchange", handleUrlChange);
     };
-  }, [enableReadMeKeywords]);
+  }, []);
 
   // Highlight search matches in paragraphs
   useEffect(() => {
@@ -131,20 +132,21 @@ export default function KeywordSearch({ customKeywords = [], enableReadMeKeyword
     });
 
     setMatchCount(matchCounter);
+    console.log(`✅ Total matches found: ${matchCounter}`);
 
     if (matchCounter > 0) {
       setTimeout(scrollToFirstMatch, 300);
     }
   }, [searchTerm]);
 
-  // Count keyword occurrences in paragraphs using finalKeywords
+  // Count keyword occurrences in paragraphs
   useEffect(() => {
-    if (finalKeywords.length === 0) return;
+    if (keywords.length === 0) return;
 
     const counts = {};
     document.querySelectorAll(".content-body p").forEach((p) => {
       const text = p.innerText;
-      finalKeywords.forEach((keyword) => {
+      keywords.forEach((keyword) => {
         const regex = new RegExp(`\\b${keyword}\\b`, "gi");
         const matches = text.match(regex);
         if (matches) {
@@ -154,7 +156,8 @@ export default function KeywordSearch({ customKeywords = [], enableReadMeKeyword
     });
 
     setKeywordCounts(counts);
-  }, [finalKeywords]);
+    console.log("📊 Keyword Counts:", counts);
+  }, [keywords]);
 
   // Restore paragraphs to original text (remove highlights)
   const restoreOriginalText = () => {
@@ -170,6 +173,7 @@ export default function KeywordSearch({ customKeywords = [], enableReadMeKeyword
     const matches = document.querySelectorAll(".highlighted-match");
     if (matches.length > 0) {
       matches[0].scrollIntoView({ behavior: "smooth", block: "center" });
+      console.log("📍 Scrolled to first match");
     }
   };
 
@@ -259,7 +263,7 @@ export default function KeywordSearch({ customKeywords = [], enableReadMeKeyword
         </div>
         {/* Keyword Buttons */}
         <div style={keywordContainerStyle}>
-          {finalKeywords.map((keyword) => (
+          {keywords.map((keyword) => (
             <button
               key={keyword}
               onClick={() => handleKeywordClick(keyword)}
@@ -274,4 +278,4 @@ export default function KeywordSearch({ customKeywords = [], enableReadMeKeyword
   );
 }
 
-<KeywordSearch/>
+<KeywordSearch /> 
