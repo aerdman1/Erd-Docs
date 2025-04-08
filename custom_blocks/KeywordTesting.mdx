@@ -3,28 +3,26 @@ name: KeywordTesting
 ---
 import React, { useState, useEffect, useRef } from "react";
 
-export default function KeywordTesting({ initialKeywords }) {
-  /* ───────────────  State  ─────────────── */
+export default function KeywordTesting1({ initialKeywords }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
   const [keywords, setKeywords] = useState(initialKeywords || []);
   const [keywordCounts, setKeywordCounts] = useState({});
-
-  // Sync keywords from props if they change.
+  const [hasContentBody, setHasContentBody] = useState(true);
+  useEffect(() => {
+    if (!document.querySelector(".content-body")) {
+      setHasContentBody(false);
+    }
+  }, []);
   useEffect(() => {
     if (initialKeywords) {
       setKeywords(initialKeywords);
     }
   }, [initialKeywords]);
-
-  /* ─────────────  Refs / consts  ───────────── */
-  const markRef = useRef(null); // will hold the mark.js instance
-  const contentRef = useRef(null); // cache .content-body root
-
+  const markRef = useRef(null);
+  const contentRef = useRef(null);
   const searchSelector =
     ".content-body p, .content-body li, .content-body ul, .content-body ol, .content-body details, .content-body code, .content-body table, .content-body th, .content-body td, .content-body pre, .content-body blockquote, .content-body h1, .content-body h2, .content-body h3, .content-body h4, .content-body h5, .content-body h6";
-
-  /* ───────  Helper: lazy‑load mark.js  ───── */
   const loadMarkJs = () =>
     new Promise((resolve) => {
       if (window.Mark) return resolve(window.Mark);
@@ -34,18 +32,21 @@ export default function KeywordTesting({ initialKeywords }) {
       document.head.appendChild(script);
     });
 
-  /* ───────────  One‑time setup  ─────────── */
   useEffect(() => {
-    // 1. Cache the root element (ensure your page has an element with .content-body)
+    // Try to find an element with class .content-body
     contentRef.current = document.querySelector(".content-body");
 
-    // 2. Inject highlight CSS once.
+    // If no .content-body exists, we’ll render a fallback in our JSX.
+    if (!contentRef.current) {
+      return;
+    }
+
+    // Inject CSS for highlighted matches
     const style = document.createElement("style");
     style.textContent =
       ".highlighted-match{background-color:#e1e8ff;font-weight:600;border-radius:4px;padding:2px 3px;}";
     document.head.appendChild(style);
 
-    // 3. Load mark.js, then create the instance.
     let markInstance;
     loadMarkJs().then((Mark) => {
       if (!contentRef.current) return;
@@ -53,27 +54,22 @@ export default function KeywordTesting({ initialKeywords }) {
       markRef.current = markInstance;
     });
 
-    // Cleanup on unmount.
     return () => {
       markInstance && markInstance.unmark();
       if (document.head.contains(style)) {
         document.head.removeChild(style);
       }
     };
-  }, []);
+  }, [hasContentBody]);
 
-  /* ──────── Initialize Search Component ──────── */
   const initializeSearchComponent = () => {
     console.log("🔍 Initializing Search Component for route:", window.location.pathname);
     markRef.current && markRef.current.unmark();
     setMatchCount(0);
   };
 
-  /* ─────  SPA Navigation Hooks & History Method Patching  ───── */
   useEffect(() => {
     initializeSearchComponent();
-
-    // Use window flag to ensure history patching happens only once.
     if (!window.__hasPatchedHistory) {
       const originalPushState = history.pushState;
       const originalReplaceState = history.replaceState;
@@ -108,17 +104,14 @@ export default function KeywordTesting({ initialKeywords }) {
     };
   }, []);
 
-  /* ──────────  Highlight on searchTerm  ───────── */
   useEffect(() => {
     const mark = markRef.current;
     if (!mark || !contentRef.current) return;
-
     if (searchTerm.length < 3) {
       mark.unmark();
       setMatchCount(0);
       return;
     }
-
     mark.unmark({
       done: () =>
         mark.mark(searchTerm, {
@@ -126,20 +119,16 @@ export default function KeywordTesting({ initialKeywords }) {
           className: "highlighted-match",
           done: (cnt) => {
             setMatchCount(cnt);
-            if (cnt > 0) {
-              setTimeout(scrollToFirstMatch, 300);
-            }
+            if (cnt > 0) setTimeout(scrollToFirstMatch, 300);
             console.log(`✅ Total matches found: ${cnt}`);
           },
         }),
     });
   }, [searchTerm]);
 
-  /* ────────  Count Keyword Occurrences  ──────── */
   useEffect(() => {
     if (!keywords.length) return;
     const counts = {};
-
     document.querySelectorAll(searchSelector).forEach((el) => {
       const text = el.textContent || "";
       keywords.forEach((kw) => {
@@ -150,12 +139,10 @@ export default function KeywordTesting({ initialKeywords }) {
         }
       });
     });
-
     setKeywordCounts(counts);
     console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
-  /* ────────────────  Helpers  ──────────────── */
   const scrollToFirstMatch = () => {
     const match = document.querySelector(".highlighted-match");
     if (match) {
@@ -165,7 +152,6 @@ export default function KeywordTesting({ initialKeywords }) {
 
   const handleKeywordClick = (kw) => setSearchTerm(kw);
 
-  /* ────────────────  Inline Styles  ──────────── */
   const containerStyle = {
     width: "100%",
     display: "flex",
@@ -219,38 +205,54 @@ export default function KeywordTesting({ initialKeywords }) {
     color: "#333",
   });
 
-  /* ─────────────────  Render  ───────────────── */
   return (
-    <div style={containerStyle}>
-      <div style={searchContainerStyle}>
-        <div style={inputContainerStyle}>
-          {matchCount > 0 && (
-            <span style={matchCountStyle}>
-              {matchCount} {matchCount === 1 ? "result" : "results"}
-            </span>
-          )}
-          <input
-            type="text"
-            placeholder="Search Page..."
-            style={inputStyle}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <>
+      {/* Render fallback content-body in the preview if one isn’t already in the DOM */}
+      {!hasContentBody && (
+        <div className="content-body" style={{ padding: "1rem", border: "1px dashed #999", marginBottom: "1rem" }}>
+          <p>This is fallback dummy content with test1, test2, and test3 for preview purposes.</p>
         </div>
-        <div style={keywordContainerStyle}>
-          {keywords.map((kw) => (
-            <button
-              key={kw}
-              onClick={() => handleKeywordClick(kw)}
-              style={keywordButtonStyle(searchTerm === kw)}
-            >
-              {kw} ({keywordCounts[kw] || 0})
-            </button>
-          ))}
+      )}
+      <div style={containerStyle}>
+        <div style={searchContainerStyle}>
+          <div style={inputContainerStyle}>
+            {matchCount > 0 && (
+              <span style={matchCountStyle}>
+                {matchCount} {matchCount === 1 ? "result" : "results"}
+              </span>
+            )}
+            <input
+              type="text"
+              placeholder="Search Page..."
+              style={inputStyle}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <div style={keywordContainerStyle}>
+            {keywords.map((kw) => (
+              <button key={kw} onClick={() => handleKeywordClick(kw)} style={keywordButtonStyle(searchTerm === kw)}>
+                {kw} ({keywordCounts[kw] || 0})
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
+<div style={{ padding: "1rem", border: "1px solid #ccc", marginBottom: "1rem" }}>
+  PREVIEW TEXT BEFORE — THIS SHOULD APPEAR.
+</div>
+
+<div className="content-body" style={{ padding: "1rem", border: "1px dashed #ccc", marginBottom: "1rem" }}>
+  <p>This is dummy searchable content that includes test1, test2, and test3.</p>
+</div>
+
 <KeywordTesting initialKeywords={["test1", "test2", "test3"]} />
+
+<div style={{ padding: "1rem", marginTop: "1rem", border: "1px solid #ccc" }}>
+  I SHOULD SEE THIS.
+</div>
+
