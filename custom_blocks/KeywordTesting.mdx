@@ -12,9 +12,7 @@ export default function KeywordTesting({ initialKeywords = ["apple", "banana", "
 
   // Sync keywords from props if they change.
   useEffect(() => {
-    if (initialKeywords.join() !== keywords.join()) {
-      setKeywords(initialKeywords);
-    }
+    setKeywords(initialKeywords);
   }, [initialKeywords]);
 
   /* ─────────────  Refs / consts  ───────────── */
@@ -253,4 +251,5 @@ export default function KeywordTesting({ initialKeywords = ["apple", "banana", "
   );
 }
 
-<KeywordTesting initialKeywords={["test", "test", "test"]} />  
+<KeywordTesting initialKeywords={["test1", "test2", "test3"]} />
+
