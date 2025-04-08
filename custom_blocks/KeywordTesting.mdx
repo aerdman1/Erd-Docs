@@ -5,7 +5,6 @@ import React, { useState, useEffect, useRef } from "react";
 
 export default function KeywordTesting({ initialKeywords }) {
   /* ───────────────  State  ─────────────── */
-  // If initialKeywords is not provided, default to an empty array.
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
   const [keywords, setKeywords] = useState(initialKeywords || []);
@@ -254,6 +253,10 @@ export default function KeywordTesting({ initialKeywords }) {
   );
 }
 
-<KeywordTesting initialKeywords={["test1", "test2", "test3"]} />
+<div className="content-body">
+  <p>
+    This is some dummy content for testing. It includes test1, test2, and test3 to match your keywords.
+  </p>
+</div>
+<KeywordTesting initialKeywords={["test1", "test2", "test3"]} /> 
 
-<div class=".content-body p">test1</div> 
