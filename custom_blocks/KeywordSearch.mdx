@@ -3,130 +3,134 @@ name: KeywordSearch
 ---
 import React, { useState, useEffect, useRef } from "react";
 
-export default function KeywordSearch({
-  /* ─────────────  Public props (all optional)  ───────────── */
-  placeholder   = "Search Page…",
-  minChars      = 3,                    // min characters before highlighting
-  highlightColor = "#e1e8ff",           // background colour for matches
-  showKeywords  = true,                 // toggle keyword chips
-  keywords: keywordsProp = [],          // override <meta keywords>
-  debounceMs    = 200,                  // debounce keystrokes
-}) {
-  /* ─────────────────────  State  ───────────────────── */
-  const [searchTerm,   setSearchTerm]   = useState("");
-  const [matchCount,   setMatchCount]   = useState(0);
-  const [keywords,     setKeywords]     = useState([]);
-  const [keywordCounts,setKeywordCounts]= useState({});
+export default function KeywordSearch() {
+  /* ───────────────  State  ─────────────── */
+  const [searchTerm, setSearchTerm] = useState("");
+  const [matchCount, setMatchCount] = useState(0);
+  const [keywords, setKeywords] = useState([]);
+  const [keywordCounts, setKeywordCounts] = useState({});
 
-  /* ────────────────────  Refs / consts  ──────────────────── */
-  const markRef     = useRef(null);           // mark.js instance
-  const contentRef  = useRef(null);           // .content-body root
-  const debounceRef = useRef(null);           // timer for debounce
+  /* ─────────────  Refs / consts  ────────── */
+  const markRef = useRef(null);                 // will hold the mark.js instance
+  const contentRef = useRef(null);              // cache .content-body root
 
   const searchSelector =
     ".content-body p, .content-body li, .content-body ul, .content-body ol, .content-body details, .content-body code, .content-body table, .content-body th, .content-body td, .content-body pre, .content-body blockquote, .content-body h1, .content-body h2, .content-body h3, .content-body h4, .content-body h5, .content-body h6";
 
-  /* ─────────────  Helper: lazy‑load mark.js  ───────────── */
+  /* ───────  Helper: lazy‑load mark.js  ───── */
   const loadMarkJs = () =>
     new Promise((resolve) => {
-      if (window.Mark) return resolve(window.Mark);        // already present
+      if (window.Mark) return resolve(window.Mark);          // already present
       const script = document.createElement("script");
       script.src = "https://unpkg.com/mark.js/dist/mark.min.js";
       script.onload = () => resolve(window.Mark);
       document.head.appendChild(script);
     });
 
-  /* ──────────────  Inject / update highlight CSS  ────────────── */
+  /* ───────────  One‑time setup  ─────────── */
   useEffect(() => {
-    const id = "ks-highlight-style";
-    let styleTag = document.getElementById(id);
-    if (!styleTag) {
-      styleTag = document.createElement("style");
-      styleTag.id = id;
-      document.head.appendChild(styleTag);
-    }
-    styleTag.textContent = `.highlighted-match{background-color:${highlightColor};font-weight:600;border-radius:4px;padding:2px 3px;}`;
-  }, [highlightColor]);
-
-  /* ────────────────  One‑time setup  ──────────────── */
-  useEffect(() => {
-    // cache root
+    // 1. cache the root element
     contentRef.current = document.querySelector(".content-body");
 
-    // load mark.js then create instance
+    // 2. inject highlight CSS once
+    const style = document.createElement("style");
+    style.textContent =
+      ".highlighted-match{background-color:#e1e8ff;font-weight:600;border-radius:4px;padding:2px 3px;}";
+    document.head.appendChild(style);
+
+    // 3. load mark.js, then create the instance
     let markInstance;
     loadMarkJs().then((Mark) => {
       if (!contentRef.current) return;
-      markInstance      = new Mark(contentRef.current);
-      markRef.current   = markInstance;
+      markInstance = new Mark(contentRef.current);
+      markRef.current = markInstance;
     });
 
-    return () => { markInstance && markInstance.unmark(); };
+    // cleanup on unmount
+    return () => {
+      markInstance && markInstance.unmark();
+      document.head.removeChild(style);
+    };
   }, []);
 
-  /* ───────────  Keyword source: prop > meta  ─────────── */
-  const updateKeywordsFromMeta = () => {
-    if (keywordsProp.length) return;           // prop wins
-    const meta = document.querySelector('meta[property="keywords"]');
-    if (meta && meta.content.trim()) {
-      setKeywords(meta.content.split(",").map((k) => k.trim()));
+  /* ──────  Keywords from <meta keywords>  ───── */
+  const updateKeywords = () => {
+    const metaTag = document.querySelector('meta[property="keywords"]');
+    if (metaTag && metaTag.content.trim()) {
+      const extracted = metaTag.content.split(",").map((kw) => kw.trim());
+      setKeywords(extracted);
+      console.log("📌 Extracted Keywords:", extracted);
     }
   };
 
-  // when prop changes
-  useEffect(() => {
-    if (keywordsProp.length) setKeywords(keywordsProp);
-  }, [keywordsProp]);
-
-  /* ─────────────  Initialisation per route  ───────────── */
-  const initializeSearchComponent = () => {
-    console.log("🔍 Initialising on:", window.location.pathname);
-    updateKeywordsFromMeta();
-    markRef.current && markRef.current.unmark();
-    setMatchCount(0);
-    setSearchTerm("");
+  const pollForMetaTagContent = (attempt = 0) => {
+    const maxAttempts = 30;
+    const metaTag = document.querySelector('meta[property="keywords"]');
+    if (metaTag && metaTag.content.trim()) {
+      updateKeywords();
+    } else if (attempt < maxAttempts) {
+      setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
+    }
   };
 
-  /* observe meta changes + SPA navigation */
+  const initializeSearchComponent = () => {
+    console.log("🔍 Initializing Search Component for route:", window.location.pathname);
+    pollForMetaTagContent();
+    markRef.current && markRef.current.unmark();
+    setMatchCount(0);
+  };
+
+  /* ─────  Observe meta changes & navigation  ───── */
   useEffect(() => {
     initializeSearchComponent();
 
-    /* watch meta[keywords] */
-    const meta = document.querySelector('meta[property="keywords"]');
+    /* watch <meta property="keywords"> */
+    const metaTag = document.querySelector('meta[property="keywords"]');
     let observer;
-    if (meta) {
-      observer = new MutationObserver(updateKeywordsFromMeta);
-      observer.observe(meta, { attributes: true, attributeFilter: ["content"] });
+    if (metaTag) {
+      observer = new MutationObserver(updateKeywords);
+      observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
     }
 
-    /* hook history.* and hashchange */
-    const onRoute = () => setTimeout(initializeSearchComponent, 500);
+    /* SPA navigation hooks */
+    const handleUrlChange = () => {
+      setTimeout(() => {
+        setSearchTerm("");
+        initializeSearchComponent();
+      }, 500);
+    };
 
-    const origPush = history.pushState;
-    const origReplace = history.replaceState;
-    history.pushState = function () { origPush.apply(history, arguments);  window.dispatchEvent(new Event("pushState")); };
-    history.replaceState = function () { origReplace.apply(history, arguments); window.dispatchEvent(new Event("replaceState")); };
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    history.pushState = function () {
+      originalPushState.apply(history, arguments);
+      window.dispatchEvent(new Event("pushState"));
+    };
+    history.replaceState = function () {
+      originalReplaceState.apply(history, arguments);
+      window.dispatchEvent(new Event("replaceState"));
+    };
 
-    window.addEventListener("popstate", onRoute);
-    window.addEventListener("pushState", onRoute);
-    window.addEventListener("replaceState", onRoute);
-    window.addEventListener("hashchange", onRoute);
+    window.addEventListener("popstate", handleUrlChange);
+    window.addEventListener("pushState", handleUrlChange);
+    window.addEventListener("replaceState", handleUrlChange);
+    window.addEventListener("hashchange", handleUrlChange);
 
     return () => {
       observer && observer.disconnect();
-      window.removeEventListener("popstate", onRoute);
-      window.removeEventListener("pushState", onRoute);
-      window.removeEventListener("replaceState", onRoute);
-      window.removeEventListener("hashchange", onRoute);
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("pushState", handleUrlChange);
+      window.removeEventListener("replaceState", handleUrlChange);
+      window.removeEventListener("hashchange", handleUrlChange);
     };
-  }, [keywordsProp]);
+  }, []);
 
-  /* ────────────────  Highlight logic  ──────────────── */
+  /* ──────────  Highlight on searchTerm  ───────── */
   useEffect(() => {
     const mark = markRef.current;
     if (!mark || !contentRef.current) return;
 
-    if (searchTerm.length < minChars) {
+    if (searchTerm.length < 3) {
       mark.unmark();
       setMatchCount(0);
       return;
@@ -139,16 +143,14 @@ export default function KeywordSearch({
           className: "highlighted-match",
           done: (cnt) => {
             setMatchCount(cnt);
-            if (cnt) setTimeout(() => {
-              const m = document.querySelector(".highlighted-match");
-              m && m.scrollIntoView({ behavior: "smooth", block: "center" });
-            }, 300);
+            if (cnt > 0) setTimeout(scrollToFirstMatch, 300);
+            console.log(`✅ Total matches found: ${cnt}`);
           },
         }),
     });
-  }, [searchTerm, minChars]);
+  }, [searchTerm]);
 
-  /* ────────────  Count keyword occurrences  ──────────── */
+  /* ────────  Count keyword occurrences  ──────── */
   useEffect(() => {
     if (!keywords.length) return;
     const counts = {};
@@ -156,32 +158,70 @@ export default function KeywordSearch({
     document.querySelectorAll(searchSelector).forEach((el) => {
       const text = el.textContent || "";
       keywords.forEach((kw) => {
-        const re = new RegExp(`\\b${kw}\\b`, "gi");
-        const m  = text.match(re);
-        if (m) counts[kw] = (counts[kw] || 0) + m.length;
+        const regex = new RegExp(`\\b${kw}\\b`, "gi");
+        const matches = text.match(regex);
+        if (matches) counts[kw] = (counts[kw] || 0) + matches.length;
       });
     });
 
     setKeywordCounts(counts);
+    console.log("📊 Keyword Counts:", counts);
   }, [keywords]);
 
-  /* ───────────────  Event handlers  ─────────────── */
-  const handleInput = (val) => {
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => setSearchTerm(val), debounceMs);
+  /* ────────────────  Helpers  ──────────────── */
+  const scrollToFirstMatch = () => {
+    const match = document.querySelector(".highlighted-match");
+    match && match.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   const handleKeywordClick = (kw) => setSearchTerm(kw);
 
-  /* ───────────────  Inline styles  ─────────────── */
-  const containerStyle = { width: "100%", display: "flex", flexDirection: "column", gap: "10px" };
-  const searchContainerStyle = { display: "flex", alignItems: "center", width: "100%", gap: "30px", position: "relative" };
-  const inputContainerStyle = { flex: "1 1 25%", maxWidth: "25%", position: "relative" };
-  const inputStyle = { width: "100%", padding: "8px", fontSize: "14px", border: "1px solid #ccc", borderRadius: "4px" };
-  const matchCountStyle = { position: "absolute", top: "-18px", left: "5px", fontSize: "12px", color: "#555", opacity: 0.8 };
-  const keywordContainerStyle = { flex: "1 1 75%", maxWidth: "75%", display: "flex", flexWrap: "wrap", gap: "5px", justifyContent: "flex-start", overflow: "hidden", whiteSpace: "nowrap" };
+  /* ────────────────  Inline styles  ──────────── */
+  const containerStyle = {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  };
+  const searchContainerStyle = {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    gap: "30px",
+    position: "relative",
+  };
+  const inputContainerStyle = {
+    flex: "1 1 25%",
+    maxWidth: "25%",
+    position: "relative",
+  };
+  const inputStyle = {
+    width: "100%",
+    padding: "8px",
+    fontSize: "14px",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+  };
+  const matchCountStyle = {
+    position: "absolute",
+    top: "-18px",
+    left: "5px",
+    fontSize: "12px",
+    color: "#555",
+    opacity: 0.8,
+  };
+  const keywordContainerStyle = {
+    flex: "1 1 75%",
+    maxWidth: "75%",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "5px",
+    justifyContent: "flex-start",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+  };
   const keywordButtonStyle = (active) => ({
-    backgroundColor: active ? highlightColor : "#f0f0f0",
+    backgroundColor: active ? "#e1e8ff" : "#f0f0f0",
     padding: "5px 10px",
     borderRadius: "15px",
     border: "1px solid #ccc",
@@ -190,11 +230,10 @@ export default function KeywordSearch({
     color: "#333",
   });
 
-  /* ─────────────────────  Render  ───────────────────── */
+  /* ─────────────────  Render  ───────────────── */
   return (
     <div style={containerStyle}>
       <div style={searchContainerStyle}>
-        {/* Input */}
         <div style={inputContainerStyle}>
           {matchCount > 0 && (
             <span style={matchCountStyle}>
@@ -203,26 +242,24 @@ export default function KeywordSearch({
           )}
           <input
             type="text"
-            placeholder={placeholder}
+            placeholder="Search Page..."
             style={inputStyle}
-            onChange={(e) => handleInput(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        {/* Keyword chips */}
-        {showKeywords && (
-          <div style={keywordContainerStyle}>
-            {keywords.map((kw) => (
-              <button
-                key={kw}
-                onClick={() => handleKeywordClick(kw)}
-                style={keywordButtonStyle(searchTerm === kw)}
-              >
-                {kw} ({keywordCounts[kw] || 0})
-              </button>
-            ))}
-          </div>
-        )}
+        <div style={keywordContainerStyle}>
+          {keywords.map((kw) => (
+            <button
+              key={kw}
+              onClick={() => handleKeywordClick(kw)}
+              style={keywordButtonStyle(searchTerm === kw)}
+            >
+              {kw} ({keywordCounts[kw] || 0})
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
