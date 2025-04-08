@@ -5,3 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
+<KeywordTesting123 keywords={['MDX', 'Tailwind', 'Marketplace']} />
+
+<p>This page supports MDX and uses Tailwind. See the Marketplace.</p>
