@@ -3,7 +3,7 @@ name: KeywordTesting123
 ---
 import React, { useEffect, useRef, useState } from 'react';
 
-export default function KeywordHighlighterInline({ keywords = [] }) {
+export const KeywordHighlighterInline = ({ keywords = [] }) => {
   const markRef = useRef(null);
   const contentRef = useRef(null);
 
@@ -65,5 +65,4 @@ export default function KeywordHighlighterInline({ keywords = [] }) {
   return null; // No UI needed — just highlight
 }
 
-
-test
+THIS WORKS!
