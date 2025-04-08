@@ -5,7 +5,9 @@ hidden: false
 metadata:
   robots: index
 ---
-<KeywordTesting />
+<KeywordTesting initialKeywords={["test1", "test2", "test3"]} />
+
+<p>test</p>
 
 test
 
