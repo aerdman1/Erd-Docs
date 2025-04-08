@@ -22,14 +22,17 @@ export const KeywordTesting123 = ({ keywords = [] }) => {
     let style;
 
     const applyHighlighting = () => {
-      // Try both selectors
-      const target = document.querySelector('.content-body') || document.querySelector('#ComponentEditor');
+      // Prefer .content-body (published), fallback to .rm-Markdown (preview)
+      const target =
+        document.querySelector('.content-body') ||
+        document.querySelector('.rm-Markdown');
+
       if (!target || target.innerText.trim().length === 0) return;
 
       clearInterval(interval);
       contentRef.current = target;
 
-      // Inject highlight styles
+      // Add custom highlight style
       style = document.createElement('style');
       style.textContent = `
         .highlighted-keyword {
@@ -53,7 +56,7 @@ export const KeywordTesting123 = ({ keywords = [] }) => {
       });
     };
 
-    // Poll every 100ms until content is ready
+    // Poll every 100ms until content is available
     interval = setInterval(applyHighlighting, 100);
 
     return () => {
@@ -68,6 +71,5 @@ export const KeywordTesting123 = ({ keywords = [] }) => {
   return null;
 };
 
-<KeywordTesting123 keywords={['MDX', 'Tailwind', 'Marketplace']} />
-<p>This page supports MDX and uses Tailwind. See the Marketplace.</p> 
-
+<KeywordTesting123 keywords={['MDX', 'Tailwind', 'Marketplace']} /> 
+<p>This page supports MDX and uses Tailwind. See the Marketplace.</p>
