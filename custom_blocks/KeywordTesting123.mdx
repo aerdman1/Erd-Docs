@@ -1,19 +1,11 @@
 ---
 name: KeywordTesting123
 ---
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
-export const KeywordHighlighterInline = ({ keywords = [] }) => {
+export const KeywordTesting123 = ({ keywords = [] }) => {
   const markRef = useRef(null);
   const contentRef = useRef(null);
-
-  const searchSelector = `
-    .content-body p, .content-body li, .content-body ul, .content-body ol,
-    .content-body details, .content-body code, .content-body table,
-    .content-body th, .content-body td, .content-body pre,
-    .content-body blockquote, .content-body h1, .content-body h2,
-    .content-body h3, .content-body h4, .content-body h5, .content-body h6
-  `;
 
   const loadMarkJs = () =>
     new Promise((resolve) => {
@@ -25,44 +17,58 @@ export const KeywordHighlighterInline = ({ keywords = [] }) => {
     });
 
   useEffect(() => {
-    contentRef.current = document.querySelector('.content-body');
-
-    if (!contentRef.current) {
-      console.warn('No .content-body found');
-      return;
-    }
-
-    const style = document.createElement('style');
-    style.textContent = `
-      .highlighted-keyword {
-        background-color: #ffeeba;
-        font-weight: bold;
-        border-radius: 4px;
-        padding: 2px 4px;
-      }
-    `;
-    document.head.appendChild(style);
-
     let markInstance;
+    let interval;
+    let style;
 
-    loadMarkJs().then((Mark) => {
-      if (!contentRef.current) return;
-      markInstance = new Mark(contentRef.current);
-      markRef.current = markInstance;
+    const applyHighlighting = () => {
+      contentRef.current = document.querySelector('.content-body');
 
-      markInstance.mark(keywords, {
-        separateWordSearch: false,
-        className: 'highlighted-keyword',
+      // Wait until .content-body exists and has content
+      if (!contentRef.current || contentRef.current.innerText.trim().length === 0) return;
+
+      // Stop polling once it's found
+      clearInterval(interval);
+
+      // Add custom highlight styles
+      style = document.createElement('style');
+      style.textContent = `
+        .highlighted-keyword {
+          background-color: #ffeeba;
+          font-weight: bold;
+          border-radius: 4px;
+          padding: 2px 4px;
+        }
+      `;
+      document.head.appendChild(style);
+
+      loadMarkJs().then((Mark) => {
+        if (!contentRef.current) return;
+        markInstance = new Mark(contentRef.current);
+        markRef.current = markInstance;
+
+        markInstance.mark(keywords, {
+          separateWordSearch: false,
+          className: 'highlighted-keyword',
+        });
       });
-    });
+    };
+
+    // Start polling for .content-body
+    interval = setInterval(applyHighlighting, 100);
 
     return () => {
+      clearInterval(interval);
       markInstance?.unmark();
-      document.head.contains(style) && document.head.removeChild(style);
+      if (style && document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
     };
   }, [keywords]);
 
-  return null; // No UI needed — just highlight
-}
+  return null; // No UI — this just adds highlighting
+};
 
-THIS WORKS!
+<KeywordTesting123 keywords={['MDX', 'Tailwind', 'Marketplace']} /> 
+
+MDX
