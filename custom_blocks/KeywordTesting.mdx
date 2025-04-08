@@ -1,258 +1,69 @@
 ---
-name: KeywordTesting
+name: KeywordTesting123
 ---
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-export default function KeywordTesting1({ initialKeywords }) {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [matchCount, setMatchCount] = useState(0);
-  const [keywords, setKeywords] = useState(initialKeywords || []);
-  const [keywordCounts, setKeywordCounts] = useState({});
-  const [hasContentBody, setHasContentBody] = useState(true);
-  useEffect(() => {
-    if (!document.querySelector(".content-body")) {
-      setHasContentBody(false);
-    }
-  }, []);
-  useEffect(() => {
-    if (initialKeywords) {
-      setKeywords(initialKeywords);
-    }
-  }, [initialKeywords]);
+export default function KeywordHighlighterInline({ keywords = [] }) {
   const markRef = useRef(null);
   const contentRef = useRef(null);
-  const searchSelector =
-    ".content-body p, .content-body li, .content-body ul, .content-body ol, .content-body details, .content-body code, .content-body table, .content-body th, .content-body td, .content-body pre, .content-body blockquote, .content-body h1, .content-body h2, .content-body h3, .content-body h4, .content-body h5, .content-body h6";
+
+  const searchSelector = `
+    .content-body p, .content-body li, .content-body ul, .content-body ol,
+    .content-body details, .content-body code, .content-body table,
+    .content-body th, .content-body td, .content-body pre,
+    .content-body blockquote, .content-body h1, .content-body h2,
+    .content-body h3, .content-body h4, .content-body h5, .content-body h6
+  `;
+
   const loadMarkJs = () =>
     new Promise((resolve) => {
       if (window.Mark) return resolve(window.Mark);
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/mark.js/dist/mark.min.js";
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/mark.js/dist/mark.min.js';
       script.onload = () => resolve(window.Mark);
       document.head.appendChild(script);
     });
 
   useEffect(() => {
-    // Try to find an element with class .content-body
-    contentRef.current = document.querySelector(".content-body");
+    contentRef.current = document.querySelector('.content-body');
 
-    // If no .content-body exists, we’ll render a fallback in our JSX.
     if (!contentRef.current) {
+      console.warn('No .content-body found');
       return;
     }
 
-    // Inject CSS for highlighted matches
-    const style = document.createElement("style");
-    style.textContent =
-      ".highlighted-match{background-color:#e1e8ff;font-weight:600;border-radius:4px;padding:2px 3px;}";
+    const style = document.createElement('style');
+    style.textContent = `
+      .highlighted-keyword {
+        background-color: #ffeeba;
+        font-weight: bold;
+        border-radius: 4px;
+        padding: 2px 4px;
+      }
+    `;
     document.head.appendChild(style);
 
     let markInstance;
+
     loadMarkJs().then((Mark) => {
       if (!contentRef.current) return;
       markInstance = new Mark(contentRef.current);
       markRef.current = markInstance;
-    });
 
-    return () => {
-      markInstance && markInstance.unmark();
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
-    };
-  }, [hasContentBody]);
-
-  const initializeSearchComponent = () => {
-    console.log("🔍 Initializing Search Component for route:", window.location.pathname);
-    markRef.current && markRef.current.unmark();
-    setMatchCount(0);
-  };
-
-  useEffect(() => {
-    initializeSearchComponent();
-    if (!window.__hasPatchedHistory) {
-      const originalPushState = history.pushState;
-      const originalReplaceState = history.replaceState;
-      history.pushState = function () {
-        originalPushState.apply(history, arguments);
-        window.dispatchEvent(new Event("pushState"));
-      };
-      history.replaceState = function () {
-        originalReplaceState.apply(history, arguments);
-        window.dispatchEvent(new Event("replaceState"));
-      };
-      window.__hasPatchedHistory = true;
-    }
-
-    const handleUrlChange = () => {
-      setTimeout(() => {
-        setSearchTerm("");
-        initializeSearchComponent();
-      }, 500);
-    };
-
-    window.addEventListener("popstate", handleUrlChange);
-    window.addEventListener("pushState", handleUrlChange);
-    window.addEventListener("replaceState", handleUrlChange);
-    window.addEventListener("hashchange", handleUrlChange);
-
-    return () => {
-      window.removeEventListener("popstate", handleUrlChange);
-      window.removeEventListener("pushState", handleUrlChange);
-      window.removeEventListener("replaceState", handleUrlChange);
-      window.removeEventListener("hashchange", handleUrlChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    const mark = markRef.current;
-    if (!mark || !contentRef.current) return;
-    if (searchTerm.length < 3) {
-      mark.unmark();
-      setMatchCount(0);
-      return;
-    }
-    mark.unmark({
-      done: () =>
-        mark.mark(searchTerm, {
-          separateWordSearch: false,
-          className: "highlighted-match",
-          done: (cnt) => {
-            setMatchCount(cnt);
-            if (cnt > 0) setTimeout(scrollToFirstMatch, 300);
-            console.log(`✅ Total matches found: ${cnt}`);
-          },
-        }),
-    });
-  }, [searchTerm]);
-
-  useEffect(() => {
-    if (!keywords.length) return;
-    const counts = {};
-    document.querySelectorAll(searchSelector).forEach((el) => {
-      const text = el.textContent || "";
-      keywords.forEach((kw) => {
-        const regex = new RegExp(`\\b${kw}\\b`, "gi");
-        const matches = text.match(regex);
-        if (matches) {
-          counts[kw] = (counts[kw] || 0) + matches.length;
-        }
+      markInstance.mark(keywords, {
+        separateWordSearch: false,
+        className: 'highlighted-keyword',
       });
     });
-    setKeywordCounts(counts);
-    console.log("📊 Keyword Counts:", counts);
+
+    return () => {
+      markInstance?.unmark();
+      document.head.contains(style) && document.head.removeChild(style);
+    };
   }, [keywords]);
 
-  const scrollToFirstMatch = () => {
-    const match = document.querySelector(".highlighted-match");
-    if (match) {
-      match.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-  };
-
-  const handleKeywordClick = (kw) => setSearchTerm(kw);
-
-  const containerStyle = {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  };
-  const searchContainerStyle = {
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    gap: "30px",
-    position: "relative",
-  };
-  const inputContainerStyle = {
-    flex: "1 1 25%",
-    maxWidth: "25%",
-    position: "relative",
-  };
-  const inputStyle = {
-    width: "100%",
-    padding: "8px",
-    fontSize: "14px",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-  };
-  const matchCountStyle = {
-    position: "absolute",
-    top: "-18px",
-    left: "5px",
-    fontSize: "12px",
-    color: "#555",
-    opacity: 0.8,
-  };
-  const keywordContainerStyle = {
-    flex: "1 1 75%",
-    maxWidth: "75%",
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "5px",
-    justifyContent: "flex-start",
-    overflow: "hidden",
-    whiteSpace: "nowrap",
-  };
-  const keywordButtonStyle = (active) => ({
-    backgroundColor: active ? "#e1e8ff" : "#f0f0f0",
-    padding: "5px 10px",
-    borderRadius: "15px",
-    border: "1px solid #ccc",
-    cursor: "pointer",
-    fontSize: "12px",
-    color: "#333",
-  });
-
-  return (
-    <>
-      {/* Render fallback content-body in the preview if one isn’t already in the DOM */}
-      {!hasContentBody && (
-        <div className="content-body" style={{ padding: "1rem", border: "1px dashed #999", marginBottom: "1rem" }}>
-          <p>This is fallback dummy content with test1, test2, and test3 for preview purposes.</p>
-        </div>
-      )}
-      <div style={containerStyle}>
-        <div style={searchContainerStyle}>
-          <div style={inputContainerStyle}>
-            {matchCount > 0 && (
-              <span style={matchCountStyle}>
-                {matchCount} {matchCount === 1 ? "result" : "results"}
-              </span>
-            )}
-            <input
-              type="text"
-              placeholder="Search Page..."
-              style={inputStyle}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div style={keywordContainerStyle}>
-            {keywords.map((kw) => (
-              <button key={kw} onClick={() => handleKeywordClick(kw)} style={keywordButtonStyle(searchTerm === kw)}>
-                {kw} ({keywordCounts[kw] || 0})
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+  return null; // No UI needed — just highlight
 }
 
-<div style={{ padding: "1rem", border: "1px solid #ccc", marginBottom: "1rem" }}>
-  PREVIEW TEXT BEFORE — THIS SHOULD APPEAR.
-</div>
 
-<div className="content-body" style={{ padding: "1rem", border: "1px dashed #ccc", marginBottom: "1rem" }}>
-  <p>This is dummy searchable content that includes test1, test2, and test3.</p>
-</div>
-
-<KeywordTesting initialKeywords={["test1", "test2", "test3"]} />
-
-<div style={{ padding: "1rem", marginTop: "1rem", border: "1px solid #ccc" }}>
-  I SHOULD SEE THIS.
-</div>
-
+test
