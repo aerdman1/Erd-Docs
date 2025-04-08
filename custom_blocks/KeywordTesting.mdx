@@ -3,16 +3,19 @@ name: KeywordTesting
 ---
 import React, { useState, useEffect, useRef } from "react";
 
-export default function KeywordTesting({ initialKeywords = ["apple", "banana", "cherry"] }) {
+export default function KeywordTesting({ initialKeywords }) {
   /* ───────────────  State  ─────────────── */
+  // If initialKeywords is not provided, default to an empty array.
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
-  const [keywords, setKeywords] = useState(initialKeywords);
+  const [keywords, setKeywords] = useState(initialKeywords || []);
   const [keywordCounts, setKeywordCounts] = useState({});
 
   // Sync keywords from props if they change.
   useEffect(() => {
-    setKeywords(initialKeywords);
+    if (initialKeywords) {
+      setKeywords(initialKeywords);
+    }
   }, [initialKeywords]);
 
   /* ─────────────  Refs / consts  ───────────── */
@@ -250,6 +253,3 @@ export default function KeywordTesting({ initialKeywords = ["apple", "banana", "
     </div>
   );
 }
-
-<KeywordTesting initialKeywords={["test1", "test2", "test3"]} />
-
