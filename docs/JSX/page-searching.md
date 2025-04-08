@@ -16,7 +16,7 @@ metadata:
     - WebSockets
   robots: index
 ---
-<KeywordSearch />
+<KeywordSearch placeholder="Search this guide!" highlightColor="#ffd54f" />
 
 * [x] Test
 * [ ] Test
