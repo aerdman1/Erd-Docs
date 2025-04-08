@@ -11,8 +11,8 @@ export default function PageHighlight() {
   const [keywordCounts, setKeywordCounts] = useState({});
 
   // Define a selector that matches all the target elements
-  const searchSelector =
-    ".content-body p, .content-body details, .content-body code, .content-body table, .content-body th";
+const searchSelector =
+  ".content-body p, .content-body li, .content-body ul, .content-body ol, .content-body details, .content-body code, .content-body table, .content-body th, .content-body td, .content-body pre, .content-body blockquote, .content-body h1, .content-body h2, .content-body h3, .content-body h4, .content-body h5, .content-body h6, .content-body .rdmd-html";
 
   // Update keywords from the meta tag if content is available
   const updateKeywords = () => {
