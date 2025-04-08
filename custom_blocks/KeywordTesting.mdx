@@ -3,7 +3,7 @@ name: KeywordTesting
 ---
 import React, { useState, useEffect, useRef } from "react";
 
-export default function KeywordTesting({ initialKeywords = ["", "", ""] }) {
+export default function KeywordTesting({ initialKeywords = ["apple", "banana", "cherry"] }) {
   /* ───────────────  State  ─────────────── */
   const [searchTerm, setSearchTerm] = useState("");
   const [matchCount, setMatchCount] = useState(0);
@@ -253,5 +253,4 @@ export default function KeywordTesting({ initialKeywords = ["", "", ""] }) {
   );
 }
 
-<KeywordTesting initialKeywords={'test', 'keywords', 'here'} />  
-
+<KeywordTesting initialKeywords={["test", "test", "test"]} />  
