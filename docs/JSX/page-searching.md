@@ -18,7 +18,7 @@ metadata:
 ---
 <KeywordSearch />
 
-* [ ] Test
+* [x] Test
 * [ ] Test
 * [ ] Test
 * [ ] Authentication
