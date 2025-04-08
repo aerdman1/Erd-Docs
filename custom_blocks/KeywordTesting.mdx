@@ -1,0 +1,257 @@
+---
+name: KeywordTesting
+---
+import React, { useState, useEffect, useRef } from "react";
+
+export default function KeywordSearch1({ initialKeywords = [] }) {
+  /* ───────────────  State  ─────────────── */
+  const [searchTerm, setSearchTerm] = useState("");
+  const [matchCount, setMatchCount] = useState(0);
+  const [keywords, setKeywords] = useState(initialKeywords);
+  const [keywordCounts, setKeywordCounts] = useState({});
+
+  // Sync keywords from props if they change.
+  useEffect(() => {
+    if (initialKeywords.join() !== keywords.join()) {
+      setKeywords(initialKeywords);
+    }
+  }, [initialKeywords]);
+
+  /* ─────────────  Refs / consts  ───────────── */
+  const markRef = useRef(null); // will hold the mark.js instance
+  const contentRef = useRef(null); // cache .content-body root
+
+  const searchSelector =
+    ".content-body p, .content-body li, .content-body ul, .content-body ol, .content-body details, .content-body code, .content-body table, .content-body th, .content-body td, .content-body pre, .content-body blockquote, .content-body h1, .content-body h2, .content-body h3, .content-body h4, .content-body h5, .content-body h6";
+
+  /* ───────  Helper: lazy‑load mark.js  ───── */
+  const loadMarkJs = () =>
+    new Promise((resolve) => {
+      if (window.Mark) return resolve(window.Mark);
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/mark.js/dist/mark.min.js";
+      script.onload = () => resolve(window.Mark);
+      document.head.appendChild(script);
+    });
+
+  /* ───────────  One‑time setup  ─────────── */
+  useEffect(() => {
+    // 1. Cache the root element (ensure your page has an element with .content-body)
+    contentRef.current = document.querySelector(".content-body");
+
+    // 2. Inject highlight CSS once.
+    const style = document.createElement("style");
+    style.textContent =
+      ".highlighted-match{background-color:#e1e8ff;font-weight:600;border-radius:4px;padding:2px 3px;}";
+    document.head.appendChild(style);
+
+    // 3. Load mark.js, then create the instance.
+    let markInstance;
+    loadMarkJs().then((Mark) => {
+      if (!contentRef.current) return;
+      markInstance = new Mark(contentRef.current);
+      markRef.current = markInstance;
+    });
+
+    // Cleanup on unmount.
+    return () => {
+      markInstance && markInstance.unmark();
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
+
+  /* ──────── Initialize Search Component ──────── */
+  const initializeSearchComponent = () => {
+    console.log("🔍 Initializing Search Component for route:", window.location.pathname);
+    markRef.current && markRef.current.unmark();
+    setMatchCount(0);
+  };
+
+  /* ─────  SPA Navigation Hooks & History Method Patching  ───── */
+  useEffect(() => {
+    initializeSearchComponent();
+
+    // Use window flag instead of a module-level variable.
+    if (!window.__hasPatchedHistory) {
+      const originalPushState = history.pushState;
+      const originalReplaceState = history.replaceState;
+      history.pushState = function () {
+        originalPushState.apply(history, arguments);
+        window.dispatchEvent(new Event("pushState"));
+      };
+      history.replaceState = function () {
+        originalReplaceState.apply(history, arguments);
+        window.dispatchEvent(new Event("replaceState"));
+      };
+      window.__hasPatchedHistory = true;
+    }
+
+    const handleUrlChange = () => {
+      setTimeout(() => {
+        setSearchTerm("");
+        initializeSearchComponent();
+      }, 500);
+    };
+
+    window.addEventListener("popstate", handleUrlChange);
+    window.addEventListener("pushState", handleUrlChange);
+    window.addEventListener("replaceState", handleUrlChange);
+    window.addEventListener("hashchange", handleUrlChange);
+
+    return () => {
+      window.removeEventListener("popstate", handleUrlChange);
+      window.removeEventListener("pushState", handleUrlChange);
+      window.removeEventListener("replaceState", handleUrlChange);
+      window.removeEventListener("hashchange", handleUrlChange);
+    };
+  }, []);
+
+  /* ──────────  Highlight on searchTerm  ───────── */
+  useEffect(() => {
+    const mark = markRef.current;
+    if (!mark || !contentRef.current) return;
+
+    if (searchTerm.length < 3) {
+      mark.unmark();
+      setMatchCount(0);
+      return;
+    }
+
+    mark.unmark({
+      done: () =>
+        mark.mark(searchTerm, {
+          separateWordSearch: false,
+          className: "highlighted-match",
+          done: (cnt) => {
+            setMatchCount(cnt);
+            if (cnt > 0) {
+              setTimeout(scrollToFirstMatch, 300);
+            }
+            console.log(`✅ Total matches found: ${cnt}`);
+          },
+        }),
+    });
+  }, [searchTerm]);
+
+  /* ────────  Count Keyword Occurrences  ──────── */
+  useEffect(() => {
+    if (!keywords.length) return;
+    const counts = {};
+
+    document.querySelectorAll(searchSelector).forEach((el) => {
+      const text = el.textContent || "";
+      keywords.forEach((kw) => {
+        const regex = new RegExp(`\\b${kw}\\b`, "gi");
+        const matches = text.match(regex);
+        if (matches) {
+          counts[kw] = (counts[kw] || 0) + matches.length;
+        }
+      });
+    });
+
+    setKeywordCounts(counts);
+    console.log("📊 Keyword Counts:", counts);
+  }, [keywords]);
+
+  /* ────────────────  Helpers  ──────────────── */
+  const scrollToFirstMatch = () => {
+    const match = document.querySelector(".highlighted-match");
+    if (match) {
+      match.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  const handleKeywordClick = (kw) => setSearchTerm(kw);
+
+  /* ────────────────  Inline Styles  ──────────── */
+  const containerStyle = {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  };
+  const searchContainerStyle = {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    gap: "30px",
+    position: "relative",
+  };
+  const inputContainerStyle = {
+    flex: "1 1 25%",
+    maxWidth: "25%",
+    position: "relative",
+  };
+  const inputStyle = {
+    width: "100%",
+    padding: "8px",
+    fontSize: "14px",
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+  };
+  const matchCountStyle = {
+    position: "absolute",
+    top: "-18px",
+    left: "5px",
+    fontSize: "12px",
+    color: "#555",
+    opacity: 0.8,
+  };
+  const keywordContainerStyle = {
+    flex: "1 1 75%",
+    maxWidth: "75%",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "5px",
+    justifyContent: "flex-start",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+  };
+  const keywordButtonStyle = (active) => ({
+    backgroundColor: active ? "#e1e8ff" : "#f0f0f0",
+    padding: "5px 10px",
+    borderRadius: "15px",
+    border: "1px solid #ccc",
+    cursor: "pointer",
+    fontSize: "12px",
+    color: "#333",
+  });
+
+  /* ─────────────────  Render  ───────────────── */
+  return (
+    <div style={containerStyle}>
+      <div style={searchContainerStyle}>
+        <div style={inputContainerStyle}>
+          {matchCount > 0 && (
+            <span style={matchCountStyle}>
+              {matchCount} {matchCount === 1 ? "result" : "results"}
+            </span>
+          )}
+          <input
+            type="text"
+            placeholder="Search Page..."
+            style={inputStyle}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div style={keywordContainerStyle}>
+          {keywords.map((kw) => (
+            <button
+              key={kw}
+              onClick={() => handleKeywordClick(kw)}
+              style={keywordButtonStyle(searchTerm === kw)}
+            >
+              {kw} ({keywordCounts[kw] || 0})
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Example usage:
+// <KeywordSearch1 initialKeywords={["apple", "banana", "cherry"]} />
