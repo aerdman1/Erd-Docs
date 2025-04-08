@@ -36,14 +36,14 @@ export const KeywordTesting123 = ({ keywords = [] }) => {
       // Try to target published docs (.content-body) or MDX preview ([data-testid="RDMD"])
       const target =
         document.querySelector('.content-body') ||
-        document.querySelector('[data-testid="RDMD"]');
+ document.querySelector("#CustomBlockForm-form-e64774ac-b63f-45d6-9979-260c252761ba > div.Flex.Flex_col.ComponentEditorn-kG_0sbsa4q > div.ComponentEditor-preview2V8EAgUYW4Qr.ComponentEditor-preview_col3xuNIQohK1pK.ComponentEditor-preview_dark > div.Flex.Flex_row.ComponentEditor-preview-render1cpO_VZOWyQv > div > div"); 
 
       // If either Mark.js or the target element is not ready yet, retry.
       if (!Mark || !target || !target.innerText.trim()) {
         if (retries-- > 0) {
           setTimeout(attemptHighlight, 300);
         } else {
-          console.warn('❌ Mark.js or content not ready after multiple attempts.');
+          console.warn('❌ Mark.js or content not ready after multiple attempts.'); 
         }
         return;
       }
