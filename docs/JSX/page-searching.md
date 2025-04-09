@@ -18,13 +18,6 @@ metadata:
 ---
 <KeywordSearch />
 
-* [x] Test
-* [ ] Test
-* [ ] Test
-* [ ] Authentication
-* test Authentication
-* Authentication
-
 [Authentication](http://www.google.com)
 
 > 📘 test
