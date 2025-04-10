@@ -4,43 +4,43 @@ name: CustomerQuotes
 import React, { useState, useMemo } from "react";
 
 export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) => {
-  // If the provided children aren’t already an array, wrap them in one.
+  // Ensure children is always an array
   const quotes = useMemo(() => (Array.isArray(children) ? children : [children]), [children]);
   const [currentQuote, setCurrentQuote] = useState(0);
 
-  // Container styles
+  // Container styling with larger and lively typography
   const containerStyle = {
-    maxWidth: "600px",
+    maxWidth: "700px",
     margin: "40px auto",
-    padding: "20px",
+    padding: "30px",
     border: "2px solid #5A3E8B",
-    borderRadius: "8px",
+    borderRadius: "10px",
     textAlign: "center",
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#f0f8ff",
   };
 
-  // Title styles
+  // Title styling with bigger font and vibrant color
   const titleStyle = {
-    fontSize: "1.5em",
+    fontSize: "2em",
     fontWeight: "bold",
-    marginBottom: "20px",
+    marginBottom: "30px",
     color: "#5A3E8B",
   };
 
-  // Quote box styling with a fun hover effect
+  // Quote box styling with enlarged text and a playful hover effect
   const quoteBoxStyle = {
-    padding: "20px",
+    padding: "30px",
     margin: "20px auto",
-    borderRadius: "8px",
-    border: "1px solid #ddd",
+    borderRadius: "10px",
+    border: "2px dashed #5A3E8B",
     backgroundColor: "white",
-    boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0px 3px 10px rgba(0, 0, 0, 0.15)",
     transition: "transform 0.3s ease, box-shadow 0.3s ease",
     cursor: "pointer",
+    fontSize: "1.4em",
   };
 
-  const handleNextQuote = () =>
-    setCurrentQuote((prev) => (prev + 1) % quotes.length);
+  const handleNextQuote = () => setCurrentQuote((prev) => (prev + 1) % quotes.length);
 
   return (
     <div style={containerStyle}>
@@ -49,12 +49,12 @@ export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) =
         style={quoteBoxStyle}
         onClick={handleNextQuote}
         onMouseOver={(e) => {
-          e.currentTarget.style.transform = "scale(1.02)";
-          e.currentTarget.style.boxShadow = "0px 0px 12px rgba(90, 62, 139, 0.3)";
+          e.currentTarget.style.transform = "scale(1.03)";
+          e.currentTarget.style.boxShadow = "0px 0px 15px rgba(90, 62, 139, 0.4)";
         }}
         onMouseOut={(e) => {
           e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0px 2px 8px rgba(0, 0, 0, 0.1)";
+          e.currentTarget.style.boxShadow = "0px 3px 10px rgba(0, 0, 0, 0.15)";
         }}
       >
         {quotes[currentQuote]}
@@ -63,17 +63,18 @@ export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) =
         type="button"
         onClick={handleNextQuote}
         style={{
-          padding: "10px 20px",
+          padding: "12px 24px",
           border: "none",
-          borderRadius: "4px",
+          borderRadius: "6px",
           backgroundColor: "#5A3E8B",
           color: "white",
           cursor: "pointer",
-          fontSize: "1em",
+          fontSize: "1.2em",
+          marginTop: "20px",
         }}
         aria-label="Show next customer quote"
       >
-        Show Next Quote
+        Next Quote
       </button>
     </div>
   );
@@ -84,29 +85,30 @@ export const CustomerQuote = ({ author, children }) => (
     <blockquote
       style={{
         fontStyle: "italic",
-        margin: "10px 0",
-        paddingLeft: "20px",
-        borderLeft: "4px solid #5A3E8B",
+        margin: "20px 0",
+        paddingLeft: "25px",
+        borderLeft: "6px solid #5A3E8B",
+        fontSize: "1.5em",
       }}
     >
       {children}
     </blockquote>
     {author && (
-      <p style={{ textAlign: "right", margin: "0 10px", fontWeight: "bold" }}>
+      <p style={{ textAlign: "right", margin: "0 15px", fontWeight: "bold", fontSize: "1.2em", color: "#333" }}>
         – {author}
       </p>
     )}
   </div>
 );
 
-<CustomerQuotes title="Hear from our happy customers!">
+<CustomerQuotes title="Our Happy Customer Moments">
   <CustomerQuote author="Alice">
-    ReadMe.io transformed the way we handle documentation!
+    ReadMe.io made our documentation sparkle with creativity!
   </CustomerQuote>
   <CustomerQuote author="Bob">
-    The user experience is simply brilliant and fun.
+    The support and experience are as bold as our ideas!
   </CustomerQuote>
   <CustomerQuote author="Charlie">
-    We love how customizable and intuitive ReadMe.io is.
+    Every time I click, I get a fresh dose of inspiration!
   </CustomerQuote>
 </CustomerQuotes>
