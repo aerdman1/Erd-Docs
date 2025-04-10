@@ -5,16 +5,16 @@ hidden: false
 metadata:
   robots: index
 ---
-<CustomerQuotes title="Hear from our happy customers!">
+<CustomerQuotes title="Customer Quotes!">
   <CustomerQuote author="Alice">
-    ReadMe.io transformed the way we handle documentation!
+    ReadMe.io made our documentation sparkle with creativity!
   </CustomerQuote>
 
   <CustomerQuote author="Bob">
-    The user experience is simply brilliant and fun.
+    The support and experience are as bold as our ideas!
   </CustomerQuote>
 
   <CustomerQuote author="Charlie">
-    We love how customizable and intuitive ReadMe.io is.
+    Every time I click, I get a fresh dose of inspiration!
   </CustomerQuote>
 </CustomerQuotes>
