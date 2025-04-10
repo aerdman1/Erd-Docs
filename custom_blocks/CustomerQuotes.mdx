@@ -11,7 +11,10 @@ export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) =
     width: "100%",
     minHeight: "50vh",
     padding: "40px 20px",
-    background: "linear-gradient(135deg, #FFFFFF 0%, #E8F3FF 100%)",
+    // Combine a gradient overlay and a background image.
+    backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(232,243,255,0.8) 100%), url("https://owlbertsio-resized.s3.amazonaws.com/Celebration-Confetti.psd.png")`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
     textAlign: "center",
     boxSizing: "border-box",
   };
@@ -24,10 +27,6 @@ export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) =
     border: "2px solid #3B89FF",
     backgroundColor: "#fff",
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.08)",
-  };
-
-  const logoContainerStyle = {
-    marginBottom: "20px",
   };
 
   const titleStyle = {
@@ -74,14 +73,6 @@ export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) =
 
   return (
     <div style={containerStyle}>
-      <div style={logoContainerStyle}>
-        <img
-          alt="Owlbert Dancing"
-          src="https://owlbertsio-resized.s3.amazonaws.com/Celebration-Confetti.psd.png"
-          decoding="async"
-          style={{ color: "transparent" }}
-        />
-      </div>
       <div style={quotesCardStyle}>
         {title && <div style={titleStyle}>{title}</div>}
         <div
@@ -135,6 +126,7 @@ export const CustomerQuote = ({ author, children }) => (
     )}
   </div>
 );
+
 
 <CustomerQuotes title="Our Happy Customer Moments">
   <CustomerQuote author="Alice">
