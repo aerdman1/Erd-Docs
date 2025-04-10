@@ -4,97 +4,132 @@ name: CustomerQuotes
 import React, { useState, useMemo } from "react";
 
 export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) => {
-  // Ensure children is always an array
   const quotes = useMemo(() => (Array.isArray(children) ? children : [children]), [children]);
   const [currentQuote, setCurrentQuote] = useState(0);
 
-  // Container styling with larger and lively typography
   const containerStyle = {
-    maxWidth: "700px",
-    margin: "40px auto",
-    padding: "30px",
-    border: "2px solid #5A3E8B",
-    borderRadius: "10px",
+    width: "100%",
+    minHeight: "50vh",
+    padding: "40px 20px",
+    background: "linear-gradient(135deg, #FFFFFF 0%, #E8F3FF 100%)",
     textAlign: "center",
-    backgroundColor: "#f0f8ff",
+    boxSizing: "border-box",
   };
 
-  // Title styling with bigger font and vibrant color
+  const quotesCardStyle = {
+    maxWidth: "700px",
+    margin: "40px auto 0 auto",
+    padding: "30px",
+    borderRadius: "12px",
+    border: "2px solid #3B89FF",
+    backgroundColor: "#fff",
+    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.08)",
+  };
+
+  const logoContainerStyle = {
+    marginBottom: "20px",
+  };
+
   const titleStyle = {
     fontSize: "2em",
     fontWeight: "bold",
     marginBottom: "30px",
-    color: "#5A3E8B",
+    color: "#3B89FF",
   };
 
-  // Quote box styling with enlarged text and a playful hover effect
   const quoteBoxStyle = {
     padding: "30px",
     margin: "20px auto",
     borderRadius: "10px",
-    border: "2px dashed #5A3E8B",
-    backgroundColor: "white",
-    boxShadow: "0px 3px 10px rgba(0, 0, 0, 0.15)",
+    border: "2px dashed #3B89FF",
+    backgroundColor: "#FAFAFA",
+    boxShadow: "0px 3px 10px rgba(0, 0, 0, 0.05)",
     transition: "transform 0.3s ease, box-shadow 0.3s ease",
     cursor: "pointer",
     fontSize: "1.4em",
+    color: "#333",
+  };
+
+  const buttonStyle = {
+    padding: "12px 24px",
+    border: "none",
+    borderRadius: "6px",
+    backgroundColor: "#3B89FF",
+    color: "white",
+    cursor: "pointer",
+    fontSize: "1.2em",
+    marginTop: "20px",
+    transition: "background-color 0.3s ease",
+  };
+
+  const handleMouseOverButton = (e) => {
+    e.currentTarget.style.backgroundColor = "#2C68C1";
+  };
+
+  const handleMouseOutButton = (e) => {
+    e.currentTarget.style.backgroundColor = "#3B89FF";
   };
 
   const handleNextQuote = () => setCurrentQuote((prev) => (prev + 1) % quotes.length);
 
   return (
     <div style={containerStyle}>
-      {title && <div style={titleStyle}>{title}</div>}
-      <div
-        style={quoteBoxStyle}
-        onClick={handleNextQuote}
-        onMouseOver={(e) => {
-          e.currentTarget.style.transform = "scale(1.03)";
-          e.currentTarget.style.boxShadow = "0px 0px 15px rgba(90, 62, 139, 0.4)";
-        }}
-        onMouseOut={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow = "0px 3px 10px rgba(0, 0, 0, 0.15)";
-        }}
-      >
-        {quotes[currentQuote]}
+      <div style={logoContainerStyle}>
+        <img
+          alt="Owlbert Dancing"
+          src="https://owlbertsio-resized.s3.amazonaws.com/Celebration-Confetti.psd.png"
+          decoding="async"
+          style={{ color: "transparent" }}
+        />
       </div>
-      <button
-        type="button"
-        onClick={handleNextQuote}
-        style={{
-          padding: "12px 24px",
-          border: "none",
-          borderRadius: "6px",
-          backgroundColor: "#5A3E8B",
-          color: "white",
-          cursor: "pointer",
-          fontSize: "1.2em",
-          marginTop: "20px",
-        }}
-        aria-label="Show next customer quote"
-      >
-        Next Quote
-      </button>
+      <div style={quotesCardStyle}>
+        {title && <div style={titleStyle}>{title}</div>}
+        <div
+          style={quoteBoxStyle}
+          onClick={handleNextQuote}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = "scale(1.02)";
+            e.currentTarget.style.boxShadow = "0px 5px 15px rgba(59, 137, 255, 0.3)";
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "0px 3px 10px rgba(0, 0, 0, 0.05)";
+          }}
+        >
+          {quotes[currentQuote]}
+        </div>
+        <button
+          type="button"
+          onClick={handleNextQuote}
+          onMouseOver={handleMouseOverButton}
+          onMouseOut={handleMouseOutButton}
+          style={buttonStyle}
+          aria-label="Show next customer quote"
+        >
+          Next Quote
+        </button>
+      </div>
     </div>
   );
 };
 
 export const CustomerQuote = ({ author, children }) => (
-  <div>
+  <div style={{ marginBottom: "40px" }}>
     <blockquote
       style={{
         fontStyle: "italic",
         margin: "20px 0",
         paddingLeft: "25px",
-        borderLeft: "6px solid #5A3E8B",
-        fontSize: "1.5em",
+        borderLeft: "6px solid #3B89FF",
+        fontSize: "1.4em",
+        lineHeight: "1.4em",
+        color: "#555",
       }}
     >
       {children}
     </blockquote>
     {author && (
-      <p style={{ textAlign: "right", margin: "0 15px", fontWeight: "bold", fontSize: "1.2em", color: "#333" }}>
+      <p style={{ textAlign: "right", margin: "0 15px", fontWeight: "bold", fontSize: "1.1em", color: "#333" }}>
         – {author}
       </p>
     )}
@@ -104,7 +139,7 @@ export const CustomerQuote = ({ author, children }) => (
 <CustomerQuotes title="Our Happy Customer Moments">
   <CustomerQuote author="Alice">
     ReadMe.io made our documentation sparkle with creativity!
-  </CustomerQuote>
+  </CustomerQuote> 
   <CustomerQuote author="Bob">
     The support and experience are as bold as our ideas!
   </CustomerQuote>
