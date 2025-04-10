@@ -12,7 +12,7 @@ export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) =
     minHeight: "50vh",
     padding: "40px 20px",
     // Combine a gradient overlay and a background image.
-    backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(232,243,255,0.5) 100%), url("//files.readme.io/9dbe441-footer-owls.png")`,
+    // backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(232,243,255,0.5) 100%), url("//files.readme.io/9dbe441-footer-owls.png")`,
     backgroundSize: "cover",
     backgroundPosition: "center",
     textAlign: "center",
@@ -25,7 +25,7 @@ export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) =
     padding: "30px",
     borderRadius: "12px",
     border: "2px solid #3B89FF",
-    backgroundColor: "#ffffff8a",
+    backgroundColor: "#fff",
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.08)",
   };
 
@@ -128,7 +128,7 @@ export const CustomerQuote = ({ author, children }) => (
 );
 
 
-<CustomerQuotes title="Our Happy Customer Moments">
+<CustomerQuotes title="Customer Quotes!">
   <CustomerQuote author="Alice">
     ReadMe.io made our documentation sparkle with creativity!
   </CustomerQuote> 
