@@ -7,7 +7,7 @@ export const EndpointPopup = ({
   endpoint, 
   displayMode = 'popup', 
   linkText, 
-  specUrl = "https://erdtest123.readme.io/openapi/ErdSpec1.json" 
+  specFile = "ErdSpec1.json" 
 }) => {
   const [endpointData, setEndpointData] = useState(null);
   const [error, setError] = useState(null);
@@ -16,6 +16,8 @@ export const EndpointPopup = ({
 
   // Default link text to the endpoint value if none is provided.
   const displayLinkText = linkText || endpoint;
+  // Build the full spec URL using the specFile prop.
+  const fullSpecUrl = `https://erdtest123.readme.io/openapi/${specFile}`;
 
   useEffect(() => {
     if (!endpoint) {
@@ -23,19 +25,17 @@ export const EndpointPopup = ({
       return;
     }
     fetchEndpointExample();
-  }, [endpoint, specUrl]);
+  }, [endpoint, fullSpecUrl]);
 
   const fetchEndpointExample = async () => {
     setLoading(true);
     setError(null);
-  try {
-    const response = await fetch(specUrl);
-if (!response.ok) {
-  throw new Error("This endpoint may be private or restricted.");
-}
-
-    const spec = await response.json();
-
+    try {
+      const response = await fetch(fullSpecUrl);
+      if (!response.ok) {
+        throw new Error("This endpoint may be private or restricted.");
+      }
+      const spec = await response.json();
       const operations = spec.paths[endpoint];
       if (!operations) {
         throw new Error(`No endpoint found in spec for path ${endpoint}`);
@@ -193,7 +193,6 @@ if (!response.ok) {
   );
 
   if (displayMode === 'popup') {
-    // Render as inline text; popup card overlays on hover.
     return (
       <span
         style={{ display: 'inline-block', position: 'relative' }}
@@ -234,7 +233,7 @@ if (!response.ok) {
                   marginTop: '4px'
                 }}
               >
-                Error: {error}
+                {error}
               </div>
             )}
             {!loading && !error && renderedContent}
@@ -244,29 +243,22 @@ if (!response.ok) {
     );
   }
 
-  // Inline mode: Always display the content inline.
   return (
     <div style={{ marginBottom: '16px', width: '100%' }}>
       {loading && <div>Loading endpoint example...</div>}
-      {error && <div style={{ color: 'red' }}>Error: {error}</div>}
+      {error && <div style={{ color: 'red' }}>{error}</div>}
       {!loading && !error && renderedContent}
     </div>
   );
 };
 
-## API Endpoint Popup Examples 
+## API Endpoint Popup Examples
 
 ### Popup Version (Link)
 
 When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over it here <EndpointPopup endpoint="/pet" displayMode="popup" />, it displays detailed information about the endpoint in a popup.
 
 Hover over the link above to see a quick summary, description, and an example response for the `/pet` endpoint. This version is ideal if you want to provide more context only when needed.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla. Etiam volutpat sem a nibh tempor, ac sollicitudin mauris ultrices. Vestibulum varius nisi ac leo consectetur pellentesque eu ut diam. Proin congue tempor urna id varius. Quisque fringilla erat nec nulla iaculis suscipit. Sed a mattis sapien. In dui arcu, facilisis quis finibus id, condimentum id ipsum. Suspendisse potenti.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla. Etiam volutpat sem a nibh tempor, ac sollicitudin mauris ultrices. Vestibulum varius nisi ac leo consectetur pellentesque eu ut diam. Proin congue tempor urna id varius. Quisque fringilla erat nec nulla iaculis suscipit. Sed a mattis sapien. In dui arcu, facilisis quis finibus id, condimentum id ipsum. Suspendisse potenti.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla. Etiam volutpat sem a nibh tempor, ac sollicitudin mauris ultrices. Vestibulum varius nisi ac leo consectetur pellentesque eu ut diam. Proin congue tempor urna id varius. Quisque fringilla erat nec nulla iaculis suscipit. Sed a mattis sapien. In dui arcu, facilisis quis finibus id, condimentum id ipsum. Suspendisse potenti.
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla. Etiam volutpat sem a nibh tempor, ac sollicitudin mauris ultrices. Vestibulum varius nisi ac leo consectetur pellentesque eu ut diam. Proin congue tempor urna id varius. Quisque fringilla erat nec nulla iaculis suscipit. Sed a mattis sapien. In dui arcu, facilisis quis finibus id, condimentum id ipsum. Suspendisse potenti.
 
