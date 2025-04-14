@@ -7,16 +7,16 @@ metadata:
 ---
 ## PET
 
-<PullFromExamples endpoint="/pet" />
+<EndpointPopup endpoint="/pet" />
 
 ***
 
 ## PET ID Testing
 
-<PullFromExamples endpoint="/pet/{petId}" />
+<EndpointPopup endpoint="/pet/{petId}" />
 
 ***
 
 ## Find Pet by Status
 
-<PullFromExamples endpoint="/pet/findByStatus" />
+<EndpointPopup endpoint="/pet/findByStatus" />
