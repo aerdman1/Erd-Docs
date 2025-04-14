@@ -35,7 +35,7 @@ export const EndpointPopup = ({
       if (response.status === 401 || response.status === 403) {
         throw new Error("Access denied. This endpoint may be gated or secure, and you don't have access to its details.");
       } else {
-        throw new Error(`HTTP error: ${response.status}`);
+ throw new Error("Access denied. This endpoint may be gated or secure, and you don't have access to its details.");
       }
     }
     const spec = await response.json();
