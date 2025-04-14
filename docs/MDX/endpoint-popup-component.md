@@ -61,11 +61,7 @@ which lets you dynamically look up pets based on availability (e.g. `available`,
   <EndpointPopup endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
 </Accordion>
 
-<br />
-
 ### Inline Version
-
-<br />
 
 If you prefer to show the API details right away without requiring any interaction, you can set the component to the "inline" mode. This will render both the hyperlink and all the endpoint details directly on the page.
 
@@ -89,13 +85,7 @@ This inline display is great for showing users how to **update** or **create** a
   </Column>
 </Columns>
 
-<br />
-
 # NovaTest.json
-
-<br />
-
-<br />
 
 <Cards columns={2}>
   <Card title="First Card" icon="fa-home" target="_blank">
@@ -110,7 +100,3 @@ This inline display is great for showing users how to **update** or **create** a
     <EndpointPopup endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
   </Card>
 </Cards>
-
-***
-
-This block includes every prop explicitly so that no defaults are relied upon.
