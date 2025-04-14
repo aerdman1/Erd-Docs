@@ -115,16 +115,32 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
     return null;
   };
 
-  // Define a style object for the card.
-  // For inline, we set width to 100%, for popup mode we'll let it be auto sized.
-  const cardStyle = {
+  // Common card styling.
+  const baseCardStyle = {
     border: '1px solid #ddd',
     background: '#fff',
     padding: '16px',
     borderRadius: '8px',
     boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
-    width: displayMode === 'inline' ? '100%' : '300px',
   };
+
+  // If displayMode is inline we want full width; in popup mode we want a fixed width.
+  const cardWidthStyle = displayMode === 'inline'
+    ? { width: '100%' }
+    : { width: '300px' };
+
+  // In popup mode, add absolute positioning so the card overlays nearby content.
+  const popupPositionStyle = displayMode === 'popup'
+    ? {
+        position: 'absolute',
+        top: '100%',
+        left: '0',
+        zIndex: 1000,
+        marginTop: '4px'
+      }
+    : {};
+
+  const cardStyle = { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
 
   // Renders the main content for both modes.
   // In "inline" mode, the header title is a clickable link.
@@ -162,9 +178,9 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
   );
 
   if (displayMode === 'popup') {
-    // "Popup" mode: shows a separate hyperlink that triggers popup on hover.
+    // "Popup" mode: renders as inline text that on hover shows an absolutely positioned popup.
     return (
-      <div
+      <span
         style={{ display: 'inline-block', position: 'relative' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -180,11 +196,13 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
             {loading && (
               <div
                 style={{
-                  padding: '8px',
-                  background: '#fff',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  marginTop: '8px'
+                  ...cardStyle,
+                  // In case loading state, force position absolute as well:
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  zIndex: 1000,
+                  marginTop: '4px'
                 }}
               >
                 Loading endpoint example...
@@ -193,12 +211,13 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
             {error && (
               <div
                 style={{
+                  ...cardStyle,
                   color: 'red',
-                  padding: '8px',
-                  background: '#fff',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  marginTop: '8px'
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  zIndex: 1000,
+                  marginTop: '4px'
                 }}
               >
                 Error: {error}
@@ -207,12 +226,12 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
             {!loading && !error && renderedContent}
           </>
         )}
-      </div>
+      </span>
     );
   }
   
-  // "Inline" mode: Always display the content.
-  // The clickable title (in renderedContent) is the only link.
+  // "Inline" mode: always display the content inline.
+  // The clickable title (within renderedContent) is the only link.
   return (
     <div style={{ marginBottom: '16px', width: '100%' }}>
       {loading && <div>Loading endpoint example...</div>}
@@ -226,9 +245,7 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
 
 ### Popup Version (Link)
 
-When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over the link, it displays detailed information about the endpoint in a popup. For example:
-
-<EndpointPopup endpoint="/pet" displayMode="popup" />
+When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over it here <EndpointPopup endpoint="/pet" displayMode="popup" />, it displays detailed information about the endpoint in a popup. 
 
 Hover over the link above to see a quick summary, description, and an example response for the `/pet` endpoint. This version is ideal if you want to provide more context only when needed.
 
@@ -239,4 +256,3 @@ If you prefer to show the API details right away without requiring any interacti
 <EndpointPopup endpoint="/pet" displayMode="inline" />
 
 With the inline version, readers see the complete endpoint information immediately. This is useful in sections where full details are critical to understanding the API behavior.
-
