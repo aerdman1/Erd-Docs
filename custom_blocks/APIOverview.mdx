@@ -1,9 +1,9 @@
 ---
-name: APIOverview
+name: EndpointDirectory
 ---
 import React, { useEffect, useState } from 'react';
 
-export const OverviewTemplate = () => {
+export const EndpointDirectory = () => {
   const [categories, setCategories] = useState([]);
   const [fetchedEndpoints, setFetchedEndpoints] = useState(new Map());
   const [endpointError, setEndpointError] = useState(null);
@@ -293,4 +293,4 @@ export const OverviewTemplate = () => {
   );
 };
 
-<OverviewTemplate />
+<EndpointDirectory />
