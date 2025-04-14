@@ -1,0 +1,274 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Nova API",
+      "version": "1.0.0",
+      "summary": "Nova API provides programmatic access to core resources for developers.",
+      "description": "The Nova API allows authenticated clients to interact with key resources such as users, posts, and usage reports. All endpoints require a valid API key in the header.",
+      "termsOfService": "https://nova.example.com/terms",
+      "contact": {
+        "email": "support@nova.example.com"
+      }
+    },
+    "components": {
+      "securitySchemes": {
+        "ApiKeyAuth": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "X-API-Key"
+        }
+      },
+      "responses": {
+        "Error": {
+          "description": "An error occurred",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "error": { "type": "string" },
+                  "message": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "security": [
+      { "ApiKeyAuth": [] }
+    ],
+    "paths": {
+      "/v1/users": {
+        "get": {
+          "summary": "List all users",
+          "description": "Retrieve a paginated list of users.",
+          "operationId": "listUsers",
+          "parameters": [
+            {
+              "name": "page",
+              "in": "query",
+              "schema": { "type": "integer", "default": 1 },
+              "description": "Page number"
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "schema": { "type": "integer", "default": 20 },
+              "description": "Number of users to return"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A list of users",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "users": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": { "type": "string" },
+                            "username": { "type": "string" },
+                            "email": { "type": "string" }
+                          }
+                        }
+                      },
+                      "nextPage": { "type": "integer", "nullable": true }
+                    }
+                  }
+                }
+              }
+            },
+            "default": { "$ref": "#/components/responses/Error" }
+          }
+        },
+        "post": {
+          "summary": "Create a new user",
+          "description": "Register a new user in the system.",
+          "operationId": "createUser",
+          "requestBody": {
+            "description": "User object that needs to be added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["username", "email", "password"],
+                  "properties": {
+                    "username": { "type": "string" },
+                    "email": { "type": "string" },
+                    "password": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "User created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "username": { "type": "string" },
+                      "email": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "default": { "$ref": "#/components/responses/Error" }
+          }
+        }
+      },
+      "/v1/posts": {
+        "get": {
+          "summary": "List all posts",
+          "description": "Retrieve a list of posts, optionally filtering by author.",
+          "operationId": "listPosts",
+          "parameters": [
+            {
+              "name": "author",
+              "in": "query",
+              "schema": { "type": "string" },
+              "description": "Filter posts by the author's username"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "A list of posts",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "posts": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": { "type": "string" },
+                            "title": { "type": "string" },
+                            "content": { "type": "string" },
+                            "author": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "default": { "$ref": "#/components/responses/Error" }
+          }
+        },
+        "post": {
+          "summary": "Create a new post",
+          "description": "Submit a new post to the system.",
+          "operationId": "createPost",
+          "requestBody": {
+            "description": "Post object that needs to be added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["title", "content"],
+                  "properties": {
+                    "title": { "type": "string" },
+                    "content": { "type": "string" },
+                    "author": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Post created successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "content": { "type": "string" },
+                      "author": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "default": { "$ref": "#/components/responses/Error" }
+          }
+        }
+      },
+      "/v1/posts/{postId}": {
+        "get": {
+          "summary": "Retrieve a post by ID",
+          "description": "Get detailed information about a specific post using its ID.",
+          "operationId": "getPostById",
+          "parameters": [
+            {
+              "name": "postId",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "string" },
+              "description": "Unique identifier of the post"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Post details",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "content": { "type": "string" },
+                      "author": { "type": "string" },
+                      "createdAt": { "type": "string", "format": "date-time" }
+                    }
+                  }
+                }
+              }
+            },
+            "default": { "$ref": "#/components/responses/Error" }
+          }
+        }
+      },
+      "/v1/reports": {
+        "get": {
+          "summary": "Retrieve API usage reports",
+          "description": "Get a summary report of API usage and performance metrics.",
+          "operationId": "getReports",
+          "responses": {
+            "200": {
+              "description": "Report data",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "totalRequests": { "type": "integer" },
+                      "errors": { "type": "integer" },
+                      "uptime": { "type": "number" }
+                    }
+                  }
+                }
+              }
+            },
+            "default": { "$ref": "#/components/responses/Error" }
+          }
+        }
+      }
+    }
+  }
+  
