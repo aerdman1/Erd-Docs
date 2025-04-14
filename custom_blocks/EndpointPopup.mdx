@@ -3,9 +3,6 @@ name: EndpointPopup
 ---
 import React, { useEffect, useState } from 'react';
 
-// Global cache to avoid re-fetching spec data for the same endpoint
-const endpointCache = new Map();
-
 export const EndpointPopup = ({ 
   baseUrl = 'https://erdtest123.readme.io',  // New prop for the base URL
   endpoint, 
@@ -18,9 +15,10 @@ export const EndpointPopup = ({
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // Default link text to the endpoint value if none is provided.
   const displayLinkText = linkText || endpoint;
+  // Build the full spec URL using the baseUrl and specFile prop.
   const fullSpecUrl = `${baseUrl}/openapi/${specFile}`;
-  const cacheKey = `${specFile}:${endpoint}`;
 
   useEffect(() => {
     if (!endpoint) {
@@ -31,11 +29,6 @@ export const EndpointPopup = ({
   }, [endpoint, fullSpecUrl]);
 
   const fetchEndpointExample = async () => {
-    if (endpointCache.has(cacheKey)) {
-      setEndpointData(endpointCache.get(cacheKey));
-      return;
-    }
-
     setLoading(true);
     setError(null);
     try {
@@ -70,16 +63,13 @@ export const EndpointPopup = ({
       const description = chosenOperation.description || '';
       const example = extractResponseExample(chosenOperation, spec.components);
 
-      const data = {
+      setEndpointData({
         path: endpoint,
         method: chosenMethod,
         summary,
         description,
         example,
-      };
-
-      endpointCache.set(cacheKey, data);
-      setEndpointData(data);
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -87,6 +77,7 @@ export const EndpointPopup = ({
     }
   };
 
+  // Helper: Recursively resolve an example from a schema.
   const resolveExampleFromSchema = (schema, components) => {
     if (!schema) return null;
     if (schema.example !== undefined) {
@@ -111,6 +102,7 @@ export const EndpointPopup = ({
     return null;
   };
 
+  // Helper: Extract an example from an operation’s responses.
   const extractResponseExample = (operation, components) => {
     if (!operation.responses) return null;
     let response = operation.responses['200'] || operation.responses['default'];
@@ -135,6 +127,7 @@ export const EndpointPopup = ({
     return null;
   };
 
+  // Base card styling.
   const baseCardStyle = {
     border: '1px solid #ddd',
     background: '#fff',
@@ -143,10 +136,12 @@ export const EndpointPopup = ({
     boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
   };
 
+  // Use full width for inline mode; fixed 400px width for popup mode.
   const cardWidthStyle = displayMode === 'inline'
     ? { width: '100%' }
     : { width: '400px' };
 
+  // For popup mode, the card is absolutely positioned so that it overlays content without moving it.
   const popupPositionStyle = displayMode === 'popup'
     ? { position: 'absolute', top: '100%', left: '0', zIndex: 1000, marginTop: '1px' }
     : {};
@@ -155,6 +150,7 @@ export const EndpointPopup = ({
     ? { padding: 0, background: 'transparent', border: 'none', boxShadow: 'none' }
     : { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
 
+  // Custom link styling so it stands out.
   const customLinkStyle = {
     textDecoration: 'none',
     cursor: 'pointer',
@@ -165,6 +161,7 @@ export const EndpointPopup = ({
     fontWeight: '600',
   };
 
+  // Render the content card.
   const renderedContent = endpointData && (
     <div style={cardStyle}>
       <h3 style={{ margin: '5px 0' }}>
@@ -259,7 +256,6 @@ export const EndpointPopup = ({
     </>
   );
 };
-
 
 ## API Endpoint Popup Examples
 
