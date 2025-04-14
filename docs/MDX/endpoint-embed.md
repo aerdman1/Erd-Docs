@@ -17,13 +17,95 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, f
 
 Another example is <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />, which lets you dynamically look up pets based on availability (e.g. `available`, `pending`, `sold`). Hover to preview how this search works without cluttering the UI.
 
-| Test | Test | Test |
-| :--- | :--- | :--- |
-| Test | Test | Test |
-| Test | Test | Test |
-| Test | Test | Test |
-| Test | Test | Test |
-| Test | Test | Test |
+<Table align={["left","left","left"]}>
+  <thead>
+    <tr>
+      <th>
+        Test
+      </th>
+
+      <th>
+        Test
+      </th>
+
+      <th>
+        Test
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+
+      <td>
+        <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+
+      <td>
+        Test
+      </td>
+    </tr>
+  </tbody>
+</Table>
 
 <Cards columns={2}>
   <Card title="First Card" icon="fa-home" target="_blank">
