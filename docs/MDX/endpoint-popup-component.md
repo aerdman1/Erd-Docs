@@ -43,10 +43,6 @@ Another example is <EndpointPopup endpoint="/pet/findByStatus" specFile="ErdSpec
   <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
 </Accordion>
 
-<br />
-
-<br />
-
 ### Inline Version
 
 If you prefer to show the API details right away without requiring any interaction, you can set the component to the "inline" mode. This will render both the hyperlink and all the endpoint details directly on the page.
