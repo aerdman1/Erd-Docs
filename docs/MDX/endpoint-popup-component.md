@@ -67,7 +67,7 @@ This inline display is great for showing users how to **update** or **create** a
   </Column>
 </Columns>
 
-# NOVA (a different spec)
+# Another Spec
 
 <br />
 
