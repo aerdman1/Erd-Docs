@@ -30,14 +30,10 @@ export const EndpointPopup = ({
     setError(null);
   try {
     const response = await fetch(specUrl);
-    if (!response.ok) {
-      // Provide a more descriptive error message for gated/secure endpoints.
-      if (response.status === 401 || response.status === 403) {
-        throw new Error("Access denied. This endpoint may be gated or secure, and you don't have access to its details.");
-      } else {
- throw new Error("Access denied. This endpoint may be gated or secure, and you don't have access to its details.");
-      }
-    }
+if (!response.ok) {
+  throw new Error("Access denied. This endpoint may be gated or secure, and you don't have access to its details.");
+}
+
     const spec = await response.json();
 
       const operations = spec.paths[endpoint];
@@ -258,7 +254,7 @@ export const EndpointPopup = ({
   );
 };
 
-## API Endpoint Popup Examples
+## API Endpoint Popup Examples 
 
 ### Popup Version (Link)
 
