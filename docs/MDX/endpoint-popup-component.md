@@ -39,8 +39,6 @@ Another example is <EndpointPopup endpoint="/pet/findByStatus" specFile="ErdSpec
   <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
 </Accordion>
 
-<br />
-
 <Accordion title="Endpoint Testing" icon="fa-info-circle">
   <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
 </Accordion>
