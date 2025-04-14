@@ -51,8 +51,6 @@ If you prefer to show the API details right away without requiring any interacti
 
 This inline display is great for showing users how to **update** or **create** a pet using the same `/pet` path but different methods (`PUT` vs `POST`).
 
-<br />
-
 <Columns layout="auto">
   <Column>
     <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload" />
@@ -83,24 +81,7 @@ This inline display is great for showing users how to **update** or **create** a
   </Card>
 </Cards>
 
-## Popup Version (Link)
-
-When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over this
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />,
-it displays detailed information about the endpoint in a popup.
-
-## Inline Version
-
-If you prefer to show the API details right away without requiring any interaction, you can set the component to "inline" mode. This will render both the hyperlink and all the endpoint details directly on the page:
-
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />
-
-<EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
-
-This inline display is great for showing users how to update or create a pet using the same /pet path but different methods.
-
-🧪 Using Another Spec File
-You can also target endpoints from a different spec file if you're documenting multiple APIs. For example:
+##
 
 <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
 
