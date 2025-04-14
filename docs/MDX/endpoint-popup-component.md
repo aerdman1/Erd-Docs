@@ -5,19 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-Below is your complete pure‐Markdown content with every instance of \<EndpointPopup> using all props (including the explicit HTTP method). You can copy and paste this whole block as-is into your documentation:
-
-<br />
-
-***
-
-<br />
-
-<br />
-
 ## API Endpoint Popup Examples
-
-<br />
 
 <br />
 
