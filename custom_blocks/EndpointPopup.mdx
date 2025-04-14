@@ -4,6 +4,7 @@ name: EndpointPopup
 import React, { useEffect, useState } from 'react';
 
 export const EndpointPopup = ({ 
+  baseUrl = 'https://erdtest123.readme.io',  // New prop for the base URL
   endpoint, 
   displayMode = 'popup', 
   linkText, 
@@ -16,8 +17,8 @@ export const EndpointPopup = ({
 
   // Default link text to the endpoint value if none is provided.
   const displayLinkText = linkText || endpoint;
-  // Build the full spec URL using the specFile prop.
-  const fullSpecUrl = `https://erdtest123.readme.io/openapi/${specFile}`;
+  // Build the full spec URL using the baseUrl and specFile prop.
+  const fullSpecUrl = `${baseUrl}/openapi/${specFile}`;
 
   useEffect(() => {
     if (!endpoint) {
@@ -161,9 +162,9 @@ export const EndpointPopup = ({
   // Render the content card.
   const renderedContent = endpointData && (
     <div style={cardStyle}>
-      <h3>
+		<h3 style={{ margin: '5px 0' }}> 
         <a
-          href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
+          href={`${baseUrl}/reference/${endpoint.replace('/', '')}`}
           style={customLinkStyle}
         >
           {endpointData.method} {endpointData.path}
@@ -199,7 +200,7 @@ export const EndpointPopup = ({
         onMouseLeave={() => setIsHovered(false)}
       >
         <a
-          href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
+          href={`${baseUrl}/reference/${endpoint.replace('/', '')}`}
           style={customLinkStyle}
         >
           {displayLinkText}
@@ -242,14 +243,17 @@ export const EndpointPopup = ({
     );
   }
 
-  return (
+return (
+  <>
+    <style>{`.markdown-body p { margin-bottom: 0; }`}</style>
     <div style={{ marginBottom: '16px', width: '100%' }}>
       {loading && <div>Loading endpoint example...</div>}
       {error && <div style={{ color: 'red' }}>{error}</div>}
       {!loading && !error && renderedContent}
     </div>
-  );
-};
+  </>
+);
+}; 
 
 ## API Endpoint Popup Examples
 
