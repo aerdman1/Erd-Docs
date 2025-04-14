@@ -1,5 +1,5 @@
 ---
-title: Guides Example Pull
+title: Endpoint Popup
 deprecated: false
 hidden: false
 metadata:
