@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 export const EndpointPopup = ({ 
   baseUrl = 'https://erdtest123.readme.io',  // New prop for the base URL
   endpoint, 
+  method, // Optional prop to specify HTTP method, e.g., 'GET', 'POST'
   displayMode = 'popup', 
   linkText, 
   specFile = "ErdSpec1.json" 
@@ -22,11 +23,12 @@ export const EndpointPopup = ({
 
   useEffect(() => {
     if (!endpoint) {
-      setError('Endpoint not provided.'); 
+      setError('Endpoint not provided.');
       return;
     }
     fetchEndpointExample();
-  }, [endpoint, fullSpecUrl]);
+    // Include method in dependency so that when method changes it refetches
+  }, [endpoint, fullSpecUrl, method]);
 
   const fetchEndpointExample = async () => {
     setLoading(true);
@@ -44,25 +46,33 @@ export const EndpointPopup = ({
 
       let chosenOperation = null;
       let chosenMethod = null;
-      // Try to pick an operation with an example, otherwise just pick the first.
-      for (const [method, operation] of Object.entries(operations)) {
-        const example = extractResponseExample(operation, spec.components);
-        if (example) {
-          chosenOperation = operation;
-          chosenMethod = method.toUpperCase();
-          break;
-        }
-      }
-      if (!chosenOperation) {
-        const [method, operation] = Object.entries(operations)[0];
-        chosenOperation = operation;
+      
+      // If a specific method is provided and exists in the spec, use it.
+      if (typeof method === 'string' && operations[method.toLowerCase()]) {
+        chosenOperation = operations[method.toLowerCase()];
         chosenMethod = method.toUpperCase();
+      } else {
+        // Otherwise, iterate over operations and pick one with an example.
+        for (const [m, op] of Object.entries(operations)) {
+          const example = extractResponseExample(op, spec.components);
+          if (example) {
+            chosenOperation = op;
+            chosenMethod = m.toUpperCase();
+            break;
+          }
+        }
+        // Fallback to the first available operation if no operation had an example.
+        if (!chosenOperation) {
+          const [m, op] = Object.entries(operations)[0];
+          chosenOperation = op;
+          chosenMethod = m.toUpperCase();
+        }
       }
 
       const summary = chosenOperation.summary || '';
       const description = chosenOperation.description || '';
       const example = extractResponseExample(chosenOperation, spec.components);
-      // NEW: Extract operationId for proper reference URL generation.
+      // Extract operationId for proper reference URL generation.
       const operationId = chosenOperation.operationId || '';
 
       setEndpointData({
@@ -174,10 +184,7 @@ export const EndpointPopup = ({
   const renderedContent = endpointData && (
     <div style={cardStyle}>
       <h3 style={{ margin: '5px 0' }}>
-        <a
-          href={referenceUrl}
-          style={customLinkStyle}
-        >
+        <a href={referenceUrl} style={customLinkStyle}>
           {displayLinkText}
         </a>
       </h3>
@@ -210,10 +217,7 @@ export const EndpointPopup = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <a
-          href={referenceUrl}
-          style={customLinkStyle}
-        >
+        <a href={referenceUrl} style={customLinkStyle}>
           {displayLinkText}
         </a>
         {isHovered && (
@@ -266,7 +270,8 @@ export const EndpointPopup = ({
   );
 };
 
-## API Endpoint Popup Examples
+
+## API Endpoint Popup Examples 
 
 ### Popup Version (Link)
 
@@ -279,3 +284,24 @@ If you prefer to show the API details right away without requiring any interacti
 <EndpointPopup endpoint="/pet" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint" />
 
 This inline display is great for showing users how to **update** or **create** a pet using the same `/pet` path but different methods (`PUT` vs `POST`).
+
+
+###Different Spec File
+
+// For listing users (GET):
+<EndpointPopup 
+  endpoint="/v1/users" 
+  method="GET"
+  specFile="NovaTest.json" 
+  displayMode="inline" 
+  linkText="List Users" 
+/>
+
+// For creating a user (POST):
+<EndpointPopup 
+  endpoint="/v1/users" 
+  method="POST"
+  specFile="NovaTest.json" 
+  displayMode="inline" 
+  linkText="Create User" 
+/>
