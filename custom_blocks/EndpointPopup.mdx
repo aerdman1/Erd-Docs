@@ -3,11 +3,14 @@ name: EndpointPopup
 ---
 import React, { useEffect, useState } from 'react';
 
-export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
+export const EndpointPopup = ({ endpoint, displayMode = 'popup', linkText }) => {
   const [endpointData, setEndpointData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Set default link text if none provided.
+  const displayLinkText = linkText || endpoint;
 
   useEffect(() => {
     if (!endpoint) {
@@ -129,12 +132,23 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
     ? { width: '100%' }
     : { width: '300px' };
 
-  // For popup mode, the card is absolutely positioned so it overlays content without moving it.
+  // For popup mode, the card is absolutely positioned so it overlays nearby content.
   const popupPositionStyle = displayMode === 'popup'
     ? { position: 'absolute', top: '100%', left: '0', zIndex: 1000, marginTop: '4px' }
     : {};
 
   const cardStyle = { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
+
+  // Define custom link styles.
+  const customLinkStyle = {
+    textDecoration: 'none',
+    cursor: 'pointer',
+    color: '#1a73e8',
+    backgroundColor: '#e8f0fe',
+    borderRadius: '4px',
+    padding: '2px 4px',
+    fontWeight: '600',
+  };
 
   // Render the content card.
   const renderedContent = endpointData && (
@@ -142,7 +156,7 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
       <h3>
         <a
           href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
-          style={{ textDecoration: 'underline', cursor: 'pointer' }}
+          style={customLinkStyle}
         >
           {endpointData.method} {endpointData.path}
         </a>
@@ -180,9 +194,9 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
       >
         <a
           href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
-          style={{ textDecoration: 'underline', cursor: 'pointer' }}
+          style={customLinkStyle}
         >
-          {endpoint}
+          {displayLinkText}
         </a>
         {isHovered && (
           <>
@@ -221,7 +235,7 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
       </span>
     );
   }
-
+  
   // Inline mode: Always display the content.
   return (
     <div style={{ marginBottom: '16px', width: '100%' }}>
