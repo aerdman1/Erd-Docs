@@ -150,26 +150,30 @@ export const OpenApiOverviewTemplate = () => {
     </div>
   );
 
-  // CSS styling string.
+  // Use a styling string similar to the EndpointDirectory for consistent look and feel.
   const styleString =
-    'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}' +
-    '.container{max-width:1200px;margin:0 auto;padding:16px}' +
-    '.hdrTemplate{display:flex;align-items:center;justify-content:space-between;position:relative;margin-bottom:24px}' +
-    '.hdrContent{flex:1}' +
-    '.hdrContent h1{font-size:2rem;margin:0 0 8px 0}' +
-    '.hdrContent p{margin:0 0 16px 0;color:#4B5563}' +
-    '.controls{display:flex;align-items:center;gap:10px;margin-top:8px}' +
-    '.search-input{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:1rem}' +
-    '.category-heading{text-align:center;font-size:1.4rem;font-weight:bold;margin:32px 0 16px 0}' +
-    '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}' +
-    '@media(min-width:1400px){.grid{grid-template-columns:repeat(3,1fr)}}' +
-    '@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}' +
-    '@media(max-width:600px){.grid{grid-template-columns:1fr}}' +
-    '.card{position:relative;min-height:220px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s;background:#fff;border-radius:6px}' +
-    '.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,0.15)}' +
-    '.card h3{margin:0 0 8px 0;font-size:1.1rem}' +
-    '.card p{margin:0 0 8px 0;color:#4B5563;font-size:13px}' +
-    '.loading{font-style:italic;color:#555}' +
+    'body{margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f9fafb;color:#111827}'+
+    '.container{max-width:1200px;margin:0 auto;padding:16px}'+
+    '.hdrTemplate{display:flex;align-items:center;justify-content:space-between;position:relative;margin-bottom:24px}'+
+    '.hdrContent{flex:1}'+
+    '.hdrContent h1{font-size:2rem;margin:0 0 8px 0}'+
+    '.hdrContent p{margin:0 0 16px 0;color:#4B5563}'+
+    '.hdrImage img{width:230px;position: absolute;right: 5%;top: -90px;}'+
+    '.controls{display:flex;align-items:center;gap:10px;margin-top:8px}'+
+    '.search-input{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:1rem}'+
+    '.refresh-button{background:#ff4744;color:#fff;padding:10px 20px;border:none;border-radius:18px;cursor:pointer;font-weight:bold;transition:background 0.2s}'+
+    '.refresh-button:hover:not(:disabled){background:#fd1411}'+
+    '.refresh-button:disabled{background:#bbb;cursor:not-allowed}'+
+    '.category-heading{text-align:center;font-size:1.4rem;font-weight:bold;margin:32px 0 16px 0}'+
+    '.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}'+
+    '@media(min-width:1400px){.grid{grid-template-columns:repeat(4,1fr)}}'+
+    '@media(max-width:1024px){.grid{grid-template-columns:repeat(2,1fr)}}'+
+    '@media(max-width:600px){.grid{grid-template-columns:1fr}}'+
+    '.card{position:relative;min-height:220px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.1);transition:transform .3s,box-shadow .3s;background:#fff;border-radius:6px}'+
+    '.card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(0,0,0,0.15)}'+
+    '.card h3{margin:0 0 8px 0;font-size:1.1rem}'+
+    '.card p{margin:0 0 8px 0;color:#4B5563;font-size:13px}'+
+    '.loading{font-style:italic;color:#555}'+
     '.error{color:red;font-weight:bold}';
 
   return (
@@ -179,7 +183,7 @@ export const OpenApiOverviewTemplate = () => {
         <div className="hdrTemplate">
           <div className="hdrContent">
             <h1>Endpoint Directory</h1>
-            <p>Your API endpoints based on the OpenAPI spec.</p>
+            <p>Your toolkit for building robust APIs and seamless integrations.</p>
             <div className="controls">
               <input
                 className="search-input"
@@ -188,7 +192,13 @@ export const OpenApiOverviewTemplate = () => {
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
               />
+              <button className="refresh-button" onClick={fetchOpenApiSpec} disabled={fetching}>
+                {fetching ? 'Refreshing...' : 'Refresh'}
+              </button>
             </div>
+          </div>
+          <div className="hdrImage">
+            <img src="https://owlbertsio-resized.s3.amazonaws.com/Popper.psd.full.png" alt="Header Owl"/>
           </div>
         </div>
         {fetching && !endpointError && <p className="loading">Loading API specification...</p>}
