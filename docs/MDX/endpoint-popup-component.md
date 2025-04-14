@@ -50,3 +50,19 @@ If you prefer to show the API details right away without requiring any interacti
 <EndpointPopup endpoint="/pet" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint" />
 
 This inline display is great for showing users how to **update** or **create** a pet using the same `/pet` path but different methods (`PUT` vs `POST`).
+
+<br />
+
+<Columns layout="auto">
+  <Column>
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+  </Column>
+
+  <Column>
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+  </Column>
+
+  <Column>
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+  </Column>
+</Columns>
