@@ -9,7 +9,7 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup', linkText }) => 
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Set default link text if none provided.
+  // Default link text to the endpoint value if none is provided.
   const displayLinkText = linkText || endpoint;
 
   useEffect(() => {
@@ -127,19 +127,19 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup', linkText }) => 
     boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
   };
 
-  // Use full width for inline content; fixed width for popups.
+  // Use full width for inline mode; fixed 400px width for popup mode.
   const cardWidthStyle = displayMode === 'inline'
     ? { width: '100%' }
-    : { width: '300px' };
+    : { width: '400px' };
 
-  // For popup mode, the card is absolutely positioned so it overlays nearby content.
+  // For popup mode, the card is absolutely positioned so that it overlays content without moving it.
   const popupPositionStyle = displayMode === 'popup'
     ? { position: 'absolute', top: '100%', left: '0', zIndex: 1000, marginTop: '4px' }
     : {};
 
   const cardStyle = { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
 
-  // Define custom link styles.
+  // Custom link styling so it stands out.
   const customLinkStyle = {
     textDecoration: 'none',
     cursor: 'pointer',
@@ -235,8 +235,8 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup', linkText }) => 
       </span>
     );
   }
-  
-  // Inline mode: Always display the content.
+
+  // Inline mode: Always display the content inline.
   return (
     <div style={{ marginBottom: '16px', width: '100%' }}>
       {loading && <div>Loading endpoint example...</div>}
