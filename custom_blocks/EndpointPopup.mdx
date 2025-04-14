@@ -31,7 +31,7 @@ export const EndpointPopup = ({
   try {
     const response = await fetch(specUrl);
 if (!response.ok) {
-  throw new Error("Access denied. This endpoint may be gated or secure, and you don't have access to its details.");
+  throw new Error("This endpoint may be private or restricted.");
 }
 
     const spec = await response.json();
