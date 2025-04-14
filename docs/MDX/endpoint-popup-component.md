@@ -28,7 +28,7 @@ Need to delete a pet? <EndpointPopup endpoint="/pet/{petId}" specFile="ErdSpec1.
 
 <Cards columns={4}>
   <Card title="First Card" href="https://readme.com" icon="fa-home" target="_blank">
-    Neque porro quisquam est qui dolorem ipsum quia
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
   </Card>
 
   <Card title="Second Card" icon="fa-user">
