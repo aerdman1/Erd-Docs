@@ -143,7 +143,7 @@ export const EndpointPopup = ({
 
   // For popup mode, the card is absolutely positioned so that it overlays content without moving it.
   const popupPositionStyle = displayMode === 'popup'
-    ? { position: 'absolute', top: '100%', left: '0', zIndex: 1000, marginTop: '4px' }
+    ? { position: 'absolute', top: '100%', left: '0', zIndex: 1000, marginTop: '1px' }
     : {};
 
   const cardStyle = { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
@@ -215,7 +215,7 @@ export const EndpointPopup = ({
                   top: '100%',
                   left: '0',
                   zIndex: 1000,
-                  marginTop: '12px'
+                  marginTop: '1px'
                 }}
               >
                 Loading endpoint example...
@@ -230,7 +230,7 @@ export const EndpointPopup = ({
                   top: '100%',
                   left: '0',
                   zIndex: 1000,
-                  marginTop: '12px'
+                  marginTop: '1px'
                 }}
               >
                 {error}
