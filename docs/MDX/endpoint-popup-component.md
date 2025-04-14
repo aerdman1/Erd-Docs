@@ -26,7 +26,7 @@ Another example is <EndpointPopup endpoint="/pet/findByStatus" specFile="ErdSpec
 | Test | Test | Test |
 
 <Cards columns={2}>
-  <Card title="First Card" href="https://readme.com" icon="fa-home" target="_blank">
+  <Card title="First Card" icon="fa-home" target="_blank">
     <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
   </Card>
 
