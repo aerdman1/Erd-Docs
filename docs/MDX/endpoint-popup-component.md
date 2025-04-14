@@ -17,10 +17,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, f
 
 Another example is <EndpointPopup endpoint="/pet/findByStatus" specFile="ErdSpec1.json" linkText="Find Pets by Status" />, which lets you dynamically look up pets based on availability (e.g. `available`, `pending`, `sold`). Hover to preview how this search works without cluttering the UI.
 
-Need to delete a pet? <EndpointPopup endpoint="/pet/{petId}" specFile="ErdSpec1.json" linkText="Delete Pet Endpoint" /> lets you see the exact method and parameters without overwhelming your layout.
-
 | Test | Test | Test |
 | :--- | :--- | :--- |
+| Test | Test | Test |
+| Test | Test | Test |
+| Test | Test | Test |
 | Test | Test | Test |
 | Test | Test | Test |
 
