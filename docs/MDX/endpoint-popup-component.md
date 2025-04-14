@@ -66,3 +66,13 @@ This inline display is great for showing users how to **update** or **create** a
     <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload" />
   </Column>
 </Columns>
+
+# NOVA (a different spec)
+
+<br />
+
+<EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
+
+<br />
+
+<EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
