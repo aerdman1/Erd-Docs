@@ -9,9 +9,7 @@ metadata:
 
 ### Popup Version (Link)
 
-When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over the link, it displays detailed information about the endpoint in a popup. For example:
-
-<EndpointPopup endpoint="/pet" displayMode="popup" />
+When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over it here <EndpointPopup endpoint="/pet" displayMode="popup" />, it displays detailed information about the endpoint in a popup.
 
 Hover over the link above to see a quick summary, description, and an example response for the `/pet` endpoint. This version is ideal if you want to provide more context only when needed.
 
