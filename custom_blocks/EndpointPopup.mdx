@@ -115,19 +115,29 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
     return null;
   };
 
-  // Render the popup content (identical in both modes).
+  // Define a style object for the card.
+  // For inline, we set width to 100%, for popup mode we'll let it be auto sized.
+  const cardStyle = {
+    border: '1px solid #ddd',
+    background: '#fff',
+    padding: '16px',
+    borderRadius: '8px',
+    boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+    width: displayMode === 'inline' ? '100%' : '300px',
+  };
+
+  // Renders the main content for both modes.
+  // In "inline" mode, the header title is a clickable link.
   const renderedContent = endpointData && (
-    <div
-      style={{
-        border: '1px solid #ddd',
-        background: '#fff',
-        padding: '16px',
-        borderRadius: '8px',
-        boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
-        maxWidth: '300px',
-      }}
-    >
-      <h3>{endpointData.method} {endpointData.path}</h3>
+    <div style={cardStyle}>
+      <h3>
+        <a
+          href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
+          style={{ textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          {endpointData.method} {endpointData.path}
+        </a>
+      </h3>
       {endpointData.summary && <p><strong>Summary:</strong> {endpointData.summary}</p>}
       {endpointData.description && <p><strong>Description:</strong> {endpointData.description}</p>}
       {endpointData.example ? (
@@ -151,8 +161,8 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
     </div>
   );
 
-  // For "popup" mode, render as a hyperlink with a hover-triggered popup.
   if (displayMode === 'popup') {
+    // "Popup" mode: shows a separate hyperlink that triggers popup on hover.
     return (
       <div
         style={{ display: 'inline-block', position: 'relative' }}
@@ -201,29 +211,32 @@ export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
     );
   }
   
-  // For "inline" mode, always display the hyperlink followed by the content.
+  // "Inline" mode: Always display the content.
+  // The clickable title (in renderedContent) is the only link.
   return (
-    <div style={{ marginBottom: '16px' }}>
-      <div>
-        <a
-          href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
-          style={{ textDecoration: 'underline', cursor: 'pointer' }}
-        >
-          {endpoint}
-        </a>
-      </div>
-      <div style={{ marginTop: '8px' }}>
-        {loading && <div>Loading endpoint example...</div>}
-        {error && <div style={{ color: 'red' }}>Error: {error}</div>}
-        {!loading && !error && renderedContent}
-      </div>
+    <div style={{ marginBottom: '16px', width: '100%' }}>
+      {loading && <div>Loading endpoint example...</div>}
+      {error && <div style={{ color: 'red' }}>Error: {error}</div>}
+      {!loading && !error && renderedContent}
     </div>
   );
 };
 
+## API Endpoint Popup Examples
+
+### Popup Version (Link)
+
+When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over the link, it displays detailed information about the endpoint in a popup. For example:
 
 <EndpointPopup endpoint="/pet" displayMode="popup" />
 
+Hover over the link above to see a quick summary, description, and an example response for the `/pet` endpoint. This version is ideal if you want to provide more context only when needed.
+
+### Inline Version
+
+If you prefer to show the API details right away without requiring any interaction, you can set the component to the "inline" mode. This will render both the hyperlink and all the endpoint details directly on the page. For example:
 
 <EndpointPopup endpoint="/pet" displayMode="inline" />
+
+With the inline version, readers see the complete endpoint information immediately. This is useful in sections where full details are critical to understanding the API behavior.
 
