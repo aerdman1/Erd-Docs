@@ -69,12 +69,16 @@ This inline display is great for showing users how to **update** or **create** a
 
 # NovaTest.json
 
-<br />
+<Cards columns={2}>
+  <Card title="First Card" icon="fa-home" target="_blank">
+    <EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
 
-<EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
+    <EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
+  </Card>
 
-<EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
+  <Card title="Second Card" icon="fa-user">
+    <EndpointPopup endpoint="/v1/posts" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" />
 
-<EndpointPopup endpoint="/v1/posts" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" />
-
-<EndpointPopup endpoint="/v1/posts/{postId}" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
+    <EndpointPopup endpoint="/v1/posts/{postId}" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
+  </Card>
+</Cards>
