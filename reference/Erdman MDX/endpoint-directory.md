@@ -5,6 +5,8 @@ hidden: false
 metadata:
   robots: index
 ---
+<EndpointDirectory />
+
 <HTMLBlock>{`
 <style>
 header.headline-container21aRBSn8Bqg6.headline-container_basic1DFntTggitfX{
