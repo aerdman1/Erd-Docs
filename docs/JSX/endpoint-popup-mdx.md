@@ -17,6 +17,10 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, f
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla. Etiam volutpat sem a nibh tempor, ac sollicitudin mauris ultrices. Vestibulum varius nisi ac leo consectetur pellentesque eu ut diam. Proin congue tempor urna id varius. Quisque fringilla erat nec nulla iaculis suscipit. Sed a mattis sapien. In dui arcu, facilisis quis finibus id, condimentum id ipsum. Suspendisse potenti.
 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla. Etiam volutpat sem a nibh tempor, ac sollicitudin mauris ultrices. Vestibulum varius nisi ac leo consectetur pellentesque eu ut diam. Proin congue tempor urna id varius. Quisque fringilla erat nec nulla iaculis suscipit. Sed a mattis sapien. In dui arcu, facilisis quis finibus id, condimentum id ipsum. Suspendisse potenti.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla. Etiam volutpat sem a nibh tempor, ac sollicitudin mauris ultrices. Vestibulum varius nisi ac leo consectetur pellentesque eu ut diam. Proin congue tempor urna id varius. Quisque fringilla erat nec nulla iaculis suscipit. Sed a mattis sapien. In dui arcu, facilisis quis finibus id, condimentum id ipsum. Suspendisse potenti.
+
 ### Inline Version
 
 If you prefer to show the API details right away without requiring any interaction, you can set the component to the "inline" mode. This will render both the hyperlink and all the endpoint details directly on the page. For example:
