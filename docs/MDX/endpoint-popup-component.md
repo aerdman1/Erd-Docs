@@ -1,5 +1,5 @@
 ---
-title: Endpoint Popup
+title: Endpoint Embed
 deprecated: false
 hidden: false
 metadata:
