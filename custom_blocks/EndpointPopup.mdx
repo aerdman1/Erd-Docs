@@ -146,10 +146,9 @@ export const EndpointPopup = ({
     ? { position: 'absolute', top: '100%', left: '0', zIndex: 1000, marginTop: '1px' }
     : {};
 
-const cardStyle = displayMode === 'inline'
-  ? { padding: 0, background: 'transparent', border: 'none', boxShadow: 'none' }
-  : { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
-
+  const cardStyle = displayMode === 'inline'
+    ? { padding: 0, background: 'transparent', border: 'none', boxShadow: 'none' }
+    : { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
 
   // Custom link styling so it stands out.
   const customLinkStyle = {
@@ -165,12 +164,12 @@ const cardStyle = displayMode === 'inline'
   // Render the content card.
   const renderedContent = endpointData && (
     <div style={cardStyle}>
-		<h3 style={{ margin: '5px 0' }}> 
+      <h3 style={{ margin: '5px 0' }}>
         <a
           href={`${baseUrl}/reference/${endpoint.replace('/', '')}`}
           style={customLinkStyle}
         >
-          {endpointData.method} {endpointData.path}
+          {displayLinkText}
         </a>
       </h3>
       {endpointData.summary && <p><strong>Summary:</strong> {endpointData.summary}</p>}
@@ -246,17 +245,17 @@ const cardStyle = displayMode === 'inline'
     );
   }
 
-return (
-  <>
-    <style>{`.markdown-body p { margin-bottom: 2px; }`}</style>
-    <div style={{ marginBottom: '16px', width: '100%' }}>
-      {loading && <div>Loading endpoint example...</div>}
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      {!loading && !error && renderedContent}
-    </div>
-  </>
-);
-}; 
+  return (
+    <>
+      <style>{`.markdown-body p { margin-bottom: 2px; }`}</style>
+      <div style={{ marginBottom: '16px', width: '100%' }}>
+        {loading && <div>Loading endpoint example...</div>}
+        {error && <div style={{ color: 'red' }}>{error}</div>}
+        {!loading && !error && renderedContent}
+      </div>
+    </>
+  );
+};
 
 ## API Endpoint Popup Examples
 
@@ -264,7 +263,37 @@ return (
 
 When you want to keep your page uncluttered, you can use the "popup" display mode. In this mode, the endpoint is shown as a hyperlink. When a user hovers over this <EndpointPopup endpoint="/pet" specFile="ErdSpec1.json" linkText="Pet Endpoint" />, it displays detailed information about the endpoint in a popup.
 
----
+Hover over the link above to see a quick summary, description, and an example response for the `/pet` endpoint. This version is ideal if you want to provide more context only when needed.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent nisl ligula, facilisis ac ante quis, pellentesque maximus nulla.
+
+Another example is <EndpointPopup endpoint="/pet/findByStatus" specFile="ErdSpec1.json" linkText="Find Pets by Status" />, which lets you dynamically look up pets based on availability (e.g. `available`, `pending`, `sold`). Hover to preview how this search works without cluttering the UI.
+
+| Test | Test | Test |
+| :--- | :--- | :--- |
+| Test | Test | Test |
+| Test | Test | Test |
+| Test | Test | Test |
+| Test | Test | Test |
+| Test | Test | Test |
+
+<Cards columns={2}>
+  <Card title="First Card" icon="fa-home" target="_blank">
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+  </Card>
+
+  <Card title="Second Card" icon="fa-user">
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+  </Card>
+</Cards>
+
+<Accordion title="Endpoint Testing" icon="fa-info-circle">
+  <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+</Accordion>
+
+<Accordion title="Endpoint Testing" icon="fa-info-circle">
+  <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+</Accordion>
 
 ### Inline Version
 
@@ -274,3 +303,18 @@ If you prefer to show the API details right away without requiring any interacti
 
 This inline display is great for showing users how to **update** or **create** a pet using the same `/pet` path but different methods (`PUT` vs `POST`).
 
+<br />
+
+<Columns layout="auto">
+  <Column>
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload" />
+  </Column>
+
+  <Column>
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload" />
+  </Column>
+
+  <Column>
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload" />
+  </Column>
+</Columns>
