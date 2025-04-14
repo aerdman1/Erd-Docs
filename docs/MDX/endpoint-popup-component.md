@@ -73,6 +73,8 @@ This inline display is great for showing users how to **update** or **create** a
 
 <EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
 
-<br />
-
 <EndpointPopup endpoint="/v1/users" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
+
+<EndpointPopup endpoint="/v1/posts" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" />
+
+<EndpointPopup endpoint="/v1/posts/{postId}" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
