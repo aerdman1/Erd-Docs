@@ -44,6 +44,7 @@ export const EndpointPopup = ({
 
       let chosenOperation = null;
       let chosenMethod = null;
+      // Try to pick an operation with an example, otherwise just pick the first.
       for (const [method, operation] of Object.entries(operations)) {
         const example = extractResponseExample(operation, spec.components);
         if (example) {
@@ -52,7 +53,6 @@ export const EndpointPopup = ({
           break;
         }
       }
-
       if (!chosenOperation) {
         const [method, operation] = Object.entries(operations)[0];
         chosenOperation = operation;
@@ -62,6 +62,8 @@ export const EndpointPopup = ({
       const summary = chosenOperation.summary || '';
       const description = chosenOperation.description || '';
       const example = extractResponseExample(chosenOperation, spec.components);
+      // NEW: Extract operationId for proper reference URL generation.
+      const operationId = chosenOperation.operationId || '';
 
       setEndpointData({
         path: endpoint,
@@ -69,6 +71,7 @@ export const EndpointPopup = ({
         summary,
         description,
         example,
+        operationId,
       });
     } catch (err) {
       setError(err.message);
@@ -161,12 +164,18 @@ export const EndpointPopup = ({
     fontWeight: '600',
   };
 
+  // Determine the reference URL.
+  // Use operationId if available; otherwise, fall back to a sanitized endpoint string.
+  const referenceUrl = endpointData && endpointData.operationId
+    ? `${baseUrl}/reference/${endpointData.operationId}`
+    : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
+
   // Render the content card.
   const renderedContent = endpointData && (
     <div style={cardStyle}>
       <h3 style={{ margin: '5px 0' }}>
         <a
-          href={`${baseUrl}/reference/${endpoint.replace('/', '')}`}
+          href={referenceUrl}
           style={customLinkStyle}
         >
           {displayLinkText}
@@ -202,7 +211,7 @@ export const EndpointPopup = ({
         onMouseLeave={() => setIsHovered(false)}
       >
         <a
-          href={`${baseUrl}/reference/${endpoint.replace('/', '')}`}
+          href={referenceUrl}
           style={customLinkStyle}
         >
           {displayLinkText}
