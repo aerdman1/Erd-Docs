@@ -1,5 +1,6 @@
 ---
-title: API Spec Test
+title: Endpoint Directory (JSON)
+excerpt: ' This version directly references the spec file'
 deprecated: false
 hidden: false
 metadata:
