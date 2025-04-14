@@ -35,8 +35,6 @@ Another example is <EndpointPopup endpoint="/pet/findByStatus" specFile="ErdSpec
   </Card>
 </Cards>
 
-***
-
 ### Inline Version
 
 If you prefer to show the API details right away without requiring any interaction, you can set the component to the "inline" mode. This will render both the hyperlink and all the endpoint details directly on the page.
@@ -44,19 +42,3 @@ If you prefer to show the API details right away without requiring any interacti
 <EndpointPopup endpoint="/pet" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint" />
 
 This inline display is great for showing users how to **update** or **create** a pet using the same `/pet` path but different methods (`PUT` vs `POST`).
-
-***
-
-You can also update pets using form fields like this:
-
-<EndpointPopup endpoint="/pet/{petId}" specFile="ErdSpec1.json" displayMode="popup" linkText="Update Pet by ID" />
-
-When your UI needs to send simple `name`/`status` form values instead of JSON, this endpoint supports that pattern.
-
-***
-
-And finally, image upload:
-
-<EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
-
-This one uses a `multipart/form-data` payload to attach files to pet records.
