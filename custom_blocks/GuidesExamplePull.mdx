@@ -1,9 +1,9 @@
 ---
-name: GuidesExamplePull
+name: EndpointPopup
 ---
 import React, { useEffect, useState } from 'react';
 
-export const PullFromExamples = ({ endpoint }) => {
+export const EndpointPopup = ({ endpoint }) => {
   const [endpointData, setEndpointData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -145,4 +145,4 @@ export const PullFromExamples = ({ endpoint }) => {
   );
 };
 
-<PullFromExamples/>
+<EndpointPopup/>
