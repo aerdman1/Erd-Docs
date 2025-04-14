@@ -3,14 +3,15 @@ name: EndpointPopup
 ---
 import React, { useEffect, useState } from 'react';
 
-export const EndpointPopup = ({ endpoint }) => {
+export const EndpointPopup = ({ endpoint, displayMode = 'popup' }) => {
   const [endpointData, setEndpointData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (!endpoint) {
-     setError('PULLING DIRECTLY FROM OPEN API URL HARD CODED');
+      setError('Endpoint not provided.');
       return;
     }
     fetchEndpointExample();
@@ -19,19 +20,16 @@ export const EndpointPopup = ({ endpoint }) => {
   const fetchEndpointExample = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const response = await fetch('https://erdtest123.readme.io/openapi/ErdSpec1.json');
       if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
       const spec = await response.json();
-
-      // Look up the provided endpoint (e.g. "/pet") in the spec.
+      
       const operations = spec.paths[endpoint];
       if (!operations) {
         throw new Error(`No endpoint found in spec for path ${endpoint}`);
       }
-
-      // Choose an operation that provides an example (if available).
+  
       let chosenOperation = null;
       let chosenMethod = null;
       for (const [method, operation] of Object.entries(operations)) {
@@ -42,17 +40,17 @@ export const EndpointPopup = ({ endpoint }) => {
           break;
         }
       }
-      // Fallback: if no example is found, use the first available operation.
+  
       if (!chosenOperation) {
         const [method, operation] = Object.entries(operations)[0];
         chosenOperation = operation;
         chosenMethod = method.toUpperCase();
       }
-
+      
       const summary = chosenOperation.summary || '';
       const description = chosenOperation.description || '';
       const example = extractResponseExample(chosenOperation, spec.components);
-
+  
       setEndpointData({
         path: endpoint,
         method: chosenMethod,
@@ -60,9 +58,9 @@ export const EndpointPopup = ({ endpoint }) => {
         description,
         example,
       });
-      setLoading(false);
     } catch (err) {
       setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -117,24 +115,33 @@ export const EndpointPopup = ({ endpoint }) => {
     return null;
   };
 
-  if (loading) return <div>Loading endpoint example...</div>;
-  if (error) return <div style={{ color: 'red' }}>Error: {error}</div>;
-  if (!endpointData) return null;
-  return (
-    <div style={{ border: '1px solid #ddd', padding: '16px', borderRadius: '8px', marginTop: '16px' }}>
+  // Render the popup content (identical in both modes).
+  const renderedContent = endpointData && (
+    <div
+      style={{
+        border: '1px solid #ddd',
+        background: '#fff',
+        padding: '16px',
+        borderRadius: '8px',
+        boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+        maxWidth: '300px',
+      }}
+    >
       <h3>{endpointData.method} {endpointData.path}</h3>
       {endpointData.summary && <p><strong>Summary:</strong> {endpointData.summary}</p>}
       {endpointData.description && <p><strong>Description:</strong> {endpointData.description}</p>}
       {endpointData.example ? (
         <div>
           <strong>Example Response:</strong>
-          <pre style={{
+          <pre
+            style={{
               whiteSpace: 'pre-wrap',
               background: '#f5f5f5',
               padding: '8px',
               borderRadius: '4px',
               marginTop: '8px'
-            }}>
+            }}
+          >
             {JSON.stringify(endpointData.example, null, 2)}
           </pre>
         </div>
@@ -143,6 +150,80 @@ export const EndpointPopup = ({ endpoint }) => {
       )}
     </div>
   );
+
+  // For "popup" mode, render as a hyperlink with a hover-triggered popup.
+  if (displayMode === 'popup') {
+    return (
+      <div
+        style={{ display: 'inline-block', position: 'relative' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <a
+          href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
+          style={{ textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          {endpoint}
+        </a>
+        {isHovered && (
+          <>
+            {loading && (
+              <div
+                style={{
+                  padding: '8px',
+                  background: '#fff',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  marginTop: '8px'
+                }}
+              >
+                Loading endpoint example...
+              </div>
+            )}
+            {error && (
+              <div
+                style={{
+                  color: 'red',
+                  padding: '8px',
+                  background: '#fff',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px',
+                  marginTop: '8px'
+                }}
+              >
+                Error: {error}
+              </div>
+            )}
+            {!loading && !error && renderedContent}
+          </>
+        )}
+      </div>
+    );
+  }
+  
+  // For "inline" mode, always display the hyperlink followed by the content.
+  return (
+    <div style={{ marginBottom: '16px' }}>
+      <div>
+        <a
+          href={`https://erdtest123.readme.io/reference/${endpoint.replace('/', '')}`}
+          style={{ textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          {endpoint}
+        </a>
+      </div>
+      <div style={{ marginTop: '8px' }}>
+        {loading && <div>Loading endpoint example...</div>}
+        {error && <div style={{ color: 'red' }}>Error: {error}</div>}
+        {!loading && !error && renderedContent}
+      </div>
+    </div>
+  );
 };
 
-<EndpointPopup/>
+
+<EndpointPopup endpoint="/pet" displayMode="popup" />
+
+
+<EndpointPopup endpoint="/pet" displayMode="inline" />
+
