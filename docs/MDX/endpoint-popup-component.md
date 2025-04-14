@@ -32,7 +32,7 @@ Need to delete a pet? <EndpointPopup endpoint="/pet/{petId}" specFile="ErdSpec1.
   </Card>
 
   <Card title="Second Card" icon="fa-user">
-    <EndpointPopup endpoint="/pet" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint" />
+    <EndpointPopup endpoint="/pet/{petId}/uploadImage" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
   </Card>
 </Cards>
 
