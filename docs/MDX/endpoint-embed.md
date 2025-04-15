@@ -17,7 +17,7 @@ When you want to keep your page clean and uncluttered, the "popup" display mode 
 
 Here's a simple inline demo using a different endpoint. For example, this component renders the details for the User Login endpoint directly in the page flow:
 
-<EndpointEmbed endpoint="/user/login" method="GET" specFile="ErdSpec1.json" linkText="User Login" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+<EndpointEmbed endpoint="/user/login" method="GET" specFile="ErdSpec1.json" linkText="User Login" displayMode="inline" show={{ summary: true, description: true, parameters: true, requestBody: true, responses: false, security: true, tags: true, example: true }} />
 
 If you want all endpoint information to be immediately visible without any user interaction, "inline" mode is a great choice. This demo keeps it simple and focuses on a real-world endpoint in your API.
 
