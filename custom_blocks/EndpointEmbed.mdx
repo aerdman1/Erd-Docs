@@ -335,11 +335,12 @@ export const EndpointEmbed = ({
           )}
           {show.example && endpointData.example && (
             <pre style={{
-              background: '#f3f4f6',
-              padding: 8,
-              borderRadius: 6,
-              fontSize: '0.85rem',
-              overflowX: 'auto'
+  background: '#f3f4f6',
+  padding: 8,
+  margin: '5px 0px',
+  borderRadius: 6,
+  fontSize: '0.85rem',
+  overflowX: 'auto'
             }}>
               {JSON.stringify(endpointData.example, null, 2)}
             </pre>
