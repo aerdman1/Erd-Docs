@@ -95,11 +95,15 @@ Switch OpenAPI files by changing `specFile`. For example:
   endpoint="/v1/users"
   method="POST"
   specFile="NovaTest.json"
+  websiteBaseUrl="https://erdtest123.readme.io"
+  apiTargetUrl="https://api.novatest.com"
   displayMode="inline"
   linkText="Create User (NovaTest)"
+  theme="simple"
+  labels={true}
   show={{
     summary: true,
-    description: true,
+    description: true, //
     parameters: true,
     requestBody: true,
     responses: true,
