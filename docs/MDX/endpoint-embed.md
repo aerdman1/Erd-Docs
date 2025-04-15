@@ -11,13 +11,15 @@ metadata:
 
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-***
-
-<br />
+When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />. When users hover over it, they’ll see a card with full details.
 
 ### Inline (directly on the page)
 
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+
+If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the page flow.
+
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />
 
 ***
 
@@ -27,31 +29,11 @@ metadata:
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-Below are more advanced examples that demonstrate the component in different display modes and container types.
-
-### 🔗 Popup Mode
-
-When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this\
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.
-When users hover over it, they’ll see a card with full details.
-
-Another one:
+<br />
 
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />
 
-which lets you preview how the search works without cluttering your layout.
-
-***
-
-### 📦 Inline Mode
-
-If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the page flow.
-
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />
-
-<EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
-
-This is great when you're walking users through specific request/response flows.
+<br />
 
 ***
 
