@@ -11,20 +11,11 @@ metadata:
 
 #### Example with minimal props:
 
-This uses the "popup" display mode. The endpoint renders as a hyperlink like this: <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />
-When users hover over it, they’ll see a full-detail card.
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> - This uses the "popup" display mode. When users hover over it, they’ll see specific default info.
 
 #### Example with all props enabled:
 
-<EndpointEmbed
-  endpoint="/pet"
-  method="PUT"
-  specFile="ErdSpec1.json"
-  linkText="Showing all props with a custom label"
-  displayMode="popup"
-  websiteBaseUrl="https://erdtest123.readme.io"
-  apiTargetUrl="https://api.erdman.com"
-  show={{
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Showing all props with a custom label" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" show={{
     summary: true,
     description: true,
     parameters: true,
@@ -35,10 +26,7 @@ When users hover over it, they’ll see a full-detail card.
     example: false,
     readmeUrl: false,
     apiUrl: false
-  }}
-/>
-
-This version includes all available options—description, parameters, request body, responses, tags, security, and more. It gives users the most complete view of the endpoint details.
+  }} /> - This version includes all available options—description, parameters, request body, responses, tags, security, and more. It gives users the most complete view of the endpoint details.
 
 ***
 
