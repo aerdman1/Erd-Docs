@@ -25,7 +25,7 @@ Renders a clickable label. On hover, a card appears with endpoint details.
   displayMode="popup"
   websiteBaseUrl="https://erdtest123.readme.io"
   apiTargetUrl="https://api.erdman.com"
-  theme="card"
+  theme="endpoint-block"
   labels={true}
   show={{  
     summary: true,  
@@ -35,9 +35,9 @@ Renders a clickable label. On hover, a card appears with endpoint details.
     requestBody: true,  
     responses: true,  
     security: true,  
-    example: false,  
-    readmeUrl: false,  
-    apiUrl: false  
+    example: true,  
+    readmeUrl: true,  
+    apiUrl: true  
   }}
 />
 
@@ -47,9 +47,19 @@ Renders a clickable label. On hover, a card appears with endpoint details.
 
 Renders the full endpoint card directly in the page.
 
+***
+
+#### Block version:
+
+<EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+
+***
+
 #### Simple version:
 
 <EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+
+***
 
 #### Full version:
 
@@ -108,6 +118,8 @@ Swap `specFile` to pull from different OpenAPI files:
 
 ***
 
+***
+
 # Advanced Usage
 
 ## 🧱 In Cards
@@ -140,38 +152,38 @@ Swap `specFile` to pull from different OpenAPI files:
 
 <Columns layout="auto">
   <Column>
-    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} />
+    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }} />
   </Column>
 
   <Column>
-    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} />
+    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }} />
   </Column>
 
   <Column>
-    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} />
+    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }} />
   </Column>
 </Columns>
 
 <Accordion title="All props/default values">
-  | **Prop**           | **Type**  | **Default**                 | **Description**                                                                  |
-  | ------------------ | --------- | --------------------------- | -------------------------------------------------------------------------------- |
-  | `websiteBaseUrl`   | `string`  | `'https://yourdocsite.com'` | The ReadMe project base URL (used for linking to reference pages).               |
-  | `apiTargetUrl`     | `string`  | *none*                      | Optional override for the real API server base URL (for displaying API URL).     |
-  | `endpoint`         | `string`  | *required*                  | The API path you want to display (e.g. `/pet/{petId}`).                          |
-  | `method`           | `string`  | *optional*                  | The HTTP method (e.g. `GET`, `POST`). If omitted, auto-selects best match.       |
-  | `specFile`         | `string`  | *required*                  | The OpenAPI JSON file name to load (e.g. `ErdSpec1.json`).                       |
-  | `displayMode`      | `string`  | `'popup'`                   | Determines how the component renders: `'popup'` or `'inline'`.                   |
-  | `linkText`         | `string`  | *fallbacks to`endpoint`*    | Custom text to display instead of the raw endpoint path.                         |
-  | `theme`            | `string`  | `'card'`                    | `'card'` renders with background chrome; `'simple'` removes padding and borders. |
-  | `labels`           | `boolean` | `true`                      | If `false`, hides labels like `Summary:`, `Parameters:`, etc.                    |
-  | `show.summary`     | `boolean` | `true`                      | Toggles display of the summary/method line.                                      |
-  | `show.description` | `boolean` | `true`                      | Toggles display of the endpoint description.                                     |
-  | `show.parameters`  | `boolean` | `true`                      | Toggles display of parameter names.                                              |
-  | `show.tags`        | `boolean` | `true`                      | Toggles display of OpenAPI tags.                                                 |
-  | `show.requestBody` | `boolean` | `false`                     | Toggles request body presence indicator.                                         |
-  | `show.responses`   | `boolean` | `false`                     | Toggles list of response codes.                                                  |
-  | `show.security`    | `boolean` | `false`                     | Toggles display of security scheme info.                                         |
-  | `show.example`     | `boolean` | `false`                     | Toggles display of a sample JSON response.                                       |
-  | `show.readmeUrl`   | `boolean` | `false`                     | Toggles display of the ReadMe reference doc URL.                                 |
-  | `show.apiUrl`      | `boolean` | `false`                     | Toggles display of the full API call URL (with method and `apiTargetUrl`).       |
+  | **Prop**           | **Type**  | **Default**                 | **Description**                                                                            |
+  | ------------------ | --------- | --------------------------- | ------------------------------------------------------------------------------------------ |
+  | `websiteBaseUrl`   | `string`  | `'https://yourdocsite.com'` | The ReadMe project base URL (used for linking to reference pages).                         |
+  | `apiTargetUrl`     | `string`  | *none*                      | Optional override for the real API server base URL (for displaying API URL).               |
+  | `endpoint`         | `string`  | *required*                  | The API path you want to display (e.g. `/pet/{petId}`).                                    |
+  | `method`           | `string`  | *optional*                  | The HTTP method (e.g. `GET`, `POST`). If omitted, auto-selects best match.                 |
+  | `specFile`         | `string`  | *required*                  | The OpenAPI JSON file name to load (e.g. `ErdSpec1.json`).                                 |
+  | `displayMode`      | `string`  | `'popup'`                   | Determines how the component renders: `'popup'` or `'inline'`.                             |
+  | `linkText`         | `string`  | *fallbacks to`endpoint`*    | Custom text to display instead of the raw endpoint path.                                   |
+  | `theme`            | `string`  | `'endpoint-block'`          | `'endpoint-block'` renders with background chrome; `'simple'` removes padding and borders. |
+  | `labels`           | `boolean` | `true`                      | If `false`, hides labels like `Summary:`, `Parameters:`, etc.                              |
+  | `show.summary`     | `boolean` | `true`                      | Toggles display of the summary/method line.                                                |
+  | `show.description` | `boolean` | `true`                      | Toggles display of the endpoint description.                                               |
+  | `show.parameters`  | `boolean` | `true`                      | Toggles display of parameter names.                                                        |
+  | `show.tags`        | `boolean` | `true`                      | Toggles display of OpenAPI tags.                                                           |
+  | `show.requestBody` | `boolean` | `false`                     | Toggles request body presence indicator.                                                   |
+  | `show.responses`   | `boolean` | `false`                     | Toggles list of response codes.                                                            |
+  | `show.security`    | `boolean` | `false`                     | Toggles display of security scheme info.                                                   |
+  | `show.example`     | `boolean` | `false`                     | Toggles display of a sample JSON response.                                                 |
+  | `show.readmeUrl`   | `boolean` | `false`                     | Toggles display of the ReadMe reference doc URL.                                           |
+  | `show.apiUrl`      | `boolean` | `false`                     | Toggles display of the full API call URL (with method and `apiTargetUrl`).                 |
 </Accordion>
