@@ -21,7 +21,11 @@ When users hover over it, they’ll see a full-detail card.
 
 If you want all endpoint info immediately visible, `"inline"` mode renders the card directly in the page flow:
 
+#### Here is one with just a few props:
+
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+
+#### Here is one with all props enabled:
 
 <EndpointEmbed
   endpoint="/pet"
@@ -50,7 +54,24 @@ Switch OpenAPI files by changing `specFile`. For example:
 
 <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
 
-<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" />
+<EndpointEmbed
+  endpoint="/v1/users"
+  method="POST"
+  specFile="NovaTest.json"
+  displayMode="inline"
+  linkText="Create User (NovaTest)"
+  show={{
+    summary: true,
+    description: true,
+    parameters: true,
+    requestBody: true,
+    responses: true,
+    security: true,
+    tags: true,
+    example: true,
+    readmeUrl: true
+  }}
+/>
 
 ***
 
