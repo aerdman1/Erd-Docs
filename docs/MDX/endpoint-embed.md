@@ -15,15 +15,11 @@ When you want to keep your page clean and uncluttered, the "popup" display mode 
 
 ## Inline (directly on the page)
 
-<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+Here's a simple inline demo using a different endpoint. For example, this component renders the details for the User Login endpoint directly in the page flow:
 
-If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the page flow. For example: <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />.
+<EndpointEmbed endpoint="/user/login" method="GET" specFile="ErdSpec1.json" linkText="User Login" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
-
-If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the page flow.
-
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />
+If you want all endpoint information to be immediately visible without any user interaction, "inline" mode is a great choice. This demo keeps it simple and focuses on a real-world endpoint in your API.
 
 ***
 
