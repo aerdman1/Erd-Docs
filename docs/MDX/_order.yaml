@@ -1,4 +1,5 @@
 - endpoint-embedding
+- endpoint-embedding-copy
 - simple-banner
 - page-banner
 - simple-stepper
@@ -7,4 +8,3 @@
 - page-template
 - keyword-testing
 - customer-quotes
-- endpoint-embedding-copy
