@@ -1,7 +1,7 @@
 ---
 name: EndpointEmbed
 ---
-import React, { useEffect, useMemo, useState } from 'react'; 
+import React, { useEffect, useMemo, useState } from 'react';
 
 export const EndpointEmbed = ({
   websiteBaseUrl = 'https://erdtest123.readme.io', // The website URL for fetching the OpenAPI spec
@@ -286,7 +286,7 @@ export const EndpointEmbed = ({
   // Build the API endpoint URL if apiTargetUrl is provided.
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
 
-  // Reusable fallback card used when there is an error loading the spec.
+  // Reusable fallback card for when there's an error (shows only basic info)
   const fallbackCard = (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
@@ -311,6 +311,18 @@ export const EndpointEmbed = ({
         </div>
       </Card>
     </a>
+  );
+
+  // Skeleton loading card
+  const skeletonCard = (
+    <div className="card skeleton popup-card">
+      <div className="card-content">
+        <div className="skeleton-method"></div>
+        <div className="skeleton-title"></div>
+        <div className="skeleton-path"></div>
+      </div>
+      <span className="arrow">{arrow}</span>
+    </div>
   );
 
   // Rendered content when endpoint data is successfully loaded.
@@ -692,4 +704,4 @@ Organize multiple endpoints side by side:
 
 </Column>
 
-</Columns> 
+</Columns>
