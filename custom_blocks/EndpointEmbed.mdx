@@ -397,13 +397,13 @@ Organize multiple endpoints side by side:
 
 <Columns layout="auto">
 <Column>
-<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
+<EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 </Column>
 <Column>
 <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 </Column>
 <Column>
-<EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
+<EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 </Column>
 </Columns>
 
@@ -430,4 +430,4 @@ Organize multiple endpoints side by side:
 | `show.example`     | `boolean`     | `false`                              | Toggles display of a sample JSON response.                                     |
 | `show.readmeUrl`   | `boolean`     | `false`                              | Toggles display of the ReadMe reference doc URL.                               |
 | `show.apiUrl`      | `boolean`     | `false`                              | Toggles display of the full API call URL (with method and `apiTargetUrl`).     |
-</Accordion> 
+</Accordion>
