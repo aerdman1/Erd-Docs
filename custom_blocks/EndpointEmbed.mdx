@@ -31,7 +31,7 @@ export const EndpointEmbed = ({
 
   // Default link text if not provided.
   const displayLinkText = linkText || endpoint;
-  // Build full spec URL
+  // Build full spec URL.
   const fullSpecUrl = `${baseUrl}/openapi/${specFile}`;
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export const EndpointEmbed = ({
     }
   };
 
-  // Recursively resolve example from a schema.
+  // Recursively resolve an example from a schema.
   const resolveExampleFromSchema = (schema, components) => {
     if (!schema) return null;
     if (schema.example !== undefined) {
@@ -186,9 +186,7 @@ export const EndpointEmbed = ({
         <MethodTag method={endpointData.method} />
       )}
       <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
-        {show.summary && endpointData.summary
-          ? endpointData.summary
-          : displayLinkText}
+        {show.summary && endpointData.summary ? endpointData.summary : displayLinkText}
       </h3>
       {endpointData && <div className="path">{referenceUrl}</div>}
     </Card>
@@ -266,6 +264,7 @@ export const EndpointEmbed = ({
           color: inherit;
           transition: background 0.2s;
           margin-bottom: 8px;
+          opacity: 1; /* Ensure cards are fully opaque */
         }
         .card:hover {
           background: #7dbeff1c;
@@ -306,7 +305,7 @@ export const EndpointEmbed = ({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          opacity: 1;
+          opacity: 1; /* Fully opaque */
           min-height: 100px;
         }
         .skeleton-method, .skeleton-title, .skeleton-path {
@@ -322,6 +321,7 @@ export const EndpointEmbed = ({
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
         }
+        
         /* Dark mode variations (optional) */
         [data-color-mode=dark] .card { background: #0000007a; }
         @media (prefers-color-scheme: dark) {
