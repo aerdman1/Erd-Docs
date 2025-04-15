@@ -286,6 +286,34 @@ export const EndpointEmbed = ({
   // Build the API endpoint URL if apiTargetUrl is provided.
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
 
+  // Reusable fallback card used when there is an error loading the spec.
+  const fallbackCard = (
+    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Card>
+        <div style={{ flexGrow: 1 }}>
+          {show.summary && method && <MethodTag method={method} />}
+          <h3 style={{ margin: '0 0 0.5em', fontSize: '1rem', fontWeight: 'bold' }}>
+            {linkText || displayLinkText}
+          </h3>
+          <div style={{ marginBottom: '0.25em', fontFamily: 'monospace', fontSize: '0.9rem', color: '#6b7280' }}>
+            {endpoint}
+          </div>
+          {show.apiUrl && apiTargetUrl && (
+            <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4b5563' }}>
+              API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
+            </div>
+          )}
+          {show.readmeUrl && (
+            <div className="path" style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#6b7280' }}>
+              {readmeDocUrl}
+            </div>
+          )}
+        </div>
+      </Card>
+    </a>
+  );
+
+  // Rendered content when endpoint data is successfully loaded.
   const renderedContent = endpointData && (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
@@ -362,30 +390,6 @@ export const EndpointEmbed = ({
     </a>
   );
 
-  const skeletonCard = (
-    <div className="card skeleton popup-card">
-      <div className="card-content">
-        <div className="skeleton-method"></div>
-        <div className="skeleton-title"></div>
-        <div className="skeleton-path"></div>
-      </div>
-      <span className="arrow">{arrow}</span>
-    </div>
-  );
-
-  const errorCard = (
-    <div style={{
-      border: '1px solid #dc2626',
-      background: '#fdeaea',
-      borderRadius: '8px',
-      padding: '16px',
-      color: '#dc2626',
-      marginBottom: '8px'
-    }} className="popup-card">
-      {error}
-    </div>
-  );
-
   if (displayMode === 'popup') {
     const popupLinkStyle = {
       textDecoration: 'none',
@@ -396,6 +400,7 @@ export const EndpointEmbed = ({
       padding: '2px 4px',
       fontWeight: '600',
     };
+
     return (
       <span
         style={{ display: 'inline-block', position: 'relative' }}
@@ -406,118 +411,85 @@ export const EndpointEmbed = ({
           {displayLinkText}
         </a>
         {isHovered && (
-          <div style={{
-            position: 'absolute',
-            left: '0',
-            zIndex: 1000,
-            width: '420px',
-          }}>
+          <div style={{ position: 'absolute', left: '0', zIndex: 1000, width: '420px' }}>
             {loading && skeletonCard}
-            {error && !loading && (
-  <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
-    <Card>
-      <div style={{ flexGrow: 1 }}>
-        {show.summary && method && <MethodTag method={method} />}
-        <h3 style={{ margin: '0 0 0.5em', fontSize: '1rem', fontWeight: 'bold' }}>
-          {linkText || displayLinkText}
-        </h3>
-        <div style={{ marginBottom: '0.25em', fontFamily: 'monospace', fontSize: '0.9rem', color: '#6b7280' }}>
-          {endpoint}
-        </div>
-        {show.apiUrl && apiTargetUrl && (
-          <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4b5563' }}>
-            API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
-          </div>
-        )}
-        {show.readmeUrl && (
-          <div className="path" style={{
-            fontFamily: 'monospace',
-            fontSize: '0.9rem',
-            color: '#6b7280'
-          }}>
-            {readmeDocUrl}
-          </div>
-        )}
-      </div>
-    </Card>
-  </a>
-)}
-
-            {!loading && !error && (
-              <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Card classNameExtra="popup-card">
-                  <div style={{ flexGrow: 1 }}>
-                    {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
-                    <h3 style={{ margin: '0 0 0.5em', fontSize: '1rem', fontWeight: 'bold' }}>
-                      {linkText ? linkText : (endpointData.summary || displayLinkText)}
-                    </h3>
-                    {show.description && endpointData.description && (
-                      <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
-                        {endpointData.description}
-                      </p>
-                    )}
-                    <div style={{ marginBottom: '0.5em' }}>
-                      {show.parameters && endpointData.parameters?.length > 0 && (
-                        <div style={{ marginBottom: '0.25em' }}>
-                          <strong>Parameters:</strong> {endpointData.parameters.map(p => p.name).join(', ')}
+            {!loading &&
+              (error ? fallbackCard : (
+                <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Card classNameExtra="popup-card">
+                    <div style={{ flexGrow: 1 }}>
+                      {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
+                      <h3 style={{ margin: '0 0 0.5em', fontSize: '1rem', fontWeight: 'bold' }}>
+                        {linkText ? linkText : (endpointData.summary || displayLinkText)}
+                      </h3>
+                      {show.description && endpointData.description && (
+                        <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
+                          {endpointData.description}
+                        </p>
+                      )}
+                      <div style={{ marginBottom: '0.5em' }}>
+                        {show.parameters && endpointData.parameters?.length > 0 && (
+                          <div style={{ marginBottom: '0.25em' }}>
+                            <strong>Parameters:</strong> {endpointData.parameters.map(p => p.name).join(', ')}
+                          </div>
+                        )}
+                        {show.requestBody && endpointData.requestBody && (
+                          <div style={{ marginBottom: '0.25em' }}>
+                            <strong>Request Body:</strong> Available
+                          </div>
+                        )}
+                        {show.responses && endpointData.responses && (
+                          <div style={{ marginBottom: '0.25em' }}>
+                            <strong>Responses:</strong> {Object.keys(endpointData.responses).join(', ')}
+                          </div>
+                        )}
+                        {show.security && endpointData.security?.length > 0 && (
+                          <div style={{ marginBottom: '0.25em' }}>
+                            <strong>Security:</strong> {JSON.stringify(endpointData.security)}
+                          </div>
+                        )}
+                        {show.tags && endpointData.tags?.length > 0 && (
+                          <div style={{ marginBottom: '0.25em' }}>
+                            <strong>Tags:</strong> {endpointData.tags.join(', ')}
+                          </div>
+                        )}
+                      </div>
+                      {show.example && endpointData.example && (
+                        <pre style={{
+                          background: '#f3f4f6',
+                          padding: '8px',
+                          borderRadius: '6px',
+                          fontSize: '0.85rem',
+                          overflowX: 'auto',
+                          marginBottom: '0.5em'
+                        }}>
+                          {JSON.stringify(endpointData.example, null, 2)}
+                        </pre>
+                      )}
+                      {show.apiUrl && apiFullUrl && (
+                        <div style={{
+                          fontFamily: 'monospace',
+                          fontSize: '0.9rem',
+                          color: '#4b5563',
+                          marginBottom: '0.25em'
+                        }}>
+                          API: {endpointData.method} {apiFullUrl}
                         </div>
                       )}
-                      {show.requestBody && endpointData.requestBody && (
-                        <div style={{ marginBottom: '0.25em' }}>
-                          <strong>Request Body:</strong> Available
-                        </div>
-                      )}
-                      {show.responses && endpointData.responses && (
-                        <div style={{ marginBottom: '0.25em' }}>
-                          <strong>Responses:</strong> {Object.keys(endpointData.responses).join(', ')}
-                        </div>
-                      )}
-                      {show.security && endpointData.security?.length > 0 && (
-                        <div style={{ marginBottom: '0.25em' }}>
-                          <strong>Security:</strong> {JSON.stringify(endpointData.security)}
-                        </div>
-                      )}
-                      {show.tags && endpointData.tags?.length > 0 && (
-                        <div style={{ marginBottom: '0.25em' }}>
-                          <strong>Tags:</strong> {endpointData.tags.join(', ')}
+                      {show.readmeUrl !== false && (
+                        <div className="path" style={{
+                          fontFamily: 'monospace',
+                          fontSize: '0.9rem',
+                          color: '#6b7280'
+                        }}>
+                          {readmeDocUrl}
                         </div>
                       )}
                     </div>
-                    {show.example && endpointData.example && (
-                      <pre style={{
-                        background: '#f3f4f6',
-                        padding: '8px',
-                        borderRadius: '6px',
-                        fontSize: '0.85rem',
-                        overflowX: 'auto',
-                        marginBottom: '0.5em'
-                      }}>
-                        {JSON.stringify(endpointData.example, null, 2)}
-                      </pre>
-                    )}
-                    {show.apiUrl && apiFullUrl && (
-                      <div style={{
-                        fontFamily: 'monospace',
-                        fontSize: '0.9rem',
-                        color: '#4b5563',
-                        marginBottom: '0.25em'
-                      }}>
-                        API: {endpointData.method} {apiFullUrl}
-                      </div>
-                    )}
-                    {show.readmeUrl !== false && (
-                      <div className="path" style={{
-                        fontFamily: 'monospace',
-                        fontSize: '0.9rem',
-                        color: '#6b7280'
-                      }}>
-                        {readmeDocUrl}
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              </a>
-            )}
+                  </Card>
+                </a>
+              ))
+            }
           </div>
         )}
       </span>
@@ -527,42 +499,13 @@ export const EndpointEmbed = ({
   return (
     <>
       {loading && skeletonCard}
-      {!loading && error && (
-        <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
-          <Card>
-            <div style={{ flexGrow: 1 }}>
-              {show.summary && method && <MethodTag method={method} />}
-              <h3 style={{ margin: '0 0 0.5em', fontSize: '1rem', fontWeight: 'bold' }}>
-                {linkText || displayLinkText}
-              </h3>
-              <div style={{ marginBottom: '0.25em', fontFamily: 'monospace', fontSize: '0.9rem', color: '#6b7280' }}>
-                {endpoint}
-              </div>
-              {show.apiUrl && apiTargetUrl && (
-                <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4b5563' }}>
-                  API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
-                </div>
-              )}
-              {show.readmeUrl && (
-                <div className="path" style={{
-                  fontFamily: 'monospace',
-                  fontSize: '0.9rem',
-                  color: '#6b7280'
-                }}>
-                  {readmeDocUrl}
-                </div>
-              )}
-            </div>
-          </Card>
-        </a>
-      )}
+      {!loading && error && fallbackCard}
       {!loading && !error && renderedContent}
     </>
   );
-  
 };
- 
-# Basic Usage  
+
+# Basic Usage
 
 ## 💬 Popup Mode
 
