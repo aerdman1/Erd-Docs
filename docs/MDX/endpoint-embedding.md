@@ -123,27 +123,6 @@ Embed this component within ReadMe's `<Cards>` layout:
     apiUrl: true
   }}
     />
-
-    <EndpointEmbed
-      endpoint="/v1/users"
-      method="POST"
-      specFile="NovaTest.json"
-      displayMode="inline"
-      theme="simple"
-      linkText="Create User"
-      show={{
-    summary: true,
-    description: true,
-    parameters: false,
-    requestBody: false,
-    responses: false,
-    security: false,
-    tags: false,
-    example: false,
-    readmeUrl: true,
-    apiUrl: true
-  }}
-    />
   </Card>
 
   <Card title="Posts API" icon="fa-file-alt">
@@ -154,27 +133,6 @@ Embed this component within ReadMe's `<Cards>` layout:
       displayMode="inline"
       theme="simple"
       linkText="Create Post"
-      show={{
-    summary: true,
-    description: true,
-    parameters: false,
-    requestBody: false,
-    responses: false,
-    security: false,
-    tags: false,
-    example: false,
-    readmeUrl: true,
-    apiUrl: true
-  }}
-    />
-
-    <EndpointEmbed
-      endpoint="/v1/posts/{postId}"
-      method="GET"
-      specFile="NovaTest.json"
-      displayMode="inline"
-      theme="simple"
-      linkText="Get Post by ID"
       show={{
     summary: true,
     description: true,
