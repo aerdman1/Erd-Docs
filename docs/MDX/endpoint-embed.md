@@ -31,8 +31,6 @@ If you want all endpoint info to be immediately visible, `"inline"` mode will re
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />
-
 ***
 
 ### 🗂️ Works with Any Spec File
