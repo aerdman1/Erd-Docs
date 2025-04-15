@@ -409,7 +409,33 @@ export const EndpointEmbed = ({
 
 ## 💬 Popup Mode
 
-When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this: <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />. When users hover over it, they’ll see a full-detail card.
+#### Example with minimal props:
+This uses the "popup" display mode. The endpoint renders as a hyperlink—like this: <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> When users hover over it, they’ll see a full-detail card.
+
+#### Example with all props enabled:
+This version includes every available prop for full customization.
+
+<EndpointEmbed
+  endpoint="/pet"
+  method="PUT"
+  specFile="ErdSpec1.json"
+  linkText="Pet Endpoint"
+  displayMode="popup"
+  websiteBaseUrl="https://erdtest123.readme.io"
+  apiTargetUrl="https://api.erdman.com"
+  show={{
+    summary: true,
+    description: true,
+    parameters: true,
+    tags: true,
+    requestBody: false,
+    responses: false,
+    security: false,
+    example: false,
+    readmeUrl: false,
+    apiUrl: false
+  }}
+/>
 
 ---
 
