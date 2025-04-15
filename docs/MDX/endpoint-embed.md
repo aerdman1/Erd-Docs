@@ -5,12 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-# ⚙️ API Endpoint Embed Examples
-
-A flexible React component that renders OpenAPI endpoint details either inline or on hover—fully interactive and spec-aware.
-
-***
-
 ## 🔗 Popup Mode
 
 When you want to keep your page uncluttered, use the `"popup"` display mode. The endpoint renders as a hyperlink. When users hover over it, they’ll see a card with full details.
