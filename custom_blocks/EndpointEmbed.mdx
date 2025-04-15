@@ -44,15 +44,13 @@ export const EndpointEmbed = ({
 /* General card styles */
 .endpoint-block {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   background: #f9f9f9!important;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 16px;
   text-decoration: none!important;
   color: inherit;
-  transition: background 0.2s;
   margin-bottom: 8px;
   width: fit-content;
   max-width: 100%;
@@ -73,25 +71,35 @@ export const EndpointEmbed = ({
   position: relative;
 }
 
-.endpoint-block-content { flex-grow: 1; }
+/* Header row (for method and connection indicator) */
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+/* Other text styles */
 .endpoint-block h3 {
-  margin: 0;
+  margin: 0 0 0.5em 0;
   font-size: 1rem;
   font-weight: bold;
   color: #111827!important;
 }
 
 .method {
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  margin-bottom: 4px;
-  display: block;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    display: inline-block;
 }
+
 .method.get { color: #2563eb; }
 .method.post { color: #16a34a; }
 .method.put { color: #ca8a04; }
 .method.delete { color: #dc2626; }
+
 .path {
   font-family: monospace;
   font-size: 0.9rem;
@@ -118,7 +126,7 @@ export const EndpointEmbed = ({
   box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Remove any arrow-related styles completely */
+/* Remove arrow styling completely */
 .popup-card .arrow,
 .popup-card::after,
 .popup-card::before {
@@ -134,10 +142,11 @@ export const EndpointEmbed = ({
   background: #fff;
 }
 
-/* For containers */
+/* Containers (for Cards, Accordions, etc.) */
 .CardsGrid .Card,
 .Accordion .Accordion-title,
-.CardsGrid .Card-icon, .Accordion {
+.CardsGrid .Card-icon,
+.Accordion {
   background: inherit;
   color: inherit;
 }
@@ -219,7 +228,7 @@ export const EndpointEmbed = ({
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
   const label = (txt) => (labels ? <strong>{txt}: </strong> : null);
 
-  // Updated connection indicator that can be inline.
+  // ConnectionIndicator: When inline, render as a small inline-block element.
   const ConnectionIndicator = ({ connected, inline }) => {
     const style = inline
       ? {
@@ -227,7 +236,8 @@ export const EndpointEmbed = ({
           width: 8,
           height: 8,
           borderRadius: '50%',
-          marginLeft: 4
+          marginLeft: 8,
+          alignSelf: 'center'
         }
       : {
           position: 'absolute',
@@ -259,35 +269,23 @@ export const EndpointEmbed = ({
     <span className={`method ${method.toLowerCase()}`}>{method}</span>
   );
 
-  // fallbackCard shown before full data is loaded.
+  // Fallback card for when full data is not loaded
   const fallbackCard = (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
         {show.summary && method && (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div className="header-row" style={{ width: '100%' }}>
             <MethodTag method={method} />
             <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
           </div>
         )}
         <div style={{ flexGrow: 1 }}>
           <h3 style={{ margin: '0 0 0.5em' }}>{linkText || displayLinkText}</h3>
-          <div
-            style={{
-              fontFamily: 'monospace',
-              fontSize: '0.9rem',
-              color: '#6b7280'
-            }}
-          >
+          <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#6b7280' }}>
             {endpoint}
           </div>
           {show.apiUrl && apiTargetUrl && (
-            <div
-              style={{
-                fontFamily: 'monospace',
-                fontSize: '0.9rem',
-                color: '#4b5563'
-              }}
-            >
+            <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4b5563' }}>
               API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
             </div>
           )}
@@ -297,11 +295,12 @@ export const EndpointEmbed = ({
     </a>
   );
 
+  // Rendered full card (when data is loaded)
   const renderedContent = endpointData && (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
         {show.summary && endpointData.method && (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div className="header-row" style={{ width: '100%' }}>
             <MethodTag method={endpointData.method} />
             <ConnectionIndicator connected={true} inline={true} />
           </div>
@@ -311,11 +310,7 @@ export const EndpointEmbed = ({
             {linkText || endpointData.summary || displayLinkText}
           </h3>
           {show.description && endpointData.description && (
-            <p style={{
-              margin: '0 0 0.5em',
-              fontSize: '0.9rem',
-              color: '#374151'
-            }}>
+            <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
               {endpointData.description}
             </p>
           )}
@@ -359,11 +354,7 @@ export const EndpointEmbed = ({
             </pre>
           )}
           {show.apiUrl && apiFullUrl && (
-            <div style={{
-              fontFamily: 'monospace',
-              fontSize: '0.9rem',
-              color: '#4b5563'
-            }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4b5563' }}>
               API: {endpointData.method} {apiFullUrl}
             </div>
           )}
@@ -402,7 +393,7 @@ export const EndpointEmbed = ({
                 <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <Card extra={`popup-card ${theme === 'simple' ? 'simple' : ''}`.trim()}>
                     {show.summary && endpointData.method && (
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div className="header-row" style={{ width: '100%' }}>
                         <MethodTag method={endpointData.method} />
                         <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
                       </div>
@@ -412,11 +403,7 @@ export const EndpointEmbed = ({
                         {linkText || endpointData.summary || displayLinkText}
                       </h3>
                       {show.description && endpointData.description && (
-                        <p style={{
-                          margin: '0 0 0.5em',
-                          fontSize: '0.9rem',
-                          color: '#374151'
-                        }}>
+                        <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
                           {endpointData.description}
                         </p>
                       )}
@@ -442,7 +429,7 @@ export const EndpointEmbed = ({
   }
   return renderedContent;
 };
-
+ 
 ## 💬 Popup Mode
 
 Renders a clickable label. On hover, a card appears with endpoint details.
@@ -671,4 +658,4 @@ Swap `specFile` to pull from different OpenAPI files:
 | `show.example`     | `boolean`     | `false`                              | Toggles display of a sample JSON response.                                     |
 | `show.readmeUrl`   | `boolean`     | `false`                              | Toggles display of the ReadMe reference doc URL.                               |
 | `show.apiUrl`      | `boolean`     | `false`                              | Toggles display of the full API call URL (with method and `apiTargetUrl`).     |
-</Accordion> 
+</Accordion>
