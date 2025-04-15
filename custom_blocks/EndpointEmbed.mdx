@@ -181,69 +181,84 @@ export const EndpointEmbed = ({
     : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
   // Render the main card content.
-  const renderedContent = endpointData && (
-    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
-      <Card>
+const renderedContent = endpointData && (
+  <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+    <Card>
+      <div style={{ flexGrow: 1 }}>
         {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
 
         {show.summary && (
-          <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
+          <h3 style={{ margin: '0 0 0.5em', fontSize: '1rem', fontWeight: 'bold' }}>
             {endpointData.summary || displayLinkText}
           </h3>
         )}
 
         {show.description && endpointData.description && (
-          <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9rem', color: '#374151' }}>
+          <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
             {endpointData.description}
           </p>
         )}
 
-        {show.parameters && endpointData.parameters?.length > 0 && (
-          <p>
-            <strong>Parameters:</strong> {endpointData.parameters.map(p => p.name).join(', ')}
-          </p>
-        )}
-
-        {show.requestBody && endpointData.requestBody && (
-          <p><strong>Has Request Body</strong></p>
-        )}
-
-        {show.responses && endpointData.responses && (
-          <p>
-            <strong>Responses:</strong> {Object.keys(endpointData.responses).join(', ')}
-          </p>
-        )}
-
-        {show.security && endpointData.security?.length > 0 && (
-          <p>
-            <strong>Security:</strong> {JSON.stringify(endpointData.security)}
-          </p>
-        )}
-
-        {show.tags && endpointData.tags?.length > 0 && (
-          <p>
-            <strong>Tags:</strong> {endpointData.tags.join(', ')}
-          </p>
-        )}
+        <div style={{ marginBottom: '0.5em' }}>
+          {show.parameters && endpointData.parameters?.length > 0 && (
+            <div style={{ marginBottom: '0.25em' }}>
+              <strong>Parameters:</strong> {endpointData.parameters.map(p => p.name).join(', ')}
+            </div>
+          )}
+          {show.requestBody && endpointData.requestBody && (
+            <div style={{ marginBottom: '0.25em' }}>
+              <strong>Request Body:</strong> Available
+            </div>
+          )}
+          {show.responses && endpointData.responses && (
+            <div style={{ marginBottom: '0.25em' }}>
+              <strong>Responses:</strong> {Object.keys(endpointData.responses).join(', ')}
+            </div>
+          )}
+          {show.security && endpointData.security?.length > 0 && (
+            <div style={{ marginBottom: '0.25em' }}>
+              <strong>Security:</strong> {JSON.stringify(endpointData.security)}
+            </div>
+          )}
+          {show.tags && endpointData.tags?.length > 0 && (
+            <div style={{ marginBottom: '0.25em' }}>
+              <strong>Tags:</strong> {endpointData.tags.join(', ')}
+            </div>
+          )}
+        </div>
 
         {show.example && endpointData.example && (
-          <pre style={{
-            background: '#f3f4f6',
-            padding: '8px',
-            borderRadius: '6px',
-            fontSize: '0.85rem',
-            overflowX: 'auto'
-          }}>
+          <pre
+            style={{
+              background: '#f3f4f6',
+              padding: '8px',
+              borderRadius: '6px',
+              fontSize: '0.85rem',
+              overflowX: 'auto',
+              marginBottom: '0.5em'
+            }}
+          >
             {JSON.stringify(endpointData.example, null, 2)}
           </pre>
         )}
 
         {show.readmeUrl !== false && (
-          <div className="path">{readmeDocUrl}</div>
+          <div
+            className="path"
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              color: '#6b7280'
+            }}
+          >
+            {readmeDocUrl}
+          </div>
         )}
-      </Card>
-    </a>
-  );
+      </div>
+    </Card>
+  </a>
+);
+
 
   // Skeleton loader markup.
   const skeletonCard = (
