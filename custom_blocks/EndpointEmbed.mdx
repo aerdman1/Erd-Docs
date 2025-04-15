@@ -1,17 +1,17 @@
 ---
 name: EndpointEmbed
 ---
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from "react";
 
 export const EndpointEmbed = ({
-  websiteBaseUrl = 'https://erdtest123.readme.io',
+  websiteBaseUrl = "https://erdtest123.readme.io",
   apiTargetUrl,
   endpoint,
   method,
-  displayMode = 'popup',
+  displayMode = "popup",
   linkText,
   specFile,
-  theme = 'endpoint-block',
+  theme = "endpoint-block",
   labels = true,
   show = {
     summary: true,
@@ -31,15 +31,20 @@ export const EndpointEmbed = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const displayLinkText = linkText || endpoint;
-  const fullSpecUrl = useMemo(() => `${websiteBaseUrl}/openapi/${specFile}`, [websiteBaseUrl, specFile]);
+  const fullSpecUrl = useMemo(
+    function () {
+      return websiteBaseUrl + "/openapi/" + specFile;
+    },
+    [websiteBaseUrl, specFile]
+  );
 
   /* ------------------------------------------------------------------
-   *  Inject shared CSS once
+   *  Inject shared CSS once (using a backtick template literal for clarity)
    * ----------------------------------------------------------------*/
-  useEffect(() => {
-    if (document.getElementById('endpoint-embed-styles')) return;
-    const style = document.createElement('style');
-    style.id = 'endpoint-embed-styles';
+  useEffect(function () {
+    if (document.getElementById("endpoint-embed-styles")) return;
+    var style = document.createElement("style");
+    style.id = "endpoint-embed-styles";
     style.textContent = `
 /* General card styles */
 .endpoint-block {
@@ -56,23 +61,20 @@ export const EndpointEmbed = ({
   max-width: 100%;
   min-width:250px;
 }
-
 .endpoint-block:hover {
   background: #7dbeff1c;
-  border: 1px solid #6b7280;;
+  border: 1px solid #6b7280;
 }
-
 .endpoint-simple {
   background: transparent!important;
   border: none!important;
-  padding: 16px; /* match endpoint-block */
+  padding: 16px;
   margin-bottom: 8px;
   width: fit-content;
   max-width: 100%;
-  min-width: 250px; /* match endpoint-block */
+  min-width: 250px;
   position: relative;
 }
-
 /* Arrow shown on hover in top-right */
 .endpoint-block::after,
 .endpoint-simple::after {
@@ -83,53 +85,43 @@ export const EndpointEmbed = ({
   right: 8px;
   opacity: 0;
   transition: opacity 0.2s ease;
-  color: #6b7280; /* subtle gray */
+  color: #6b7280;
 }
-
-/* Reveal on hover */
 .endpoint-block:hover::after,
 .endpoint-simple:hover::after {
   opacity: 1;
 }
-
-
 /* Header row (for method and connection indicator) */
 .header-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-bottom: 4px;
-    flex-direction: row-reverse;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+  flex-direction: row-reverse;
 }
-
-/* Other text styles */
 .endpoint-block h3 {
   margin: 0 0 0.5em 0;
   font-size: 1rem;
   font-weight: bold;
   color: #111827!important;
 }
-
 .method {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    margin-bottom: 4px;
-    display: inline-block;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  display: inline-block;
 }
-
 .method.get { color: #2563eb; }
 .method.post { color: #16a34a; }
 .method.put { color: #ca8a04; }
 .method.delete { color: #dc2626; }
-
 .path {
   font-family: monospace;
   font-size: 0.9rem;
   color: #6b7280;
   word-break: break-all;
 }
-
 /* Popup specific styles */
 .popup-card {
   position: relative;
@@ -141,15 +133,12 @@ export const EndpointEmbed = ({
   max-width: 100%;
   font-size: 0.85rem!important;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
- transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
 }
-
 .popup-card:hover {
   border: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
-
-/* Arrow on top-right of popup cards */
 .popup-card::after {
   content: '↗';
   font-size: 0.75rem;
@@ -160,13 +149,9 @@ export const EndpointEmbed = ({
   transition: opacity 0.2s ease;
   color: #6b7280;
 }
-
-/* Show arrow on hover */
 .popup-card:hover::after {
   opacity: 1;
 }
-
-/* Simple theme overrides */
 .popup-card.simple {
   box-shadow: none;
   border: none;
@@ -174,7 +159,6 @@ export const EndpointEmbed = ({
   padding: 0;
   background: #fff;
 }
-
 /* Containers (for Cards, Accordions, etc.) */
 .CardsGrid .Card,
 .Accordion .Accordion-title,
@@ -188,41 +172,41 @@ export const EndpointEmbed = ({
   }, []);
 
   /* ------------------------------------------------------------------
-   *  Fetch & parse spec
+   *  Fetch & parse spec with ES5‑compatible syntax
    * ----------------------------------------------------------------*/
-  useEffect(() => {
+  useEffect(function () {
     if (!endpoint) return;
-    const run = async () => {
+    var run = async function () {
       setLoading(true);
       try {
         if (!window.__endpointSpecCache) window.__endpointSpecCache = {};
-        let spec = window.__endpointSpecCache[fullSpecUrl];
+        var spec = window.__endpointSpecCache[fullSpecUrl];
         if (!spec) {
-          const res = await fetch(fullSpecUrl);
-          if (!res.ok) throw new Error('fetch failed');
+          var res = await fetch(fullSpecUrl);
+          if (!res.ok) throw new Error("fetch failed");
           spec = await res.json();
           window.__endpointSpecCache[fullSpecUrl] = spec;
         }
-        const ops = spec.paths[endpoint];
-        if (!ops) throw new Error('missing path');
-        const m = method?.toLowerCase();
-        const opMethod = m && ops[m] ? m : Object.keys(ops)[0];
-        const op = ops[opMethod];
-        const example = extractExample(op, spec.components);
+        var ops = spec.paths[endpoint];
+        if (!ops) throw new Error("missing path");
+        var m = method ? method.toLowerCase() : undefined;
+        var opMethod = (m && ops[m]) ? m : Object.keys(ops)[0];
+        var op = ops[opMethod];
+        var example = extractExample(op, spec.components);
         setEndpointData({
           path: endpoint,
           method: opMethod.toUpperCase(),
-          summary: op.summary || '',
-          description: op.description || '',
-          example,
-          operationId: op.operationId || '',
+          summary: op.summary || "",
+          description: op.description || "",
+          example: example,
+          operationId: op.operationId || "",
           parameters: op.parameters || [],
           requestBody: op.requestBody || null,
           responses: op.responses || {},
           security: op.security || [],
-          tags: op.tags || [],
+          tags: op.tags || []
         });
-      } catch {
+      } catch (e) {
         setEndpointData(null);
       } finally {
         setLoading(false);
@@ -231,95 +215,132 @@ export const EndpointEmbed = ({
     run();
   }, [endpoint, fullSpecUrl, method]);
 
-  /* Helpers */
-  const resolveSchema = (schema, comps) => {
+  /* Helper functions – no optional chaining or Object.fromEntries */
+  function resolveSchema(schema, comps) {
     if (!schema) return null;
     if (schema.example !== undefined) return schema.example;
-    if (schema.$ref)
-      return resolveSchema(comps.schemas[schema.$ref.split('/').pop()], comps);
-    if (schema.type === 'object' && schema.properties) {
-      return Object.fromEntries(
-        Object.entries(schema.properties).map(([k, v]) => [k, resolveSchema(v, comps)])
-      );
+    if (schema.$ref) {
+      var refKey = schema.$ref.split("/").pop();
+      return resolveSchema(comps.schemas[refKey], comps);
     }
-    if (schema.type === 'array') return [resolveSchema(schema.items, comps)];
+    if (schema.type === "object" && schema.properties) {
+      var result = {};
+      Object.keys(schema.properties).forEach(function (k) {
+        result[k] = resolveSchema(schema.properties[k], comps);
+      });
+      return result;
+    }
+    if (schema.type === "array") return [resolveSchema(schema.items, comps)];
     return null;
-  };
+  }
 
-  const extractExample = (op, comps) => {
-    const resp = op.responses?.['200'] || Object.values(op.responses || {})[0];
-    const media = resp?.content?.['application/json'];
+  function extractExample(op, comps) {
+    var responses = op.responses || {};
+    var resp = responses["200"] || (Object.values(responses)[0]);
+    var media = resp && resp.content && resp.content["application/json"];
     if (!media) return null;
     if (media.example) return media.example;
-    if (media.examples) return Object.values(media.examples)[0]?.value;
+    if (media.examples) {
+      var vals = Object.values(media.examples);
+      if (vals.length > 0 && vals[0].value) return vals[0].value;
+    }
     return resolveSchema(media.schema, comps);
+  }
+
+  var readmeDocUrl =
+    (endpointData && endpointData.operationId)
+      ? websiteBaseUrl + "/reference/" + endpointData.operationId
+      : websiteBaseUrl + "/reference/" + endpoint.replace(/[\/{}]/g, "");
+  var apiFullUrl = apiTargetUrl ? (apiTargetUrl + endpoint) : null;
+  var label = function (txt) {
+    return labels ? <strong>{txt}: </strong> : null;
   };
 
-  const readmeDocUrl = endpointData?.operationId
-    ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
-    : `${websiteBaseUrl}/reference/${endpoint?.replace(/[\/{}]/g, '')}`;
-  const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
-  const label = (txt) => (labels ? <strong>{txt}: </strong> : null);
-
-  // ConnectionIndicator: When inline, render as a small inline-block element.
-  const ConnectionIndicator = ({ connected, inline }) => {
-    const style = inline
+  // ConnectionIndicator renders as a small inline-block element when inline.
+  var ConnectionIndicator = function ({ connected, inline }) {
+    var style = inline
       ? {
-          display: 'inline-block',
+          display: "inline-block",
           width: 8,
           height: 8,
-          borderRadius: '50%',
+          borderRadius: "50%",
           marginRight: 8,
-          alignSelf: 'center'
+          alignSelf: "center",
         }
       : {
-          position: 'absolute',
+          position: "absolute",
           top: 4,
           right: 4,
           width: 10,
           height: 10,
-          borderRadius: '50%'
+          borderRadius: "50%",
         };
     return (
       <div
-        style={{ ...style, backgroundColor: connected ? 'green' : 'red' }}
-        title={connected ? 'Synced' : 'Not Connected'}
+        style={{ ...style, backgroundColor: connected ? "green" : "red" }}
+        title={connected ? "Synced" : "Not Connected"}
       />
     );
   };
 
   /* UI Pieces */
-  const Card = ({ children, extra = '' }) => (
-    <div
-      className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} ${extra}`}
-      style={{ position: 'relative' }}
-    >
-      {children}
-    </div>
-  );
+  var Card = function ({ children, extra = "" }) {
+    return (
+      <div
+        className={
+          (theme === "simple" ? "endpoint-simple" : "endpoint-block") +
+          " " +
+          extra
+        }
+        style={{ position: "relative" }}
+      >
+        {children}
+      </div>
+    );
+  };
 
-  const MethodTag = ({ method }) => (
-    <span className={`method ${method.toLowerCase()}`}>{method}</span>
-  );
+  var MethodTag = function ({ method }) {
+    return (
+      <span className={"method " + method.toLowerCase()}>{method}</span>
+    );
+  };
 
-  // Fallback card for when full data is not loaded
-  const fallbackCard = (
-    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+  // Fallback card when data is not yet loaded
+  var fallbackCard = (
+    <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
       <Card>
         {show.summary && method && (
-          <div className="header-row" style={{ width: '100%' }}>
+          <div className="header-row" style={{ width: "100%" }}>
             <MethodTag method={method} />
-            <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
+            <ConnectionIndicator
+              connected={!!endpointData && !loading}
+              inline={true}
+            />
           </div>
         )}
         <div style={{ flexGrow: 1 }}>
-          <h3 style={{ margin: '0 0 0.5em' }}>{linkText || displayLinkText}</h3>
-          <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#6b7280' }}>
+          <h3 style={{ margin: "0 0 0.5em" }}>
+            {linkText || displayLinkText}
+          </h3>
+          <div
+            style={{
+              fontFamily: "monospace",
+              fontSize: "0.9rem",
+              color: "#6b7280",
+            }}
+          >
             {endpoint}
           </div>
           {show.apiUrl && apiTargetUrl && (
-            <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4b5563' }}>
-              API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: "0.9rem",
+                color: "#4b5563",
+              }}
+            >
+              API: {method ? method.toUpperCase() : ""}{" "}
+              {apiTargetUrl + endpoint}
             </div>
           )}
           {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
@@ -328,115 +349,164 @@ export const EndpointEmbed = ({
     </a>
   );
 
-  // Rendered full card (when data is loaded)
-  const renderedContent = endpointData && (
-    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
-      <Card>
-        {show.summary && endpointData.method && (
-          <div className="header-row" style={{ width: '100%' }}>
-            <MethodTag method={endpointData.method} />
-            <ConnectionIndicator connected={true} inline={true} />
+  // Full rendered card (when data is loaded)
+  var renderedContent =
+    endpointData && (
+      <a
+        href={readmeDocUrl}
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <Card>
+          {show.summary && endpointData.method && (
+            <div className="header-row" style={{ width: "100%" }}>
+              <MethodTag method={endpointData.method} />
+              <ConnectionIndicator connected={true} inline={true} />
+            </div>
+          )}
+          <div style={{ flexGrow: 1 }}>
+            <h3 style={{ margin: "0 0 0.5em" }}>
+              {linkText || endpointData.summary || displayLinkText}
+            </h3>
+            {show.description && endpointData.description && (
+              <p
+                style={{
+                  margin: "0 0 0.5em",
+                  fontSize: "0.9rem",
+                  color: "#374151",
+                }}
+              >
+                {endpointData.description}
+              </p>
+            )}
+            {show.parameters &&
+              endpointData.parameters.length > 0 && (
+                <div>
+                  {label("Parameters")}
+                  {endpointData.parameters
+                    .map(function (p) {
+                      return p.name;
+                    })
+                    .join(", ")}
+                </div>
+              )}
+            {show.requestBody && endpointData.requestBody && (
+              <div>
+                {label("Request Body")}Available
+              </div>
+            )}
+            {show.responses && endpointData.responses && (
+              <div>
+                {label("Responses")}
+                {Object.keys(endpointData.responses).join(", ")}
+              </div>
+            )}
+            {show.security &&
+              endpointData.security.length > 0 && (
+                <div>
+                  {label("Security")}
+                  {JSON.stringify(endpointData.security)}
+                </div>
+              )}
+            {show.tags &&
+              endpointData.tags.length > 0 && (
+                <div>
+                  {label("Tags")}
+                  {endpointData.tags.join(", ")}
+                </div>
+              )}
+            {show.example && endpointData.example && (
+              <pre
+                style={{
+                  background: "#f3f4f6",
+                  padding: 8,
+                  margin: "5px 0px",
+                  borderRadius: 6,
+                  fontSize: "0.85rem",
+                  overflowX: "auto",
+                }}
+              >
+                {JSON.stringify(endpointData.example, null, 2)}
+              </pre>
+            )}
+            {show.apiUrl && apiFullUrl && (
+              <div
+                style={{
+                  fontFamily: "monospace",
+                  fontSize: "0.9rem",
+                  color: "#4b5563",
+                }}
+              >
+                API: {endpointData.method} {apiFullUrl}
+              </div>
+            )}
+            {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
           </div>
-        )}
-        <div style={{ flexGrow: 1 }}>
-          <h3 style={{ margin: '0 0 0.5em' }}>
-            {linkText || endpointData.summary || displayLinkText}
-          </h3>
-          {show.description && endpointData.description && (
-            <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
-              {endpointData.description}
-            </p>
-          )}
-          {show.parameters && endpointData.parameters.length > 0 && (
-            <div>
-              {label('Parameters')}
-              {endpointData.parameters.map((p) => p.name).join(', ')}
-            </div>
-          )}
-          {show.requestBody && endpointData.requestBody && (
-            <div>{label('Request Body')}Available</div>
-          )}
-          {show.responses && endpointData.responses && (
-            <div>
-              {label('Responses')}
-              {Object.keys(endpointData.responses).join(', ')}
-            </div>
-          )}
-          {show.security && endpointData.security.length > 0 && (
-            <div>
-              {label('Security')}
-              {JSON.stringify(endpointData.security)}
-            </div>
-          )}
-          {show.tags && endpointData.tags.length > 0 && (
-            <div>
-              {label('Tags')}
-              {endpointData.tags.join(', ')}
-            </div>
-          )}
-          {show.example && endpointData.example && (
-            <pre style={{
-              background: '#f3f4f6',
-              padding: 8,
-              margin: '5px 0px',
-              borderRadius: 6,
-              fontSize: '0.85rem',
-              overflowX: 'auto'
-            }}>
-              {JSON.stringify(endpointData.example, null, 2)}
-            </pre>
-          )}
-          {show.apiUrl && apiFullUrl && (
-            <div style={{ fontFamily: 'monospace', fontSize: '0.9rem', color: '#4b5563' }}>
-              API: {endpointData.method} {apiFullUrl}
-            </div>
-          )}
-          {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-        </div>
-      </Card>
-    </a>
-  );
+        </Card>
+      </a>
+    );
 
   /* ------------------------------------------------------------------
-   *  Render
+   *  Render based on displayMode
    * ----------------------------------------------------------------*/
-  if (displayMode === 'popup') {
-    const linkStyle = {
-      textDecoration: 'none',
-      cursor: 'pointer',
-      color: '#1a73e8',
-      background: '#e8f0fe',
-      borderRadius: '4px',
-      padding: '2px 4px',
-      fontWeight: 600
+  if (displayMode === "popup") {
+    var linkStyle = {
+      textDecoration: "none",
+      cursor: "pointer",
+      color: "#1a73e8",
+      background: "#e8f0fe",
+      borderRadius: "4px",
+      padding: "2px 4px",
+      fontWeight: 600,
     };
     return (
       <span
-        style={{ display: 'inline-block', position: 'relative' }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        style={{ display: "inline-block", position: "relative" }}
+        onMouseEnter={function () {
+          setIsHovered(true);
+        }}
+        onMouseLeave={function () {
+          setIsHovered(false);
+        }}
       >
         <a href={readmeDocUrl} style={linkStyle}>
           {displayLinkText}
         </a>
         {isHovered && (
-          <div style={{ position: 'absolute', left: 0, zIndex: 1000, width: 420 }}>
+          <div style={{ position: "absolute", left: 0, zIndex: 1000, width: 420 }}>
             {!loading &&
               (endpointData ? (
-                <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <Card extra={`popup-card ${theme === 'simple' ? 'simple' : ''}`.trim()}>
+                <a
+                  href={readmeDocUrl}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <Card
+                    extra={
+                      ("popup-card " + (theme === "simple" ? "simple" : "")).trim()
+                    }
+                  >
                     {show.summary && endpointData.method && (
-                      <div className="header-row" style={{ width: '100%' }}>
+                      <div className="header-row" style={{ width: "100%" }}>
                         <MethodTag method={endpointData.method} />
-                        <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
+                        <ConnectionIndicator
+                          connected={!!endpointData && !loading}
+                          inline={true}
+                        />
                       </div>
                     )}
                     <div style={{ flexGrow: 1 }}>
-                      <h3 style={{ margin: '0 0 0.5em' }}>
-                        {linkText || endpointData.summary || displayLinkText}
+                      <h3 style={{ margin: "0 0 0.5em" }}>
+                        {linkText ||
+                          endpointData.summary ||
+                          displayLinkText}
                       </h3>
                       {show.description && endpointData.description && (
-                        <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
+                        <p
+                          style={{
+                            margin: "0 0 0.5em",
+                            fontSize: "0.9rem",
+                            color: "#374151",
+                          }}
+                        >
                           {endpointData.description}
                         </p>
                       )}
@@ -451,18 +521,13 @@ export const EndpointEmbed = ({
       </span>
     );
   }
-
-  // Inline mode: show fallback until data is loaded, then show full content.
+  // Inline mode: show fallback until data is loaded, then full content.
   if (!endpointData) {
-    return (
-      <div style={{ position: 'relative' }}>
-        {fallbackCard}
-      </div>
-    );
+    return <div style={{ position: "relative" }}>{fallbackCard}</div>;
   }
   return renderedContent;
 };
- 
+
 ## 💬 Popup Mode
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details.
@@ -485,7 +550,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
 
 ## 📄 Inline Mode
 
-<Columns layout="auto">
+<Columns layout="auto"> 
   
   <Column> 
     #### Block version:
