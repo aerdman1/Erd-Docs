@@ -130,34 +130,6 @@ export const EndpointEmbed = ({
   background: #fff;
 }
 
-/* Instead of a text arrow, consider using a CSS-generated arrow */
-.popup-card::after {
-  content: "";
-  position: absolute;
-  bottom: 100%; /* Positions it above the card */
-  left: 20px;  /* Adjust this value to align with your design */
-  border-width: 6px;
-  border-style: solid;
-  border-color: transparent transparent #fff transparent;
-}
-
-/* Optionally add a subtle shadow to the arrow */
-.popup-card::before {
-  content: "";
-  position: absolute;
-  bottom: calc(100% - 1px); /* Slightly offset from the card */
-  left: 20px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
-  z-index: -1;
-}
-
-/* Hide the default arrow if you still have the .arrow element inside */
-.popup-card .arrow {
-  display: none;
-}
-
 .CardsGrid .Card,
 .Accordion .Accordion-title,
 .CardsGrid .Card-icon, .Accordion {
