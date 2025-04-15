@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-## 💬 Popup Mode
+Popup Mode
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details.
 
@@ -28,17 +28,23 @@ On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, cons
 
 Renders the full endpoint card directly in the page.
 
-***
+<Columns layout="auto">
+  <Column>
+    #### Block version:
 
-#### Block version:
+    <EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+  </Column>
 
-<EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+  <Column>
+    #### Simple version:
 
-***
+    <EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+  </Column>
+</Columns>
 
-#### Simple version:
+<br />
 
-<EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+<br />
 
 ***
 
