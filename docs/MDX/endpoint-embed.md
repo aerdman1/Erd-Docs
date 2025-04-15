@@ -7,17 +7,9 @@ metadata:
 ---
 ## 🔗 Popup Mode
 
-When you want to keep your page uncluttered, use the `"popup"` display mode. The endpoint renders as a hyperlink. When users hover over it, they’ll see a card with full details.
+When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />. When users hover over it, they’ll see a card with full details.
 
-Example:
-
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />
-
-Another one:
-
-<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />
-
-This is ideal for adding context without overwhelming the page layout.
+Another one: <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />—which lets you preview how the search works without cluttering your layout.
 
 ***
 
