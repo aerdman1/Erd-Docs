@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-## Basic Usage
+#### Basic Usage
 
 ## 🔗 Popup Mode
 
