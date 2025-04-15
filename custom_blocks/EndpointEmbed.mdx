@@ -64,6 +64,8 @@ export const EndpointEmbed = ({
   border: none!important;
   padding: 0;
   margin-bottom: 8px;
+  /* Ensure position relative so children with absolute position are anchored */
+  position: relative;
 }
 /* The inner content container */
 .endpoint-block-content { flex-grow: 1; }
@@ -94,35 +96,6 @@ export const EndpointEmbed = ({
   font-size: 1.2rem;
   color: #6b7280;
 }
-/* Uncomment below if you ever want the Skeleton loading state back
-.skeleton {
-  width: 200px !important;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  opacity: 0.7;
-  min-height: 100px;
-}
-.skeleton-method,
-.skeleton-title,
-.skeleton-path {
-  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-  border-radius: 4px;
-}
-.skeleton-method { width: 50px; height: 12px; margin-bottom: 8px; }
-.skeleton-title { width: 60%; height: 16px; margin-bottom: 6px; }
-.skeleton-path { width: 80%; height: 12px; }
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-*/
 .popup-card {
   position: relative;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -231,13 +204,13 @@ export const EndpointEmbed = ({
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
   const label = (txt) => (labels ? <strong>{txt}: </strong> : null);
 
-  // A simple connection indicator component
+  // Updated connection indicator with fixed top-right positioning (using 4px offsets)
   const ConnectionIndicator = ({ connected }) => (
     <div
       style={{
         position: 'absolute',
-        top: 8,
-        right: 8,
+        top: 4,
+        right: 4,
         width: 10,
         height: 10,
         borderRadius: '50%',
@@ -250,7 +223,7 @@ export const EndpointEmbed = ({
 
   /* UI Pieces */
   const Card = ({ children, extra = '' }) => (
-    // Use endpoint-simple if theme is "simple", otherwise endpoint-block
+    // Ensure position: relative on the container in every case
     <div
       className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} ${extra}`}
       style={{ position: 'relative' }}
@@ -263,11 +236,9 @@ export const EndpointEmbed = ({
     <span className={`method ${method.toLowerCase()}`}>{method}</span>
   );
 
-  // Keeping the skeletonCard in case it is needed later
+  // Note: skeletonCard is kept in the code (commented out) for potential future use
   // const skeletonCard = (
-  //   <div
-  //     className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} skeleton popup-card`}
-  //   >
+  //   <div className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} skeleton popup-card`}>
   //     <div className="endpoint-block-content">
   //       <div className="skeleton-method"></div>
   //       <div className="skeleton-title"></div>
