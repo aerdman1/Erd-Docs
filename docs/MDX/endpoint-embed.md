@@ -13,10 +13,6 @@ When you want to keep your page uncluttered, you can use the "popup" display mod
 
 Hover over the link above to see a quick summary, description, and an example response for the `/pet` endpoint. This version is ideal if you want to provide more context only when needed.
 
-<Accordion title="My Embedded Endpoint" icon="fa-info-circle">
-  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
-</Accordion>
-
 Another example is <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />, which lets you dynamically look up pets based on availability (e.g. `available`, `pending`, `sold`). Hover to preview how this search works without cluttering the UI.
 
 ### Inline mode
@@ -70,3 +66,9 @@ This inline display is great for showing users how to **update** or **create** a
     <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
   </Card>
 </Cards>
+
+<br />
+
+<Accordion title="My Embedded Endpoint" icon="fa-info-circle">
+  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+</Accordion>
