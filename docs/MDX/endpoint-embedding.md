@@ -86,7 +86,7 @@ Renders the full endpoint card directly in the page.
 
 ***
 
-## 🗂️ Multiple Spec Files
+## 🗂️ Different Spec Files
 
 Swap `specFile` to pull from different OpenAPI files:
 
@@ -115,6 +115,36 @@ Swap `specFile` to pull from different OpenAPI files:
     apiUrl: true  
   }}
 />
+
+## Broken Spec File/Link?
+
+### We will fallback to the basics set in the component/props so it at leasts shows something
+
+<EndpointEmbed
+  endpoint="/v1/users"
+  method="POST"
+  specFile="DoesNotExist.json"
+  websiteBaseUrl="https://erdtest123.readme.io"
+  apiTargetUrl="https://api.novatest.com"
+  displayMode="inline"
+  linkText="Create User (NovaTest)"
+  theme="simple"
+  labels={true}
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    tags: true,  
+    example: true,  
+    readmeUrl: false,  
+    apiUrl: true  
+  }}
+/>
+
+<br />
 
 ***
 
