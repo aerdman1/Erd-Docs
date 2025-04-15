@@ -7,9 +7,11 @@ metadata:
 ---
 ### Basic Usage
 
-These examples show the default behavior with minimal details (only summary and description):
+## Popup (hover over):
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+
+## Inline (directly on the page):
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
@@ -17,37 +19,35 @@ These examples show the default behavior with minimal details (only summary and 
 
 # Advanced Usage
 
-Below are more advanced examples that demonstrate the component in different display modes and container types.
+Below are advanced examples demonstrating different display modes and container types.
 
 ## 🔗 Popup Mode
 
 When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this\
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.\
-When users hover over it, they’ll see a card with full details.
+When users hover over it, they’ll see a full-detail card.
 
-Another one:
+Another example:
 
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />
 
-which lets you preview how the search works without cluttering your layout.
+which lets you preview search functionality without cluttering the layout.
 
 ***
 
 ## 📦 Inline Mode
 
-If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the page flow.
+If you want all endpoint info immediately visible, `"inline"` mode renders the card directly in the page flow.
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />
 
 <EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
 
-This is great when you're walking users through specific request/response flows.
-
 ***
 
 ## 🗂️ Works with Any Spec File
 
-You can point to other OpenAPI files by changing the `specFile` prop. Useful if you’re documenting multiple services.
+Switch OpenAPI files by changing `specFile`. For example:
 
 <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
 
@@ -57,19 +57,19 @@ You can point to other OpenAPI files by changing the `specFile` prop. Useful if 
 
 ## 🧱 Inside Cards
 
-This component plays nicely inside ReadMe's `<Cards>` layout. Great for overview sections or dashboards.
+Embed this component within ReadMe's `<Cards>` layout:
 
 <Cards columns={2}>
   <Card title="User Management" icon="fa-user-cog">
-    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
+    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-    <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
+    <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
   </Card>
 
   <Card title="Posts API" icon="fa-file-alt">
-    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" />
+    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-    <EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
+    <EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
   </Card>
 </Cards>
 
@@ -77,32 +77,20 @@ This component plays nicely inside ReadMe's `<Cards>` layout. Great for overview
 
 ## 🔽 Inside Accordions
 
-Perfect for FAQs or progressive disclosure.
+Great for FAQs or progressive disclosure:
 
 <Accordion title="Upload a Pet Image" icon="fa-image">
-  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 </Accordion>
 
 <Accordion title="Delete Pet by ID" icon="fa-trash">
-  <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" />
+  <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 </Accordion>
 
 ***
 
 ## ➗ Inside Columns
 
-Use `<Columns>` to organize multiple endpoints side by side.
+Organize multiple endpoints side by side:
 
-<Columns layout="auto">
-  <Column>
-    <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" />
-  </Column>
-
-  <Column>
-    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" />
-  </Column>
-
-  <Column>
-    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" />
-  </Column>
-</Columns>
+<Columns layout="auto"> <Column> <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> </Columns> \`\`\`
