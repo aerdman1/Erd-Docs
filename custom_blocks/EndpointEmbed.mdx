@@ -21,7 +21,7 @@ export const EndpointEmbed = ({
     security: false,
     example: false,
     readmeUrl: false,
-    apiUrl: false,  // New toggle to display the actual API URL
+    apiUrl: false, // New toggle to display the actual API URL
   }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
@@ -34,6 +34,95 @@ export const EndpointEmbed = ({
   const displayLinkText = linkText || endpoint;
   // Build full spec URL using websiteBaseUrl:
   const fullSpecUrl = `${websiteBaseUrl}/openapi/${specFile}`;
+
+  // Inject shared CSS into document head exactly once.
+  useEffect(() => {
+    if (!document.getElementById('endpoint-embed-styles')) {
+      const style = document.createElement('style');
+      style.id = 'endpoint-embed-styles';
+      style.textContent = `
+        .card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #f9f9f9 !important;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          padding: 16px;
+          text-decoration: none !important;
+          color: inherit;
+          transition: background 0.2s;
+          margin-bottom: 8px;
+        }
+        .card:hover {
+          background: #7dbeff1c;
+          border: 1px solid #018ef5;
+        }
+        .card-content { flex-grow: 1; }
+        .card h3 {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: bold;
+          color: #111827 !important;
+        }
+        .method {
+          font-weight: bold;
+          text-transform: uppercase;
+          font-size: 0.85rem;
+          margin-bottom: 4px;
+          display: block;
+        }
+        .method.get { color: #2563eb; }
+        .method.post { color: #16a34a; }
+        .method.put { color: #ca8a04; }
+        .method.delete { color: #dc2626; }
+        .path {
+          font-family: monospace;
+          font-size: 0.9rem;
+          color: #6b7280;
+        }
+        .arrow { font-size: 1.2rem; color: #6b7280; }
+        .skeleton {
+          width: 420px !important;
+          background: #f3f4f6;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          opacity: 0.7;
+          min-height: 100px;
+        }
+        .skeleton-method, .skeleton-title, .skeleton-path {
+          background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite linear;
+          border-radius: 4px;
+        }
+        .skeleton-method { width: 50px; height: 12px; margin-bottom: 8px; }
+        .skeleton-title { width: 60%; height: 16px; margin-bottom: 6px; }
+        .skeleton-path { width: 80%; height: 12px; }
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        [data-color-mode=dark] .card { background: #0000007a; }
+        @media (prefers-color-scheme: dark) {
+          [data-color-mode=system] .card { background:#0000007a; }
+        }
+        [data-color-mode=dark] .card:hover { background:black; }
+        @media (prefers-color-scheme: dark) {
+          [data-color-mode=system] .card:hover { background:black; }
+        }
+        [data-color-mode=dark] .card h3 { color: #fff; }
+        @media (prefers-color-scheme: dark) {
+          [data-color-mode=system] .card h3 { color: #fff; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   useEffect(() => {
     if (!endpoint) {
@@ -312,90 +401,10 @@ export const EndpointEmbed = ({
       {loading && skeletonCard}
       {error && !loading && errorCard}
       {!loading && !error && renderedContent}
-      <style>{`
-        .card {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          background: #f9f9f9 !important;
-          border: 1px solid #d1d5db;
-          border-radius: 8px;
-          padding: 16px;
-          text-decoration: none !important;
-          color: inherit;
-          transition: background 0.2s;
-          margin-bottom: 8px;
-        }
-        .card:hover {
-          background: #7dbeff1c;
-          border: 1px solid #018ef5;
-        }
-        .card-content { flex-grow: 1; }
-        .card h3 {
-          margin: 0;
-          font-size: 1rem;
-          font-weight: bold;
-          color: #111827 !important;
-        }
-        .method {
-          font-weight: bold;
-          text-transform: uppercase;
-          font-size: 0.85rem;
-          margin-bottom: 4px;
-          display: block;
-        }
-        .method.get { color: #2563eb; }
-        .method.post { color: #16a34a; }
-        .method.put { color: #ca8a04; }
-        .method.delete { color: #dc2626; }
-        .path {
-          font-family: monospace;
-          font-size: 0.9rem;
-          color: #6b7280;
-        }
-        .arrow { font-size: 1.2rem; color: #6b7280; }
-        .skeleton {
-          width: 420px !important;
-          background: #f3f4f6;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          padding: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          opacity: 0.7;
-          min-height: 100px;
-        }
-        .skeleton-method, .skeleton-title, .skeleton-path {
-          background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.5s infinite linear;
-          border-radius: 4px;
-        }
-        .skeleton-method { width: 50px; height: 12px; margin-bottom: 8px; }
-        .skeleton-title { width: 60%; height: 16px; margin-bottom: 6px; }
-        .skeleton-path { width: 80%; height: 12px; }
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
-        [data-color-mode=dark] .card { background: #0000007a; }
-        @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card { background:#0000007a; }
-        }
-        [data-color-mode=dark] .card:hover { background:black; }
-        @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card:hover { background:black; }
-        }
-        [data-color-mode=dark] .card h3 { color: #fff; }
-        @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card h3 { color: #fff; }
-        }
-      `}</style>
     </>
   );
 };
-
+ 
 ## Basic Usage 
 
 ## 💬 Popup Mode
