@@ -42,8 +42,6 @@ export const EndpointEmbed = ({
     const style = document.createElement('style');
     style.id = 'endpoint-embed-styles';
     style.textContent = `
-/* Replacing .card with .endpoint-block for the standard style
-   and .endpoint-simple for the simple style */
 .endpoint-block {
   display: flex;
   align-items: center;
@@ -530,11 +528,19 @@ Renders a clickable label. On hover, a card appears with endpoint details.
 
 Renders the full endpoint card directly in the page.
 
-#### Card version:
+___
+
+#### Block version:
 
 <EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
 
+___
+
+#### Simple version: 
+
 <EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+
+___
 
 #### Full version:
 
@@ -559,7 +565,7 @@ Renders the full endpoint card directly in the page.
   }}  
 />
 
----
+___
 
 ## 🗂️ Multiple Spec Files
 
