@@ -73,6 +73,26 @@ export const EndpointEmbed = ({
   position: relative;
 }
 
+/* Arrow shown on hover in top-right */
+.endpoint-block::after,
+.endpoint-simple::after {
+  content: '↗';
+  font-size: 0.75rem;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #6b7280; /* subtle gray */
+}
+
+/* Reveal on hover */
+.endpoint-block:hover::after,
+.endpoint-simple:hover::after {
+  opacity: 1;
+} 
+
+
 /* Header row (for method and connection indicator) */
 .header-row {
     display: flex;
