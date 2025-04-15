@@ -21,6 +21,8 @@ Here's a simple inline demo using a different endpoint. For example, this compon
 
 If you want all endpoint information to be immediately visible without any user interaction, "inline" mode is a great choice. This demo keeps it simple and focuses on a real-world endpoint in your API.
 
+***
+
 <br />
 
 ## Advanced Usage
