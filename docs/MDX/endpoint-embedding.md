@@ -15,7 +15,7 @@ metadata:
 
 #### Example with all props enabled:
 
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Showing all props with a custom label" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Showing all props with a custom label" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="card" labels={true} show={{
     summary: true,
     description: true,
     parameters: true,
