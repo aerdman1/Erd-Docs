@@ -346,10 +346,10 @@ const renderedContent = endpointData && (
 ## Popup (hover over):
 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> Morbi ornare nibh at rutrum pulvinar. Aliquam varius urna in pellentesque tempus. Vestibulum gravida mattis sem, at hendrerit nisi elementum at. Ut ut sodales neque. Pellentesque malesuada libero auctor eros elementum condimentum. Aenean vel consectetur eros. Sed turpis ligula, vehicula non lobortis eu, mollis eu mauris. Duis in gravida libero. Etiam eget turpis ut dui cursus cursus eget vel nisi. Morbi eros erat, mattis nec nunc at, placerat mollis ex.
-## Inline (directly on the page):
+When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.   When users hover over it, they’ll see a full-detail card.
 
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+Another example:  <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />   which lets you preview search functionality without cluttering the layout.
+
 ---
 
 # Advanced Usage
@@ -358,13 +358,7 @@ Below are advanced examples demonstrating different display modes and container 
 
 ## 🔗 Popup Mode
 
-When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this  
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.  
-When users hover over it, they’ll see a full-detail card.
 
-Another example:  
-<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />  
-which lets you preview search functionality without cluttering the layout.
 
 ---
 
