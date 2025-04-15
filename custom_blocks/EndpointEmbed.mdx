@@ -146,14 +146,24 @@ export const EndpointEmbed = ({
 
 .popup-card:hover {
   transform: translateY(4px);
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.05);
 }
 
-/* Remove arrow styling completely */
-.popup-card .arrow,
-.popup-card::after,
-.popup-card::before {
-  display: none;
+/* Arrow on top-right of popup cards */
+.popup-card::after {
+  content: '↗';
+  font-size: 0.75rem;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: #6b7280;
+}
+
+/* Show arrow on hover */
+.popup-card:hover::after {
+  opacity: 1;
 }
 
 /* Simple theme overrides */
