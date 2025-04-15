@@ -5,13 +5,9 @@ hidden: false
 metadata:
   robots: index
 ---
-# Basic Usage
-
 ## Popup (hover over):
 
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ornare nibh at rutrum pulvinar. Aliquam varius urna in pellentesque tempus. Vestibulum gravida mattis sem, at hendrerit nisi elementum at. Ut ut sodales neque. Pellentesque malesuada libero auctor eros elementum condimentum. Aenean vel consectetur eros. Sed turpis ligula, vehicula non lobortis eu, mollis eu mauris. Duis in gravida libero. Etiam eget turpis ut dui cursus cursus eget vel nisi. Morbi eros erat, mattis nec nunc at, placerat mollis ex.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ornare nibh at rutrum pulvinar. Aliquam varius urna in pellentesque tempus. Vestibulum gravida mattis sem, at hendrerit nisi elementum at. Ut ut sodales neque. Pellentesque malesuada libero auctor eros elementum condimentum. Aenean vel consectetur eros. Sed turpis ligula, vehicula non lobortis eu, mollis eu mauris. Duis in gravida libero. Etiam eget turpis ut dui cursus cursus eget vel nisi. Morbi eros erat, mattis nec nunc at, placerat mollis ex.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> Morbi ornare nibh at rutrum pulvinar. Aliquam varius urna in pellentesque tempus. Vestibulum gravida mattis sem, at hendrerit nisi elementum at. Ut ut sodales neque. Pellentesque malesuada libero auctor eros elementum condimentum. Aenean vel consectetur eros. Sed turpis ligula, vehicula non lobortis eu, mollis eu mauris. Duis in gravida libero. Etiam eget turpis ut dui cursus cursus eget vel nisi. Morbi eros erat, mattis nec nunc at, placerat mollis ex.
 
 ## Inline (directly on the page):
 
