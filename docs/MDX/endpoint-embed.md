@@ -5,19 +5,11 @@ hidden: false
 metadata:
   robots: index
 ---
-## Popup (hover over):
-
-When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.   When users hover over it, they’ll see a full-detail card.
-
-Another example:  <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />   which lets you preview search functionality without cluttering the layout.
-
-***
-
-# Advanced Usage
-
-Below are advanced examples demonstrating different display modes and container types.
+# Basic Usage
 
 ## 🔗 Popup Mode
+
+When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />. When users hover over it, they’ll see a full-detail card.
 
 ***
 
@@ -40,6 +32,8 @@ Switch OpenAPI files by changing `specFile`. For example:
 <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" />
 
 ***
+
+# Advanced Usage
 
 ## 🧱 Inside Cards
 
