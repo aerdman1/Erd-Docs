@@ -5,11 +5,12 @@ hidden: false
 metadata:
   robots: index
 ---
-## Popup Mode
+## 💬 Popup Mode
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details.
 
-On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Full Details" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="endpoint-block" labels={true} show={{  
+On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Full Details" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="endpoint-block" labels={true} show={{  
     summary: true,  
     description: true,  
     parameters: true,  
@@ -20,56 +21,69 @@ On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, cons
     example: true,  
     readmeUrl: true,  
     apiUrl: true  
-  }} /> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
+  }} />  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
 
 ***
 
 ## 📄 Inline Mode
 
-Renders the full endpoint card directly in the page.
-
 <Columns layout="auto">
   <Column>
     #### Block version:
 
-    <EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+    <EndpointEmbed
+      endpoint="/pet"
+      method="PUT"
+      specFile="ErdSpec1.json"
+      linkText="Full Details"
+      displayMode="inline"
+      websiteBaseUrl="https://erdtest123.readme.io"
+      apiTargetUrl="https://api.erdman.com"
+      theme="endpoint-block"
+      labels={true}
+      show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: false,  
+    responses: true,  
+    security: false,  
+    example: false,
+    readmeUrl: false,  
+    apiUrl: false  
+  }}
+    />
   </Column>
 
   <Column>
     #### Simple version:
 
-    <EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
-  </Column>
-</Columns>
-
-<br />
-
-<br />
-
-***
-
-#### Full version:
-
-<EndpointEmbed
-  endpoint="/pet"
-  method="POST"
-  specFile="ErdSpec1.json"
-  displayMode="inline"
-  apiTargetUrl="https://example.com"
-  linkText="Custom Label (POST)"
-  show={{  
+    <EndpointEmbed
+      endpoint="/pet"
+      method="PUT"
+      specFile="ErdSpec1.json"
+      linkText="Full Details"
+      displayMode="inline"
+      websiteBaseUrl="https://erdtest123.readme.io"
+      apiTargetUrl="https://api.erdman.com"
+      theme="simple"
+      labels={true}
+      show={{  
     summary: true,  
     description: true,  
     parameters: true,  
-    requestBody: true,  
-    responses: true,  
-    security: true,  
     tags: true,  
-    example: true,  
-    readmeUrl: true,  
-    apiUrl: true  
+    requestBody: false,  
+    responses: true,  
+    security: false,  
+    example: false,  
+    readmeUrl: false,  
+    apiUrl: false  
   }}
-/>
+    />
+  </Column>
+</Columns>
 
 ***
 
