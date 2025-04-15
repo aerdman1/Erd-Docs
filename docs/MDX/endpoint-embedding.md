@@ -30,9 +30,9 @@ This version includes all available options—description, parameters, request b
     description: true,
     parameters: true,
     tags: true,
-    requestBody: false,
-    responses: false,
-    security: false,
+    requestBody: true,
+    responses: true,
+    security: true,
     example: false,
     readmeUrl: false,
     apiUrl: false
