@@ -9,7 +9,17 @@ export const EndpointEmbed = ({
   method, // Optional prop to specify HTTP method, e.g., 'GET', 'POST'
   displayMode = 'popup',
   linkText,
-  specFile = "ErdSpec1.json"
+  specFile = "ErdSpec1.json",
+  show = {
+    summary: true,
+    description: true,
+    parameters: true,
+    requestBody: true,
+    responses: true,
+    security: true,
+    tags: true,
+    example: true,
+  }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
   const [error, setError] = useState(null);
@@ -27,6 +37,7 @@ export const EndpointEmbed = ({
       return;
     }
     fetchEndpointExample();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endpoint, fullSpecUrl, method]);
 
   const fetchEndpointExample = async () => {
@@ -192,9 +203,9 @@ export const EndpointEmbed = ({
     ? `${baseUrl}/reference/${endpointData.operationId}`
     : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
-  // Render additional metadata sections.
+  // Render additional metadata sections using the "show" prop to toggle visibility.
   const renderParameters = () => {
-    if (!endpointData.parameters.length) return null;
+    if (!show.parameters || !endpointData.parameters.length) return null;
     return (
       <div>
         <strong>Parameters:</strong>
@@ -213,7 +224,7 @@ export const EndpointEmbed = ({
   };
 
   const renderRequestBody = () => {
-    if (!endpointData.requestBody) return null;
+    if (!show.requestBody || !endpointData.requestBody) return null;
     // For brevity, show description and available media types.
     const contentTypes = endpointData.requestBody.content ? Object.keys(endpointData.requestBody.content) : [];
     return (
@@ -228,7 +239,7 @@ export const EndpointEmbed = ({
   };
 
   const renderResponses = () => {
-    if (!endpointData.responses || Object.keys(endpointData.responses).length === 0) return null;
+    if (!show.responses || !endpointData.responses || Object.keys(endpointData.responses).length === 0) return null;
     return (
       <div>
         <strong>Responses:</strong>
@@ -244,7 +255,7 @@ export const EndpointEmbed = ({
   };
 
   const renderSecurity = () => {
-    if (!endpointData.security.length) return null;
+    if (!show.security || !endpointData.security.length) return null;
     return (
       <div>
         <strong>Security:</strong>
@@ -256,7 +267,7 @@ export const EndpointEmbed = ({
   };
 
   const renderTags = () => {
-    if (!endpointData.tags.length) return null;
+    if (!show.tags || !endpointData.tags.length) return null;
     return (
       <div>
         <strong>Tags:</strong> {endpointData.tags.join(', ')}
@@ -273,6 +284,35 @@ export const EndpointEmbed = ({
     );
   };
 
+  const renderSummary = () => {
+    if (!show.summary || !endpointData.summary) return null;
+    return <p><strong>Summary:</strong> {endpointData.summary}</p>;
+  };
+
+  const renderDescription = () => {
+    if (!show.description || !endpointData.description) return null;
+    return <p><strong>Description:</strong> {endpointData.description}</p>;
+  };
+
+  const renderExample = () => {
+    if (!show.example || !endpointData.example) return null;
+    return (
+      <div>
+        <strong>Example Response:</strong>
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap',
+            padding: '8px',
+            borderRadius: '4px',
+            marginTop: '8px'
+          }}
+        >
+          {JSON.stringify(endpointData.example, null, 2)}
+        </pre>
+      </div>
+    );
+  };
+
   // Render the main content card.
   const renderedContent = endpointData && (
     <div style={cardStyle}>
@@ -281,31 +321,15 @@ export const EndpointEmbed = ({
           {displayLinkText}
         </a>
       </h3>
-      {endpointData.deprecated && renderDeprecated()}
-      {endpointData.summary && <p><strong>Summary:</strong> {endpointData.summary}</p>}
-      {endpointData.description && <p><strong>Description:</strong> {endpointData.description}</p>}
+      {renderDeprecated()}
+      {renderSummary()}
+      {renderDescription()}
       {renderParameters()}
       {renderRequestBody()}
       {renderResponses()}
       {renderSecurity()}
       {renderTags()}
-      {endpointData.example ? (
-        <div>
-          <strong>Example Response:</strong>
-          <pre
-            style={{
-              whiteSpace: 'pre-wrap',
-              padding: '8px',
-              borderRadius: '4px',
-              marginTop: '8px'
-            }}
-          >
-            {JSON.stringify(endpointData.example, null, 2)}
-          </pre>
-        </div>
-      ) : (
-        <p>No example available.</p>
-      )}
+      {renderExample()}
     </div>
   );
 
@@ -369,84 +393,11 @@ export const EndpointEmbed = ({
   );
 };
 
-## 🔗 Popup Mode
-
-When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />. When users hover over it, they’ll see a card with full details.
-
-Another one: <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />—which lets you preview how the search works without cluttering your layout.
-
-***
-
-## 📦 Inline Mode
-
-If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the flow of the page content.
-
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />
-
-<EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
-
-This is great when you're walking users through specific request/response flows.
-
-***
-
-## 🗂️ Works with Any Spec File
-
-You can point to other OpenAPI files by changing the `specFile` prop. Useful if you’re documenting multiple services.
-
-<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
-
-<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" />
-
-***
-
-## 🧱 Inside Cards
-
-This component plays nice inside ReadMe's `<Cards>` layout. Great for overview sections or dashboards.
-
-<Cards columns={2}>
-  <Card title="User Management" icon="fa-user-cog">
-    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
-
-    <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
-  </Card>
-
-  <Card title="Posts API" icon="fa-file-alt">
-    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" />
-
-    <EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
-  </Card>
-</Cards>
-
-***
-
-## 🔽 Inside Accordions
-
-Perfect for FAQs or progressive disclosure.
-
-<Accordion title="Upload a Pet Image" icon="fa-image">
-  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
-</Accordion>
-
-<Accordion title="Delete Pet by ID" icon="fa-trash">
-  <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" />
-</Accordion>
-
-***
-
-## ➗ Inside Columns
-
-Use `<Columns>` to organize multiple endpoints side by side.
-
-<Columns layout="auto">
-  <Column>
-    <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" />
-  </Column>
-
-  <Column>
-    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" />
-  </Column>
-
-  <Column>
-    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" />
-  </Column>
-</Columns>
+<EndpointEmbed 
+  endpoint="/pet" 
+  method="PUT" 
+  specFile="ErdSpec1.json" 
+  linkText="Pet Endpoint" 
+  displayMode="popup" 
+  show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }}
+/>
