@@ -32,20 +32,16 @@ export const EndpointEmbed = ({
   const [fadeIn, setFadeIn] = useState(false);
 
   const displayLinkText = linkText || endpoint;
-  const fullSpecUrl = useMemo(
-    function () {
-      return websiteBaseUrl + "/openapi/" + specFile;
-    },
-    [websiteBaseUrl, specFile]
-  );
+  const fullSpecUrl = useMemo(() => {
+    return websiteBaseUrl + "/openapi/" + specFile;
+  }, [websiteBaseUrl, specFile]);
 
   /* ------------------------------------------------------------------
    *  Inject shared CSS once (using a backtick template literal for clarity)
-   *  Added keyframes for the pulse animation and basic skeleton styles.
    * ----------------------------------------------------------------*/
-  useEffect(function () {
+  useEffect(() => {
     if (document.getElementById("embed-styles")) return;
-    var style = document.createElement("style");
+    const style = document.createElement("style");
     style.id = "embed-styles";
     style.textContent = `
       /* Shared color palette */
@@ -68,7 +64,7 @@ export const EndpointEmbed = ({
         color: inherit;
         margin-bottom: 8px;
         width: auto;
-				max-width: 100%;
+        max-width: 100%;
         position: relative;
       }
 
@@ -197,27 +193,34 @@ export const EndpointEmbed = ({
   }, []);
 
   /* ------------------------------------------------------------------
-   *  Fetch & parse spec with ES5‑compatible syntax
+   *  Fetch & parse spec with logging for debugging caching issues
    * ----------------------------------------------------------------*/
-  useEffect(function () {
+  useEffect(() => {
     if (!endpoint) return;
-    var run = async function () {
+    const run = async () => {
       setLoading(true);
       try {
         if (!window.__endpointSpecCache) window.__endpointSpecCache = {};
-        var spec = window.__endpointSpecCache[fullSpecUrl];
-        if (!spec) {
-          var res = await fetch(fullSpecUrl);
+        let spec = window.__endpointSpecCache[fullSpecUrl];
+        if (spec) {
+          console.log(`[CACHE HIT] Spec from cache for ${fullSpecUrl}:`, spec);
+        } else {
+          const res = await fetch(fullSpecUrl);
           if (!res.ok) throw new Error("fetch failed");
           spec = await res.json();
+          console.log(`[FETCH] New spec retrieved from ${fullSpecUrl}:`, spec);
           window.__endpointSpecCache[fullSpecUrl] = spec;
         }
-        var ops = spec.paths[endpoint];
-        if (!ops) throw new Error("missing path");
-        var m = method ? method.toLowerCase() : undefined;
-        var opMethod = (m && ops[m]) ? m : Object.keys(ops)[0];
-        var op = ops[opMethod];
-        var example = extractExample(op, spec.components);
+        // Log the spec file received (or not) for the given endpoint
+        if (!spec.paths || !spec.paths[endpoint]) {
+          console.error(`Spec does not contain endpoint "${endpoint}":`, spec);
+          throw new Error("missing path");
+        }
+        const ops = spec.paths[endpoint];
+        const m = method ? method.toLowerCase() : undefined;
+        const opMethod = (m && ops[m]) ? m : Object.keys(ops)[0];
+        const op = ops[opMethod];
+        const example = extractExample(op, spec.components);
         setEndpointData({
           path: endpoint,
           method: opMethod.toUpperCase(),
@@ -232,6 +235,7 @@ export const EndpointEmbed = ({
           tags: op.tags || []
         });
       } catch (e) {
+        console.error("Error fetching or processing spec:", e);
         setEndpointData(null);
       } finally {
         setLoading(false);
@@ -252,12 +256,12 @@ export const EndpointEmbed = ({
     if (!schema) return null;
     if (schema.example !== undefined) return schema.example;
     if (schema.$ref) {
-      var refKey = schema.$ref.split("/").pop();
+      const refKey = schema.$ref.split("/").pop();
       return resolveSchema(comps.schemas[refKey], comps);
     }
     if (schema.type === "object" && schema.properties) {
-      var result = {};
-      Object.keys(schema.properties).forEach(function (k) {
+      const result = {};
+      Object.keys(schema.properties).forEach(k => {
         result[k] = resolveSchema(schema.properties[k], comps);
       });
       return result;
@@ -267,30 +271,28 @@ export const EndpointEmbed = ({
   }
 
   function extractExample(op, comps) {
-    var responses = op.responses || {};
-    var resp = responses["200"] || (Object.values(responses)[0]);
-    var media = resp && resp.content && resp.content["application/json"];
+    const responses = op.responses || {};
+    const resp = responses["200"] || Object.values(responses)[0];
+    const media = resp && resp.content && resp.content["application/json"];
     if (!media) return null;
     if (media.example) return media.example;
     if (media.examples) {
-      var vals = Object.values(media.examples);
+      const vals = Object.values(media.examples);
       if (vals.length > 0 && vals[0].value) return vals[0].value;
     }
     return resolveSchema(media.schema, comps);
   }
 
-  var readmeDocUrl =
+  const readmeDocUrl =
     (endpointData && endpointData.operationId)
       ? websiteBaseUrl + "/reference/" + endpointData.operationId
       : websiteBaseUrl + "/reference/" + endpoint.replace(/[\/{}]/g, "");
-  var apiFullUrl = apiTargetUrl ? (apiTargetUrl + endpoint) : null;
-  var label = function (txt) {
-    return labels ? <strong>{txt}: </strong> : null;
-  };
+  const apiFullUrl = apiTargetUrl ? (apiTargetUrl + endpoint) : null;
+  const label = txt => (labels ? <strong>{txt}: </strong> : null);
 
   // ConnectionIndicator renders as a small inline-block element when inline.
-  var ConnectionIndicator = function ({ connected, inline }) {
-    var style = inline
+  const ConnectionIndicator = ({ connected, inline }) => {
+    const style = inline
       ? {
           display: "inline-block",
           width: 8,
@@ -316,14 +318,10 @@ export const EndpointEmbed = ({
   };
 
   /* UI Pieces */
-  var Card = function ({ children, extra = "" }) {
+  const Card = ({ children, extra = "" }) => {
     return (
       <div
-        className={
-          (theme === "simple" ? "endpoint-simple" : "endpoint-block") +
-          " " +
-          extra
-        }
+        className={(theme === "simple" ? "endpoint-simple" : "endpoint-block") + " " + extra}
         style={{ position: "relative" }}
       >
         {children}
@@ -331,10 +329,8 @@ export const EndpointEmbed = ({
     );
   };
 
-  var MethodTag = function ({ method }) {
-    return (
-      <span className={"method " + method.toLowerCase()}>{method}</span>
-    );
+  const MethodTag = ({ method }) => {
+    return <span className={"method " + method.toLowerCase()}>{method}</span>;
   };
 
   // Skeleton placeholder to show while loading
@@ -356,21 +352,16 @@ export const EndpointEmbed = ({
   );
 
   // Fallback card when no data is available (used only if not loading)
-  var fallbackCard = (
+  const fallbackCard = (
     <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
       <div
-        className={
-          ("popup-card " + (theme === "simple" ? "simple" : "")).trim()
-        }
+        className={("popup-card " + (theme === "simple" ? "simple" : "")).trim()}
         style={{ position: "relative" }}
       >
         {show.summary && method && (
           <div className="header-row" style={{ width: "100%" }}>
             <MethodTag method={method} />
-            <ConnectionIndicator
-              connected={!!endpointData && !loading}
-              inline={true}
-            />
+            <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
           </div>
         )}
         <div style={{ flexGrow: 1 }}>
@@ -404,16 +395,15 @@ export const EndpointEmbed = ({
   );
 
   // Full rendered card (when data is loaded) with fade-in transition
-  var renderedContent =
+  const renderedContent =
     endpointData && (
-      <div style={{ 
-        opacity: fadeIn ? 1 : 0, 
-        transition: "opacity 0.5s ease-in-out" 
-      }}>
-        <a
-          href={readmeDocUrl}
-          style={{ textDecoration: "none", color: "inherit" }}
-        >
+      <div
+        style={{
+          opacity: fadeIn ? 1 : 0,
+          transition: "opacity 0.5s ease-in-out"
+        }}
+      >
+        <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
           <Card>
             {show.summary && endpointData.method && (
               <div className="header-row" style={{ width: "100%" }}>
@@ -426,13 +416,7 @@ export const EndpointEmbed = ({
                 {linkText || endpointData.summary || displayLinkText}
               </h3>
               {show.description && endpointData.description && (
-                <p
-                  style={{
-                    margin: "0 0 0.5em",
-                    fontSize: "0.9rem",
-                    color: "#374151",
-                  }}
-                >
+                <p style={{ margin: "0 0 0.5em", fontSize: "0.9rem", color: "#374151" }}>
                   {endpointData.description}
                 </p>
               )}
@@ -440,11 +424,7 @@ export const EndpointEmbed = ({
                 endpointData.parameters.length > 0 && (
                   <div>
                     {label("Parameters")}
-                    {endpointData.parameters
-                      .map(function (p) {
-                        return p.name;
-                      })
-                      .join(", ")}
+                    {endpointData.parameters.map(p => p.name).join(", ")}
                   </div>
                 )}
               {show.requestBody && endpointData.requestBody && (
@@ -508,7 +488,7 @@ export const EndpointEmbed = ({
    *  Render based on displayMode
    * ----------------------------------------------------------------*/
   if (displayMode === "popup") {
-    var linkStyle = {
+    const linkStyle = {
       textDecoration: "none",
       cursor: "pointer",
       color: "#1a73e8",
@@ -520,10 +500,10 @@ export const EndpointEmbed = ({
     return (
       <span
         style={{ display: "inline-block", position: "relative" }}
-        onMouseEnter={function () {
+        onMouseEnter={() => {
           setIsHovered(true);
         }}
-        onMouseLeave={function () {
+        onMouseLeave={() => {
           setIsHovered(false);
         }}
       >
@@ -536,10 +516,12 @@ export const EndpointEmbed = ({
               <SkeletonCard />
             ) : (
               endpointData ? (
-                <div style={{ 
-                  opacity: fadeIn ? 1 : 0, 
-                  transition: "opacity 0.5s ease-in-out" 
-                }}>
+                <div
+                  style={{
+                    opacity: fadeIn ? 1 : 0,
+                    transition: "opacity 0.5s ease-in-out",
+                  }}
+                >
                   <a
                     href={readmeDocUrl}
                     style={{ textDecoration: "none", color: "inherit" }}
@@ -582,7 +564,7 @@ export const EndpointEmbed = ({
       </span>
     );
   }
-  
+
   // Inline mode: Always show Skeleton if loading; show fallback only if no data is available after loading.
   if (loading) {
     return <div style={{ position: "relative" }}><SkeletonCard /></div>;
@@ -593,7 +575,7 @@ export const EndpointEmbed = ({
   return renderedContent;
 };
 
-## 💬 Popup Mode 
+## 💬 Popup Mode  
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details.
 
