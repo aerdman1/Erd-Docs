@@ -9,8 +9,6 @@ metadata:
 
 When you want to keep your page clean and uncluttered, the "popup" display mode is the perfect solution. In this mode, the endpoint appears as a simple hyperlink—like this <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" show={{ summary: true, description: true, parameters: true, requestBody: true, responses: true, security: true, tags: true, example: false }} />—and when users hover over it, a card pops up, revealing a concise summary and description of the endpoint. It’s super easy to integrate and customize, letting you provide just the right amount of detail without overwhelming your readers. Whether you're showcasing search capabilities or guiding users through your API, this approach makes your documentation interactive and engaging.
 
-<br />
-
 ***
 
 ## Inline (directly on the page)
@@ -22,8 +20,6 @@ Here's a simple inline demo using a different endpoint. For example, this compon
 If you want all endpoint information to be immediately visible without any user interaction, "inline" mode is a great choice. This demo keeps it simple and focuses on a real-world endpoint in your API.
 
 ***
-
-<br />
 
 ## Advanced Usage
 
