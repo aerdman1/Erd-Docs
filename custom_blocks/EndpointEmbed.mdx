@@ -25,8 +25,6 @@ export const EndpointEmbed = ({
   }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
-  // Instead of storing the error text, we now use a boolean flag.
-  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const arrow = '›';
@@ -136,12 +134,14 @@ export const EndpointEmbed = ({
   // Fetch the spec file and extract endpoint info.
   useEffect(() => {
     if (!endpoint) {
-      setError(true);
+      // Instead of setting an error, simply stop loading and show fallback.
+      setLoading(false);
+      setEndpointData(null);
       return;
     }
     const fetchEndpointExample = async () => {
       setLoading(true);
-      setError(false);
+      // Use a simple cache if available.
       let cache = {};
       if (typeof window !== 'undefined') {
         if (!window.__endpointSpecCache) {
@@ -155,16 +155,18 @@ export const EndpointEmbed = ({
           spec = cache[fullSpecUrl];
         } else {
           const response = await fetch(fullSpecUrl);
-          // Instead of throwing an error with text, simply set error state.
           if (!response.ok) {
-            throw new Error();
+            // Instead of throwing an error, fall back.
+            setEndpointData(null);
+            return;
           }
           spec = await response.json();
           cache[fullSpecUrl] = spec;
         }
         const operations = spec.paths[endpoint];
         if (!operations) {
-          throw new Error();
+          setEndpointData(null);
+          return;
         }
         let chosenOperation = null;
         let chosenMethod = null;
@@ -210,8 +212,8 @@ export const EndpointEmbed = ({
           tags,
         });
       } catch (err) {
-        // We no longer set the error message; we simply flag that an error occurred.
-        setError(true);
+        // On any error, simply clear the endpoint data.
+        setEndpointData(null);
       } finally {
         setLoading(false);
       }
@@ -286,7 +288,7 @@ export const EndpointEmbed = ({
   // Build the API endpoint URL if provided.
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
 
-  // Reusable fallback card when error occurs — shows only basic endpoint info.
+  // Reusable fallback card when no valid endpoint data is available.
   const fallbackCard = (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
@@ -426,7 +428,7 @@ export const EndpointEmbed = ({
           <div style={{ position: 'absolute', left: '0', zIndex: 1000, width: '420px' }}>
             {loading && skeletonCard}
             {!loading &&
-              (error ? fallbackCard : (
+              (!endpointData ? fallbackCard : (
                 <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <Card classNameExtra="popup-card">
                     <div style={{ flexGrow: 1 }}>
@@ -509,7 +511,7 @@ export const EndpointEmbed = ({
   }
 
   if (loading) return skeletonCard;
-  if (error) return fallbackCard;
+  if (!endpointData) return fallbackCard;
   return renderedContent;
 };
 
