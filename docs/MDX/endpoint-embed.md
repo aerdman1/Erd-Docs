@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-# Basic Usage
+## Basic Usage
 
 ## 🔗 Popup Mode
 
@@ -55,7 +55,7 @@ Switch OpenAPI files by changing `specFile`. For example:
 
 ***
 
-# Advanced Usage
+## Advanced Usage
 
 ## 🧱 Inside Cards
 
