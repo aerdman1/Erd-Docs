@@ -5,6 +5,8 @@ hidden: false
 metadata:
   robots: index
 ---
+# Basic Usage
+
 ## 🔗 Popup Mode
 
 When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this:
@@ -23,6 +25,24 @@ If you want all endpoint info immediately visible, `"inline"` mode renders the c
 
 <EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
 
+<EndpointEmbed
+  endpoint="/pet"
+  method="POST"
+  specFile="ErdSpec1.json"
+  displayMode="inline"
+  linkText="Inline Pet Endpoint (POST)"
+  show={{ 
+    summary: true, 
+    description: true, 
+    parameters: true, 
+    requestBody: true, 
+    responses: true, 
+    security: true, 
+    tags: true, 
+    example: true 
+  }}
+/>
+
 ***
 
 ## 🗂️ Works with Any Spec File
@@ -35,7 +55,7 @@ Switch OpenAPI files by changing `specFile`. For example:
 
 ***
 
-## Advanced Usage
+# Advanced Usage
 
 ## 🧱 Inside Cards
 
