@@ -1,7 +1,7 @@
 ---
 name: EndpointEmbed
 ---
-import React, { useEffect, useState } from 'react'; 
+import React, { useEffect, useState } from 'react';
 
 export const EndpointEmbed = ({
   websiteBaseUrl = 'https://erdtest123.readme.io', // The website URL for fetching the OpenAPI spec
@@ -15,12 +15,13 @@ export const EndpointEmbed = ({
     summary: true,
     description: true,
     parameters: true,
-    tags: true, 
+    tags: true,
     requestBody: false,
     responses: false,
     security: false,
     example: false,
     readmeUrl: false,
+    apiUrl: false,  // New toggle to display the actual API URL
   }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
@@ -29,7 +30,9 @@ export const EndpointEmbed = ({
   const [isHovered, setIsHovered] = useState(false);
   const [arrow] = useState('›');
 
+  // Default link text if not provided.
   const displayLinkText = linkText || endpoint;
+  // Build full spec URL using websiteBaseUrl:
   const fullSpecUrl = `${websiteBaseUrl}/openapi/${specFile}`;
 
   useEffect(() => {
@@ -104,6 +107,7 @@ export const EndpointEmbed = ({
     }
   };
 
+  // Recursively resolve example from a schema.
   const resolveExampleFromSchema = (schema, components) => {
     if (!schema) return null;
     if (schema.example !== undefined) return schema.example;
@@ -126,6 +130,7 @@ export const EndpointEmbed = ({
     return null;
   };
 
+  // Extract an example from an operation’s responses.
   const extractResponseExample = (operation, components) => {
     if (!operation.responses) return null;
     let response = operation.responses['200'] || operation.responses['default'];
@@ -144,6 +149,7 @@ export const EndpointEmbed = ({
     return null;
   };
 
+  // Card component for inline usage.
   const Card = ({ children }) => (
     <div className="card">
       <div className="card-content">{children}</div>
@@ -151,16 +157,20 @@ export const EndpointEmbed = ({
     </div>
   );
 
+  // Method tag with colors: GET blue, POST green, PUT yellowish, DELETE red.
   const MethodTag = ({ method }) => {
     const lowerMethod = (method || '').toLowerCase();
     return <span className={`method ${lowerMethod}`}>{method}</span>;
   };
 
-  // Use the apiTargetUrl if provided; otherwise, use websiteBaseUrl to form the reference link.
+  // Use apiTargetUrl if provided; otherwise use websiteBaseUrl for the reference URL.
   const targetUrl = apiTargetUrl || websiteBaseUrl;
   const readmeDocUrl = endpointData && endpointData.operationId
-    ? `${targetUrl}/reference/${endpointData.operationId}`
-    : `${targetUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
+    ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
+    : `${websiteBaseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
+
+  // Build the API endpoint URL if apiTargetUrl is provided.
+  const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
 
   const renderedContent = endpointData && (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -213,6 +223,16 @@ export const EndpointEmbed = ({
             }}>
               {JSON.stringify(endpointData.example, null, 2)}
             </pre>
+          )}
+          {show.apiUrl && apiFullUrl && (
+            <div style={{
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              color: '#4b5563',
+              marginBottom: '0.25em'
+            }}>
+              API: {endpointData.method} {apiFullUrl}
+            </div>
           )}
           {show.readmeUrl !== false && (
             <div className="path" style={{
@@ -376,7 +396,7 @@ export const EndpointEmbed = ({
   );
 };
 
-### Basic Usage 
+## Basic Usage 
 
 ## 💬 Popup Mode
 
@@ -414,10 +434,10 @@ If you want all endpoint info immediately visible, `"inline"` mode renders the c
     security: true, 
     tags: true, 
     example: true,
-    readmeUrl: true
+    readmeUrl: true,
+    apiUrl: true
   }}
 />
-
 
 ---
 
@@ -442,10 +462,10 @@ Switch OpenAPI files by changing `specFile`. For example:
     security: true,
     tags: true,
     example: true,
-    readmeUrl: true
+    readmeUrl: false,
+    apiUrl: true
   }}
 />
-
 
 ---
 
@@ -459,17 +479,17 @@ Embed this component within ReadMe's `<Cards>` layout:
 
 <Card title="User Management" icon="fa-user-cog">
 
-<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
-<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
 </Card>
 
 <Card title="Posts API" icon="fa-file-alt">
 
-<EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
-<EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
 </Card>
 
@@ -483,13 +503,13 @@ Great for FAQs or progressive disclosure:
 
 <Accordion title="Upload a Pet Image" icon="fa-image">
 
-<EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
 </Accordion>
 
 <Accordion title="Delete Pet by ID" icon="fa-trash">
 
-<EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
 </Accordion>
 
@@ -503,19 +523,19 @@ Organize multiple endpoints side by side:
 
 <Column>
 
-<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
 </Column>
 
 <Column>
 
-<EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
 </Column>
 
 <Column>
 
-<EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true }} />
+<EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
 
 </Column>
 
