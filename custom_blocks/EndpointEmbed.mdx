@@ -32,12 +32,13 @@ export const EndpointEmbed = ({
   const [fadeIn, setFadeIn] = useState(false);
 
   const displayLinkText = linkText || endpoint;
+  // Append a query parameter to bypass cache if needed for debugging
   const fullSpecUrl = useMemo(() => {
-    return websiteBaseUrl + "/openapi/" + specFile;
+    return websiteBaseUrl + "/openapi/" + specFile + "?nocache=" + Date.now();
   }, [websiteBaseUrl, specFile]);
 
   /* ------------------------------------------------------------------
-   *  Inject shared CSS once (using a backtick template literal for clarity)
+   *  Inject shared CSS once
    * ----------------------------------------------------------------*/
   useEffect(() => {
     if (document.getElementById("embed-styles")) return;
@@ -193,13 +194,15 @@ export const EndpointEmbed = ({
   }, []);
 
   /* ------------------------------------------------------------------
-   *  Fetch & parse spec with logging for debugging caching issues
+   *  Fetch & parse spec with logging and cache-bypass query param
    * ----------------------------------------------------------------*/
   useEffect(() => {
     if (!endpoint) return;
     const run = async () => {
       setLoading(true);
       try {
+        // Disable the internal cache by not using window.__endpointSpecCache,
+        // or if you prefer to keep it, you could comment the next two lines out.
         if (!window.__endpointSpecCache) window.__endpointSpecCache = {};
         let spec = window.__endpointSpecCache[fullSpecUrl];
         if (spec) {
@@ -211,7 +214,7 @@ export const EndpointEmbed = ({
           console.log(`[FETCH] New spec retrieved from ${fullSpecUrl}:`, spec);
           window.__endpointSpecCache[fullSpecUrl] = spec;
         }
-        // Log the spec file received (or not) for the given endpoint
+        // Log the full spec for debugging
         if (!spec.paths || !spec.paths[endpoint]) {
           console.error(`Spec does not contain endpoint "${endpoint}":`, spec);
           throw new Error("missing path");
@@ -522,10 +525,7 @@ export const EndpointEmbed = ({
                     transition: "opacity 0.5s ease-in-out",
                   }}
                 >
-                  <a
-                    href={readmeDocUrl}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
+                  <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
                     <Card extra={("popup-card " + (theme === "simple" ? "simple" : "")).trim()}>
                       {show.summary && endpointData.method && (
                         <div className="header-row" style={{ width: "100%" }}>
@@ -541,13 +541,7 @@ export const EndpointEmbed = ({
                           {linkText || endpointData.summary || displayLinkText}
                         </h3>
                         {show.description && endpointData.description && (
-                          <p
-                            style={{
-                              margin: "0 0 0.5em",
-                              fontSize: "0.9rem",
-                              color: "#374151",
-                            }}
-                          >
+                          <p style={{ margin: "0 0 0.5em", fontSize: "0.9rem", color: "#374151" }}>
                             {endpointData.description}
                           </p>
                         )}
@@ -565,7 +559,7 @@ export const EndpointEmbed = ({
     );
   }
 
-  // Inline mode: Always show Skeleton if loading; show fallback only if no data is available after loading.
+  // Inline mode: Always show Skeleton if loading; show fallback if no data.
   if (loading) {
     return <div style={{ position: "relative" }}><SkeletonCard /></div>;
   }
@@ -575,7 +569,8 @@ export const EndpointEmbed = ({
   return renderedContent;
 };
 
-## 💬 Popup Mode  
+
+## 💬 Popup Mode
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details.
 
@@ -591,7 +586,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
     example: true,  
     readmeUrl: true,  
     apiUrl: true  
-  }} />  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
+  }} /> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
 
 ---
 
@@ -600,7 +595,8 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
 <Columns layout="auto"> 
   
   <Column> 
-    #### Block version:
+
+#### Block version:
 
 <EndpointEmbed  
   endpoint="/pet"  
@@ -629,6 +625,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   <Column>
 
 #### Simple version:
+  
 <EndpointEmbed  
   endpoint="/pet"  
   method="PUT"  
