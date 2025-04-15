@@ -7,22 +7,24 @@ metadata:
 ---
 ### Basic Usage
 
-These examples show the default behavior with minimal details (only summary and description):
+#### Popup (hover over)
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+
+#### Inline (directly on the page)
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
 ***
 
-# Advanced Usage
+## Advanced Usage
 
 Below are more advanced examples that demonstrate the component in different display modes and container types.
 
-## 🔗 Popup Mode
+### 🔗 Popup Mode
 
 When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this\
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.\
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.
 When users hover over it, they’ll see a card with full details.
 
 Another one:
@@ -33,7 +35,7 @@ which lets you preview how the search works without cluttering your layout.
 
 ***
 
-## 📦 Inline Mode
+### 📦 Inline Mode
 
 If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the page flow.
 
@@ -45,7 +47,7 @@ This is great when you're walking users through specific request/response flows.
 
 ***
 
-## 🗂️ Works with Any Spec File
+### 🗂️ Works with Any Spec File
 
 You can point to other OpenAPI files by changing the `specFile` prop. Useful if you’re documenting multiple services.
 
@@ -55,7 +57,7 @@ You can point to other OpenAPI files by changing the `specFile` prop. Useful if 
 
 ***
 
-## 🧱 Inside Cards
+### 🧱 Inside Cards
 
 This component plays nicely inside ReadMe's `<Cards>` layout. Great for overview sections or dashboards.
 
@@ -75,7 +77,7 @@ This component plays nicely inside ReadMe's `<Cards>` layout. Great for overview
 
 ***
 
-## 🔽 Inside Accordions
+### 🔽 Inside Accordions
 
 Perfect for FAQs or progressive disclosure.
 
@@ -89,7 +91,7 @@ Perfect for FAQs or progressive disclosure.
 
 ***
 
-## ➗ Inside Columns
+### ➗ Inside Columns
 
 Use `<Columns>` to organize multiple endpoints side by side.
 
