@@ -98,28 +98,66 @@ export const EndpointEmbed = ({
 }
 .popup-card {
   position: relative;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  background: #fff!important;
-  border: 1px solid #ccc;
-  padding: 14px 16px!important;
-  border-radius: 4px;
+  background: #fff !important;
+  /* Remove border or use a very light border */
+  border: none;
+  /* Increase the border radius for a softer look */
+  border-radius: 8px;
+  padding: 12px 16px !important;
   width: fit-content;
   max-width: 100%;
-  font-size: 0.85rem!important;
+  font-size: 0.85rem !important;
+  /* A softer, more modern box-shadow */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  /* Add a transition for a fade/scale effect */
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
+
+/* When popup is active, add a class like .show to display it */
+.popup-card.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* If you're using the "simple" theme, you can keep it minimal: */
 .popup-card.simple {
   box-shadow: none;
   border: none;
   border-radius: 0;
   padding: 0;
+  background: #fff;
 }
-.popup-card .arrow {
+
+/* Instead of a text arrow, consider using a CSS-generated arrow */
+.popup-card::after {
+  content: "";
   position: absolute;
-  top: 8px;
-  right: 12px;
-  font-size: 1.2rem;
-  color: #6b7280;
+  bottom: 100%; /* Positions it above the card */
+  left: 20px;  /* Adjust this value to align with your design */
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #fff transparent;
 }
+
+/* Optionally add a subtle shadow to the arrow */
+.popup-card::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 1px); /* Slightly offset from the card */
+  left: 20px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  z-index: -1;
+}
+
+/* Hide the default arrow if you still have the .arrow element inside */
+.popup-card .arrow {
+  display: none;
+}
+
 .CardsGrid .Card,
 .Accordion .Accordion-title,
 .CardsGrid .Card-icon, .Accordion {
