@@ -5,26 +5,26 @@ hidden: false
 metadata:
   robots: index
 ---
-## Basic Usage
+# Basic Usage
 
-### Popup (hover over):
+## Popup (hover over):
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-### Inline (directly on the page):
+## Inline (directly on the page):
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
 ***
 
-## Advanced Usage
+# Advanced Usage
 
 Below are advanced examples demonstrating different display modes and container types.
 
-### 🔗 Popup Mode
+## 🔗 Popup Mode
 
 When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this\
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.\
 When users hover over it, they’ll see a full-detail card.
 
 Another example:
@@ -35,7 +35,7 @@ which lets you preview search functionality without cluttering the layout.
 
 ***
 
-### 📦 Inline Mode
+## 📦 Inline Mode
 
 If you want all endpoint info immediately visible, `"inline"` mode renders the card directly in the page flow.
 
@@ -45,7 +45,7 @@ If you want all endpoint info immediately visible, `"inline"` mode renders the c
 
 ***
 
-### 🗂️ Works with Any Spec File
+## 🗂️ Works with Any Spec File
 
 Switch OpenAPI files by changing `specFile`. For example:
 
@@ -55,7 +55,7 @@ Switch OpenAPI files by changing `specFile`. For example:
 
 ***
 
-### 🧱 Inside Cards
+## 🧱 Inside Cards
 
 Embed this component within ReadMe's `<Cards>` layout:
 
@@ -75,7 +75,7 @@ Embed this component within ReadMe's `<Cards>` layout:
 
 ***
 
-### 🔽 Inside Accordions
+## 🔽 Inside Accordions
 
 Great for FAQs or progressive disclosure:
 
@@ -89,7 +89,7 @@ Great for FAQs or progressive disclosure:
 
 ***
 
-### ➗ Inside Columns
+## ➗ Inside Columns
 
 Organize multiple endpoints side by side:
 
