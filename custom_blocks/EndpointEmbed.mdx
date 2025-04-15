@@ -29,6 +29,7 @@ export const EndpointEmbed = ({
   const [endpointData, setEndpointData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [fadeIn, setFadeIn] = useState(false);
 
   const displayLinkText = linkText || endpoint;
   const fullSpecUrl = useMemo(
@@ -40,147 +41,159 @@ export const EndpointEmbed = ({
 
   /* ------------------------------------------------------------------
    *  Inject shared CSS once (using a backtick template literal for clarity)
+   *  Added keyframes for the pulse animation and basic skeleton styles.
    * ----------------------------------------------------------------*/
   useEffect(function () {
     if (document.getElementById("endpoint-embed-styles")) return;
     var style = document.createElement("style");
     style.id = "endpoint-embed-styles";
- style.textContent = `
-  /* Shared color palette */
-  :root {
-    --gray-500: #6b7280;
-    --gray-800: #111827;
-    --gray-light: #f9f9f9;
-    --blue-hover: #f0f8ff;
-    --white: #fff;
-    --shadow-default: 0 8px 16px rgba(0, 0, 0, 0.1);
-    --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
-  }
+    style.textContent = `
+      /* Shared color palette */
+      :root {
+        --gray-500: #6b7280;
+        --gray-800: #111827;
+        --gray-light: #f9f9f9;
+        --blue-hover: #f0f8ff;
+        --white: #fff;
+        --shadow-default: 0 8px 16px rgba(0, 0, 0, 0.1);
+        --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
 
-  /* Base block styles */
-  .endpoint-block,
-  .endpoint-simple {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
-    margin-bottom: 8px;
-    width: fit-content;
-    max-width: 100%;
-    min-width: 250px;
-    position: relative;
-  }
+      /* Base block styles */
+      .endpoint-block,
+      .endpoint-simple {
+        display: flex;
+        flex-direction: column;
+        text-decoration: none;
+        color: inherit;
+        margin-bottom: 8px;
+        width: fit-content;
+        max-width: 100%;
+        min-width: 250px;
+        position: relative;
+      }
 
-  .endpoint-block {
-    background: var(--gray-light);
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 16px;
-  }
+      .endpoint-block {
+        background: var(--gray-light);
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 16px;
+      }
 
-  .endpoint-block:hover {
-    background: var(--blue-hover);
-    border-color: var(--gray-500);
-  }
+      .endpoint-block:hover {
+        background: var(--blue-hover);
+        border-color: var(--gray-500);
+      }
 
-  .endpoint-simple {
-    background: transparent;
-    border: none;
-    padding: 16px;
-  }
+      .endpoint-simple {
+        background: transparent;
+        border: none;
+        padding: 16px;
+      }
 
-  /* Shared arrow indicator */
-  .endpoint-block::after,
-  .endpoint-simple::after,
-  .popup-card::after {
-    content: '↗';
-    font-size: 0.75rem;
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    opacity: 0;
-    color: var(--gray-500);
-    transition: opacity 0.2s ease;
-  }
+      /* Shared arrow indicator */
+      .endpoint-block::after,
+      .endpoint-simple::after,
+      .popup-card::after {
+        content: '↗';
+        font-size: 0.75rem;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        opacity: 0;
+        color: var(--gray-500);
+        transition: opacity 0.2s ease;
+      }
 
-  .endpoint-block:hover::after,
-  .endpoint-simple:hover::after,
-  .popup-card:hover::after {
-    opacity: 1;
-  }
+      .endpoint-block:hover::after,
+      .endpoint-simple:hover::after,
+      .popup-card:hover::after {
+        opacity: 1;
+      }
 
-  /* Header section */
-  .header-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-direction: row-reverse;
-    padding-bottom: 3px;
-    border-bottom: .5px solid #6b728057;
-  }
+      /* Header section */
+      .header-row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-direction: row-reverse;
+        padding-bottom: 3px;
+        border-bottom: 0.5px solid #6b728057;
+      }
 
-  /* Text and metadata */
-  .endpoint-block h3 {
-    margin: 0 0 0.5em;
-    font-size: 1rem;
-    font-weight: bold;
-    color: var(--gray-800);
-  }
+      /* Text and metadata */
+      .endpoint-block h3 {
+        margin: 0 0 0.5em;
+        font-size: 1rem;
+        font-weight: bold;
+        color: var(--gray-800);
+      }
 
-  .method {
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    display: inline-block;
-  }
+      .method {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        display: inline-block;
+      }
 
-  .method.get { color: #2563eb; }
-  .method.post { color: #16a34a; }
-  .method.put { color: #ca8a04; }
-  .method.delete { color: #dc2626; }
+      .method.get { color: #2563eb; }
+      .method.post { color: #16a34a; }
+      .method.put { color: #ca8a04; }
+      .method.delete { color: #dc2626; }
 
-  .path {
-    font-family: monospace;
-    font-size: 0.9rem;
-    color: var(--gray-500);
-    word-break: break-word;
-  }
+      .path {
+        font-family: monospace;
+        font-size: 0.9rem;
+        color: var(--gray-500);
+        word-break: break-word;
+      }
 
-  /* Popup-specific styling */
-  .popup-card {
-    position: relative;
-    background: var(--white);
-    border: none;
-    border-radius: 8px;
-    padding: 12px 16px;
-    width: fit-content;
-    max-width: 100%;
-    font-size: 0.85rem;
-    box-shadow: var(--shadow-default);
-    transition: box-shadow 0.2s ease, background 0.2s ease;
-  }
+      /* Popup-specific styling */
+      .popup-card {
+        position: relative;
+        background: var(--white);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 16px;
+        width: fit-content;
+        max-width: 100%;
+        font-size: 0.85rem;
+        box-shadow: var(--shadow-default);
+        transition: box-shadow 0.2s ease, background 0.2s ease;
+      }
 
-  .popup-card:hover {
-    background: var(--blue-hover);
-    box-shadow: var(--shadow-hover);
-  }
+      .popup-card:hover {
+        background: var(--blue-hover);
+        box-shadow: var(--shadow-hover);
+      }
 
-  .popup-card.simple {
-    box-shadow: none;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-  }
+      .popup-card.simple {
+        box-shadow: none;
+        border: none;
+        border-radius: 0;
+        padding: 0;
+      }
 
-  /* Neutralize container colors */
-  .CardsGrid .Card,
-  .Accordion .Accordion-title,
-  .CardsGrid .Card-icon,
-  .Accordion {
-    background: inherit;
-    color: inherit;
-  }
-`;
+      /* Neutralize container colors */
+      .CardsGrid .Card,
+      .Accordion .Accordion-title,
+      .CardsGrid .Card-icon,
+      .Accordion {
+        background: inherit;
+        color: inherit;
+      }
+
+      /* Skeleton animation & styling */
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+      }
+      
+      .skeleton-card {
+        animation: pulse 1.5s infinite ease-in-out;
+      }
+    `;
     document.head.appendChild(style);
   }, []);
 
@@ -227,6 +240,13 @@ export const EndpointEmbed = ({
     };
     run();
   }, [endpoint, fullSpecUrl, method]);
+
+  // When endpointData loads, trigger the fade-in effect.
+  useEffect(() => {
+    if (endpointData) {
+      setTimeout(() => setFadeIn(true), 100);
+    }
+  }, [endpointData]);
 
   /* Helper functions – no optional chaining or Object.fromEntries */
   function resolveSchema(schema, comps) {
@@ -318,148 +338,171 @@ export const EndpointEmbed = ({
     );
   };
 
-  // Fallback card when data is not yet loaded
-var fallbackCard = (
-  <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
+  // Skeleton placeholder to show while loading
+  const SkeletonCard = () => (
     <div
-      className={
-        ("popup-card " + (theme === "simple" ? "simple" : "")).trim()
-      }
-      style={{ position: "relative" }}
+      className="skeleton-card"
+      style={{
+        background: "#e2e2e2",
+        borderRadius: 8,
+        padding: 16,
+        width: "fit-content",
+        minWidth: 250,
+      }}
     >
-      {show.summary && method && (
-        <div className="header-row" style={{ width: "100%" }}>
-          <MethodTag method={method} />
-          <ConnectionIndicator
-            connected={!!endpointData && !loading}
-            inline={true}
-          />
-        </div>
-      )}
-      <div style={{ flexGrow: 1 }}>
-        <h3 style={{ margin: "0.5em 0 0.5em" }}>
-          {linkText || displayLinkText}
-        </h3>
-        <div
-          style={{
-            fontFamily: "monospace",
-            fontSize: "0.9rem",
-            color: "#6b7280",
-          }}
-        >
-          {endpoint}
-        </div>
-        {show.apiUrl && apiTargetUrl && (
+      <div style={{ height: 20, width: "60%", background: "#ccc", marginBottom: 8 }} />
+      <div style={{ height: 16, width: "80%", background: "#ccc", marginBottom: 4 }} />
+      <div style={{ height: 16, width: "90%", background: "#ccc", marginBottom: 4 }} />
+    </div>
+  );
+
+  // Fallback card when data is not yet loaded
+  var fallbackCard = (
+    <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
+      <div
+        className={
+          ("popup-card " + (theme === "simple" ? "simple" : "")).trim()
+        }
+        style={{ position: "relative" }}
+      >
+        {show.summary && method && (
+          <div className="header-row" style={{ width: "100%" }}>
+            <MethodTag method={method} />
+            <ConnectionIndicator
+              connected={!!endpointData && !loading}
+              inline={true}
+            />
+          </div>
+        )}
+        <div style={{ flexGrow: 1 }}>
+          <h3 style={{ margin: "0.5em 0 0.5em" }}>
+            {linkText || displayLinkText}
+          </h3>
           <div
             style={{
               fontFamily: "monospace",
               fontSize: "0.9rem",
-              color: "#4b5563",
+              color: "#6b7280",
             }}
           >
-            API: {method ? method.toUpperCase() : ""} {apiTargetUrl + endpoint}
+            {endpoint}
           </div>
-        )}
-        {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-      </div>
-    </div>
-  </a>
-);
-
-  // Full rendered card (when data is loaded)
-  var renderedContent =
-    endpointData && (
-      <a
-        href={readmeDocUrl}
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <Card>
-          {show.summary && endpointData.method && (
-            <div className="header-row" style={{ width: "100%" }}>
-              <MethodTag method={endpointData.method} />
-              <ConnectionIndicator connected={true} inline={true} />
+          {show.apiUrl && apiTargetUrl && (
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: "0.9rem",
+                color: "#4b5563",
+              }}
+            >
+              API: {method ? method.toUpperCase() : ""} {apiTargetUrl + endpoint}
             </div>
           )}
-          <div style={{ flexGrow: 1 }}>
-            <h3 style={{ margin: "0.5em 0 0.5em" }}>
-              {linkText || endpointData.summary || displayLinkText}
-            </h3>
-            {show.description && endpointData.description && (
-              <p
-                style={{
-                  margin: "0 0 0.5em",
-                  fontSize: "0.9rem",
-                  color: "#374151",
-                }}
-              >
-                {endpointData.description}
-              </p>
-            )}
-            {show.parameters &&
-              endpointData.parameters.length > 0 && (
-                <div>
-                  {label("Parameters")}
-                  {endpointData.parameters
-                    .map(function (p) {
-                      return p.name;
-                    })
-                    .join(", ")}
-                </div>
-              )}
-            {show.requestBody && endpointData.requestBody && (
-              <div>
-                {label("Request Body")}Available
+          {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+        </div>
+      </div>
+    </a>
+  );
+
+  // Full rendered card (when data is loaded) with fade-in transition
+  var renderedContent =
+    endpointData && (
+      <div style={{ 
+        opacity: fadeIn ? 1 : 0, 
+        transition: "opacity 0.5s ease-in-out" 
+      }}>
+        <a
+          href={readmeDocUrl}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <Card>
+            {show.summary && endpointData.method && (
+              <div className="header-row" style={{ width: "100%" }}>
+                <MethodTag method={endpointData.method} />
+                <ConnectionIndicator connected={true} inline={true} />
               </div>
             )}
-            {show.responses && endpointData.responses && (
-              <div>
-                {label("Responses")}
-                {Object.keys(endpointData.responses).join(", ")}
-              </div>
-            )}
-            {show.security &&
-              endpointData.security.length > 0 && (
+            <div style={{ flexGrow: 1 }}>
+              <h3 style={{ margin: "0.5em 0 0.5em" }}>
+                {linkText || endpointData.summary || displayLinkText}
+              </h3>
+              {show.description && endpointData.description && (
+                <p
+                  style={{
+                    margin: "0 0 0.5em",
+                    fontSize: "0.9rem",
+                    color: "#374151",
+                  }}
+                >
+                  {endpointData.description}
+                </p>
+              )}
+              {show.parameters &&
+                endpointData.parameters.length > 0 && (
+                  <div>
+                    {label("Parameters")}
+                    {endpointData.parameters
+                      .map(function (p) {
+                        return p.name;
+                      })
+                      .join(", ")}
+                  </div>
+                )}
+              {show.requestBody && endpointData.requestBody && (
                 <div>
-                  {label("Security")}
-                  {JSON.stringify(endpointData.security)}
+                  {label("Request Body")}Available
                 </div>
               )}
-            {show.tags &&
-              endpointData.tags.length > 0 && (
+              {show.responses && endpointData.responses && (
                 <div>
-                  {label("Tags")}
-                  {endpointData.tags.join(", ")}
+                  {label("Responses")}
+                  {Object.keys(endpointData.responses).join(", ")}
                 </div>
               )}
-            {show.example && endpointData.example && (
-              <pre
-                style={{
-                  background: "#f3f4f6",
-                  padding: 8,
-                  margin: "5px 0px",
-                  borderRadius: 6,
-                  fontSize: "0.85rem",
-                  overflowX: "auto",
-                }}
-              >
-                {JSON.stringify(endpointData.example, null, 2)}
-              </pre>
-            )}
-            {show.apiUrl && apiFullUrl && (
-              <div
-                style={{
-                  fontFamily: "monospace",
-                  fontSize: "0.9rem",
-                  color: "#4b5563",
-                }}
-              >
-                API: {endpointData.method} {apiFullUrl}
-              </div>
-            )}
-            {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-          </div>
-        </Card>
-      </a>
+              {show.security &&
+                endpointData.security.length > 0 && (
+                  <div>
+                    {label("Security")}
+                    {JSON.stringify(endpointData.security)}
+                  </div>
+                )}
+              {show.tags &&
+                endpointData.tags.length > 0 && (
+                  <div>
+                    {label("Tags")}
+                    {endpointData.tags.join(", ")}
+                  </div>
+                )}
+              {show.example && endpointData.example && (
+                <pre
+                  style={{
+                    background: "#f3f4f6",
+                    padding: 8,
+                    margin: "5px 0px",
+                    borderRadius: 6,
+                    fontSize: "0.85rem",
+                    overflowX: "auto",
+                  }}
+                >
+                  {JSON.stringify(endpointData.example, null, 2)}
+                </pre>
+              )}
+              {show.apiUrl && apiFullUrl && (
+                <div
+                  style={{
+                    fontFamily: "monospace",
+                    fontSize: "0.9rem",
+                    color: "#4b5563",
+                  }}
+                >
+                  API: {endpointData.method} {apiFullUrl}
+                </div>
+              )}
+              {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+            </div>
+          </Card>
+        </a>
+      </div>
     );
 
   /* ------------------------------------------------------------------
@@ -490,57 +533,59 @@ var fallbackCard = (
         </a>
         {isHovered && (
           <div style={{ position: "absolute", left: 0, zIndex: 1000, width: 420 }}>
-            {!loading &&
-              (endpointData ? (
-                <a
-                  href={readmeDocUrl}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <Card
-                    extra={
-                      ("popup-card " + (theme === "simple" ? "simple" : "")).trim()
-                    }
+            {loading ? (
+              <SkeletonCard />
+            ) : (
+              endpointData ? (
+                <div style={{ 
+                  opacity: fadeIn ? 1 : 0, 
+                  transition: "opacity 0.5s ease-in-out" 
+                }}>
+                  <a
+                    href={readmeDocUrl}
+                    style={{ textDecoration: "none", color: "inherit" }}
                   >
-                    {show.summary && endpointData.method && (
-                      <div className="header-row" style={{ width: "100%" }}>
-                        <MethodTag method={endpointData.method} />
-                        <ConnectionIndicator
-                          connected={!!endpointData && !loading}
-                          inline={true}
-                        />
-                      </div>
-                    )}
-                    <div style={{ flexGrow: 1 }}>
-                      <h3 style={{ margin: "0.5em 0 0.5em" }}>
-                        {linkText ||
-                          endpointData.summary ||
-                          displayLinkText}
-                      </h3>
-                      {show.description && endpointData.description && (
-                        <p
-                          style={{
-                            margin: "0 0 0.5em",
-                            fontSize: "0.9rem",
-                            color: "#374151",
-                          }}
-                        >
-                          {endpointData.description}
-                        </p>
+                    <Card extra={("popup-card " + (theme === "simple" ? "simple" : "")).trim()}>
+                      {show.summary && endpointData.method && (
+                        <div className="header-row" style={{ width: "100%" }}>
+                          <MethodTag method={endpointData.method} />
+                          <ConnectionIndicator
+                            connected={!!endpointData && !loading}
+                            inline={true}
+                          />
+                        </div>
                       )}
-                    </div>
-                  </Card>
-                </a>
+                      <div style={{ flexGrow: 1 }}>
+                        <h3 style={{ margin: "0.5em 0 0.5em" }}>
+                          {linkText || endpointData.summary || displayLinkText}
+                        </h3>
+                        {show.description && endpointData.description && (
+                          <p
+                            style={{
+                              margin: "0 0 0.5em",
+                              fontSize: "0.9rem",
+                              color: "#374151",
+                            }}
+                          >
+                            {endpointData.description}
+                          </p>
+                        )}
+                      </div>
+                    </Card>
+                  </a>
+                </div>
               ) : (
                 fallbackCard
-              ))}
+              )
+            )}
           </div>
         )}
       </span>
     );
   }
-  // Inline mode: show fallback until data is loaded, then full content.
+  // Inline mode: show skeleton while loading; then full content if available.
   if (!endpointData) {
-    return <div style={{ position: "relative" }}>{fallbackCard}</div>;
+    return <div style={{ position: "relative" }}>{loading ? <SkeletonCard /> : fallbackCard}</div>;
   }
   return renderedContent;
 };
