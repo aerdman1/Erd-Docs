@@ -108,13 +108,13 @@ export const EndpointEmbed = ({
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
         }
-        [data-color-mode=dark] .card { background: #0000007a; }
+        [data-color-mode=dark] .card { background: #000; }
         @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card { background:#0000007a; }
+          [data-color-mode=system] .card { background:#000; }
         }
-        [data-color-mode=dark] .card:hover { background:black; }
+        [data-color-mode=dark] .card:hover { background: #000; }
         @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card:hover { background:black; }
+          [data-color-mode=system] .card:hover { background: #000; }
         }
         [data-color-mode=dark] .card h3 { color: #fff; }
         @media (prefers-color-scheme: dark) {
@@ -127,7 +127,7 @@ export const EndpointEmbed = ({
           border: 1px solid #ccc;
         }
         .popup-card:hover {
-
+         border: 1px solid #ccc;
         }
       `;
       document.head.appendChild(style);
