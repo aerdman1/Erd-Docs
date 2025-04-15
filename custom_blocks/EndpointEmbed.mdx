@@ -26,12 +26,12 @@ export const EndpointEmbed = ({
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  // For the "card" style
-  const [arrow] = useState('›'); // You could use an icon
+  // For the "card" style arrow (you could use an icon)
+  const [arrow] = useState('›');
 
-  // Default link text to the endpoint value if none is provided.
+  // Default link text if not provided.
   const displayLinkText = linkText || endpoint;
-  // Build the full spec URL using baseUrl and specFile.
+  // Build full spec URL
   const fullSpecUrl = `${baseUrl}/openapi/${specFile}`;
 
   useEffect(() => {
@@ -59,12 +59,10 @@ export const EndpointEmbed = ({
       let chosenOperation = null;
       let chosenMethod = null;
 
-      // If a specific method is provided and exists, use it.
       if (typeof method === 'string' && operations[method.toLowerCase()]) {
         chosenOperation = operations[method.toLowerCase()];
         chosenMethod = method.toUpperCase();
       } else {
-        // Otherwise, iterate to find an operation with an example.
         for (const [m, op] of Object.entries(operations)) {
           const example = extractResponseExample(op, spec.components);
           if (example) {
@@ -74,7 +72,6 @@ export const EndpointEmbed = ({
           }
         }
         if (!chosenOperation) {
-          // fallback to first
           const [m, op] = Object.entries(operations)[0];
           chosenOperation = op;
           chosenMethod = m.toUpperCase();
@@ -148,22 +145,18 @@ export const EndpointEmbed = ({
     if (response && response.content) {
       const media = response.content['application/json'];
       if (media) {
-        if (media.example) {
-          return media.example;
-        }
+        if (media.example) return media.example;
         if (media.examples) {
           const firstExample = Object.values(media.examples)[0];
           if (firstExample && firstExample.value) return firstExample.value;
         }
-        if (media.schema) {
-          return resolveExampleFromSchema(media.schema, components);
-        }
+        if (media.schema) return resolveExampleFromSchema(media.schema, components);
       }
     }
     return null;
   };
 
-  // ** "Card" style for inline usage. **
+  // Card component for inline usage.
   const Card = ({ children }) => (
     <div className="card">
       <div className="card-content">{children}</div>
@@ -171,7 +164,7 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // We also show the method style, e.g. GET, POST, DELETE, etc.
+  // Method tag with colors: GET blue, POST green, PUT yellowish, DELETE red.
   const MethodTag = ({ method }) => {
     const lowerMethod = (method || '').toLowerCase();
     return (
@@ -181,35 +174,27 @@ export const EndpointEmbed = ({
     );
   };
 
-  // Determine the reference URL
+  // Determine the reference URL.
   const referenceUrl = endpointData && endpointData.operationId
     ? `${baseUrl}/reference/${endpointData.operationId}`
     : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
-  // This is the main rendered content (like the "card") for inline mode
-  // or the content that appears in the popup if displayMode = 'popup' and not loading.
+  // Render the main card content.
   const renderedContent = endpointData && (
     <Card>
-      {/* If you want to show the actual method: */}
-      {endpointData.method && show.parameters !== false && (
+      {endpointData.method && show.summary !== false && (
         <MethodTag method={endpointData.method} />
       )}
-
-      {/* Title or summary */}
       <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
         {show.summary && endpointData.summary
           ? endpointData.summary
           : displayLinkText}
       </h3>
-
-      {/* Path or reference URL. This is optional. */}
-      {endpointData ? (
-        <div className="path">{referenceUrl}</div>
-      ) : null}
+      {endpointData && <div className="path">{referenceUrl}</div>}
     </Card>
   );
 
-  // The skeleton loader markup, displayed while `loading === true`.
+  // Skeleton loader markup.
   const skeletonCard = (
     <div className="card skeleton">
       <div className="card-content">
@@ -221,24 +206,14 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // ERROR display
+  // Error display.
   const errorCard = (
-    <div
-      style={{
-        border: '1px solid #dc2626',
-        background: '#fdeaea',
-        borderRadius: '8px',
-        padding: '16px',
-        color: '#dc2626',
-        marginBottom: '8px',
-      }}
-    >
+    <div style={{ border: '1px solid #dc2626', background: '#fdeaea', borderRadius: '8px', padding: '16px', color: '#dc2626', marginBottom: '8px' }}>
       {error}
     </div>
   );
 
-  // ** RENDER LOGIC **
-  // For POPUP mode, we show just a link, and on hover we show the card or skeleton/error.
+  // Render logic for popup vs inline.
   if (displayMode === 'popup') {
     const popupLinkStyle = {
       textDecoration: 'none',
@@ -249,29 +224,22 @@ export const EndpointEmbed = ({
       padding: '2px 4px',
       fontWeight: '600',
     };
-
     return (
-      <span
-        style={{ display: 'inline-block', position: 'relative' }}
+      <span style={{ display: 'inline-block', position: 'relative' }}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {/* The hyperlink or "trigger" */}
+        onMouseLeave={() => setIsHovered(false)}>
         <a href={referenceUrl} style={popupLinkStyle}>
           {displayLinkText}
         </a>
-
         {isHovered && (
-          <div
-            style={{
-              position: 'absolute',
-              top: '100%',
-              left: '0',
-              zIndex: 1000,
-              marginTop: '1px',
-              width: '420px', // matches skeleton width
-            }}
-          >
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: '0',
+            zIndex: 1000,
+            marginTop: '1px',
+            width: '420px',
+          }}>
             {loading && skeletonCard}
             {error && !loading && errorCard}
             {!loading && !error && renderedContent}
@@ -280,17 +248,11 @@ export const EndpointEmbed = ({
       </span>
     );
   }
-
-  // INLINE mode: We simply show the skeleton if loading, an error if error, or the card if loaded.
   return (
     <>
       {loading && skeletonCard}
       {error && !loading && errorCard}
       {!loading && !error && renderedContent}
-
-      {/* Inline styles from your DocumentsAPI snippet. 
-          Or you can load them globally. 
-      */}
       <style>{`
         .card {
           display: flex;
@@ -309,9 +271,7 @@ export const EndpointEmbed = ({
           background: #7dbeff1c;
           border: 1px solid #018ef5;
         }
-        .card-content {
-          flex-grow: 1;
-        }
+        .card-content { flex-grow: 1; }
         .card h3 {
           margin: 0;
           font-size: 1rem;
@@ -334,14 +294,11 @@ export const EndpointEmbed = ({
           font-size: 0.9rem;
           color: #6b7280;
         }
-        .arrow {
-          font-size: 1.2rem;
-          color: #6b7280;
-        }
+        .arrow { font-size: 1.2rem; color: #6b7280; }
 
         /* Skeleton Loading Styles */
         .skeleton {
-          width: 420px !important; /* Matches real cards */
+          width: 420px !important;
           background: #f3f4f6;
           border: 1px solid #e5e7eb;
           border-radius: 8px;
@@ -350,174 +307,110 @@ export const EndpointEmbed = ({
           align-items: center;
           justify-content: space-between;
           opacity: 0.7;
-          min-height: 100px; /* Ensures same height as real cards */
+          min-height: 100px;
         }
-
         .skeleton-method, .skeleton-title, .skeleton-path {
           background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
           background-size: 200% 100%;
           animation: shimmer 1.5s infinite linear;
           border-radius: 4px;
         }
-        .skeleton-method {
-          width: 50px;
-          height: 12px;
-          margin-bottom: 8px;
-        }
-        .skeleton-title {
-          width: 60%;
-          height: 16px;
-          margin-bottom: 6px;
-        }
-        .skeleton-path {
-          width: 80%;
-          height: 12px;
-        }
+        .skeleton-method { width: 50px; height: 12px; margin-bottom: 8px; }
+        .skeleton-title { width: 60%; height: 16px; margin-bottom: 6px; }
+        .skeleton-path { width: 80%; height: 12px; }
         @keyframes shimmer {
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
         }
-
         /* Dark mode variations (optional) */
-        [data-color-mode=dark] .card {
-          background: #0000007a;
-        }
+        [data-color-mode=dark] .card { background: #0000007a; }
         @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card {
-            background:#0000007a;
-          }
+          [data-color-mode=system] .card { background:#0000007a; }
         }
-        [data-color-mode=dark] .card:hover {
-          background:black;
-        }
+        [data-color-mode=dark] .card:hover { background:black; }
         @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card:hover {
-            background:black;
-          }
+          [data-color-mode=system] .card:hover { background:black; }
         }
-        [data-color-mode=dark] .card h3 {
-          color: #fff;
-        }
+        [data-color-mode=dark] .card h3 { color: #fff; }
         @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card h3 {
-            color: #fff;
-          }
+          [data-color-mode=system] .card h3 { color: #fff; }
         }
       `}</style>
     </>
   );
 };
 
-### Basic Usage 
+### Basic Usage
 
-These examples show the default behavior with minimal details (only summary and description):
+These examples show the default behavior with minimal details:
 
-<EndpointEmbed 
-  endpoint="/pet" 
-  method="PUT" 
-  specFile="ErdSpec1.json" 
-  linkText="Pet Endpoint" 
-  displayMode="popup" 
-  show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }}
-/>
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-<EndpointEmbed 
-  endpoint="/pet" 
-  method="PUT" 
-  specFile="ErdSpec1.json" 
-  linkText="Pet Endpoint" 
-  displayMode="inline" 
-  show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }}
-/>
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-___
+---
 
 # Advanced Usage
 
-Below are more advanced examples that demonstrate the component in different display modes and container types.
+Below are advanced examples demonstrating different display modes and container types.
 
 ## 🔗 Popup Mode
 
 When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this  
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />.  
-When users hover over it, they’ll see a card with full details.
+When users hover over it, they’ll see a full-detail card.
 
-Another one:  
+Another example:  
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />  
-which lets you preview how the search works without cluttering your layout.
+which lets you preview search functionality without cluttering the layout.
 
-***
+---
 
 ## 📦 Inline Mode
 
-If you want all endpoint info to be immediately visible, `"inline"` mode will render the card directly in the page flow.
+If you want all endpoint info immediately visible, `"inline"` mode renders the card directly in the page flow.
 
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" />
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (PUT)" /> <EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
 
-<EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
-
-This is great when you're walking users through specific request/response flows.
-
-***
+---
 
 ## 🗂️ Works with Any Spec File
 
-You can point to other OpenAPI files by changing the `specFile` prop. Useful if you’re documenting multiple services.
+Switch OpenAPI files by changing `specFile`. For example:
 
-<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
+<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" /> <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" />
 
-<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" />
-
-***
+---
 
 ## 🧱 Inside Cards
 
-This component plays nicely inside ReadMe's `<Cards>` layout. Great for overview sections or dashboards.
+Embed this component within ReadMe's `<Cards>` layout:
 
-<Cards columns={2}>
-  <Card title="User Management" icon="fa-user-cog">
-    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
-    <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
-  </Card>
+<Cards columns={2}> <Card title="User Management" icon="fa-user-cog"> <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-  <Card title="Posts API" icon="fa-file-alt">
-    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" />
-    <EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
-  </Card>
-</Cards>
+<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-***
+</Card> <Card title="Posts API" icon="fa-file-alt"> <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+
+
+
+<EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+
+</Card> </Cards>
+
+---
 
 ## 🔽 Inside Accordions
 
-Perfect for FAQs or progressive disclosure.
+Great for FAQs or progressive disclosure:
 
-<Accordion title="Upload a Pet Image" icon="fa-image">
-  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
-</Accordion>
+<Accordion title="Upload a Pet Image" icon="fa-image"> <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Accordion> <Accordion title="Delete Pet by ID" icon="fa-trash"> <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Accordion>
 
-<Accordion title="Delete Pet by ID" icon="fa-trash">
-  <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" />
-</Accordion>
-
-***
+---
 
 ## ➗ Inside Columns
 
-Use `<Columns>` to organize multiple endpoints side by side.
+Organize multiple endpoints side by side:
 
-<Columns layout="auto">
-  <Column>
-    <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" />
-  </Column>
-
-  <Column>
-    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" />
-  </Column>
-
-  <Column>
-    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" />
-  </Column>
-</Columns>
-
+<Columns layout="auto"> <Column> <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> </Columns> \`\`\`
 
