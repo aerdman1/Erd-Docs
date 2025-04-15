@@ -59,6 +59,7 @@ export const EndpointEmbed = ({
       .card:hover { background: #7dbeff1c; border: 1px solid #018ef5; }
       .card.simple { background: transparent !important; border:none !important; padding:0; margin-bottom:8px; }
       .card-content { flex-grow: 1; }
+       .CardsGrid .Card {background: inherit;}  
       .card h3 { margin: 0; font-size: 1rem; font-weight: bold; color: #111827 !important; }
       .method { font-weight:bold; text-transform:uppercase; font-size:0.85rem; margin-bottom:4px; display:block; }
       .method.get{color:#2563eb}.method.post{color:#16a34a}.method.put{color:#ca8a04}.method.delete{color:#dc2626}
@@ -355,17 +356,93 @@ Embed this component within ReadMe's `<Cards>` layout:
 
 <Card title="User Management" icon="fa-user-cog">
 
-<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
+<EndpointEmbed
+  endpoint="/v1/users"
+  method="GET"
+  specFile="NovaTest.json"
+  displayMode="inline"
+  theme="simple"
+  linkText="List Users"
+  show={{
+    summary: true,
+    description: true,
+    parameters: false,
+    requestBody: false,
+    responses: false,
+    security: false,
+    tags: false,
+    example: false,
+    readmeUrl: true,
+    apiUrl: true
+  }}
+/>
 
-<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
+<EndpointEmbed
+  endpoint="/v1/users"
+  method="POST"
+  specFile="NovaTest.json"
+  displayMode="inline"
+  theme="simple"
+  linkText="Create User"
+  show={{
+    summary: true,
+    description: true,
+    parameters: false,
+    requestBody: false,
+    responses: false,
+    security: false,
+    tags: false,
+    example: false,
+    readmeUrl: true,
+    apiUrl: true
+  }}
+/>
 
 </Card>
 
 <Card title="Posts API" icon="fa-file-alt">
 
-<EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
+<EndpointEmbed
+  endpoint="/v1/posts"
+  method="POST"
+  specFile="NovaTest.json"
+  displayMode="inline"
+  theme="simple"
+  linkText="Create Post"
+  show={{
+    summary: true,
+    description: true,
+    parameters: false,
+    requestBody: false,
+    responses: false,
+    security: false,
+    tags: false,
+    example: false,
+    readmeUrl: true,
+    apiUrl: true
+  }}
+/>
 
-<EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
+<EndpointEmbed
+  endpoint="/v1/posts/{postId}"
+  method="GET"
+  specFile="NovaTest.json"
+  displayMode="inline"
+  theme="simple"
+  linkText="Get Post by ID"
+  show={{
+    summary: true,
+    description: true,
+    parameters: false,
+    requestBody: false,
+    responses: false,
+    security: false,
+    tags: false,
+    example: false,
+    readmeUrl: true,
+    apiUrl: true
+  }}
+/>
 
 </Card>
 
