@@ -87,11 +87,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
 
 ***
 
-## 🗂️ Multiple Spec Files
-
-Swap `specFile` to pull from different OpenAPI files:
-
-<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
+## 🗂️ All Props!
 
 <EndpointEmbed
   endpoint="/v1/users"
@@ -112,7 +108,7 @@ Swap `specFile` to pull from different OpenAPI files:
     security: true,  
     tags: true,  
     example: true,  
-    readmeUrl: false,  
+    readmeUrl: true,  
     apiUrl: true  
   }}
 />
