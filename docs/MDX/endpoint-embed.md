@@ -5,17 +5,15 @@ hidden: false
 metadata:
   robots: index
 ---
-### Popup (hover over)
+## Popup (hover over)
 
-When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />.
+When you want to keep your page clean and uncluttered, the "popup" display mode is the perfect solution. In this mode, the endpoint appears as a simple hyperlink—like this <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />—and when users hover over it, a card pops up, revealing a concise summary and description of the endpoint. It’s super easy to integrate and customize, letting you provide just the right amount of detail without overwhelming your readers. Whether you're showcasing search capabilities or guiding users through your API, this approach makes your documentation interactive and engaging.
 
 <br />
 
 ***
 
-<br />
-
-### Inline (directly on the page)
+## Inline (directly on the page)
 
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
