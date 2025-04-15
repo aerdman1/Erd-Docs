@@ -44,9 +44,9 @@ export const EndpointEmbed = ({
    *  Added keyframes for the pulse animation and basic skeleton styles.
    * ----------------------------------------------------------------*/
   useEffect(function () {
-    if (document.getElementById("endpoint-embed-styles")) return;
+    if (document.getElementById("embed-styles")) return;
     var style = document.createElement("style");
-    style.id = "endpoint-embed-styles";
+    style.id = "embed-styles";
     style.textContent = `
       /* Shared color palette */
       :root {
