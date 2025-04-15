@@ -239,27 +239,27 @@ Renders a clickable label. On hover, a card appears with endpoint details.
 #### Full example:
 
 <EndpointEmbed  
-endpoint="/pet"  
-method="PUT"  
-specFile="ErdSpec1.json"  
-linkText="Full Details"  
-displayMode="popup"  
-websiteBaseUrl="[https://erdtest123.readme.io](https://erdtest123.readme.io/)"  
-apiTargetUrl="[https://api.erdman.com](https://api.erdman.com/)"  
-theme="card"  
-labels={true}  
-show={{  
-summary: true,  
-description: true,  
-parameters: true,  
-tags: true,  
-requestBody: true,  
-responses: true,  
-security: true,  
-example: false,  
-readmeUrl: false,  
-apiUrl: false  
-}}  
+  endpoint="/pet"  
+  method="PUT"  
+  specFile="ErdSpec1.json"  
+  linkText="Full Details"  
+  displayMode="popup"  
+  websiteBaseUrl="https://erdtest123.readme.io"  
+  apiTargetUrl="https://api.erdman.com"  
+  theme="card"  
+  labels={true}  
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    example: false,  
+    readmeUrl: false,  
+    apiUrl: false  
+  }}  
 />
 
 ---
@@ -275,24 +275,24 @@ Renders the full endpoint card directly in the page.
 #### Full version:
 
 <EndpointEmbed  
-endpoint="/pet"  
-method="POST"  
-specFile="ErdSpec1.json"  
-displayMode="inline"  
-apiTargetUrl="[https://example.com](https://example.com/)"  
-linkText="Custom Label (POST)"  
-show={{  
-summary: true,  
-description: true,  
-parameters: true,  
-requestBody: true,  
-responses: true,  
-security: true,  
-tags: true,  
-example: true,  
-readmeUrl: true,  
-apiUrl: true  
-}}  
+  endpoint="/pet"  
+  method="POST"  
+  specFile="ErdSpec1.json"  
+  displayMode="inline"  
+  apiTargetUrl="https://example.com"  
+  linkText="Custom Label (POST)"  
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    tags: true,  
+    example: true,  
+    readmeUrl: true,  
+    apiUrl: true  
+  }}  
 />
 
 ---
@@ -304,27 +304,27 @@ Swap `specFile` to pull from different OpenAPI files:
 <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
 
 <EndpointEmbed  
-endpoint="/v1/users"  
-method="POST"  
-specFile="NovaTest.json"  
-websiteBaseUrl="[https://erdtest123.readme.io](https://erdtest123.readme.io/)"  
-apiTargetUrl="[https://api.novatest.com](https://api.novatest.com/)"  
-displayMode="inline"  
-linkText="Create User (NovaTest)"  
-theme="simple"  
-labels={true}  
-show={{  
-summary: true,  
-description: true,  
-parameters: true,  
-requestBody: true,  
-responses: true,  
-security: true,  
-tags: true,  
-example: true,  
-readmeUrl: false,  
-apiUrl: true  
-}}  
+  endpoint="/v1/users"  
+  method="POST"  
+  specFile="NovaTest.json"  
+  websiteBaseUrl="https://erdtest123.readme.io"  
+  apiTargetUrl="https://api.novatest.com"  
+  displayMode="inline"  
+  linkText="Create User (NovaTest)"  
+  theme="simple"  
+  labels={true}  
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    tags: true,  
+    example: true,  
+    readmeUrl: false,  
+    apiUrl: true  
+  }}  
 />
 
 ---
@@ -333,19 +333,94 @@ apiUrl: true
 
 ## 🧱 In Cards
 
-<Cards columns={2}> <Card title="User Management" icon="fa-user-cog"> <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" theme="simple" linkText="List Users" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} /> </Card> <Card title="Posts API" icon="fa-file-alt"> <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" theme="simple" linkText="Create Post" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} /> </Card> </Cards>
+<Cards columns={2}>  
+  <Card title="User Management" icon="fa-user-cog">  
+    <EndpointEmbed  
+      endpoint="/v1/users"  
+      method="GET"  
+      specFile="NovaTest.json"  
+      displayMode="inline"  
+      theme="simple"  
+      linkText="List Users"  
+      show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
+    />  
+  </Card>  
+
+  <Card title="Posts API" icon="fa-file-alt">  
+    <EndpointEmbed  
+      endpoint="/v1/posts"  
+      method="POST"  
+      specFile="NovaTest.json"  
+      displayMode="inline"  
+      theme="simple"  
+      linkText="Create Post"  
+      show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
+    />  
+  </Card>  
+</Cards>
 
 ---
 
 ## 🔽 In Accordions
 
-<Accordion title="Upload a Pet Image" icon="fa-image"> <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} /> </Accordion> <Accordion title="Delete Pet by ID" icon="fa-trash"> <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} /> </Accordion>
+<Accordion title="Upload a Pet Image" icon="fa-image">  
+  <EndpointEmbed  
+    endpoint="/pet/{petId}/uploadImage"  
+    method="POST"  
+    specFile="ErdSpec1.json"  
+    displayMode="inline"  
+    linkText="Upload Pet Image"  
+    show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
+  />  
+</Accordion>  
+
+<Accordion title="Delete Pet by ID" icon="fa-trash">  
+  <EndpointEmbed  
+    endpoint="/pet/{petId}"  
+    method="DELETE"  
+    specFile="ErdSpec1.json"  
+    displayMode="inline"  
+    linkText="Delete Pet"  
+    show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
+  />  
+</Accordion>
 
 ---
 
 ## ➗ In Columns
 
-<Columns layout="auto"> <Column> <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} /> </Column> </Columns>
+<Columns layout="auto">  
+  <Column>  
+    <EndpointEmbed  
+      endpoint="/pet/findByTags"  
+      method="GET"  
+      specFile="ErdSpec1.json"  
+      displayMode="inline"  
+      linkText="Find by Tags"  
+      show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
+    />  
+  </Column>  
+  <Column>  
+    <EndpointEmbed  
+      endpoint="/pet/findByTags"  
+      method="GET"  
+      specFile="ErdSpec1.json"  
+      displayMode="inline"  
+      linkText="Find by Tags"  
+      show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
+    />  
+  </Column>  
+  <Column>  
+    <EndpointEmbed  
+      endpoint="/pet/findByTags"  
+      method="GET"  
+      specFile="ErdSpec1.json"  
+      displayMode="inline"  
+      linkText="Find by Tags"  
+      show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
+    />  
+  </Column>  
+</Columns>
 
 
 <Accordion title="All props/default values">
