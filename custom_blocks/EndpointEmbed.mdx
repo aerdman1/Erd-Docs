@@ -19,6 +19,7 @@ export const EndpointEmbed = ({
     security: false,
     tags: false,
     example: false,
+    readmeUrl: true, // New explicit toggle for displaying the ReadMe URL
   }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
@@ -174,60 +175,75 @@ export const EndpointEmbed = ({
     );
   };
 
-  // Determine the reference URL.
-  const referenceUrl = endpointData && endpointData.operationId
+  // Determine the ReadMe documentation URL.
+  const readmeDocUrl = endpointData && endpointData.operationId
     ? `${baseUrl}/reference/${endpointData.operationId}`
     : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
   // Render the main card content.
-const renderedContent = endpointData && (
-  <a href={referenceUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
-    <Card>
-      {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
+  const renderedContent = endpointData && (
+    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Card>
+        {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
 
-      {show.summary && (
-        <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
-          {endpointData.summary || displayLinkText}
-        </h3>
-      )}
+        {show.summary && (
+          <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
+            {endpointData.summary || displayLinkText}
+          </h3>
+        )}
 
-      {show.description && endpointData.description && (
-        <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9rem', color: '#374151' }}>
-          {endpointData.description}
-        </p>
-      )}
+        {show.description && endpointData.description && (
+          <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9rem', color: '#374151' }}>
+            {endpointData.description}
+          </p>
+        )}
 
-      {show.parameters && endpointData.parameters?.length > 0 && (
-        <p><strong>Parameters:</strong> {endpointData.parameters.map(p => p.name).join(', ')}</p>
-      )}
+        {show.parameters && endpointData.parameters?.length > 0 && (
+          <p>
+            <strong>Parameters:</strong> {endpointData.parameters.map(p => p.name).join(', ')}
+          </p>
+        )}
 
-      {show.requestBody && endpointData.requestBody && (
-        <p><strong>Has Request Body</strong></p>
-      )}
+        {show.requestBody && endpointData.requestBody && (
+          <p><strong>Has Request Body</strong></p>
+        )}
 
-      {show.responses && endpointData.responses && (
-        <p><strong>Responses:</strong> {Object.keys(endpointData.responses).join(', ')}</p>
-      )}
+        {show.responses && endpointData.responses && (
+          <p>
+            <strong>Responses:</strong> {Object.keys(endpointData.responses).join(', ')}
+          </p>
+        )}
 
-      {show.security && endpointData.security?.length > 0 && (
-        <p><strong>Security:</strong> {JSON.stringify(endpointData.security)}</p>
-      )}
+        {show.security && endpointData.security?.length > 0 && (
+          <p>
+            <strong>Security:</strong> {JSON.stringify(endpointData.security)}
+          </p>
+        )}
 
-      {show.tags && endpointData.tags?.length > 0 && (
-        <p><strong>Tags:</strong> {endpointData.tags.join(', ')}</p>
-      )}
+        {show.tags && endpointData.tags?.length > 0 && (
+          <p>
+            <strong>Tags:</strong> {endpointData.tags.join(', ')}
+          </p>
+        )}
 
-      {show.example && endpointData.example && (
-        <pre style={{ background: '#f3f4f6', padding: '8px', borderRadius: '6px', fontSize: '0.85rem', overflowX: 'auto' }}>
-          {JSON.stringify(endpointData.example, null, 2)}
-        </pre>
-      )}
+        {show.example && endpointData.example && (
+          <pre style={{
+            background: '#f3f4f6',
+            padding: '8px',
+            borderRadius: '6px',
+            fontSize: '0.85rem',
+            overflowX: 'auto'
+          }}>
+            {JSON.stringify(endpointData.example, null, 2)}
+          </pre>
+        )}
 
-      <div className="path">{referenceUrl}</div>
-    </Card>
-  </a>
-);
-
+        {show.readmeUrl !== false && (
+          <div className="path">{readmeDocUrl}</div>
+        )}
+      </Card>
+    </a>
+  );
 
   // Skeleton loader markup.
   const skeletonCard = (
@@ -243,7 +259,14 @@ const renderedContent = endpointData && (
 
   // Error display.
   const errorCard = (
-    <div style={{ border: '1px solid #dc2626', background: '#fdeaea', borderRadius: '8px', padding: '16px', color: '#dc2626', marginBottom: '8px' }}>
+    <div style={{
+      border: '1px solid #dc2626',
+      background: '#fdeaea',
+      borderRadius: '8px',
+      padding: '16px',
+      color: '#dc2626',
+      marginBottom: '8px'
+    }}>
       {error}
     </div>
   );
@@ -260,10 +283,12 @@ const renderedContent = endpointData && (
       fontWeight: '600',
     };
     return (
-      <span style={{ display: 'inline-block', position: 'relative' }}
+      <span
+        style={{ display: 'inline-block', position: 'relative' }}
         onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}>
-        <a href={referenceUrl} style={popupLinkStyle}>
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <a href={readmeDocUrl} style={popupLinkStyle}>
           {displayLinkText}
         </a>
         {isHovered && (
@@ -281,6 +306,7 @@ const renderedContent = endpointData && (
       </span>
     );
   }
+  
   return (
     <>
       {loading && skeletonCard}
@@ -372,7 +398,6 @@ const renderedContent = endpointData && (
     </>
   );
 };
-
 
 # Basic Usage
 
