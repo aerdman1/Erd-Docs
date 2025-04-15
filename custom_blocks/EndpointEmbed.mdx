@@ -180,19 +180,20 @@ export const EndpointEmbed = ({
     : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
   // Render the main card content.
-  const renderedContent = endpointData && (
+const renderedContent = endpointData && (
+  <a href={referenceUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
     <Card>
       {endpointData.method && show.summary !== false && (
         <MethodTag method={endpointData.method} />
       )}
       <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
-        {show.summary && endpointData.summary
-          ? endpointData.summary
-          : displayLinkText}
+        {show.summary && endpointData.summary ? endpointData.summary : displayLinkText}
       </h3>
       {endpointData && <div className="path">{referenceUrl}</div>}
     </Card>
-  );
+  </a>
+);
+
 
   // Skeleton loader markup.
   const skeletonCard = (
