@@ -15,8 +15,6 @@ This uses the "popup" display mode. The endpoint renders as a hyperlink—like t
 
 #### Example with all props enabled:
 
-This version includes all available options—description, parameters, request body, responses, tags, security, and more.
-
 <EndpointEmbed
   endpoint="/pet"
   method="PUT"
@@ -39,7 +37,7 @@ This version includes all available options—description, parameters, request b
   }}
 />
 
-It gives users the most complete view of the endpoint details.
+This version includes all available options—description, parameters, request body, responses, tags, security, and more. It gives users the most complete view of the endpoint details.
 
 ***
 
