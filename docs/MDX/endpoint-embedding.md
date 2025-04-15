@@ -5,7 +5,7 @@ hidden: false
 metadata:
   robots: index
 ---
-Popup Mode
+## Popup Mode
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details.
 
