@@ -25,6 +25,9 @@ If you want all endpoint info to be immediately visible, `"inline"` mode will re
 
 ***
 
+\<Accordion title="My Accordion Title" icon="fa-info-circle">
+
+
 ## Advanced Usage
 
 #### Deprecated
@@ -100,6 +103,9 @@ Use `<Columns>` to organize multiple endpoints side by side.
     <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" />
   </Column>
 </Columns>
+
+&#x20;&#x20;
+\</Accordion>
 
 ***
 
