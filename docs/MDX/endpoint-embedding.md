@@ -23,22 +23,22 @@ Renders a clickable label. On hover, a card appears with endpoint details.
   specFile="ErdSpec1.json"
   linkText="Full Details"
   displayMode="popup"
-  websiteBaseUrl="[https://erdtest123.readme.io](https://erdtest123.readme.io/)"
-  apiTargetUrl="[https://api.erdman.com](https://api.erdman.com/)"
+  websiteBaseUrl="https://erdtest123.readme.io"
+  apiTargetUrl="https://api.erdman.com"
   theme="card"
   labels={true}
   show={{  
-summary: true,  
-description: true,  
-parameters: true,  
-tags: true,  
-requestBody: true,  
-responses: true,  
-security: true,  
-example: false,  
-readmeUrl: false,  
-apiUrl: false  
-}}
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    example: false,  
+    readmeUrl: false,  
+    apiUrl: false  
+  }}
 />
 
 ***
@@ -58,20 +58,20 @@ Renders the full endpoint card directly in the page.
   method="POST"
   specFile="ErdSpec1.json"
   displayMode="inline"
-  apiTargetUrl="[https://example.com](https://example.com/)"
+  apiTargetUrl="https://example.com"
   linkText="Custom Label (POST)"
   show={{  
-summary: true,  
-description: true,  
-parameters: true,  
-requestBody: true,  
-responses: true,  
-security: true,  
-tags: true,  
-example: true,  
-readmeUrl: true,  
-apiUrl: true  
-}}
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    tags: true,  
+    example: true,  
+    readmeUrl: true,  
+    apiUrl: true  
+  }}
 />
 
 ***
@@ -86,24 +86,24 @@ Swap `specFile` to pull from different OpenAPI files:
   endpoint="/v1/users"
   method="POST"
   specFile="NovaTest.json"
-  websiteBaseUrl="[https://erdtest123.readme.io](https://erdtest123.readme.io/)"
-  apiTargetUrl="[https://api.novatest.com](https://api.novatest.com/)"
+  websiteBaseUrl="https://erdtest123.readme.io"
+  apiTargetUrl="https://api.novatest.com"
   displayMode="inline"
   linkText="Create User (NovaTest)"
   theme="simple"
   labels={true}
   show={{  
-summary: true,  
-description: true,  
-parameters: true,  
-requestBody: true,  
-responses: true,  
-security: true,  
-tags: true,  
-example: true,  
-readmeUrl: false,  
-apiUrl: true  
-}}
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    tags: true,  
+    example: true,  
+    readmeUrl: false,  
+    apiUrl: true  
+  }}
 />
 
 ***
