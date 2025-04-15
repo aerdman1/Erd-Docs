@@ -5,8 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-# Basic Usage
-
 ## 💬 Popup Mode
 
 Renders a clickable label. On hover, a card appears with endpoint details.
