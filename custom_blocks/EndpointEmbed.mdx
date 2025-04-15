@@ -11,8 +11,8 @@ export const EndpointEmbed = ({
   displayMode = 'popup',
   linkText,
   specFile,
-  theme = 'card',   // NEW
-  labels = true,    // NEW
+  theme = 'endpoint-block',
+  labels = true,
   show = {
     summary: true,
     description: true,
@@ -42,24 +42,117 @@ export const EndpointEmbed = ({
     const style = document.createElement('style');
     style.id = 'endpoint-embed-styles';
     style.textContent = `
-.card{display:flex;align-items:center;justify-content:space-between;background:#f9f9f9!important;border:1px solid #d1d5db;border-radius:8px;padding:16px;text-decoration:none!important;color:inherit;transition:background 0.2s;margin-bottom:8px}
-.card:hover{background:#7dbeff1c;border:1px solid #018ef5}
-.card.simple{background:transparent!important;border:none!important;padding:0;margin-bottom:8px}
-.card-content{flex-grow:1}
-.card h3{margin:0;font-size:1rem;font-weight:bold;color:#111827!important}
-.method{font-weight:bold;text-transform:uppercase;font-size:0.85rem;margin-bottom:4px;display:block}
-.method.get{color:#2563eb}.method.post{color:#16a34a}.method.put{color:#ca8a04}.method.delete{color:#dc2626}
-.path{font-family:monospace;font-size:0.9rem;color:#6b7280;word-break:break-all}
-.arrow{font-size:1.2rem;color:#6b7280}
-.skeleton{width:200px !important;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:8px;padding:16px;display:flex;align-items:center;justify-content:space-between;opacity:0.7;min-height:100px}
-.skeleton-method,.skeleton-title,.skeleton-path{background:linear-gradient(90deg,#e5e7eb 25%,#f3f4f6 50%,#e5e7eb 75%);background-size:200% 100%;animation:shimmer 1.5s infinite linear;border-radius:4px}
-.skeleton-method{width:50px;height:12px;margin-bottom:8px}.skeleton-title{width:60%;height:16px;margin-bottom:6px}.skeleton-path{width:80%;height:12px}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-.popup-card{position:relative;box-shadow:0 4px 10px rgba(0,0,0,0.2);background:#fff!important;border:1px solid #ccc;padding:14px 16px!important;border-radius:20px;width:fit-content;max-width:100%;font-size:0.85rem!important}
-.popup-card.simple{box-shadow:none;border:none;border-radius:0;padding:0}
-.popup-card .arrow{position:absolute;top:8px;right:12px;font-size:1.2rem;color:#6b7280}
+/* Replacing .card with .endpoint-block for the standard style
+   and .endpoint-simple for the simple style */
+.endpoint-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9f9f9!important;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  text-decoration: none!important;
+  color: inherit;
+  transition: background 0.2s;
+  margin-bottom: 8px;
+}
+.endpoint-block:hover {
+  background: #7dbeff1c;
+  border: 1px solid #018ef5;
+}
+.endpoint-simple {
+  background: transparent!important;
+  border: none!important;
+  padding: 0;
+  margin-bottom: 8px;
+}
+/* The inner content container */
+.endpoint-block-content { flex-grow: 1; }
+.endpoint-block h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #111827!important;
+}
+.method {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  display: block;
+}
+.method.get { color: #2563eb; }
+.method.post { color: #16a34a; }
+.method.put { color: #ca8a04; }
+.method.delete { color: #dc2626; }
+.path {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #6b7280;
+  word-break: break-all;
+}
+.arrow {
+  font-size: 1.2rem;
+  color: #6b7280;
+}
+.skeleton {
+  width: 200px !important;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0.7;
+  min-height: 100px;
+}
+.skeleton-method,
+.skeleton-title,
+.skeleton-path {
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: 4px;
+}
+.skeleton-method { width: 50px; height: 12px; margin-bottom: 8px; }
+.skeleton-title { width: 60%; height: 16px; margin-bottom: 6px; }
+.skeleton-path { width: 80%; height: 12px; }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.popup-card {
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  background: #fff!important;
+  border: 1px solid #ccc;
+  padding: 14px 16px!important;
+  border-radius: 20px;
+  width: fit-content;
+  max-width: 100%;
+  font-size: 0.85rem!important;
+}
+.popup-card.simple {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+.popup-card .arrow {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  font-size: 1.2rem;
+  color: #6b7280;
+}
 .CardsGrid .Card,
-.Accordion .Accordion-title, .CardsGrid .Card-icon {background: inherit;color: inherit}
+.Accordion .Accordion-title,
+.CardsGrid .Card-icon {
+  background: inherit;
+  color: inherit;
+}
     `;
     document.head.appendChild(style);
   }, []);
@@ -101,7 +194,9 @@ export const EndpointEmbed = ({
         });
       } catch {
         setEndpointData(null);
-      } finally { setLoading(false); }
+      } finally {
+        setLoading(false);
+      }
     };
     run();
   }, [endpoint, fullSpecUrl, method]);
@@ -110,53 +205,87 @@ export const EndpointEmbed = ({
   const resolveSchema = (schema, comps) => {
     if (!schema) return null;
     if (schema.example !== undefined) return schema.example;
-    if (schema.$ref) return resolveSchema(comps.schemas[schema.$ref.split('/').pop()], comps);
+    if (schema.$ref)
+      return resolveSchema(comps.schemas[schema.$ref.split('/').pop()], comps);
     if (schema.type === 'object' && schema.properties) {
-      return Object.fromEntries(Object.entries(schema.properties).map(([k,v]) => [k, resolveSchema(v, comps)]));
+      return Object.fromEntries(
+        Object.entries(schema.properties).map(([k, v]) => [k, resolveSchema(v, comps)])
+      );
     }
     if (schema.type === 'array') return [resolveSchema(schema.items, comps)];
     return null;
   };
+
   const extractExample = (op, comps) => {
-    const resp = op.responses?.['200'] || Object.values(op.responses||{})[0];
+    const resp = op.responses?.['200'] || Object.values(op.responses || {})[0];
     const media = resp?.content?.['application/json'];
     if (!media) return null;
     if (media.example) return media.example;
     if (media.examples) return Object.values(media.examples)[0]?.value;
     return resolveSchema(media.schema, comps);
   };
+
   const readmeDocUrl = endpointData?.operationId
     ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
-    : `${websiteBaseUrl}/reference/${endpoint?.replace(/[\/{}]/g,'')}`;
+    : `${websiteBaseUrl}/reference/${endpoint?.replace(/[\/{}]/g, '')}`;
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
   const label = (txt) => (labels ? <strong>{txt}: </strong> : null);
 
   /* UI Pieces */
-const Card = ({ children, extra = '' }) => (
-  <div className={`card ${theme === 'simple' ? 'simple' : ''} ${extra}`}>
-    <div className="card-content">{children}</div>
-    {theme !== 'simple' && <span className="arrow">{arrow}</span>}
-  </div>
-);
+  const Card = ({ children, extra = '' }) => (
+    // Use endpoint-simple if theme is "simple", otherwise endpoint-block
+    <div
+      className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} ${extra}`}
+    >
+      <div className="endpoint-block-content">{children}</div>
+      {theme !== 'simple' && <span className="arrow">{arrow}</span>}
+    </div>
+  );
 
-  const MethodTag = ({ method }) => <span className={`method ${method.toLowerCase()}`}>{method}</span>;
+  const MethodTag = ({ method }) => (
+    <span className={`method ${method.toLowerCase()}`}>{method}</span>
+  );
 
   const skeletonCard = (
-    <div className={`card skeleton ${theme==='simple'?'simple':''} popup-card`}>
-      <div className="card-content"><div className="skeleton-method"></div><div className="skeleton-title"></div><div className="skeleton-path"></div></div>
+    <div
+      className={`${
+        theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'
+      } skeleton popup-card`}
+    >
+      <div className="endpoint-block-content">
+        <div className="skeleton-method"></div>
+        <div className="skeleton-title"></div>
+        <div className="skeleton-path"></div>
+      </div>
       <span className="arrow">{arrow}</span>
     </div>
   );
 
   const fallbackCard = (
-    <a href={readmeDocUrl} style={{ textDecoration:'none', color:'inherit' }}>
+    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
-        <div style={{ flexGrow:1 }}>
+        <div style={{ flexGrow: 1 }}>
           {show.summary && method && <MethodTag method={method} />}
-          <h3 style={{ margin:'0 0 0.5em' }}>{linkText || displayLinkText}</h3>
-          <div style={{ fontFamily:'monospace', fontSize:'0.9rem', color:'#6b7280' }}>{endpoint}</div>
+          <h3 style={{ margin: '0 0 0.5em' }}>{linkText || displayLinkText}</h3>
+          <div
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              color: '#6b7280',
+            }}
+          >
+            {endpoint}
+          </div>
           {show.apiUrl && apiTargetUrl && (
-            <div style={{ fontFamily:'monospace', fontSize:'0.9rem', color:'#4b5563' }}>API: {method?.toUpperCase()} {apiTargetUrl+endpoint}</div>
+            <div
+              style={{
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                color: '#4b5563',
+              }}
+            >
+              API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
+            </div>
           )}
           {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
         </div>
@@ -165,19 +294,77 @@ const Card = ({ children, extra = '' }) => (
   );
 
   const renderedContent = endpointData && (
-    <a href={readmeDocUrl} style={{ textDecoration:'none', color:'inherit' }}>
+    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
-        <div style={{ flexGrow:1 }}>
+        <div style={{ flexGrow: 1 }}>
           {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
-          <h3 style={{ margin:'0 0 0.5em' }}>{linkText || endpointData.summary || displayLinkText}</h3>
-          {show.description && endpointData.description && <p style={{ margin:'0 0 0.5em', fontSize:'0.9rem', color:'#374151' }}>{endpointData.description}</p>}
-          {show.parameters && endpointData.parameters.length>0 && <div>{label('Parameters')}{endpointData.parameters.map(p=>p.name).join(', ')}</div>}
-          {show.requestBody && endpointData.requestBody && <div>{label('Request Body')}Available</div>}
-          {show.responses && endpointData.responses && <div>{label('Responses')}{Object.keys(endpointData.responses).join(', ')}</div>}
-          {show.security && endpointData.security.length>0 && <div>{label('Security')}{JSON.stringify(endpointData.security)}</div>}
-          {show.tags && endpointData.tags.length>0 && <div>{label('Tags')}{endpointData.tags.join(', ')}</div>}
-          {show.example && endpointData.example && <pre style={{ background:'#f3f4f6', padding:8, borderRadius:6, fontSize:'0.85rem', overflowX:'auto' }}>{JSON.stringify(endpointData.example,null,2)}</pre>}
-          {show.apiUrl && apiFullUrl && <div style={{ fontFamily:'monospace', fontSize:'0.9rem', color:'#4b5563' }}>API: {endpointData.method} {apiFullUrl}</div>}
+          <h3 style={{ margin: '0 0 0.5em' }}>
+            {linkText || endpointData.summary || displayLinkText}
+          </h3>
+          {show.description && endpointData.description && (
+            <p
+              style={{
+                margin: '0 0 0.5em',
+                fontSize: '0.9rem',
+                color: '#374151',
+              }}
+            >
+              {endpointData.description}
+            </p>
+          )}
+          {show.parameters && endpointData.parameters.length > 0 && (
+            <div>
+              {label('Parameters')}
+              {endpointData.parameters.map((p) => p.name).join(', ')}
+            </div>
+          )}
+          {show.requestBody && endpointData.requestBody && (
+            <div>
+              {label('Request Body')}Available
+            </div>
+          )}
+          {show.responses && endpointData.responses && (
+            <div>
+              {label('Responses')}
+              {Object.keys(endpointData.responses).join(', ')}
+            </div>
+          )}
+          {show.security && endpointData.security.length > 0 && (
+            <div>
+              {label('Security')}
+              {JSON.stringify(endpointData.security)}
+            </div>
+          )}
+          {show.tags && endpointData.tags.length > 0 && (
+            <div>
+              {label('Tags')}
+              {endpointData.tags.join(', ')}
+            </div>
+          )}
+          {show.example && endpointData.example && (
+            <pre
+              style={{
+                background: '#f3f4f6',
+                padding: 8,
+                borderRadius: 6,
+                fontSize: '0.85rem',
+                overflowX: 'auto',
+              }}
+            >
+              {JSON.stringify(endpointData.example, null, 2)}
+            </pre>
+          )}
+          {show.apiUrl && apiFullUrl && (
+            <div
+              style={{
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                color: '#4b5563',
+              }}
+            >
+              API: {endpointData.method} {apiFullUrl}
+            </div>
+          )}
           {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
         </div>
       </Card>
@@ -188,32 +375,108 @@ const Card = ({ children, extra = '' }) => (
    *  Render
    * ----------------------------------------------------------------*/
   if (displayMode === 'popup') {
-    const linkStyle = { textDecoration:'none', cursor:'pointer', color:'#1a73e8', background:'#e8f0fe', borderRadius:'4px', padding:'2px 4px', fontWeight:600 };
+    const linkStyle = {
+      textDecoration: 'none',
+      cursor: 'pointer',
+      color: '#1a73e8',
+      background: '#e8f0fe',
+      borderRadius: '4px',
+      padding: '2px 4px',
+      fontWeight: 600,
+    };
     return (
-      <span style={{ display:'inline-block', position:'relative' }} onMouseEnter={()=>setIsHovered(true)} onMouseLeave={()=>setIsHovered(false)}>
-        <a href={readmeDocUrl} style={linkStyle}>{displayLinkText}</a>
+      <span
+        style={{ display: 'inline-block', position: 'relative' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <a href={readmeDocUrl} style={linkStyle}>
+          {displayLinkText}
+        </a>
         {isHovered && (
-          <div style={{ position:'absolute', left:0, zIndex:1000, width:420 }}>
+          <div style={{ position: 'absolute', left: 0, zIndex: 1000, width: 420 }}>
             {loading && skeletonCard}
-            {!loading && (endpointData ? (
-              <a href={readmeDocUrl} style={{ textDecoration:'none', color:'inherit' }}>
-                <Card extra={`popup-card ${theme==='simple'?'simple':''}`.trim()}>
-                  <div style={{ flexGrow:1 }}>
-                    {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
-                    <h3 style={{ margin:'0 0 0.5em' }}>{linkText || endpointData.summary || displayLinkText}</h3>
-                    {show.description && endpointData.description && <p style={{ margin:'0 0 0.5em', fontSize:'0.9rem', color:'#374151' }}>{endpointData.description}</p>}
-                    {show.parameters && endpointData.parameters.length>0 && <div>{label('Parameters')}{endpointData.parameters.map(p=>p.name).join(', ')}</div>}
-                    {show.requestBody && endpointData.requestBody && <div>{label('Request Body')}Available</div>}
-                    {show.responses && endpointData.responses && <div>{label('Responses')}{Object.keys(endpointData.responses).join(', ')}</div>}
-                    {show.security && endpointData.security.length>0 && <div>{label('Security')}{JSON.stringify(endpointData.security)}</div>}
-                    {show.tags && endpointData.tags.length>0 && <div>{label('Tags')}{endpointData.tags.join(', ')}</div>}
-                    {show.example && endpointData.example && <pre style={{ background:'#f3f4f6', padding:8, borderRadius:6, fontSize:'0.85rem', overflowX:'auto' }}>{JSON.stringify(endpointData.example,null,2)}</pre>}
-                    {show.apiUrl && apiFullUrl && <div style={{ fontFamily:'monospace', fontSize:'0.9rem', color:'#4b5563' }}>API: {endpointData.method} {apiFullUrl}</div>}
-                    {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-                  </div>
-                </Card>
-              </a>
-            ) : fallbackCard)}
+            {!loading &&
+              (endpointData ? (
+                <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Card extra={`popup-card ${theme === 'simple' ? 'simple' : ''}`.trim()}>
+                    <div style={{ flexGrow: 1 }}>
+                      {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
+                      <h3 style={{ margin: '0 0 0.5em' }}>
+                        {linkText || endpointData.summary || displayLinkText}
+                      </h3>
+                      {show.description && endpointData.description && (
+                        <p
+                          style={{
+                            margin: '0 0 0.5em',
+                            fontSize: '0.9rem',
+                            color: '#374151',
+                          }}
+                        >
+                          {endpointData.description}
+                        </p>
+                      )}
+                      {show.parameters &&
+                        endpointData.parameters.length > 0 && (
+                          <div>
+                            {label('Parameters')}
+                            {endpointData.parameters.map((p) => p.name).join(', ')}
+                          </div>
+                        )}
+                      {show.requestBody && endpointData.requestBody && (
+                        <div>{label('Request Body')}Available</div>
+                      )}
+                      {show.responses && endpointData.responses && (
+                        <div>
+                          {label('Responses')}
+                          {Object.keys(endpointData.responses).join(', ')}
+                        </div>
+                      )}
+                      {show.security &&
+                        endpointData.security.length > 0 && (
+                          <div>
+                            {label('Security')}
+                            {JSON.stringify(endpointData.security)}
+                          </div>
+                        )}
+                      {show.tags &&
+                        endpointData.tags.length > 0 && (
+                          <div>
+                            {label('Tags')}
+                            {endpointData.tags.join(', ')}
+                          </div>
+                        )}
+                      {show.example && endpointData.example && (
+                        <pre
+                          style={{
+                            background: '#f3f4f6',
+                            padding: 8,
+                            borderRadius: 6,
+                            fontSize: '0.85rem',
+                            overflowX: 'auto',
+                          }}
+                        >
+                          {JSON.stringify(endpointData.example, null, 2)}
+                        </pre>
+                      )}
+                      {show.apiUrl && apiFullUrl && (
+                        <div
+                          style={{
+                            fontFamily: 'monospace',
+                            fontSize: '0.9rem',
+                            color: '#4b5563',
+                          }}
+                        >
+                          API: {endpointData.method} {apiFullUrl}
+                        </div>
+                      )}
+                      {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+                    </div>
+                  </Card>
+                </a>
+              ) : (
+                fallbackCard
+              ))}
           </div>
         )}
       </span>
@@ -224,7 +487,6 @@ const Card = ({ children, extra = '' }) => (
   if (!endpointData) return fallbackCard;
   return renderedContent;
 };
-
 
 # Basic Usage
 
@@ -246,7 +508,7 @@ Renders a clickable label. On hover, a card appears with endpoint details.
   displayMode="popup"  
   websiteBaseUrl="https://erdtest123.readme.io"  
   apiTargetUrl="https://api.erdman.com"  
-  theme="card"  
+  theme="endpoint-block"  
   labels={true}  
   show={{  
     summary: true,  
@@ -268,7 +530,9 @@ Renders a clickable label. On hover, a card appears with endpoint details.
 
 Renders the full endpoint card directly in the page.
 
-#### Simple version:
+#### Card version:
+
+<EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
 
 <EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
 
@@ -433,7 +697,7 @@ Swap `specFile` to pull from different OpenAPI files:
 | `specFile`         | `string`      | _required_                           | The OpenAPI JSON file name to load (e.g. `ErdSpec1.json`).                     |
 | `displayMode`      | `string`      | `'popup'`                            | Determines how the component renders: `'popup'` or `'inline'`.                 |
 | `linkText`         | `string`      | _fallbacks to `endpoint`_            | Custom text to display instead of the raw endpoint path.                        |
-| `theme`            | `string`      | `'card'`                             | `'card'` renders with background chrome; `'simple'` removes padding and borders.|
+| `theme`            | `string`      | `'endpoint-block'`                   | `'endpoint-block'` renders with background chrome; `'simple'` removes padding and borders.|
 | `labels`           | `boolean`     | `true`                               | If `false`, hides labels like `Summary:`, `Parameters:`, etc.                  |
 | `show.summary`     | `boolean`     | `true`                               | Toggles display of the summary/method line.                                    |
 | `show.description` | `boolean`     | `true`                               | Toggles display of the endpoint description.                                   |
