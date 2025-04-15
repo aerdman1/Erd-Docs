@@ -21,7 +21,7 @@ Here's a simple inline demo using a different endpoint. For example, this compon
 
 If you want all endpoint information to be immediately visible without any user interaction, "inline" mode is a great choice. This demo keeps it simple and focuses on a real-world endpoint in your API.
 
-***
+<br />
 
 ## Advanced Usage
 
@@ -33,29 +33,29 @@ If you want all endpoint information to be immediately visible without any user 
 
 ### 🗂️ Works with Any Spec File
 
-You can point to other OpenAPI files by changing the `specFile` prop. Useful if you’re documenting multiple services.
+You can point to other OpenAPI files by changing the `specFile` prop. This is useful if you’re documenting multiple services.
 
-<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
+<EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" />
+<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
 ***
 
 ### 🧱 Inside Cards
 
-This component plays nicely inside ReadMe's `<Cards>` layout. Great for overview sections or dashboards.
+This component integrates nicely within ReadMe's `<Cards>` layout, making it ideal for dashboards or overview sections.
 
 <Cards columns={2}>
   <Card title="User Management" icon="fa-user-cog">
-    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" />
+    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-    <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" />
+    <EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
   </Card>
 
   <Card title="Posts API" icon="fa-file-alt">
-    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" />
+    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create Post" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-    <EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" />
+    <EndpointEmbed endpoint="/v1/posts/{postId}" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="Get Post by ID" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
   </Card>
 </Cards>
 
@@ -66,11 +66,11 @@ This component plays nicely inside ReadMe's `<Cards>` layout. Great for overview
 Perfect for FAQs or progressive disclosure.
 
 <Accordion title="Upload a Pet Image" icon="fa-image">
-  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
+  <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 </Accordion>
 
 <Accordion title="Delete Pet by ID" icon="fa-trash">
-  <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" />
+  <EndpointEmbed endpoint="/pet/{petId}" method="DELETE" specFile="ErdSpec1.json" displayMode="inline" linkText="Delete Pet" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 </Accordion>
 
 ***
@@ -81,15 +81,15 @@ Use `<Columns>` to organize multiple endpoints side by side.
 
 <Columns layout="auto">
   <Column>
-    <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" />
+    <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
   </Column>
 
   <Column>
-    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" />
+    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
   </Column>
 </Columns>
 
-&#x20;&#x20;
+<br />
 
 ***
 
