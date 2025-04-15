@@ -4,9 +4,9 @@ name: EndpointEmbed
 import React, { useEffect, useState } from 'react';
 
 export const EndpointEmbed = ({
-  baseUrl = 'https://erdtest123.readme.io',  // New prop for the base URL
+  baseUrl = 'https://erdtest123.readme.io',  // Base URL for fetching the OpenAPI spec
   endpoint,
-  method, // Optional prop to specify HTTP method, e.g., 'GET', 'POST'
+  method,
   displayMode = 'popup',
   linkText,
   specFile = "ErdSpec1.json",
@@ -26,9 +26,12 @@ export const EndpointEmbed = ({
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
+  // For the "card" style
+  const [arrow] = useState('›'); // You could use an icon
+
   // Default link text to the endpoint value if none is provided.
   const displayLinkText = linkText || endpoint;
-  // Build the full spec URL using the baseUrl and specFile prop.
+  // Build the full spec URL using baseUrl and specFile.
   const fullSpecUrl = `${baseUrl}/openapi/${specFile}`;
 
   useEffect(() => {
@@ -37,7 +40,6 @@ export const EndpointEmbed = ({
       return;
     }
     fetchEndpointExample();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endpoint, fullSpecUrl, method]);
 
   const fetchEndpointExample = async () => {
@@ -56,13 +58,13 @@ export const EndpointEmbed = ({
 
       let chosenOperation = null;
       let chosenMethod = null;
-      
-      // If a specific method is provided and exists in the spec, use it.
+
+      // If a specific method is provided and exists, use it.
       if (typeof method === 'string' && operations[method.toLowerCase()]) {
         chosenOperation = operations[method.toLowerCase()];
         chosenMethod = method.toUpperCase();
       } else {
-        // Otherwise, iterate over operations and pick one with an example.
+        // Otherwise, iterate to find an operation with an example.
         for (const [m, op] of Object.entries(operations)) {
           const example = extractResponseExample(op, spec.components);
           if (example) {
@@ -71,8 +73,8 @@ export const EndpointEmbed = ({
             break;
           }
         }
-        // Fallback to the first available operation if no operation had an example.
         if (!chosenOperation) {
+          // fallback to first
           const [m, op] = Object.entries(operations)[0];
           chosenOperation = op;
           chosenMethod = m.toUpperCase();
@@ -83,8 +85,6 @@ export const EndpointEmbed = ({
       const description = chosenOperation.description || '';
       const example = extractResponseExample(chosenOperation, spec.components);
       const operationId = chosenOperation.operationId || '';
-
-      // Additional metadata from the operation.
       const parameters = chosenOperation.parameters || [];
       const requestBody = chosenOperation.requestBody || null;
       const responses = chosenOperation.responses || {};
@@ -113,7 +113,7 @@ export const EndpointEmbed = ({
     }
   };
 
-  // Helper: Recursively resolve an example from a schema.
+  // Recursively resolve example from a schema.
   const resolveExampleFromSchema = (schema, components) => {
     if (!schema) return null;
     if (schema.example !== undefined) {
@@ -138,7 +138,7 @@ export const EndpointEmbed = ({
     return null;
   };
 
-  // Helper: Extract an example from an operation’s responses.
+  // Extract an example from an operation’s responses.
   const extractResponseExample = (operation, components) => {
     if (!operation.responses) return null;
     let response = operation.responses['200'] || operation.responses['default'];
@@ -163,241 +163,247 @@ export const EndpointEmbed = ({
     return null;
   };
 
-  // Base card styling.
-  const baseCardStyle = {
-    border: '1px solid #ddd',
-    background: '#fff',
-    padding: '16px',
-    borderRadius: '8px',
-    boxShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+  // ** "Card" style for inline usage. **
+  const Card = ({ children }) => (
+    <div className="card">
+      <div className="card-content">{children}</div>
+      <span className="arrow">{arrow}</span>
+    </div>
+  );
+
+  // We also show the method style, e.g. GET, POST, DELETE, etc.
+  const MethodTag = ({ method }) => {
+    const lowerMethod = (method || '').toLowerCase();
+    return (
+      <span className={`method ${lowerMethod}`}>
+        {method}
+      </span>
+    );
   };
 
-  // Use full width for inline mode; fixed 400px width for popup mode.
-  const cardWidthStyle = displayMode === 'inline'
-    ? { width: '100%' }
-    : { width: '400px' };
-
-  // For popup mode, the card is absolutely positioned so that it overlays content without moving it.
-  const popupPositionStyle = displayMode === 'popup'
-    ? { position: 'absolute', top: '100%', left: '0', zIndex: 1000, marginTop: '1px' }
-    : {};
-
-  const cardStyle = displayMode === 'inline'
-    ? { padding: 0, background: 'transparent', border: 'none', boxShadow: 'none' }
-    : { ...baseCardStyle, ...cardWidthStyle, ...popupPositionStyle };
-
-  // Custom link styling so it stands out.
-  const customLinkStyle = {
-    textDecoration: 'none',
-    cursor: 'pointer',
-    color: '#1a73e8',
-    backgroundColor: '#e8f0fe',
-    borderRadius: '4px',
-    padding: '2px 4px',
-    fontWeight: '600',
-  };
-
-  // Determine the reference URL.
-  // Use operationId if available; otherwise, fall back to a sanitized endpoint string.
+  // Determine the reference URL
   const referenceUrl = endpointData && endpointData.operationId
     ? `${baseUrl}/reference/${endpointData.operationId}`
     : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
-  // Render additional metadata sections using the "show" prop to toggle visibility.
-  const renderParameters = () => {
-    if (!show.parameters || !endpointData.parameters.length) return null;
-    return (
-      <div>
-        <strong>Parameters:</strong>
-        <ul>
-          {endpointData.parameters.map((param, idx) => (
-            <li key={idx}>
-              <strong>{param.name}</strong> (<em>{param.in}</em>) {param.required ? '[Required]' : ''}
-              {param.description && ` - ${param.description}`}
-              {param.schema && param.schema.type && ` (type: ${param.schema.type})`}
-              {param.schema && param.schema.default !== undefined && ` [default: ${param.schema.default}]`}
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
-  const renderRequestBody = () => {
-    if (!show.requestBody || !endpointData.requestBody) return null;
-    const contentTypes = endpointData.requestBody.content ? Object.keys(endpointData.requestBody.content) : [];
-    return (
-      <div>
-        <strong>Request Body:</strong>
-        {endpointData.requestBody.description && <p>{endpointData.requestBody.description}</p>}
-        {contentTypes.length > 0 && (
-          <p>Supported Content Types: {contentTypes.join(', ')}</p>
-        )}
-      </div>
-    );
-  };
-
-  const renderResponses = () => {
-    if (!show.responses || !endpointData.responses || Object.keys(endpointData.responses).length === 0) return null;
-    return (
-      <div>
-        <strong>Responses:</strong>
-        <ul>
-          {Object.entries(endpointData.responses).map(([code, response]) => (
-            <li key={code}>
-              <strong>{code}:</strong> {response.description}
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
-  const renderSecurity = () => {
-    if (!show.security || !endpointData.security.length) return null;
-    return (
-      <div>
-        <strong>Security:</strong>
-        <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.9em' }}>
-          {JSON.stringify(endpointData.security, null, 2)}
-        </pre>
-      </div>
-    );
-  };
-
-  const renderTags = () => {
-    if (!show.tags || !endpointData.tags.length) return null;
-    return (
-      <div>
-        <strong>Tags:</strong> {endpointData.tags.join(', ')}
-      </div>
-    );
-  };
-
-  const renderDeprecated = () => {
-    if (!endpointData.deprecated) return null;
-    return (
-      <div style={{ color: 'red', fontWeight: 'bold' }}>
-        Warning: This endpoint is deprecated.
-      </div>
-    );
-  };
-
-  const renderSummary = () => {
-    if (!show.summary || !endpointData.summary) return null;
-    return <p><strong>Summary:</strong> {endpointData.summary}</p>;
-  };
-
-  const renderDescription = () => {
-    if (!show.description || !endpointData.description) return null;
-    return <p><strong>Description:</strong> {endpointData.description}</p>;
-  };
-
-  const renderExample = () => {
-    if (!show.example || !endpointData.example) return null;
-    return (
-      <div>
-        <strong>Example Response:</strong>
-        <pre
-          style={{
-            whiteSpace: 'pre-wrap',
-            padding: '8px',
-            borderRadius: '4px',
-            marginTop: '8px'
-          }}
-        >
-          {JSON.stringify(endpointData.example, null, 2)}
-        </pre>
-      </div>
-    );
-  };
-
-  // Render the main content card.
+  // This is the main rendered content (like the "card") for inline mode
+  // or the content that appears in the popup if displayMode = 'popup' and not loading.
   const renderedContent = endpointData && (
-    <div style={cardStyle}>
-      <h3 style={{ margin: '5px 0' }}>
-        <a href={referenceUrl} style={customLinkStyle}>
-          {displayLinkText}
-        </a>
+    <Card>
+      {/* If you want to show the actual method: */}
+      {endpointData.method && show.parameters !== false && (
+        <MethodTag method={endpointData.method} />
+      )}
+
+      {/* Title or summary */}
+      <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
+        {show.summary && endpointData.summary
+          ? endpointData.summary
+          : displayLinkText}
       </h3>
-      {renderDeprecated()}
-      {renderSummary()}
-      {renderDescription()}
-      {renderParameters()}
-      {renderRequestBody()}
-      {renderResponses()}
-      {renderSecurity()}
-      {renderTags()}
-      {renderExample()}
-    </div>
+
+      {/* Path or reference URL. This is optional. */}
+      {endpointData ? (
+        <div className="path">{referenceUrl}</div>
+      ) : null}
+    </Card>
   );
 
-  // Skeleton Loader component to use during loading.
-  const SkeletonLoader = () => (
-    <div className="skeleton">
-      <div>
+  // The skeleton loader markup, displayed while `loading === true`.
+  const skeletonCard = (
+    <div className="card skeleton">
+      <div className="card-content">
         <div className="skeleton-method"></div>
         <div className="skeleton-title"></div>
         <div className="skeleton-path"></div>
       </div>
+      <span className="arrow">›</span>
     </div>
   );
 
+  // ERROR display
+  const errorCard = (
+    <div
+      style={{
+        border: '1px solid #dc2626',
+        background: '#fdeaea',
+        borderRadius: '8px',
+        padding: '16px',
+        color: '#dc2626',
+        marginBottom: '8px',
+      }}
+    >
+      {error}
+    </div>
+  );
+
+  // ** RENDER LOGIC **
+  // For POPUP mode, we show just a link, and on hover we show the card or skeleton/error.
   if (displayMode === 'popup') {
+    const popupLinkStyle = {
+      textDecoration: 'none',
+      cursor: 'pointer',
+      color: '#1a73e8',
+      backgroundColor: '#e8f0fe',
+      borderRadius: '4px',
+      padding: '2px 4px',
+      fontWeight: '600',
+    };
+
     return (
       <span
         style={{ display: 'inline-block', position: 'relative' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <a href={referenceUrl} style={customLinkStyle}>
+        {/* The hyperlink or "trigger" */}
+        <a href={referenceUrl} style={popupLinkStyle}>
           {displayLinkText}
         </a>
+
         {isHovered && (
-          <>
-            {loading && (
-              <div
-                style={{
-                  ...cardStyle,
-                  position: 'absolute',
-                  top: '100%',
-                  left: '0',
-                  zIndex: 1000,
-                  marginTop: '1px'
-                }}
-              >
-                <SkeletonLoader />
-              </div>
-            )}
-            {error && (
-              <div
-                style={{
-                  ...cardStyle,
-                  color: 'red',
-                  position: 'absolute',
-                  top: '100%',
-                  left: '0',
-                  zIndex: 1000,
-                  marginTop: '1px'
-                }}
-              >
-                {error}
-              </div>
-            )}
+          <div
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: '0',
+              zIndex: 1000,
+              marginTop: '1px',
+              width: '420px', // matches skeleton width
+            }}
+          >
+            {loading && skeletonCard}
+            {error && !loading && errorCard}
             {!loading && !error && renderedContent}
-          </>
+          </div>
         )}
       </span>
     );
   }
 
+  // INLINE mode: We simply show the skeleton if loading, an error if error, or the card if loaded.
   return (
     <>
-      <div style={{ marginBottom: '16px', width: '100%' }}>
-        {loading && <SkeletonLoader />}
-        {error && <div style={{ color: 'red' }}>{error}</div>}
-        {!loading && !error && renderedContent}
-      </div>
+      {loading && skeletonCard}
+      {error && !loading && errorCard}
+      {!loading && !error && renderedContent}
+
+      {/* Inline styles from your DocumentsAPI snippet. 
+          Or you can load them globally. 
+      */}
+      <style>{`
+        .card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #f9f9f9bf;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          padding: 16px;
+          text-decoration: none !important;
+          color: inherit;
+          transition: background 0.2s;
+          margin-bottom: 8px;
+        }
+        .card:hover {
+          background: #7dbeff1c;
+          border: 1px solid #018ef5;
+        }
+        .card-content {
+          flex-grow: 1;
+        }
+        .card h3 {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: bold;
+          color: #111827;
+        }
+        .method {
+          font-weight: bold;
+          text-transform: uppercase;
+          font-size: 0.85rem;
+          margin-bottom: 4px;
+          display: block;
+        }
+        .method.get { color: #2563eb; }
+        .method.post { color: #16a34a; }
+        .method.put { color: #ca8a04; }
+        .method.delete { color: #dc2626; }
+        .path {
+          font-family: monospace;
+          font-size: 0.9rem;
+          color: #6b7280;
+        }
+        .arrow {
+          font-size: 1.2rem;
+          color: #6b7280;
+        }
+
+        /* Skeleton Loading Styles */
+        .skeleton {
+          width: 420px !important; /* Matches real cards */
+          background: #f3f4f6;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          opacity: 0.7;
+          min-height: 100px; /* Ensures same height as real cards */
+        }
+
+        .skeleton-method, .skeleton-title, .skeleton-path {
+          background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+          background-size: 200% 100%;
+          animation: shimmer 1.5s infinite linear;
+          border-radius: 4px;
+        }
+        .skeleton-method {
+          width: 50px;
+          height: 12px;
+          margin-bottom: 8px;
+        }
+        .skeleton-title {
+          width: 60%;
+          height: 16px;
+          margin-bottom: 6px;
+        }
+        .skeleton-path {
+          width: 80%;
+          height: 12px;
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+
+        /* Dark mode variations (optional) */
+        [data-color-mode=dark] .card {
+          background: #0000007a;
+        }
+        @media (prefers-color-scheme: dark) {
+          [data-color-mode=system] .card {
+            background:#0000007a;
+          }
+        }
+        [data-color-mode=dark] .card:hover {
+          background:black;
+        }
+        @media (prefers-color-scheme: dark) {
+          [data-color-mode=system] .card:hover {
+            background:black;
+          }
+        }
+        [data-color-mode=dark] .card h3 {
+          color: #fff;
+        }
+        @media (prefers-color-scheme: dark) {
+          [data-color-mode=system] .card h3 {
+            color: #fff;
+          }
+        }
+      `}</style>
     </>
   );
 };
