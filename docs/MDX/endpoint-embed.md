@@ -57,18 +57,6 @@ This inline display is great for showing users how to **update** or **create** a
   </Column>
 </Columns>
 
-<Cards columns={2}>
-  <Card title="First Card" icon="fa-home" target="_blank">
-    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
-  </Card>
-
-  <Card title="Second Card" icon="fa-user">
-    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
-  </Card>
-</Cards>
-
-<br />
-
 <Accordion title="My Embedded Endpoint" icon="fa-info-circle">
   <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Pet Image" />
 </Accordion>
