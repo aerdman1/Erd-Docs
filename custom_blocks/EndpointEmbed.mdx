@@ -35,7 +35,49 @@ export const EndpointEmbed = ({
   const displayLinkText = linkText || endpoint;
   // Use useMemo to avoid recalculating URL on every render.
   const fullSpecUrl = useMemo(() => `${websiteBaseUrl}/openapi/${specFile}`, [websiteBaseUrl, specFile]);
+  
+  // Cache
+  useEffect(() => {
+  if (!endpoint) {
+    setError('Endpoint not provided.');
+    return;
+  }
 
+  const fetchEndpointExample = async () => { 
+    setLoading(true);
+    setError(null);
+
+    let cache = {};
+    if (typeof window !== 'undefined') {
+      if (!window.__endpointSpecCache) {
+        window.__endpointSpecCache = {};
+      }
+      cache = window.__endpointSpecCache;
+    }
+
+    try {
+      let spec;
+      if (cache[fullSpecUrl]) {
+        spec = cache[fullSpecUrl];
+      } else {
+        const response = await fetch(fullSpecUrl);
+        if (!response.ok) throw new Error("This endpoint may be private or restricted.");
+        spec = await response.json();
+        cache[fullSpecUrl] = spec;
+      }
+
+      // rest of your parsing logic here...
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchEndpointExample();
+}, [endpoint, fullSpecUrl, method]);
+
+  
   // Inject shared CSS into document head exactly once.
   useEffect(() => {
     if (!document.getElementById('endpoint-embed-styles')) {
@@ -46,7 +88,7 @@ export const EndpointEmbed = ({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: #f9f9f9;
+          background: #f9f9f9 !important;
           border: 1px solid #d1d5db;
           border-radius: 8px;
           padding: 16px;
@@ -127,14 +169,14 @@ export const EndpointEmbed = ({
           border: 1px solid #ccc;
         }
         .popup-card:hover {
-         border: 1px solid #018ef5;
+          border: 1px solid #018ef5;
         }
       `;
       document.head.appendChild(style);
     }
   }, []);
 
-  // Fetch the endpoint info when dependencies change.
+  // Fetch the spec file (using cache) then extract endpoint info.
   useEffect(() => {
     if (!endpoint) {
       setError('Endpoint not provided.');
@@ -144,11 +186,19 @@ export const EndpointEmbed = ({
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(fullSpecUrl);
-        if (!response.ok) {
-          throw new Error("This endpoint may be private or restricted.");
+        let spec;
+        if (specCache[fullSpecUrl]) {
+          spec = specCache[fullSpecUrl];
+        } else {
+          const response = await fetch(fullSpecUrl);
+          if (!response.ok) {
+            throw new Error("This endpoint may be private or restricted.");
+          }
+          spec = await response.json();
+          // Cache the fetched spec
+          specCache[fullSpecUrl] = spec;
         }
-        const spec = await response.json();
+        
         const operations = spec.paths[endpoint];
         if (!operations) {
           throw new Error(`No endpoint found in spec for path ${endpoint}`);
