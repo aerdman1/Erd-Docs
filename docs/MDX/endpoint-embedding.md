@@ -20,7 +20,7 @@ Renders a clickable label. On hover, a card appears with endpoint details.
 <EndpointEmbed
   endpoint="/pet"
   method="PUT"
-  specFile="ErdSpec21.json"
+  specFile="ErdSpec1.json"
   linkText="Full Details"
   displayMode="popup"
   websiteBaseUrl="https://erdtest123.readme.io"
@@ -86,7 +86,7 @@ Renders the full endpoint card directly in the page.
 
 ***
 
-## 🗂️ Different Spec Files
+## 🗂️ Multiple Spec Files
 
 Swap `specFile` to pull from different OpenAPI files:
 
@@ -115,36 +115,6 @@ Swap `specFile` to pull from different OpenAPI files:
     apiUrl: true  
   }}
 />
-
-## Broken Spec File/Link?
-
-### We will fallback to the basics set in the component/props so it at leasts shows something
-
-<EndpointEmbed
-  endpoint="/v1/users"
-  method="POST"
-  specFile="DoesNotExist.json"
-  websiteBaseUrl="https://erdtest123.readme.io"
-  apiTargetUrl="https://api.novatest.com"
-  displayMode="inline"
-  linkText="Create User (NovaTest)"
-  theme="simple"
-  labels={true}
-  show={{  
-    summary: true,  
-    description: true,  
-    parameters: true,  
-    requestBody: true,  
-    responses: true,  
-    security: true,  
-    tags: true,  
-    example: true,  
-    readmeUrl: false,  
-    apiUrl: true  
-  }}
-/>
-
-<br />
 
 ***
 
