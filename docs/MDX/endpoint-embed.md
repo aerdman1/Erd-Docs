@@ -5,11 +5,11 @@ hidden: false
 metadata:
   robots: index
 ---
-## Basic Usage
-
 ### Popup (hover over)
 
 When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />.
+
+<br />
 
 ***
 
