@@ -360,6 +360,24 @@ If you want all endpoint info immediately visible, `"inline"` mode renders the c
 
 <EndpointEmbed endpoint="/pet" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Inline Pet Endpoint (POST)" />
 
+<EndpointEmbed 
+  endpoint="/pet" 
+  method="POST" 
+  specFile="ErdSpec1.json" 
+  displayMode="popup" 
+  linkText="Inline Pet Endpoint (POST)"
+  show={{ 
+    summary: true, 
+    description: true, 
+    parameters: true, 
+    requestBody: true, 
+    responses: true, 
+    security: true, 
+    tags: true, 
+    example: true 
+  }} 
+/>
+
 ---
 
 ## 🗂️ Works with Any Spec File
