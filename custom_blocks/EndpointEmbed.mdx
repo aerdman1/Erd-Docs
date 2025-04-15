@@ -1,7 +1,7 @@
 ---
 name: EndpointEmbed
 ---
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 export const EndpointEmbed = ({
   websiteBaseUrl = 'https://erdtest123.readme.io', // The website URL for fetching the OpenAPI spec
@@ -28,12 +28,13 @@ export const EndpointEmbed = ({
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [arrow] = useState('›');
+  // arrow is static so no need to update it.
+  const arrow = '›';
 
   // Default link text if not provided.
   const displayLinkText = linkText || endpoint;
-  // Build full spec URL using websiteBaseUrl:
-  const fullSpecUrl = `${websiteBaseUrl}/openapi/${specFile}`;
+  // Use useMemo to avoid recalculating URL on every render.
+  const fullSpecUrl = useMemo(() => `${websiteBaseUrl}/openapi/${specFile}`, [websiteBaseUrl, specFile]);
 
   // Inject shared CSS into document head exactly once.
   useEffect(() => {
@@ -124,94 +125,94 @@ export const EndpointEmbed = ({
     }
   }, []);
 
+  // Fetch the endpoint info when dependencies change.
   useEffect(() => {
     if (!endpoint) {
       setError('Endpoint not provided.');
       return;
     }
+    const fetchEndpointExample = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(fullSpecUrl);
+        if (!response.ok) {
+          throw new Error("This endpoint may be private or restricted.");
+        }
+        const spec = await response.json();
+        const operations = spec.paths[endpoint];
+        if (!operations) {
+          throw new Error(`No endpoint found in spec for path ${endpoint}`);
+        }
+        let chosenOperation = null;
+        let chosenMethod = null;
+        const lowerMethod = typeof method === 'string' ? method.toLowerCase() : null;
+        if (lowerMethod && operations[lowerMethod]) {
+          chosenOperation = operations[lowerMethod];
+          chosenMethod = method.toUpperCase();
+        } else {
+          for (const [m, op] of Object.entries(operations)) {
+            const example = extractResponseExample(op, spec.components);
+            if (example) {
+              chosenOperation = op;
+              chosenMethod = m.toUpperCase();
+              break;
+            }
+          }
+          if (!chosenOperation) {
+            const [m, op] = Object.entries(operations)[0];
+            chosenOperation = op;
+            chosenMethod = m.toUpperCase();
+          }
+        }
+
+        const summary = chosenOperation.summary || '';
+        const description = chosenOperation.description || '';
+        const example = extractResponseExample(chosenOperation, spec.components);
+        const operationId = chosenOperation.operationId || '';
+        const parameters = chosenOperation.parameters || [];
+        const requestBody = chosenOperation.requestBody || null;
+        const responses = chosenOperation.responses || {};
+        const security = chosenOperation.security || [];
+        const tags = chosenOperation.tags || [];
+        setEndpointData({
+          path: endpoint,
+          method: chosenMethod,
+          summary,
+          description,
+          example,
+          operationId,
+          parameters,
+          requestBody,
+          responses,
+          security,
+          tags,
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchEndpointExample();
   }, [endpoint, fullSpecUrl, method]);
 
-  const fetchEndpointExample = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(fullSpecUrl);
-      if (!response.ok) {
-        throw new Error("This endpoint may be private or restricted.");
-      }
-      const spec = await response.json();
-      const operations = spec.paths[endpoint];
-      if (!operations) {
-        throw new Error(`No endpoint found in spec for path ${endpoint}`);
-      }
-
-      let chosenOperation = null;
-      let chosenMethod = null;
-      if (typeof method === 'string' && operations[method.toLowerCase()]) {
-        chosenOperation = operations[method.toLowerCase()];
-        chosenMethod = method.toUpperCase();
-      } else {
-        for (const [m, op] of Object.entries(operations)) {
-          const example = extractResponseExample(op, spec.components);
-          if (example) {
-            chosenOperation = op;
-            chosenMethod = m.toUpperCase();
-            break;
-          }
-        }
-        if (!chosenOperation) {
-          const [m, op] = Object.entries(operations)[0];
-          chosenOperation = op;
-          chosenMethod = m.toUpperCase();
-        }
-      }
-
-      const summary = chosenOperation.summary || '';
-      const description = chosenOperation.description || '';
-      const example = extractResponseExample(chosenOperation, spec.components);
-      const operationId = chosenOperation.operationId || '';
-      const parameters = chosenOperation.parameters || [];
-      const requestBody = chosenOperation.requestBody || null;
-      const responses = chosenOperation.responses || {};
-      const security = chosenOperation.security || [];
-      const tags = chosenOperation.tags || [];
-      setEndpointData({
-        path: endpoint,
-        method: chosenMethod,
-        summary,
-        description,
-        example,
-        operationId,
-        parameters,
-        requestBody,
-        responses,
-        security,
-        tags,
-      });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Recursively resolve example from a schema.
+  // Recursively resolve an example from a schema.
   const resolveExampleFromSchema = (schema, components) => {
     if (!schema) return null;
     if (schema.example !== undefined) return schema.example;
     if (schema.$ref) {
-      const refParts = schema.$ref.split('/');
-      const schemaName = refParts[refParts.length - 1];
+      const schemaName = schema.$ref.split('/').pop();
       const resolved = components.schemas[schemaName];
       return resolveExampleFromSchema(resolved, components);
     }
     if (schema.type === 'object' && schema.properties) {
-      const obj = {};
-      Object.entries(schema.properties).forEach(([prop, propSchema]) => {
-        obj[prop] = resolveExampleFromSchema(propSchema, components);
-      });
-      return obj;
+      return Object.fromEntries(
+        Object.entries(schema.properties).map(([prop, propSchema]) => [
+          prop,
+          resolveExampleFromSchema(propSchema, components)
+        ])
+      );
     }
     if (schema.type === 'array' && schema.items) {
       return [resolveExampleFromSchema(schema.items, components)];
@@ -223,7 +224,9 @@ export const EndpointEmbed = ({
   const extractResponseExample = (operation, components) => {
     if (!operation.responses) return null;
     let response = operation.responses['200'] || operation.responses['default'];
-    if (!response) response = Object.values(operation.responses)[0];
+    if (!response) {
+      response = Object.values(operation.responses)[0];
+    }
     if (response && response.content) {
       const media = response.content['application/json'];
       if (media) {
@@ -253,10 +256,10 @@ export const EndpointEmbed = ({
   };
 
   // Use apiTargetUrl if provided; otherwise use websiteBaseUrl for the reference URL.
-  const targetUrl = apiTargetUrl || websiteBaseUrl;
-  const readmeDocUrl = endpointData && endpointData.operationId
-    ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
-    : `${websiteBaseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
+  const readmeDocUrl =
+    endpointData && endpointData.operationId
+      ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
+      : `${websiteBaseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
   // Build the API endpoint URL if apiTargetUrl is provided.
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
@@ -344,7 +347,7 @@ export const EndpointEmbed = ({
         <div className="skeleton-title"></div>
         <div className="skeleton-path"></div>
       </div>
-      <span className="arrow">›</span>
+      <span className="arrow">{arrow}</span>
     </div>
   );
 
@@ -404,7 +407,7 @@ export const EndpointEmbed = ({
     </>
   );
 };
- 
+
 # Basic Usage 
 
 ## 💬 Popup Mode
