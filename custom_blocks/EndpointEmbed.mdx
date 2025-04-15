@@ -45,53 +45,69 @@ export const EndpointEmbed = ({
     if (document.getElementById("endpoint-embed-styles")) return;
     var style = document.createElement("style");
     style.id = "endpoint-embed-styles";
-    style.textContent = `
-/* General card styles */
-.endpoint-block {
+ style.textContent = `
+/* Shared color palette */
+:root {
+  --gray-500: #6b7280;
+  --gray-800: #111827;
+  --gray-light: #f9f9f9;
+  --blue-hover: #7dbeff1c;
+  --white: #fff;
+  --shadow-default: 0 8px 16px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Base block styles */
+.endpoint-block,
+.endpoint-simple {
   display: flex;
   flex-direction: column;
-  background: #f9f9f9!important;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 16px;
-  text-decoration: none!important;
+  text-decoration: none;
   color: inherit;
-  margin-bottom: 8px;
-  width: fit-content;
-  max-width: 100%;
-  min-width:250px;
-}
-.endpoint-block:hover {
-  background: #7dbeff1c;
-  border: 1px solid #6b7280;
-}
-.endpoint-simple {
-  background: transparent!important;
-  border: none!important;
-  padding: 16px;
   margin-bottom: 8px;
   width: fit-content;
   max-width: 100%;
   min-width: 250px;
   position: relative;
 }
-/* Arrow shown on hover in top-right */
+
+.endpoint-block {
+  background: var(--gray-light);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+}
+.endpoint-block:hover {
+  background: var(--blue-hover);
+  border-color: var(--gray-500);
+}
+
+.endpoint-simple {
+  background: transparent;
+  border: none;
+  padding: 16px;
+}
+
+/* Shared arrow indicator */
 .endpoint-block::after,
-.endpoint-simple::after {
+.endpoint-simple::after,
+.popup-card::after {
   content: '↗';
   font-size: 0.75rem;
   position: absolute;
   top: 8px;
   right: 8px;
   opacity: 0;
+  color: var(--gray-500);
   transition: opacity 0.2s ease;
-  color: #6b7280;
 }
 .endpoint-block:hover::after,
-.endpoint-simple:hover::after {
+.endpoint-simple:hover::after,
+.popup-card:hover::after {
   opacity: 1;
 }
-/* Header row (for method and connection indicator) */
+
+/* Header section */
 .header-row {
   display: flex;
   align-items: center;
@@ -99,12 +115,15 @@ export const EndpointEmbed = ({
   margin-bottom: 4px;
   flex-direction: row-reverse;
 }
+
+/* Text and metadata */
 .endpoint-block h3 {
-  margin: 0 0 0.5em 0;
+  margin: 0 0 0.5em;
   font-size: 1rem;
   font-weight: bold;
-  color: #111827!important;
+  color: var(--gray-800);
 }
+
 .method {
   font-weight: bold;
   text-transform: uppercase;
@@ -116,50 +135,38 @@ export const EndpointEmbed = ({
 .method.post { color: #16a34a; }
 .method.put { color: #ca8a04; }
 .method.delete { color: #dc2626; }
+
 .path {
   font-family: monospace;
   font-size: 0.9rem;
-  color: #6b7280;
-  word-break: break-all;
+  color: var(--gray-500);
+  word-break: break-word;
 }
-/* Popup specific styles */
+
+/* Popup-specific styling */
 .popup-card {
   position: relative;
-  background: #fff!important;
+  background: var(--white);
   border: none;
   border-radius: 8px;
-  padding: 12px 16px!important;
+  padding: 12px 16px;
   width: fit-content;
   max-width: 100%;
-  font-size: 0.85rem!important;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  font-size: 0.85rem;
+  box-shadow: var(--shadow-default);
   transition: box-shadow 0.2s ease;
 }
 .popup-card:hover {
-  border: none;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-.popup-card::after {
-  content: '↗';
-  font-size: 0.75rem;
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  color: #6b7280;
-}
-.popup-card:hover::after {
-  opacity: 1;
+  box-shadow: var(--shadow-hover);
 }
 .popup-card.simple {
   box-shadow: none;
   border: none;
   border-radius: 0;
   padding: 0;
-  background: #fff;
 }
-/* Containers (for Cards, Accordions, etc.) */
+
+/* Neutralize container colors */
 .CardsGrid .Card,
 .Accordion .Accordion-title,
 .CardsGrid .Card-icon,
@@ -167,7 +174,7 @@ export const EndpointEmbed = ({
   background: inherit;
   color: inherit;
 }
-    `;
+`;
     document.head.appendChild(style);
   }, []);
 
