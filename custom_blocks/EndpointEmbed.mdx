@@ -508,13 +508,9 @@ export const EndpointEmbed = ({
     );
   }
 
-  return (
-    <>
-      {loading && skeletonCard}
-      {!loading && error && fallbackCard}
-      {!loading && !error && renderedContent}
-    </>
-  );
+  if (loading) return skeletonCard;
+  if (error) return fallbackCard;
+  return renderedContent;
 };
 
 # Basic Usage
@@ -685,23 +681,13 @@ Great for FAQs or progressive disclosure:
 Organize multiple endpoints side by side:
 
 <Columns layout="auto">
-
 <Column>
-
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
-
 </Column>
-
 <Column>
-
 <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
-
 </Column>
-
 <Column>
-
 <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false, readmeUrl: true, apiUrl: true }} />
-
 </Column>
-
-</Columns>
+</Columns> 
