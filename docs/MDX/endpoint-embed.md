@@ -11,6 +11,8 @@ metadata:
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ornare nibh at rutrum pulvinar. Aliquam varius urna in pellentesque tempus. Vestibulum gravida mattis sem, at hendrerit nisi elementum at. Ut ut sodales neque. Pellentesque malesuada libero auctor eros elementum condimentum. Aenean vel consectetur eros. Sed turpis ligula, vehicula non lobortis eu, mollis eu mauris. Duis in gravida libero. Etiam eget turpis ut dui cursus cursus eget vel nisi. Morbi eros erat, mattis nec nunc at, placerat mollis ex.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ornare nibh at rutrum pulvinar. Aliquam varius urna in pellentesque tempus. Vestibulum gravida mattis sem, at hendrerit nisi elementum at. Ut ut sodales neque. Pellentesque malesuada libero auctor eros elementum condimentum. Aenean vel consectetur eros. Sed turpis ligula, vehicula non lobortis eu, mollis eu mauris. Duis in gravida libero. Etiam eget turpis ut dui cursus cursus eget vel nisi. Morbi eros erat, mattis nec nunc at, placerat mollis ex.
+
 ## Inline (directly on the page):
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
@@ -93,4 +95,16 @@ Great for FAQs or progressive disclosure:
 
 Organize multiple endpoints side by side:
 
-<Columns layout="auto"> <Column> <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> </Columns> \`\`\`
+<Columns layout="auto">
+  <Column>
+    <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+  </Column>
+
+  <Column>
+    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+  </Column>
+
+  <Column>
+    <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
+  </Column>
+</Columns>
