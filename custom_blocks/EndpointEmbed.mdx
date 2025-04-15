@@ -1,7 +1,429 @@
 ---
 name: EndpointEmbed
 ---
+import React, { useEffect, useMemo, useState } from 'react';
 
+export const EndpointEmbed = ({
+  websiteBaseUrl = 'https://erdtest123.readme.io',
+  apiTargetUrl,
+  endpoint,
+  method,
+  displayMode = 'popup',
+  linkText,
+  specFile,
+  theme = 'endpoint-block',
+  labels = true,
+  show = {
+    summary: true,
+    description: true,
+    parameters: true,
+    tags: true,
+    requestBody: false,
+    responses: false,
+    security: false,
+    example: false,
+    readmeUrl: false,
+    apiUrl: false,
+  },
+}) => {
+  const [endpointData, setEndpointData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const displayLinkText = linkText || endpoint;
+  const fullSpecUrl = useMemo(() => `${websiteBaseUrl}/openapi/${specFile}`, [websiteBaseUrl, specFile]);
+
+  /* ------------------------------------------------------------------
+   *  Inject shared CSS once
+   * ----------------------------------------------------------------*/
+  useEffect(() => {
+    if (document.getElementById('endpoint-embed-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'endpoint-embed-styles';
+    style.textContent = `
+/* General card styles */
+.endpoint-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f9f9f9!important;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px;
+  text-decoration: none!important;
+  color: inherit;
+  transition: background 0.2s;
+  margin-bottom: 8px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.endpoint-block:hover {
+  background: #7dbeff1c;
+  border: 1px solid #018ef5;
+}
+
+.endpoint-simple {
+  background: transparent!important;
+  border: none!important;
+  padding: 0;
+  margin-bottom: 8px;
+  width: fit-content;
+  max-width: 100%;
+  position: relative;
+}
+
+.endpoint-block-content { flex-grow: 1; }
+
+.endpoint-block h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #111827!important;
+}
+
+.method {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+  display: block;
+}
+.method.get { color: #2563eb; }
+.method.post { color: #16a34a; }
+.method.put { color: #ca8a04; }
+.method.delete { color: #dc2626; }
+.path {
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #6b7280;
+  word-break: break-all;
+}
+
+/* Popup specific styles */
+.popup-card {
+  position: relative;
+  background: #fff!important;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px!important;
+  width: fit-content;
+  max-width: 100%;
+  font-size: 0.85rem!important;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.popup-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Remove any arrow-related styles completely */
+.popup-card .arrow,
+.popup-card::after,
+.popup-card::before {
+  display: none;
+}
+
+/* Simple theme overrides */
+.popup-card.simple {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  background: #fff;
+}
+
+/* Always force the connection indicator to the top right */
+.connection-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+}
+
+/* Ensure relative position for cards in external containers */
+.CardsGrid .Card,
+.Accordion .Accordion-title,
+.CardsGrid .Card-icon, .Accordion {
+  background: inherit;
+  color: inherit;
+}
+    `;
+    document.head.appendChild(style);
+  }, []);
+
+  /* ------------------------------------------------------------------
+   *  Fetch & parse spec
+   * ----------------------------------------------------------------*/
+  useEffect(() => {
+    if (!endpoint) return;
+    const run = async () => {
+      setLoading(true);
+      try {
+        if (!window.__endpointSpecCache) window.__endpointSpecCache = {};
+        let spec = window.__endpointSpecCache[fullSpecUrl];
+        if (!spec) {
+          const res = await fetch(fullSpecUrl);
+          if (!res.ok) throw new Error('fetch failed');
+          spec = await res.json();
+          window.__endpointSpecCache[fullSpecUrl] = spec;
+        }
+        const ops = spec.paths[endpoint];
+        if (!ops) throw new Error('missing path');
+        const m = method?.toLowerCase();
+        const opMethod = m && ops[m] ? m : Object.keys(ops)[0];
+        const op = ops[opMethod];
+        const example = extractExample(op, spec.components);
+        setEndpointData({
+          path: endpoint,
+          method: opMethod.toUpperCase(),
+          summary: op.summary || '',
+          description: op.description || '',
+          example,
+          operationId: op.operationId || '',
+          parameters: op.parameters || [],
+          requestBody: op.requestBody || null,
+          responses: op.responses || {},
+          security: op.security || [],
+          tags: op.tags || [],
+        });
+      } catch {
+        setEndpointData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    run();
+  }, [endpoint, fullSpecUrl, method]);
+
+  /* Helpers */
+  const resolveSchema = (schema, comps) => {
+    if (!schema) return null;
+    if (schema.example !== undefined) return schema.example;
+    if (schema.$ref)
+      return resolveSchema(comps.schemas[schema.$ref.split('/').pop()], comps);
+    if (schema.type === 'object' && schema.properties) {
+      return Object.fromEntries(
+        Object.entries(schema.properties).map(([k, v]) => [k, resolveSchema(v, comps)])
+      );
+    }
+    if (schema.type === 'array') return [resolveSchema(schema.items, comps)];
+    return null;
+  };
+
+  const extractExample = (op, comps) => {
+    const resp = op.responses?.['200'] || Object.values(op.responses || {})[0];
+    const media = resp?.content?.['application/json'];
+    if (!media) return null;
+    if (media.example) return media.example;
+    if (media.examples) return Object.values(media.examples)[0]?.value;
+    return resolveSchema(media.schema, comps);
+  };
+
+  const readmeDocUrl = endpointData?.operationId
+    ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
+    : `${websiteBaseUrl}/reference/${endpoint?.replace(/[\/{}]/g, '')}`;
+  const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
+  const label = (txt) => (labels ? <strong>{txt}: </strong> : null);
+
+  // The connection indicator: green if connected, red if not.
+  const ConnectionIndicator = ({ connected }) => (
+    <div
+      className="connection-indicator"
+      style={{ backgroundColor: connected ? 'green' : 'red' }}
+      title={connected ? 'Synced' : 'Not Connected'}
+    />
+  );
+
+  /* UI Pieces */
+  const Card = ({ children, extra = '' }) => (
+    <div
+      className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} ${extra}`}
+      style={{ position: 'relative' }}
+    >
+      {children}
+    </div>
+  );
+
+  const MethodTag = ({ method }) => (
+    <span className={`method ${method.toLowerCase()}`}>{method}</span>
+  );
+
+  // fallbackCard displayed before full data is loaded.
+  const fallbackCard = (
+    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Card>
+        <ConnectionIndicator connected={!!endpointData && !loading} />
+        <div style={{ flexGrow: 1 }}>
+          {show.summary && method && <MethodTag method={method} />}
+          <h3 style={{ margin: '0 0 0.5em' }}>{linkText || displayLinkText}</h3>
+          <div
+            style={{
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              color: '#6b7280'
+            }}
+          >
+            {endpoint}
+          </div>
+          {show.apiUrl && apiTargetUrl && (
+            <div
+              style={{
+                fontFamily: 'monospace',
+                fontSize: '0.9rem',
+                color: '#4b5563'
+              }}
+            >
+              API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
+            </div>
+          )}
+          {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+        </div>
+      </Card>
+    </a>
+  );
+
+  const renderedContent = endpointData && (
+    <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Card>
+        <ConnectionIndicator connected={true} />
+        <div style={{ flexGrow: 1 }}>
+          {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
+          <h3 style={{ margin: '0 0 0.5em' }}>
+            {linkText || endpointData.summary || displayLinkText}
+          </h3>
+          {show.description && endpointData.description && (
+            <p style={{
+              margin: '0 0 0.5em',
+              fontSize: '0.9rem',
+              color: '#374151'
+            }}>
+              {endpointData.description}
+            </p>
+          )}
+          {show.parameters && endpointData.parameters.length > 0 && (
+            <div>
+              {label('Parameters')}
+              {endpointData.parameters.map((p) => p.name).join(', ')}
+            </div>
+          )}
+          {show.requestBody && endpointData.requestBody && (
+            <div>{label('Request Body')}Available</div>
+          )}
+          {show.responses && endpointData.responses && (
+            <div>
+              {label('Responses')}
+              {Object.keys(endpointData.responses).join(', ')}
+            </div>
+          )}
+          {show.security && endpointData.security.length > 0 && (
+            <div>
+              {label('Security')}
+              {JSON.stringify(endpointData.security)}
+            </div>
+          )}
+          {show.tags && endpointData.tags.length > 0 && (
+            <div>
+              {label('Tags')}
+              {endpointData.tags.join(', ')}
+            </div>
+          )}
+          {show.example && endpointData.example && (
+            <pre style={{
+              background: '#f3f4f6',
+              padding: 8,
+              borderRadius: 6,
+              fontSize: '0.85rem',
+              overflowX: 'auto'
+            }}>
+              {JSON.stringify(endpointData.example, null, 2)}
+            </pre>
+          )}
+          {show.apiUrl && apiFullUrl && (
+            <div style={{
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              color: '#4b5563'
+            }}>
+              API: {endpointData.method} {apiFullUrl}
+            </div>
+          )}
+          {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+        </div>
+      </Card>
+    </a>
+  );
+
+  /* ------------------------------------------------------------------
+   *  Render
+   * ----------------------------------------------------------------*/
+  if (displayMode === 'popup') {
+    const linkStyle = {
+      textDecoration: 'none',
+      cursor: 'pointer',
+      color: '#1a73e8',
+      background: '#e8f0fe',
+      borderRadius: '4px',
+      padding: '2px 4px',
+      fontWeight: 600
+    };
+    return (
+      <span
+        style={{ display: 'inline-block', position: 'relative' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <a href={readmeDocUrl} style={linkStyle}>
+          {displayLinkText}
+        </a>
+        {isHovered && (
+          <div style={{ position: 'absolute', left: 0, zIndex: 1000, width: 420 }}>
+            {!loading &&
+              (endpointData ? (
+                <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <Card extra={`popup-card ${theme === 'simple' ? 'simple' : ''}`.trim()}>
+                    <ConnectionIndicator connected={!!endpointData && !loading} />
+                    <div style={{ flexGrow: 1 }}>
+                      {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
+                      <h3 style={{ margin: '0 0 0.5em' }}>
+                        {linkText || endpointData.summary || displayLinkText}
+                      </h3>
+                      {show.description && endpointData.description && (
+                        <p style={{
+                          margin: '0 0 0.5em',
+                          fontSize: '0.9rem',
+                          color: '#374151'
+                        }}>
+                          {endpointData.description}
+                        </p>
+                      )}
+                    </div>
+                  </Card>
+                </a>
+              ) : (
+                fallbackCard
+              ))}
+          </div>
+        )}
+      </span>
+    );
+  }
+
+  // Inline mode: show fallback until data is loaded, then show full content.
+  if (!endpointData) {
+    return (
+      <div style={{ position: 'relative' }}>
+        {fallbackCard}
+      </div>
+    );
+  }
+  return renderedContent;
+};
 
 ## 💬 Popup Mode
 
