@@ -20,7 +20,7 @@ Renders a clickable label. On hover, a card appears with endpoint details.
 <EndpointEmbed
   endpoint="/pet"
   method="PUT"
-  specFile="ErdSpec1.json"
+  specFile="ErdSpec21.json"
   linkText="Full Details"
   displayMode="popup"
   websiteBaseUrl="https://erdtest123.readme.io"
