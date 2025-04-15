@@ -31,7 +31,7 @@ export const EndpointEmbed = ({
 
   // Default link text if not provided.
   const displayLinkText = linkText || endpoint;
-  // Build the full spec URL.
+  // Build full spec URL
   const fullSpecUrl = `${baseUrl}/openapi/${specFile}`;
 
   useEffect(() => {
@@ -110,7 +110,7 @@ export const EndpointEmbed = ({
     }
   };
 
-  // Recursively resolve an example from a schema.
+  // Recursively resolve example from a schema.
   const resolveExampleFromSchema = (schema, components) => {
     if (!schema) return null;
     if (schema.example !== undefined) {
@@ -186,7 +186,9 @@ export const EndpointEmbed = ({
         <MethodTag method={endpointData.method} />
       )}
       <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
-        {show.summary && endpointData.summary ? endpointData.summary : displayLinkText}
+        {show.summary && endpointData.summary
+          ? endpointData.summary
+          : displayLinkText}
       </h3>
       {endpointData && <div className="path">{referenceUrl}</div>}
     </Card>
@@ -206,19 +208,12 @@ export const EndpointEmbed = ({
 
   // Error display.
   const errorCard = (
-    <div style={{
-      border: '1px solid #dc2626',
-      background: '#fdeaea',
-      borderRadius: '8px',
-      padding: '16px',
-      color: '#dc2626',
-      marginBottom: '8px',
-    }}>
+    <div style={{ border: '1px solid #dc2626', background: '#fdeaea', borderRadius: '8px', padding: '16px', color: '#dc2626', marginBottom: '8px' }}>
       {error}
     </div>
   );
 
-  // Render logic for popup vs. inline.
+  // Render logic for popup vs inline.
   if (displayMode === 'popup') {
     const popupLinkStyle = {
       textDecoration: 'none',
@@ -231,8 +226,8 @@ export const EndpointEmbed = ({
     };
     return (
       <span style={{ display: 'inline-block', position: 'relative' }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}>
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}>
         <a href={referenceUrl} style={popupLinkStyle}>
           {displayLinkText}
         </a>
@@ -263,7 +258,7 @@ export const EndpointEmbed = ({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: #f9f9f9; /* Solid, opaque background */
+          background: #f9f9f9;
           border: 1px solid #d1d5db;
           border-radius: 8px;
           padding: 16px;
@@ -276,9 +271,7 @@ export const EndpointEmbed = ({
           background: #7dbeff1c;
           border: 1px solid #018ef5;
         }
-        .card-content { 
-          flex-grow: 1; 
-        }
+        .card-content { flex-grow: 1; }
         .card h3 {
           margin: 0;
           font-size: 1rem;
@@ -301,10 +294,7 @@ export const EndpointEmbed = ({
           font-size: 0.9rem;
           color: #6b7280;
         }
-        .arrow { 
-          font-size: 1.2rem; 
-          color: #6b7280; 
-        }
+        .arrow { font-size: 1.2rem; color: #6b7280; }
 
         /* Skeleton Loading Styles */
         .skeleton {
@@ -316,7 +306,7 @@ export const EndpointEmbed = ({
           display: flex;
           align-items: center;
           justify-content: space-between;
-          /* Remove opacity to ensure full opacity */
+          opacity: 0.7;
           min-height: 100px;
         }
         .skeleton-method, .skeleton-title, .skeleton-path {
@@ -332,15 +322,14 @@ export const EndpointEmbed = ({
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
         }
-
         /* Dark mode variations (optional) */
         [data-color-mode=dark] .card { background: #0000007a; }
         @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card { background: #0000007a; }
+          [data-color-mode=system] .card { background:#0000007a; }
         }
-        [data-color-mode=dark] .card:hover { background: black; }
+        [data-color-mode=dark] .card:hover { background:black; }
         @media (prefers-color-scheme: dark) {
-          [data-color-mode=system] .card:hover { background: black; }
+          [data-color-mode=system] .card:hover { background:black; }
         }
         [data-color-mode=dark] .card h3 { color: #fff; }
         @media (prefers-color-scheme: dark) {
@@ -350,7 +339,6 @@ export const EndpointEmbed = ({
     </>
   );
 };
-
 
 # Basic Usage
 
