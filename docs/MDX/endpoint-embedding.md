@@ -9,23 +9,25 @@ metadata:
 
 Renders a clickable label. On hover, a card appears with endpoint details.
 
-#### Minimal example:
+<Columns layout="auto">
+  <Column>
+    #### Minimal example:
 
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />
+    <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />
 
-#### Full example:
+    #### Full example:
 
-<EndpointEmbed
-  endpoint="/pet"
-  method="PUT"
-  specFile="ErdSpec1.json"
-  linkText="Full Details"
-  displayMode="popup"
-  websiteBaseUrl="https://erdtest123.readme.io"
-  apiTargetUrl="https://api.erdman.com"
-  theme="endpoint-block"
-  labels={true}
-  show={{  
+    <EndpointEmbed
+      endpoint="/pet"
+      method="PUT"
+      specFile="ErdSpec1.json"
+      linkText="Full Details"
+      displayMode="popup"
+      websiteBaseUrl="https://erdtest123.readme.io"
+      apiTargetUrl="https://api.erdman.com"
+      theme="endpoint-block"
+      labels={true}
+      show={{  
     summary: true,  
     description: true,  
     parameters: true,  
@@ -37,7 +39,37 @@ Renders a clickable label. On hover, a card appears with endpoint details.
     readmeUrl: true,  
     apiUrl: true  
   }}
-/>
+    />
+  </Column>
+
+  <Column>
+    <EndpointEmbed
+      endpoint="/pet"
+      method="PUT"
+      specFile="ErdSpec1.json"
+      linkText="Full Details"
+      displayMode="popup"
+      websiteBaseUrl="https://erdtest123.readme.io"
+      apiTargetUrl="https://api.erdman.com"
+      theme="endpoint-block"
+      labels={true}
+      show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    example: true,  
+    readmeUrl: true,  
+    apiUrl: true  
+  }}
+    />
+  </Column>
+</Columns>
+
+<br />
 
 ***
 
