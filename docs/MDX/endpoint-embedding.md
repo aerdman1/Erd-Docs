@@ -28,6 +28,28 @@ metadata:
     apiUrl: false
   }} /> - This version includes all available options—description, parameters, request body, responses, tags, security, and more. It gives users the most complete view of the endpoint details.
 
+All props with descriptions and default values where applicable:
+
+| **Prop**           | **Type**  | **Default**                 | **Description**                                                              |
+| ------------------ | --------- | --------------------------- | ---------------------------------------------------------------------------- |
+| `websiteBaseUrl`   | `string`  | `'https://yourdocsite.com'` | The ReadMe project base URL (used for linking to reference pages).           |
+| `apiTargetUrl`     | `string`  | *none*                      | Optional override for the real API server base URL (for displaying API URL). |
+| `endpoint`         | `string`  | *required*                  | The API path you want to display (e.g. `/pet/{petId}`).                      |
+| `method`           | `string`  | *optional*                  | The HTTP method (e.g. `GET`, `POST`). If omitted, auto-selects best match.   |
+| `displayMode`      | `string`  | `'popup'`                   | Determines how the component renders: `'popup'` or `'inline'`.               |
+| `linkText`         | `string`  | *fallbacks to`endpoint`*    | Custom text to display instead of the raw endpoint path.                     |
+| `specFile`         | `string`  | *required*                  | The OpenAPI JSON file name to load (e.g. `ErdSpec1.json`).                   |
+| `show.summary`     | `boolean` | `true`                      | Toggles display of the summary/method line.                                  |
+| `show.description` | `boolean` | `true`                      | Toggles display of the endpoint description.                                 |
+| `show.parameters`  | `boolean` | `true`                      | Toggles display of parameter names.                                          |
+| `show.tags`        | `boolean` | `true`                      | Toggles display of OpenAPI tags.                                             |
+| `show.requestBody` | `boolean` | `false`                     | Toggles request body presence indicator.                                     |
+| `show.responses`   | `boolean` | `false`                     | Toggles list of response codes.                                              |
+| `show.security`    | `boolean` | `false`                     | Toggles display of security scheme info.                                     |
+| `show.example`     | `boolean` | `false`                     | Toggles display of a sample JSON response.                                   |
+| `show.readmeUrl`   | `boolean` | `false`                     | Toggles display of the ReadMe reference doc URL.                             |
+| `show.apiUrl`      | `boolean` | `false`                     | Toggles display of the full API call URL (with method and `apiTargetUrl`).   |
+
 ***
 
 ## 📄 Inline Mode
