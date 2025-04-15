@@ -11,7 +11,8 @@ metadata:
 
 #### Example with minimal props:
 
-This uses the "popup" display mode. The endpoint renders as a hyperlink like this: <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> When users hover over it, they’ll see a full-detail card.
+This uses the "popup" display mode. The endpoint renders as a hyperlink like this: <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" />
+When users hover over it, they’ll see a full-detail card.
 
 #### Example with all props enabled:
 
