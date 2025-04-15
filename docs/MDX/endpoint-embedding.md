@@ -15,7 +15,7 @@ metadata:
 
 #### Example with all props enabled:
 
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Showing all props with a custom label" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" show={{
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Showing all props with a custom label" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{
     summary: true,
     description: true,
     parameters: true,
@@ -58,7 +58,7 @@ If you want all endpoint info immediately visible, `"inline"` mode renders the c
 
 #### Here is one with just a few props:
 
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
+<EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
 
 #### Here is one with all props enabled:
 
