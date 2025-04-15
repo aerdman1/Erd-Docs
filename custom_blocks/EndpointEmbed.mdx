@@ -65,10 +65,11 @@ export const EndpointEmbed = ({
 .endpoint-simple {
   background: transparent!important;
   border: none!important;
-  padding: 0;
+  padding: 16px; /* match endpoint-block */
   margin-bottom: 8px;
   width: fit-content;
   max-width: 100%;
+  min-width: 250px; /* match endpoint-block */
   position: relative;
 }
 
@@ -455,54 +456,63 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
 ## 📄 Inline Mode
 
 <Columns layout="auto">
-  <Column>
+  
+  <Column> 
     #### Block version:
-
-    <EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
-  </Column>
-
-  <Column>
-    #### Simple version:
-
-    <EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
-  </Column>
-</Columns>
----
-
-#### Block version:
-
-<EndpointEmbed theme="endpoint-block" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
-
----
-
-#### Simple version: 
-
-<EndpointEmbed theme="simple" endpoint="/pet" method="PUT" specFile="ErdSpec1.json" displayMode="inline" />
-
----
-
-#### Full version:
 
 <EndpointEmbed  
   endpoint="/pet"  
-  method="POST"  
+  method="PUT"  
   specFile="ErdSpec1.json"  
+  linkText="Full Details"  
   displayMode="inline"  
-  apiTargetUrl="https://example.com"  
-  linkText="Custom Label (POST)"  
+  websiteBaseUrl="https://erdtest123.readme.io"  
+  apiTargetUrl="https://api.erdman.com"  
+  theme="endpoint-block"  
+  labels={true}  
   show={{  
     summary: true,  
     description: true,  
     parameters: true,  
-    requestBody: true,  
-    responses: true,  
-    security: true,  
     tags: true,  
-    example: true,  
-    readmeUrl: true,  
-    apiUrl: true  
+    requestBody: false,  
+    responses: true,  
+    security: false,  
+    example: false,
+    readmeUrl: false,  
+    apiUrl: false  
   }}  
 />
+  </Column>
+  <Column>
+
+#### Simple version:
+<EndpointEmbed  
+  endpoint="/pet"  
+  method="PUT"  
+  specFile="ErdSpec1.json"  
+  linkText="Full Details"  
+  displayMode="inline"  
+  websiteBaseUrl="https://erdtest123.readme.io"  
+  apiTargetUrl="https://api.erdman.com"  
+  theme="simple"  
+  labels={true}  
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: false,  
+    responses: true,  
+    security: false,  
+    example: false,  
+    readmeUrl: false,  
+    apiUrl: false  
+  }}  
+/>
+
+  </Column>
+</Columns>
 
 ---
 
