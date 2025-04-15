@@ -14,11 +14,11 @@ export const EndpointEmbed = ({
     summary: true,
     description: true,
     parameters: true,
-    requestBody: true,
-    responses: true,
-    security: true,
-    tags: true,
-    example: true,
+    requestBody: false,
+    responses: false,
+    security: false,
+    tags: false,
+    example: false,
   }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
@@ -183,13 +183,47 @@ export const EndpointEmbed = ({
 const renderedContent = endpointData && (
   <a href={referenceUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
     <Card>
-      {endpointData.method && show.summary !== false && (
-        <MethodTag method={endpointData.method} />
+      {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
+
+      {show.summary && (
+        <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
+          {endpointData.summary || displayLinkText}
+        </h3>
       )}
-      <h3 style={{ margin: '0 0 0.5em 0', fontSize: '1rem', fontWeight: 'bold' }}>
-        {show.summary && endpointData.summary ? endpointData.summary : displayLinkText}
-      </h3>
-      {endpointData && <div className="path">{referenceUrl}</div>}
+
+      {show.description && endpointData.description && (
+        <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9rem', color: '#374151' }}>
+          {endpointData.description}
+        </p>
+      )}
+
+      {show.parameters && endpointData.parameters?.length > 0 && (
+        <p><strong>Parameters:</strong> {endpointData.parameters.map(p => p.name).join(', ')}</p>
+      )}
+
+      {show.requestBody && endpointData.requestBody && (
+        <p><strong>Has Request Body</strong></p>
+      )}
+
+      {show.responses && endpointData.responses && (
+        <p><strong>Responses:</strong> {Object.keys(endpointData.responses).join(', ')}</p>
+      )}
+
+      {show.security && endpointData.security?.length > 0 && (
+        <p><strong>Security:</strong> {JSON.stringify(endpointData.security)}</p>
+      )}
+
+      {show.tags && endpointData.tags?.length > 0 && (
+        <p><strong>Tags:</strong> {endpointData.tags.join(', ')}</p>
+      )}
+
+      {show.example && endpointData.example && (
+        <pre style={{ background: '#f3f4f6', padding: '8px', borderRadius: '6px', fontSize: '0.85rem', overflowX: 'auto' }}>
+          {JSON.stringify(endpointData.example, null, 2)}
+        </pre>
+      )}
+
+      <div className="path">{referenceUrl}</div>
     </Card>
   </a>
 );
