@@ -1,39 +1,36 @@
 ---
 name: EndpointEmbed
 ---
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 
 export const EndpointEmbed = ({
-  baseUrl = 'https://erdtest123.readme.io',  // Base URL for fetching the OpenAPI spec
+  websiteBaseUrl = 'https://erdtest123.readme.io', // The website URL for fetching the OpenAPI spec
+  apiTargetUrl, // Optional: The actual API URL for the endpoint (if different)
   endpoint,
   method,
   displayMode = 'popup',
   linkText,
-  specFile = "ErdSpec1.json",
+  specFile,
   show = {
     summary: true,
     description: true,
     parameters: true,
+    tags: true, 
     requestBody: false,
     responses: false,
     security: false,
-    tags: false,
     example: false,
-    readmeUrl: true, // Toggle to show/hide the ReadMe URL inside the card.
+    readmeUrl: false,
   }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-
-  // For the "card" style arrow (you could use an icon)
   const [arrow] = useState('›');
 
-  // Default link text if not provided.
   const displayLinkText = linkText || endpoint;
-  // Build full spec URL
-  const fullSpecUrl = `${baseUrl}/openapi/${specFile}`;
+  const fullSpecUrl = `${websiteBaseUrl}/openapi/${specFile}`;
 
   useEffect(() => {
     if (!endpoint) {
@@ -59,7 +56,6 @@ export const EndpointEmbed = ({
 
       let chosenOperation = null;
       let chosenMethod = null;
-
       if (typeof method === 'string' && operations[method.toLowerCase()]) {
         chosenOperation = operations[method.toLowerCase()];
         chosenMethod = method.toUpperCase();
@@ -88,8 +84,6 @@ export const EndpointEmbed = ({
       const responses = chosenOperation.responses || {};
       const security = chosenOperation.security || [];
       const tags = chosenOperation.tags || [];
-      const deprecated = chosenOperation.deprecated || false;
-
       setEndpointData({
         path: endpoint,
         method: chosenMethod,
@@ -102,7 +96,6 @@ export const EndpointEmbed = ({
         responses,
         security,
         tags,
-        deprecated,
       });
     } catch (err) {
       setError(err.message);
@@ -111,12 +104,9 @@ export const EndpointEmbed = ({
     }
   };
 
-  // Recursively resolve example from a schema.
   const resolveExampleFromSchema = (schema, components) => {
     if (!schema) return null;
-    if (schema.example !== undefined) {
-      return schema.example;
-    }
+    if (schema.example !== undefined) return schema.example;
     if (schema.$ref) {
       const refParts = schema.$ref.split('/');
       const schemaName = refParts[refParts.length - 1];
@@ -136,13 +126,10 @@ export const EndpointEmbed = ({
     return null;
   };
 
-  // Extract an example from an operation’s responses.
   const extractResponseExample = (operation, components) => {
     if (!operation.responses) return null;
     let response = operation.responses['200'] || operation.responses['default'];
-    if (!response) {
-      response = Object.values(operation.responses)[0];
-    }
+    if (!response) response = Object.values(operation.responses)[0];
     if (response && response.content) {
       const media = response.content['application/json'];
       if (media) {
@@ -157,7 +144,6 @@ export const EndpointEmbed = ({
     return null;
   };
 
-  // Card component for inline usage.
   const Card = ({ children }) => (
     <div className="card">
       <div className="card-content">{children}</div>
@@ -165,39 +151,30 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // Method tag with colors: GET blue, POST green, PUT yellowish, DELETE red.
   const MethodTag = ({ method }) => {
     const lowerMethod = (method || '').toLowerCase();
-    return (
-      <span className={`method ${lowerMethod}`}>
-        {method}
-      </span>
-    );
+    return <span className={`method ${lowerMethod}`}>{method}</span>;
   };
 
-  // Determine the ReadMe documentation URL.
+  // Use the apiTargetUrl if provided; otherwise, use websiteBaseUrl to form the reference link.
+  const targetUrl = apiTargetUrl || websiteBaseUrl;
   const readmeDocUrl = endpointData && endpointData.operationId
-    ? `${baseUrl}/reference/${endpointData.operationId}`
-    : `${baseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
+    ? `${targetUrl}/reference/${endpointData.operationId}`
+    : `${targetUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
-  // Render the main card content.
   const renderedContent = endpointData && (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
         <div style={{ flexGrow: 1 }}>
           {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
-
-          {/* Always use provided linkText if set; otherwise use the fetched summary */}
           <h3 style={{ margin: '0 0 0.5em', fontSize: '1rem', fontWeight: 'bold' }}>
             {linkText ? linkText : (endpointData.summary || displayLinkText)}
           </h3>
-
           {show.description && endpointData.description && (
             <p style={{ margin: '0 0 0.5em', fontSize: '0.9rem', color: '#374151' }}>
               {endpointData.description}
             </p>
           )}
-
           <div style={{ marginBottom: '0.5em' }}>
             {show.parameters && endpointData.parameters?.length > 0 && (
               <div style={{ marginBottom: '0.25em' }}>
@@ -225,7 +202,6 @@ export const EndpointEmbed = ({
               </div>
             )}
           </div>
-
           {show.example && endpointData.example && (
             <pre style={{
               background: '#f3f4f6',
@@ -238,16 +214,12 @@ export const EndpointEmbed = ({
               {JSON.stringify(endpointData.example, null, 2)}
             </pre>
           )}
-
           {show.readmeUrl !== false && (
-            <div
-              className="path"
-              style={{
-                fontFamily: 'monospace',
-                fontSize: '0.9rem',
-                color: '#6b7280'
-              }}
-            >
+            <div className="path" style={{
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              color: '#6b7280'
+            }}>
               {readmeDocUrl}
             </div>
           )}
@@ -256,7 +228,6 @@ export const EndpointEmbed = ({
     </a>
   );
 
-  // Skeleton loader markup.
   const skeletonCard = (
     <div className="card skeleton">
       <div className="card-content">
@@ -268,7 +239,6 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // Error display.
   const errorCard = (
     <div style={{
       border: '1px solid #dc2626',
@@ -282,7 +252,6 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // Render logic for popup vs inline.
   if (displayMode === 'popup') {
     const popupLinkStyle = {
       textDecoration: 'none',
@@ -365,8 +334,6 @@ export const EndpointEmbed = ({
           color: #6b7280;
         }
         .arrow { font-size: 1.2rem; color: #6b7280; }
-
-        /* Skeleton Loading Styles */
         .skeleton {
           width: 420px !important;
           background: #f3f4f6;
@@ -392,7 +359,6 @@ export const EndpointEmbed = ({
           0% { background-position: -200% 0; }
           100% { background-position: 200% 0; }
         }
-        /* Dark mode variations (optional) */
         [data-color-mode=dark] .card { background: #0000007a; }
         @media (prefers-color-scheme: dark) {
           [data-color-mode=system] .card { background:#0000007a; }
@@ -459,7 +425,25 @@ Switch OpenAPI files by changing `specFile`. For example:
 
 <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" linkText="List Users (NovaTest)" />
 
-<EndpointEmbed endpoint="/v1/users" method="POST" specFile="NovaTest.json" displayMode="inline" linkText="Create User (NovaTest)" />
+<EndpointEmbed
+  endpoint="/v1/users"
+  method="POST"
+  specFile="NovaTest.json"
+  displayMode="inline"
+  linkText="Create User (NovaTest)"
+  show={{
+    summary: true,
+    description: true,
+    parameters: true,
+    requestBody: true,
+    responses: true,
+    security: true,
+    tags: true,
+    example: true,
+    readmeUrl: true
+  }}
+/>
+
 
 ---
 
