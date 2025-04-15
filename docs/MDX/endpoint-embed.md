@@ -5,8 +5,6 @@ hidden: false
 metadata:
   robots: index
 ---
-# Basic Usage
-
 ## 🔗 Popup Mode
 
 When you want to keep your page uncluttered, use the "popup" display mode. The endpoint renders as a hyperlink—like this:
@@ -37,7 +35,7 @@ Switch OpenAPI files by changing `specFile`. For example:
 
 ***
 
-# Advanced Usage
+## Advanced Usage
 
 ## 🧱 Inside Cards
 
