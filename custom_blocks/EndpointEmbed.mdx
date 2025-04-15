@@ -235,7 +235,6 @@ const renderedContent = endpointData && (
         {isHovered && (
           <div style={{
             position: 'absolute',
-            top: '100%',
             left: '0',
             zIndex: 1000,
             width: '420px',
@@ -395,6 +394,6 @@ Great for FAQs or progressive disclosure:
 
 ## ➗ Inside Columns
 
-Organize multiple endpoints side by side:
+Organize multiple endpoints side by side: 
 
 <Columns layout="auto"> <Column> <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Status" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> <Column> <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} /> </Column> </Columns>
