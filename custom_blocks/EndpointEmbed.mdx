@@ -481,9 +481,16 @@ export const EndpointEmbed = ({
     );
   }
 
-  if (loading) return skeletonCard;
-  if (!endpointData) return fallbackCard;
-  return renderedContent;
+if (!endpointData) {
+  return (
+    <div style={{ position: 'relative' }}>
+      {fallbackCard}
+      {loading && skeletonCard}
+    </div>
+  );
+}
+return renderedContent;
+
 };
 
 # Basic Usage
@@ -716,4 +723,4 @@ Swap `specFile` to pull from different OpenAPI files:
 | `show.example`     | `boolean`     | `false`                              | Toggles display of a sample JSON response.                                     |
 | `show.readmeUrl`   | `boolean`     | `false`                              | Toggles display of the ReadMe reference doc URL.                               |
 | `show.apiUrl`      | `boolean`     | `false`                              | Toggles display of the full API call URL (with method and `apiTargetUrl`).     |
-</Accordion>
+</Accordion> 
