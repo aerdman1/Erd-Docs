@@ -58,7 +58,8 @@ export const EndpointEmbed = ({
 .popup-card{position:relative;box-shadow:0 4px 10px rgba(0,0,0,0.2);background:#fff!important;border:1px solid #ccc;padding:14px 16px!important;border-radius:20px;width:fit-content;max-width:100%;font-size:0.85rem!important}
 .popup-card.simple{box-shadow:none;border:none;border-radius:0;padding:0}
 .popup-card .arrow{position:absolute;top:8px;right:12px;font-size:1.2rem;color:#6b7280}
-.CardsGrid .Card,.Accordion .Accordion-title{background:inherit}
+.CardsGrid .Card,
+.Accordion .Accordion-title, .CardsGrid .Card-icon {background: inherit;color: inherit}
     `;
     document.head.appendChild(style);
   }, []);
@@ -242,7 +243,7 @@ const Card = ({ children, extra = '' }) => (
   displayMode="popup"
   websiteBaseUrl="https://erdtest123.readme.io"
   apiTargetUrl="https://api.erdman.com"
-  theme="simple"
+  theme="card"
   labels={true}
   show={{
     summary: true,
