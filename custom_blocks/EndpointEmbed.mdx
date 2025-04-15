@@ -94,6 +94,7 @@ export const EndpointEmbed = ({
   font-size: 1.2rem;
   color: #6b7280;
 }
+/* Uncomment below if you ever want the Skeleton loading state back
 .skeleton {
   width: 200px !important;
   background: #f3f4f6;
@@ -121,6 +122,7 @@ export const EndpointEmbed = ({
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+*/
 .popup-card {
   position: relative;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
@@ -229,14 +231,31 @@ export const EndpointEmbed = ({
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
   const label = (txt) => (labels ? <strong>{txt}: </strong> : null);
 
+  // A simple connection indicator component
+  const ConnectionIndicator = ({ connected }) => (
+    <div
+      style={{
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        width: 10,
+        height: 10,
+        borderRadius: '50%',
+        backgroundColor: connected ? 'green' : 'red',
+        border: '1px solid #fff'
+      }}
+      title={connected ? 'Synced' : 'Not Connected'}
+    />
+  );
+
   /* UI Pieces */
   const Card = ({ children, extra = '' }) => (
     // Use endpoint-simple if theme is "simple", otherwise endpoint-block
     <div
       className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} ${extra}`}
+      style={{ position: 'relative' }}
     >
-      <div className="endpoint-block-content">{children}</div>
-      {theme !== 'simple' && <span className="arrow">{arrow}</span>}
+      {children}
     </div>
   );
 
@@ -244,44 +263,40 @@ export const EndpointEmbed = ({
     <span className={`method ${method.toLowerCase()}`}>{method}</span>
   );
 
-  const skeletonCard = (
-    <div
-      className={`${
-        theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'
-      } skeleton popup-card`}
-    >
-      <div className="endpoint-block-content">
-        <div className="skeleton-method"></div>
-        <div className="skeleton-title"></div>
-        <div className="skeleton-path"></div>
-      </div>
-      <span className="arrow">{arrow}</span>
-    </div>
-  );
+  // Keeping the skeletonCard in case it is needed later
+  // const skeletonCard = (
+  //   <div
+  //     className={`${theme === 'simple' ? 'endpoint-simple' : 'endpoint-block'} skeleton popup-card`}
+  //   >
+  //     <div className="endpoint-block-content">
+  //       <div className="skeleton-method"></div>
+  //       <div className="skeleton-title"></div>
+  //       <div className="skeleton-path"></div>
+  //     </div>
+  //     <span className="arrow">{arrow}</span>
+  //   </div>
+  // );
 
   const fallbackCard = (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
+        <ConnectionIndicator connected={!!endpointData && !loading} />
         <div style={{ flexGrow: 1 }}>
           {show.summary && method && <MethodTag method={method} />}
           <h3 style={{ margin: '0 0 0.5em' }}>{linkText || displayLinkText}</h3>
-          <div
-            style={{
+          <div style={{
               fontFamily: 'monospace',
               fontSize: '0.9rem',
               color: '#6b7280',
-            }}
-          >
+            }}>
             {endpoint}
           </div>
           {show.apiUrl && apiTargetUrl && (
-            <div
-              style={{
+            <div style={{
                 fontFamily: 'monospace',
                 fontSize: '0.9rem',
                 color: '#4b5563',
-              }}
-            >
+              }}>
               API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
             </div>
           )}
@@ -294,19 +309,18 @@ export const EndpointEmbed = ({
   const renderedContent = endpointData && (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
+        <ConnectionIndicator connected={true} />
         <div style={{ flexGrow: 1 }}>
           {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
           <h3 style={{ margin: '0 0 0.5em' }}>
             {linkText || endpointData.summary || displayLinkText}
           </h3>
           {show.description && endpointData.description && (
-            <p
-              style={{
+            <p style={{
                 margin: '0 0 0.5em',
                 fontSize: '0.9rem',
                 color: '#374151',
-              }}
-            >
+              }}>
               {endpointData.description}
             </p>
           )}
@@ -317,9 +331,7 @@ export const EndpointEmbed = ({
             </div>
           )}
           {show.requestBody && endpointData.requestBody && (
-            <div>
-              {label('Request Body')}Available
-            </div>
+            <div>{label('Request Body')}Available</div>
           )}
           {show.responses && endpointData.responses && (
             <div>
@@ -340,26 +352,22 @@ export const EndpointEmbed = ({
             </div>
           )}
           {show.example && endpointData.example && (
-            <pre
-              style={{
+            <pre style={{
                 background: '#f3f4f6',
                 padding: 8,
                 borderRadius: 6,
                 fontSize: '0.85rem',
                 overflowX: 'auto',
-              }}
-            >
+              }}>
               {JSON.stringify(endpointData.example, null, 2)}
             </pre>
           )}
           {show.apiUrl && apiFullUrl && (
-            <div
-              style={{
+            <div style={{
                 fontFamily: 'monospace',
                 fontSize: '0.9rem',
                 color: '#4b5563',
-              }}
-            >
+              }}>
               API: {endpointData.method} {apiFullUrl}
             </div>
           )}
@@ -393,82 +401,26 @@ export const EndpointEmbed = ({
         </a>
         {isHovered && (
           <div style={{ position: 'absolute', left: 0, zIndex: 1000, width: 420 }}>
-            {loading && skeletonCard}
             {!loading &&
               (endpointData ? (
                 <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
                   <Card extra={`popup-card ${theme === 'simple' ? 'simple' : ''}`.trim()}>
+                    <ConnectionIndicator connected={!!endpointData && !loading} />
                     <div style={{ flexGrow: 1 }}>
                       {show.summary && endpointData.method && <MethodTag method={endpointData.method} />}
                       <h3 style={{ margin: '0 0 0.5em' }}>
                         {linkText || endpointData.summary || displayLinkText}
                       </h3>
                       {show.description && endpointData.description && (
-                        <p
-                          style={{
+                        <p style={{
                             margin: '0 0 0.5em',
                             fontSize: '0.9rem',
                             color: '#374151',
-                          }}
-                        >
+                          }}>
                           {endpointData.description}
                         </p>
                       )}
-                      {show.parameters &&
-                        endpointData.parameters.length > 0 && (
-                          <div>
-                            {label('Parameters')}
-                            {endpointData.parameters.map((p) => p.name).join(', ')}
-                          </div>
-                        )}
-                      {show.requestBody && endpointData.requestBody && (
-                        <div>{label('Request Body')}Available</div>
-                      )}
-                      {show.responses && endpointData.responses && (
-                        <div>
-                          {label('Responses')}
-                          {Object.keys(endpointData.responses).join(', ')}
-                        </div>
-                      )}
-                      {show.security &&
-                        endpointData.security.length > 0 && (
-                          <div>
-                            {label('Security')}
-                            {JSON.stringify(endpointData.security)}
-                          </div>
-                        )}
-                      {show.tags &&
-                        endpointData.tags.length > 0 && (
-                          <div>
-                            {label('Tags')}
-                            {endpointData.tags.join(', ')}
-                          </div>
-                        )}
-                      {show.example && endpointData.example && (
-                        <pre
-                          style={{
-                            background: '#f3f4f6',
-                            padding: 8,
-                            borderRadius: 6,
-                            fontSize: '0.85rem',
-                            overflowX: 'auto',
-                          }}
-                        >
-                          {JSON.stringify(endpointData.example, null, 2)}
-                        </pre>
-                      )}
-                      {show.apiUrl && apiFullUrl && (
-                        <div
-                          style={{
-                            fontFamily: 'monospace',
-                            fontSize: '0.9rem',
-                            color: '#4b5563',
-                          }}
-                        >
-                          API: {endpointData.method} {apiFullUrl}
-                        </div>
-                      )}
-                      {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+                      {/* Additional details as needed */}
                     </div>
                   </Card>
                 </a>
@@ -481,16 +433,15 @@ export const EndpointEmbed = ({
     );
   }
 
-if (!endpointData) {
-  return (
-    <div style={{ position: 'relative' }}>
-      {fallbackCard}
-      {loading}
-    </div>
-  );
-}
-return renderedContent;
-
+  // Inline mode: show fallback until data is loaded, then show full content.
+  if (!endpointData) {
+    return (
+      <div style={{ position: 'relative' }}>
+        {fallbackCard}
+      </div>
+    );
+  }
+  return renderedContent;
 };
 
 # Basic Usage
