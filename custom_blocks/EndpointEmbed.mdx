@@ -145,12 +145,13 @@ export const EndpointEmbed = ({
   const label = (txt) => (labels ? <strong>{txt}: </strong> : null);
 
   /* UI Pieces */
-  const Card = ({ children, extra='' }) => (
-    <div className={`card ${theme==='simple' ? 'simple' : ''} ${extra}`.trim()}>
-      <div className="card-content">{children}</div>
-      <span className="arrow">{arrow}</span>
-    </div>
-  );
+const Card = ({ children, extra = '' }) => (
+  <div className={`card ${theme === 'simple' ? 'simple' : ''} ${extra}`}>
+    <div className="card-content">{children}</div>
+    {theme !== 'simple' && <span className="arrow">{arrow}</span>}
+  </div>
+);
+
   const MethodTag = ({ method }) => <span className={`method ${method.toLowerCase()}`}>{method}</span>;
 
   const skeletonCard = (
