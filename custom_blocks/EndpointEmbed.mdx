@@ -25,18 +25,17 @@ export const EndpointEmbed = ({
   }
 }) => {
   const [endpointData, setEndpointData] = useState(null);
-  const [error, setError] = useState(null);
+  // Instead of storing the error text, we now use a boolean flag.
+  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  // arrow is static so no need to update it.
   const arrow = '›';
 
   // Default link text if not provided.
   const displayLinkText = linkText || endpoint;
-  // Use useMemo to avoid recalculating URL on every render.
   const fullSpecUrl = useMemo(() => `${websiteBaseUrl}/openapi/${specFile}`, [websiteBaseUrl, specFile]);
 
-  // Inject shared CSS into document head exactly once.
+  // Inject shared CSS once.
   useEffect(() => {
     if (!document.getElementById('endpoint-embed-styles')) {
       const style = document.createElement('style');
@@ -134,16 +133,15 @@ export const EndpointEmbed = ({
     }
   }, []);
 
-  // Fetch the spec file (with caching) and extract endpoint info.
+  // Fetch the spec file and extract endpoint info.
   useEffect(() => {
     if (!endpoint) {
-      setError('Endpoint not provided.');
+      setError(true);
       return;
     }
     const fetchEndpointExample = async () => {
       setLoading(true);
-      setError(null);
-      // Initialize the cache inside the function for MDX compatibility.
+      setError(false);
       let cache = {};
       if (typeof window !== 'undefined') {
         if (!window.__endpointSpecCache) {
@@ -157,15 +155,16 @@ export const EndpointEmbed = ({
           spec = cache[fullSpecUrl];
         } else {
           const response = await fetch(fullSpecUrl);
+          // Instead of throwing an error with text, simply set error state.
           if (!response.ok) {
-            throw new Error("This endpoint may be private or restricted.");
+            throw new Error();
           }
           spec = await response.json();
           cache[fullSpecUrl] = spec;
         }
         const operations = spec.paths[endpoint];
         if (!operations) {
-          throw new Error(`No endpoint found in spec for path ${endpoint}`);
+          throw new Error();
         }
         let chosenOperation = null;
         let chosenMethod = null;
@@ -211,7 +210,8 @@ export const EndpointEmbed = ({
           tags,
         });
       } catch (err) {
-        setError(err.message);
+        // We no longer set the error message; we simply flag that an error occurred.
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -263,7 +263,7 @@ export const EndpointEmbed = ({
     return null;
   };
 
-  // Card component for inline usage; accepts an extra CSS class for popup mode.
+  // Card component for inline usage.
   const Card = ({ children, classNameExtra = '' }) => (
     <div className={`card ${classNameExtra}`}>
       <div className="card-content">{children}</div>
@@ -271,22 +271,22 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // Method tag with colors: GET blue, POST green, PUT yellowish, DELETE red.
+  // Method tag component.
   const MethodTag = ({ method }) => {
     const lowerMethod = (method || '').toLowerCase();
     return <span className={`method ${lowerMethod}`}>{method}</span>;
   };
 
-  // Use apiTargetUrl if provided; otherwise, use websiteBaseUrl for the reference URL.
+  // Construct the ReadMe reference URL.
   const readmeDocUrl =
     endpointData && endpointData.operationId
       ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
       : `${websiteBaseUrl}/reference/${endpoint ? endpoint.replace(/[\/{}]/g, '') : ''}`;
 
-  // Build the API endpoint URL if apiTargetUrl is provided.
+  // Build the API endpoint URL if provided.
   const apiFullUrl = apiTargetUrl ? `${apiTargetUrl}${endpoint}` : null;
 
-  // Reusable fallback card for when there's an error (shows only basic info)
+  // Reusable fallback card when error occurs — shows only basic endpoint info.
   const fallbackCard = (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
@@ -313,7 +313,7 @@ export const EndpointEmbed = ({
     </a>
   );
 
-  // Skeleton loading card
+  // Skeleton card to display during loading.
   const skeletonCard = (
     <div className="card skeleton popup-card">
       <div className="card-content">
@@ -325,7 +325,7 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // Rendered content when endpoint data is successfully loaded.
+  // Fully rendered content when the spec loads successfully.
   const renderedContent = endpointData && (
     <a href={readmeDocUrl} style={{ textDecoration: 'none', color: 'inherit' }}>
       <Card>
