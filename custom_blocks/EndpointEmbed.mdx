@@ -115,6 +115,7 @@ export const EndpointEmbed = ({
     align-items: center;
     justify-content: flex-end;
     flex-direction: row-reverse;
+    border-bottom: 1px solid var(--gray-500);
   }
 
   /* Text and metadata */
@@ -335,7 +336,7 @@ var fallbackCard = (
         </div>
       )}
       <div style={{ flexGrow: 1 }}>
-        <h3 style={{ margin: "0 0 0.5em" }}>
+        <h3 style={{ margin: "0.5em 0 0.5em" }}>
           {linkText || displayLinkText}
         </h3>
         <div
@@ -379,7 +380,7 @@ var fallbackCard = (
             </div>
           )}
           <div style={{ flexGrow: 1 }}>
-            <h3 style={{ margin: "0 0 0.5em" }}>
+            <h3 style={{ margin: "0.5em 0 0.5em" }}>
               {linkText || endpointData.summary || displayLinkText}
             </h3>
             {show.description && endpointData.description && (
@@ -509,7 +510,7 @@ var fallbackCard = (
                       </div>
                     )}
                     <div style={{ flexGrow: 1 }}>
-                      <h3 style={{ margin: "0 0 0.5em" }}>
+                      <h3 style={{ margin: "0.5em 0 0.5em" }}>
                         {linkText ||
                           endpointData.summary ||
                           displayLinkText}
