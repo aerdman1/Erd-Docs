@@ -74,6 +74,13 @@ export const EndpointEmbed = ({
 /* Header row (for method and connection indicator) */
 .header-row {
   display: flex;
+  align-items: center; /* this is the key for vertical centering */
+  gap: 6px; /* adds spacing between method and dot */
+  margin-bottom: 4px;
+  margin-top: -4px;
+}
+.header-row {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 4px;
