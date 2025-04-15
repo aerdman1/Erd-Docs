@@ -85,10 +85,6 @@ Use `<Columns>` to organize multiple endpoints side by side.
   </Column>
 
   <Column>
-    <EndpointEmbed endpoint="/pet/findByTags" method="GET" specFile="ErdSpec1.json" displayMode="inline" linkText="Find by Tags" />
-  </Column>
-
-  <Column>
     <EndpointEmbed endpoint="/pet/{petId}/uploadImage" method="POST" specFile="ErdSpec1.json" displayMode="inline" linkText="Upload Image" />
   </Column>
 </Columns>
