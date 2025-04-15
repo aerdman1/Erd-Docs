@@ -25,20 +25,13 @@ If you want all endpoint info to be immediately visible, `"inline"` mode will re
 
 ***
 
-\<Accordion title="My Accordion Title" icon="fa-info-circle">
-
-
 ## Advanced Usage
 
 #### Deprecated
 
 <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="inline" show={{ summary: true, description: true, parameters: false, requestBody: false, responses: false, security: false, tags: false, example: false }} />
 
-<br />
-
 <EndpointEmbed endpoint="/pet/findByStatus" method="GET" specFile="ErdSpec1.json" linkText="Find Pets by Status" displayMode="popup" />
-
-<br />
 
 ***
 
@@ -105,7 +98,6 @@ Use `<Columns>` to organize multiple endpoints side by side.
 </Columns>
 
 &#x20;&#x20;
-\</Accordion>
 
 ***
 
