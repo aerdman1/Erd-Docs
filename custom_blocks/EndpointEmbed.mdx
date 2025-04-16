@@ -222,11 +222,15 @@ export const EndpointEmbed = ({
         const opMethod = (m && ops[m]) ? m : Object.keys(ops)[0];
         const op = ops[opMethod];
         const example = extractExample(op, spec.components);
-        // Extract the spec's last updated timestamp from your custom extension, if available.
-        const specLastUpdated =
+
+        // Extract global file-level last updated timestamp.
+        const fileLastUpdated =
           spec["x-readme"] && spec["x-readme"]["x-last-updated"]
             ? spec["x-readme"]["x-last-updated"]
             : null;
+        // Extract endpoint-specific last updated timestamp if available.
+        const endpointLastUpdated = op["x-last-updated"] ? op["x-last-updated"] : null;
+
         setEndpointData({
           path: endpoint,
           method: opMethod.toUpperCase(),
@@ -239,7 +243,8 @@ export const EndpointEmbed = ({
           responses: op.responses || {},
           security: op.security || [],
           tags: op.tags || [],
-          specLastUpdated: specLastUpdated,
+          endpointLastUpdated,
+          fileLastUpdated,
         });
       } catch (e) {
         console.error("Error fetching or processing spec:", e);
@@ -485,8 +490,9 @@ export const EndpointEmbed = ({
                 </div>
               )}
               {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-              {/* Render the spec last updated bubble if available */}
-              {endpointData.specLastUpdated && (
+              {/* Render the updated bubble.
+                  If the endpoint has a specific timestamp, show that; otherwise, if available, show the file-level timestamp. */}
+              {endpointData.endpointLastUpdated ? (
                 <div
                   style={{
                     fontSize: "0.75rem",
@@ -498,9 +504,26 @@ export const EndpointEmbed = ({
                     borderRadius: "4px",
                   }}
                 >
-                  Spec Last Updated:{" "}
-                  {new Date(endpointData.specLastUpdated).toLocaleString()}
+                  Endpoint Last Updated:{" "}
+                  {new Date(endpointData.endpointLastUpdated).toLocaleString()}
                 </div>
+              ) : (
+                endpointData.fileLastUpdated && (
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#6b7280",
+                      marginTop: 8,
+                      textAlign: "right",
+                      background: "#f9f9f9",
+                      padding: "2px 4px",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    File Last Updated:{" "}
+                    {new Date(endpointData.fileLastUpdated).toLocaleString()}
+                  </div>
+                )
               )}
             </div>
           </Card>
