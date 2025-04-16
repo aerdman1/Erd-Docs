@@ -1,5 +1,5 @@
 ---
-title: Keyword Testing
+title: Keywords
 deprecated: false
 hidden: false
 metadata:
