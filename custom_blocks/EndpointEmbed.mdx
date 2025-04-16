@@ -589,6 +589,29 @@ export const EndpointEmbed = ({
 
 ## 💬 Popup Mode
 
+<EndpointEmbed  
+  endpoint="/user/{username}"  
+  method="PUT"  
+  specFile="ErdSpec1.json"  
+  linkText="This should show endpoint last updated!"  
+  displayMode="popup"  
+  websiteBaseUrl="https://erdtest123.readme.io"  
+  apiTargetUrl="https://api.erdman.com"  
+  theme="simple" 
+  labels={true}  
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: false,  
+    responses: true,  
+    security: false,  
+    example: false,  
+    readmeUrl: false,  
+    apiUrl: false  
+  }}  
+/> 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed 
   endpoint="/pet" 
   method="PUT" 
