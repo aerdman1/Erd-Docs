@@ -5,8 +5,10 @@ import React, { useEffect, useMemo, useState } from "react";
 
 export const EndpointEmbed = ({
   websiteBaseUrl = "https://erdtest123.readme.io",
-  displayMode = "popup",
-  theme = "endpoint-block",
+  displayMode = "popup",            // "popup" or "inline"
+  theme = "card-block",             // "card-block" or "card-simple"
+  cardBg,                           // optional override for background
+  cardPadding,                      // optional override for padding
   apiTargetUrl,
   endpoint,
   method,
@@ -26,20 +28,32 @@ export const EndpointEmbed = ({
     apiUrl: false,
   },
 }) => {
+  const DEFAULT_SHOW = {
+    summary:    true,
+    description:true,
+    parameters: true,
+    tags:       true,
+    requestBody:false, 
+    responses:  true,
+    security:   false,
+    example:    false,
+    readmeUrl:  false,
+    apiUrl:     false,
+  };
+  const mergedShow = { ...DEFAULT_SHOW, ...show };
+
   const [endpointData, setEndpointData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [fadeIn, setFadeIn] = useState(false);
 
   const displayLinkText = linkText || endpoint;
-  // Append a query parameter to bypass cache if needed for debugging
-  const fullSpecUrl = useMemo(() => {
-    return websiteBaseUrl + "/openapi/" + specFile + "?nocache=" + Date.now();
-  }, [websiteBaseUrl, specFile]);
+  const fullSpecUrl = useMemo(
+    () => `${websiteBaseUrl}/openapi/${specFile}?nocache=${Date.now()}`,
+    [websiteBaseUrl, specFile]
+  );
 
-  /* ------------------------------------------------------------------
-   *  Inject shared CSS once
-   * ----------------------------------------------------------------*/
+  // Inject shared CSS once
   useEffect(() => {
     if (document.getElementById("embed-styles")) return;
     const style = document.createElement("style");
@@ -52,40 +66,32 @@ export const EndpointEmbed = ({
         --gray-light: #f9f9f9;
         --blue-hover: #f0f8ff;
         --white: #fff;
-        --shadow-default: 0 8px 16px rgba(0, 0, 0, 0.1);
-        --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --shadow-default: 0 8px 16px rgba(0,0,0,0.1);
+        --shadow-hover:   0 4px 20px rgba(0,0,0,0.08);
       }
-      /* Base block styles */
-      .endpoint-block,
-      .endpoint-simple {
+      .card-block,
+      .card-simple {
         display: flex;
         flex-direction: column;
         text-decoration: none;
         color: inherit;
         margin-bottom: 8px;
-        width: auto;
         max-width: 100%;
         position: relative;
       }
-      .endpoint-block {
-        background: var(--gray-light);
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        padding: 16px;
+      .method {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        display: inline-block;
       }
-      .endpoint-block:hover {
-        background: var(--blue-hover);
-        border-color: var(--gray-500);
-      }
-      .endpoint-simple {
-        background: transparent;
-        border: none;
-        padding: 16px;
-      }
-      /* Shared arrow indicator */
-      .endpoint-block::after,
-      .endpoint-simple::after,
-      .popup-card::after {
+      .method.get    { color: #2563eb; }
+      .method.post   { color: #16a34a; }
+      .method.put    { color: #ca8a04; }
+      .method.delete { color: #dc2626; }
+      .card-block::after,
+      .card-simple::after,
+      .card-popup::after {
         content: '↗';
         font-size: 0.75rem;
         position: absolute;
@@ -95,84 +101,40 @@ export const EndpointEmbed = ({
         color: var(--gray-500);
         transition: opacity 0.2s ease;
       }
-      .endpoint-block:hover::after,
-      .endpoint-simple:hover::after,
-      .popup-card:hover::after {
+      .card-block:hover::after,
+      .card-simple:hover::after,
+      .card-popup:hover::after {
         opacity: 1;
       }
-      /* Header section */
       .header-row {
         display: flex;
         align-items: center;
         justify-content: flex-end;
         flex-direction: row-reverse;
         padding-bottom: 3px;
-        border-bottom: 0.5px solid #6b728057;
+        border-bottom: 0.5px solid rgba(107,115,128,0.35);
       }
-      /* Text and metadata */
-      .endpoint-block h3 {
-        margin: 0 0 0.5em;
-        font-size: 1rem;
-        font-weight: bold;
-        color: var(--gray-800);
-      }
-      .method {
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        display: inline-block;
-      }
-      .method.get { color: #2563eb; }
-      .method.post { color: #16a34a; }
-      .method.put { color: #ca8a04; }
-      .method.delete { color: #dc2626; }
-      .path {
-        font-family: monospace;
-        font-size: 0.9rem;
-        color: var(--gray-500);
-        word-break: break-word;
-      }
-      /* Popup-specific styling */
-      .popup-card {
+      .card-popup {
         position: relative;
-        background: var(--white);
         border: none;
         border-radius: 8px;
-        padding: 12px 16px;
-        width: fit-content;
-        min-width: 300px;
-        max-width: 100%;
         font-size: 0.85rem;
         box-shadow: var(--shadow-default);
         transition: box-shadow 0.2s ease, background 0.2s ease;
       }
-      .popup-card:hover {
-        background: var(--blue-hover);
-        box-shadow: var(--shadow-hover);
-      }
-      /* When using the "simple" theme, the popup-card gets minimal styling */
-      .popup-card.simple {
-        border: none;
+      .card-popup.simple {
         border-radius: 0;
-        background: var(--white);
       }
-      
-/* Make block‐themed popups use the same grey background as endpoint‐block */
-.popup-card:not(.simple) {
-  background: var(--gray-light);
-}
-      /* Neutralize container colors */
       .CardsGrid .Card,
+      .Accordion,
       .Accordion .Accordion-title,
-      .CardsGrid .Card-icon,
-      .Accordion {
-        background: inherit;
-        color: inherit;
+      .CardsGrid .Card-icon {
+        background: inherit !important;
+        color:     inherit !important;
       }
-      /* Skeleton animation & styling */
       @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.4; }
+        0%   { opacity: 1; }
+        50%  { opacity: 0.4; }
         100% { opacity: 1; }
       }
       .skeleton-card {
@@ -182,453 +144,303 @@ export const EndpointEmbed = ({
     document.head.appendChild(style);
   }, []);
 
-  /* ------------------------------------------------------------------
-   *  Fetch & parse spec with logging and cache-bypass query param
-   * ----------------------------------------------------------------*/
+  // Fetch & parse spec
   useEffect(() => {
     if (!endpoint) return;
-    const run = async () => {
-      setLoading(true);
+    setLoading(true);
+    (async () => {
       try {
         if (!window.__endpointSpecCache) window.__endpointSpecCache = {};
         let spec = window.__endpointSpecCache[fullSpecUrl];
-        if (spec) {
-          console.log(`[CACHE HIT] Spec from cache for ${fullSpecUrl}:`, spec);
-        } else {
+        if (!spec) {
           const res = await fetch(fullSpecUrl);
           if (!res.ok) throw new Error("fetch failed");
           spec = await res.json();
-          console.log(`[FETCH] New spec retrieved from ${fullSpecUrl}:`, spec);
           window.__endpointSpecCache[fullSpecUrl] = spec;
         }
-        if (!spec.paths || !spec.paths[endpoint]) {
-          console.error(`Spec does not contain endpoint "${endpoint}":`, spec);
-          throw new Error("missing path");
-        }
-        const ops = spec.paths[endpoint];
-        const m = method ? method.toLowerCase() : undefined;
-        const opMethod = (m && ops[m]) ? m : Object.keys(ops)[0];
-        const op = ops[opMethod];
-        const example = extractExample(op, spec.components);
+        const ops = spec.paths?.[endpoint];
+        if (!ops) throw new Error(`missing path "${endpoint}"`);
+        const m = method?.toLowerCase();
+        const opKey = m && ops[m] ? m : Object.keys(ops)[0];
+        const op = ops[opKey];
 
-        // Extract global file-level last updated timestamp.
-        const fileLastUpdated =
-          spec["x-readme"] && spec["x-readme"]["x-last-updated"]
-            ? spec["x-readme"]["x-last-updated"]
-            : null;
-        // Extract endpoint-specific last updated timestamp if available.
-        const endpointLastUpdated = op["x-last-updated"] ? op["x-last-updated"] : null;
+        const example = extractExample(op, spec.components);
+        const fileLastUpdated     = spec["x-readme"]?.["x-last-updated"] || null;
+        const endpointLastUpdated = op["x-last-updated"] || null;
 
         setEndpointData({
           path: endpoint,
-          method: opMethod.toUpperCase(),
-          summary: op.summary || "",
+          method: opKey.toUpperCase(),
+          summary:     op.summary     || "",
           description: op.description || "",
-          example: example,
+          example,
           operationId: op.operationId || "",
-          parameters: op.parameters || [],
+          parameters:  op.parameters  || [],
           requestBody: op.requestBody || null,
-          responses: op.responses || {},
-          security: op.security || [],
-          tags: op.tags || [],
+          responses:   op.responses   || {},
+          security:    op.security    || [],
+          tags:        op.tags        || [],
           endpointLastUpdated,
           fileLastUpdated,
         });
       } catch (e) {
-        console.error("Error fetching or processing spec:", e);
+        console.error(e);
         setEndpointData(null);
       } finally {
         setLoading(false);
       }
-    };
-    run();
+    })();
   }, [endpoint, fullSpecUrl, method]);
 
-  // When endpointData loads, trigger the fade-in effect.
   useEffect(() => {
-    if (endpointData) {
-      setTimeout(() => setFadeIn(true), 100);
-    }
+    if (endpointData) setTimeout(() => setFadeIn(true), 100);
   }, [endpointData]);
 
-  /* Helper functions – no optional chaining or Object.fromEntries */
+  // Helpers
   function resolveSchema(schema, comps) {
     if (!schema) return null;
     if (schema.example !== undefined) return schema.example;
     if (schema.$ref) {
-      const refKey = schema.$ref.split("/").pop();
-      return resolveSchema(comps.schemas[refKey], comps);
+      const key = schema.$ref.split("/").pop();
+      return resolveSchema(comps.schemas[key], comps);
     }
-    if (schema.type === "object" && schema.properties) {
-      const result = {};
-      Object.keys(schema.properties).forEach(k => {
-        result[k] = resolveSchema(schema.properties[k], comps);
+    if (schema.type === "object") {
+      const obj = {};
+      Object.entries(schema.properties || {}).forEach(([k,v]) => {
+        obj[k] = resolveSchema(v, comps);
       });
-      return result;
+      return obj;
     }
-    if (schema.type === "array") return [resolveSchema(schema.items, comps)];
+    if (schema.type === "array") {
+      return [resolveSchema(schema.items, comps)];
+    }
     return null;
   }
-
   function extractExample(op, comps) {
-    const responses = op.responses || {};
-    const resp = responses["200"] || Object.values(responses)[0];
-    const media = resp && resp.content && resp.content["application/json"];
+    const resp = op.responses?.["200"] || Object.values(op.responses || {})[0];
+    const media = resp?.content?.["application/json"];
     if (!media) return null;
     if (media.example) return media.example;
     if (media.examples) {
-      const vals = Object.values(media.examples);
-      if (vals.length > 0 && vals[0].value) return vals[0].value;
+      const ex = Object.values(media.examples)[0];
+      return ex?.value ?? null;
     }
     return resolveSchema(media.schema, comps);
   }
-
-  // Custom parser to handle date strings in the forced format "YYYY-MM-D"
-  function parseCustomDate(dateStr) {
-    const parts = dateStr.split("-");
-    if (parts.length !== 3) return new Date(dateStr);
-    const [year, month, day] = parts;
-    const paddedMonth = month.padStart(2, "0");
-    const paddedDay = day.padStart(2, "0");
-    const isoDate = `${year}-${paddedMonth}-${paddedDay}`;
-    return new Date(isoDate);
+  function parseCustomDate(s) {
+    const [y,m,d] = s.split("-");
+    return new Date(`${y}-${m.padStart(2,"0")}-${d.padStart(2,"0")}`);
+  }
+  function formatLastUpdated(s) {
+    return parseCustomDate(s).toLocaleDateString();
   }
 
-  function formatLastUpdated(dateStr) {
-    const date = parseCustomDate(dateStr);
-    return date.toLocaleDateString();
-  }
+  const readmeDocUrl = endpointData?.operationId
+    ? `${websiteBaseUrl}/reference/${endpointData.operationId}`
+    : `${websiteBaseUrl}/reference/${endpoint.replace(/[\/{}]/g,"")}`;
 
-  const readmeDocUrl =
-    (endpointData && endpointData.operationId)
-      ? websiteBaseUrl + "/reference/" + endpointData.operationId
-      : websiteBaseUrl + "/reference/" + endpoint.replace(/[\/{}]/g, "");
-  const apiFullUrl = apiTargetUrl ? (apiTargetUrl + endpoint) : null;
-  const label = txt => (labels ? <strong>{txt}: </strong> : null);
+  const label = txt => labels ? <strong>{txt}: </strong> : null;
 
-  // ConnectionIndicator renders as a small inline-block element.
-  const ConnectionIndicator = ({ connected, inline }) => {
-    const style = inline
-      ? {
-          display: "inline-block",
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          marginRight: 8,
-          alignSelf: "center",
-        }
-      : {
-          position: "absolute",
-          top: 2,
-          right: 4,
-          width: 10,
-          height: 10,
-          borderRadius: "50%",
-        };
+  // Card wrapper
+  const Card = ({ children, variant }) => {
+    const defaults = {
+      popup:    { bg: theme==="card-block" ? "var(--gray-light)" : "var(--white)",    pad: "12px 16px" },
+      inline:   { bg: theme==="card-block" ? "var(--gray-light)" : "transparent",     pad: "16px"     },
+      fallback: { bg: theme==="card-block" ? "var(--gray-light)" : "transparent",     pad: "16px"     },
+    }[variant];
+
     return (
       <div
-        style={{ ...style, backgroundColor: connected ? "green" : "red" }}
-        title={connected ? "Synced" : "Not Connected"}
-      />
-    );
-  };
-
-  /* UI Pieces */
-  const Card = ({ children, extra = "" }) => {
-    return (
-      <div
-        className={(theme === "simple" ? "endpoint-simple" : "endpoint-block") + " " + extra}
-        style={{ position: "relative" }}
+        className={variant==="popup" ? "card-popup" : theme}
+        style={{
+          position:    "relative",
+          background:  cardBg     ?? defaults.bg,
+          padding:     cardPadding?? defaults.pad,
+          border:      theme==="card-block" ? "1px solid #d1d5db" : "none",
+          borderRadius:8,
+          boxShadow:   variant==="popup" ? "var(--shadow-default)" : "none",
+        }}
       >
         {children}
       </div>
     );
   };
 
-  const MethodTag = ({ method }) => {
-    return <span className={"method " + method.toLowerCase()}>{method}</span>;
+  const MethodTag    = ({ method }) => <span className={`method ${method.toLowerCase()}`}>{method}</span>;
+  const ConnectionIndicator = ({ connected, inline }) => {
+    const s = inline
+      ? { display:"inline-block", width:8, height:8, borderRadius:"50%", marginRight:8 }
+      : { position:"absolute", top:2, right:4, width:10, height:10, borderRadius:"50%" };
+    return <div style={{ ...s, backgroundColor: connected?"green":"red" }} />;
   };
-
-  // Skeleton placeholder while loading.
   const SkeletonCard = () => (
-    <div
-      className="skeleton-card"
-      style={{
-        background: "#e2e2e2",
-        borderRadius: 8,
-        padding: 16,
-        width: "fit-content",
-        minWidth: 250,
-      }}
-    >
-      <div style={{ height: 20, width: "60%", background: "#ccc", marginBottom: 8 }} />
-      <div style={{ height: 16, width: "80%", background: "#ccc", marginBottom: 4 }} />
-      <div style={{ height: 16, width: "90%", background: "#ccc", marginBottom: 4 }} />
+    <div className="skeleton-card" style={{ background:"#e2e2e2", borderRadius:8, padding:16, width:250 }}>
+      <div style={{ height:20, width:"60%", background:"#ccc", marginBottom:8 }} />
+      <div style={{ height:16, width:"80%", background:"#ccc", marginBottom:4 }} />
+      <div style={{ height:16, width:"90%", background:"#ccc", marginBottom:4 }} />
     </div>
   );
 
-  // Fallback card when no data is available.
-const fallbackCard = (
-  <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
-    <Card>
-      {show.summary && method && (
-        <div className="header-row" style={{ width: "100%" }}>
-          <MethodTag method={method} />
-          <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
-        </div>
-      )}
-      <div style={{ flexGrow: 1 }}>
-        <h3 style={{ margin: "0.5em 0 0.5em" }}>{linkText || displayLinkText}</h3>
-        <div style={{ fontFamily: "monospace", fontSize: "0.9rem", color: "#6b7280" }}>
-          {endpoint}
-        </div>
-        {show.apiUrl && apiTargetUrl && (
-          <div
-            style={{
-              fontFamily: "monospace",
-              fontSize: "0.9rem",
-              color: "#4b5563",
-            }}
-          >
-            API: {method ? method.toUpperCase() : ""} {apiTargetUrl + endpoint}
+  // Fallback
+  const fallbackCard = (
+    <a href={readmeDocUrl} style={{ textDecoration:"none", color:"inherit" }}>
+      <Card variant="fallback">
+        {mergedShow.summary && method && (
+          <div className="header-row">
+            <MethodTag method={method} />
+            <ConnectionIndicator connected={!!endpointData && !loading} inline />
           </div>
         )}
-        {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-      </div>
-    </Card>
-  </a>
-);
-
-  // Full rendered content (all extra fields) used for inline mode.
-  const renderedContent =
-    endpointData && (
-      <div
-        style={{
-          opacity: fadeIn ? 1 : 0,
-          transition: "opacity 0.5s ease-in-out"
-        }}
-      >
-        <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
-          <Card>
-            {show.summary && endpointData.method && (
-              <div className="header-row" style={{ width: "100%" }}>
-                <MethodTag method={endpointData.method} />
-                <ConnectionIndicator connected={true} inline={true} />
-              </div>
-            )}
-            <div style={{ flexGrow: 1 }}>
-              <h3 style={{ margin: "0.5em 0 0.5em" }}>
-                {linkText || endpointData.summary || displayLinkText}
-              </h3>
-              {show.description && endpointData.description && (
-                <p style={{ margin: "0 0 0.5em", fontSize: "0.9rem", color: "#374151" }}>
-                  {endpointData.description}
-                </p>
-              )}
-              {show.parameters &&
-                endpointData.parameters.length > 0 && (
-                  <div>
-                    {label("Parameters")}
-                    {endpointData.parameters.map(p => p.name).join(", ")}
-                  </div>
-                )}
-              {show.requestBody && endpointData.requestBody && (
-                <div>
-                  {label("Request Body")}Available
-                </div>
-              )}
-              {show.responses && endpointData.responses && (
-                <div>
-                  {label("Responses")}
-                  {Object.keys(endpointData.responses).join(", ")}
-                </div>
-              )}
-              {show.security &&
-                endpointData.security.length > 0 && (
-                  <div>
-                    {label("Security")}
-                    {JSON.stringify(endpointData.security)}
-                  </div>
-                )}
-              {show.tags &&
-                endpointData.tags.length > 0 && (
-                  <div>
-                    {label("Tags")}
-                    {endpointData.tags.join(", ")}
-                  </div>
-                )}
-              {show.example && endpointData.example && (
-                <pre
-                  style={{
-                    background: "#f3f4f6",
-                    padding: 8,
-                    margin: "5px 0px",
-                    borderRadius: 6,
-                    fontSize: "0.85rem",
-                    overflowX: "auto",
-                  }}
-                >
-                  {JSON.stringify(endpointData.example, null, 2)}
-                </pre>
-              )}
-              {show.apiUrl && apiFullUrl && (
-                <div
-                  style={{
-                    fontFamily: "monospace",
-                    fontSize: "0.9rem",
-                    color: "#4b5563",
-                  }}
-                >
-                  API: {endpointData.method} {apiFullUrl}
-                </div>
-              )}
-              {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-              {/* Render the updated bubble using the custom date parser */}
-              {endpointData.endpointLastUpdated ? (
-                <div
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "#6b7280",
-                    marginTop: 8,
-                    textAlign: "right",
-                    background: "#f9f9f9",
-                    padding: "2px 4px",
-                    borderRadius: "4px",
-                  }}
-                >
-                  Endpoint Modified:{" "}
-                  {formatLastUpdated(endpointData.endpointLastUpdated)}
-                </div>
-              ) : (
-                endpointData.fileLastUpdated && (
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "#6b7280",
-                      marginTop: 8,
-                      textAlign: "right",
-                      background: "#f9f9f9",
-                      padding: "2px 4px",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    File Last Updated:{" "}
-                    {formatLastUpdated(endpointData.fileLastUpdated)}
-                  </div>
-                )
-              )}
+        <div style={{ flexGrow:1 }}>
+          <h3 style={{ margin:"0.5em 0" }}>{displayLinkText}</h3>
+          <div style={{ fontFamily:"monospace", fontSize:"0.9rem", color:"#6b7280" }}>
+            {endpoint}
+          </div>
+          {mergedShow.apiUrl && apiTargetUrl && (
+            <div style={{ fontFamily:"monospace", fontSize:"0.9rem", color:"#4b5563" }}>
+              API: {method?.toUpperCase()} {apiTargetUrl + endpoint}
             </div>
-          </Card>
-        </a>
-      </div>
-    );
+          )}
+          {mergedShow.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+        </div>
+      </Card>
+    </a>
+  );
 
-  /* ------------------------------------------------------------------
-   *  Render based on displayMode
-   * ----------------------------------------------------------------*/
+  // Full content
+  const renderedContent = endpointData && (
+    <a href={readmeDocUrl} style={{ textDecoration:"none", color:"inherit" }}>
+      <Card variant={displayMode}>
+        {mergedShow.summary && endpointData.method && (
+          <div className="header-row">
+            <MethodTag method={endpointData.method} />
+            <ConnectionIndicator connected inline />
+          </div>
+        )}
+        <div style={{ flexGrow:1, opacity: fadeIn?1:0, transition:"opacity 0.5s" }}>
+          <h3 style={{ margin:"0.5em 0" }}>{endpointData.summary || displayLinkText}</h3>
+          {mergedShow.description && endpointData.description && (
+            <p style={{ margin:"0 0 0.5em", fontSize:"0.9rem", color:"#374151" }}>
+              {endpointData.description}
+            </p>
+          )}
+          {mergedShow.parameters && endpointData.parameters.length>0 && (
+            <div>{label("Parameters")}{endpointData.parameters.map(p=>p.name).join(", ")}</div>
+          )}
+          {mergedShow.requestBody && endpointData.requestBody && (
+            <div>{label("Request Body")}Available</div>
+          )}
+          {mergedShow.responses && (
+            <div>{label("Responses")}{Object.keys(endpointData.responses).join(", ")}</div>
+          )}
+          {mergedShow.security && endpointData.security.length>0 && (
+            <div>{label("Security")}{JSON.stringify(endpointData.security)}</div>
+          )}
+          {mergedShow.tags && endpointData.tags.length>0 && (
+            <div>{label("Tags")}{endpointData.tags.join(", ")}</div>
+          )}
+          {mergedShow.example && endpointData.example && (
+            <pre style={{ background:"#f3f4f6", padding:8, borderRadius:6, overflowX:"auto" }}>
+              {JSON.stringify(endpointData.example,null,2)}
+            </pre>
+          )}
+          {mergedShow.apiUrl && apiTargetUrl && (
+            <div style={{ fontFamily:"monospace", fontSize:"0.9rem", color:"#4b5563" }}>
+              API: {endpointData.method} {apiTargetUrl+endpoint}
+            </div>
+          )}
+          {mergedShow.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+          {(endpointData.endpointLastUpdated||endpointData.fileLastUpdated)&&(
+            <div style={{ fontSize:"0.75rem", color:"#6b7280", marginTop:8, textAlign:"right" }}>
+              {endpointData.endpointLastUpdated
+                ? `Endpoint Modified: ${formatLastUpdated(endpointData.endpointLastUpdated)}`
+                : `File Last Updated: ${formatLastUpdated(endpointData.fileLastUpdated)}`}
+            </div>
+          )}
+        </div>
+      </Card>
+    </a>
+  );
+
+  // Final render
   if (displayMode === "popup") {
-    const linkStyle = {
-      textDecoration: "none",
-      cursor: "pointer",
-      color: "#1a73e8",
-      background: "#e8f0fe",
-      borderRadius: "4px",
-      padding: "2px 4px",
-      fontWeight: 600,
-    };
     return (
       <span
-        style={{ display: "inline-block", position: "relative" }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        style={{ display:"inline-block", position:"relative", cursor:"pointer" }}
+        onMouseEnter={()=>setIsHovered(true)}
+        onMouseLeave={()=>setIsHovered(false)}
       >
-        <a href={readmeDocUrl} style={linkStyle}>
+        <a
+          href={readmeDocUrl}
+          style={{
+            textDecoration:"none",
+            color:"#1a73e8",
+            background:"#e8f0fe",
+            borderRadius:4,
+            padding:"2px 4px",
+            fontWeight:600
+          }}
+        >
           {displayLinkText}
         </a>
         {isHovered && (
-          <div style={{ position: "absolute", left: 0, zIndex: 1000, width: 220 }}>
-            {loading ? (
-              <SkeletonCard />
-            ) : (
-              endpointData ? (
-                <div
-                  style={{
-                    opacity: fadeIn ? 1 : 0,
-                    transition: "opacity 0.5s ease-in-out",
-                  }}
-                >
-                  <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
-                    <div className={"popup-card " + (theme === "simple" ? "simple" : "")}>
-                      {renderedContent}
-                    </div>
-                  </a>
-                </div>
-              ) : (
-                fallbackCard
-              )
-            )}
+          <div style={{ position:"absolute", left:0, top:"100%", zIndex:1000 }}>
+            {loading ? <SkeletonCard/> : (endpointData ? renderedContent : fallbackCard)}
           </div>
         )}
       </span>
     );
   }
 
-  // Inline mode: show fallback if no data.
-  if (loading) return <div style={{ position: "relative" }}><SkeletonCard /></div>;
-  if (!endpointData) return <div style={{ position: "relative" }}>{fallbackCard}</div>;
+  // inline
+  if (loading) return <SkeletonCard />;
+  if (!endpointData) return fallbackCard;
   return renderedContent;
 };
- 
-## 💬 Popup Mode 
-This should show the endpoint info and when it was  <EndpointEmbed  
-  endpoint="/user/{username}"  
+
+## 💬 Popup Mode  
+
+Default:
+<EndpointEmbed endpoint="/user/{username}" specFile="ErdSpec1.json" />
+
+ALL PROPS:
+<EndpointEmbed
+      websiteBaseUrl="https://erdtest123.readme.io"
+      displayMode="popup"           
+      theme="card-block"          
+      cardBg="#f9f9f9"              
+      cardPadding="20px"         
+      apiTargetUrl="https://api.erdman.com"
+      endpoint="/user/{username}"
+      method="PUT"
+      linkText="Update User"
+      specFile="ErdSpec1.json"
+      labels={false}
+      show={{
+        summary:    true,
+        description:true,
+        parameters: true,
+        tags:       true,
+        requestBody:true,
+        responses:  true,
+        security:   true,
+        example:    true,
+        readmeUrl:  true,
+        apiUrl:     true
+      }}
+    /> 
+
+<EndpointEmbed  
+  endpoint="/pet"  
   method="PUT"  
   specFile="ErdSpec1.json"  
-  linkText="last updated!"  
+  linkText="Pet Endpoint"  
   displayMode="popup"  
   websiteBaseUrl="https://erdtest123.readme.io"  
   apiTargetUrl="https://api.erdman.com"  
-  theme="simple" 
+  theme="card-block"  
   labels={true}  
   show={{  
-    summary: true,  
-    description: true,  
-    parameters: true,  
-    tags: true,  
-    requestBody: false,  
-    responses: true,  
-    security: false,  
-    example: false,  
-    readmeUrl: false,  
-    apiUrl: false  
-  }}  
-/> 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed 
-  endpoint="/pet" 
-  method="PUT" 
-  specFile="ErdSpec1.json" 
-  linkText="Pet Endpoint" 
-  displayMode="popup" 
-  websiteBaseUrl="https://erdtest123.readme.io" 
-  apiTargetUrl="https://api.erdman.com" 
-  theme="simple" 
-  labels={true} 
-  show={{
-    summary: true,
-    description: true,
-    parameters: true,
-    tags: true,
-    requestBody: true,
-    responses: true,
-    security: true,
-    example: true,
-    readmeUrl: true,
-    apiUrl: true
-  }}
-/>  Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. (Renders a clickable label. On hover, a card appears with endpoint details.)
-
-On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
-  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Full Details" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{  
     summary: true,  
     description: true,  
     parameters: true,  
@@ -639,15 +451,42 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
     example: true,  
     readmeUrl: true,  
     apiUrl: true  
-  }} /> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
+  }}  
+/>  
+
+<EndpointEmbed  
+  endpoint="/pet"  
+  method="PUT"  
+  specFile="ErdSpec1.json"  
+  linkText="Full Details"  
+  displayMode="popup"  
+  websiteBaseUrl="https://erdtest123.readme.io"  
+  apiTargetUrl="https://api.erdman.com"  
+  theme="card-simple"  
+  labels={true}  
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    example: true,  
+    readmeUrl: true,  
+    apiUrl: true  
+  }}  
+/> 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit.
 
 ---
 
 ## 📄 Inline Mode
 
-<Columns layout="auto"> 
-  
-  <Column> 
+<Columns layout="auto">
+
+<Column>
 
 #### Block version:
 
@@ -659,35 +498,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   displayMode="inline"  
   websiteBaseUrl="https://erdtest123.readme.io"  
   apiTargetUrl="https://api.erdman.com"  
-  theme="endpoint-block"  
-  labels={true}  
-  show={{  
-    summary: true,  
-    description: true,  
-    parameters: true,  
-    tags: true,  
-    requestBody: false,  
-    responses: true,  
-    security: false,  
-    example: false,
-    readmeUrl: false,  
-    apiUrl: false  
-  }}  
-/>
-  </Column>
-  <Column>
-
-#### Simple version:
-  
-<EndpointEmbed  
-  endpoint="/pet"  
-  method="PUT"  
-  specFile="ErdSpec1.json"  
-  linkText="Full Details"  
-  displayMode="inline"  
-  websiteBaseUrl="https://erdtest123.readme.io"  
-  apiTargetUrl="https://api.erdman.com"  
-  theme="simple"  
+  theme="card-block"  
   labels={true}  
   show={{  
     summary: true,  
@@ -703,7 +514,38 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   }}  
 />
 
-  </Column>
+</Column>
+
+<Column>
+
+#### Simple version:
+
+<EndpointEmbed  
+  endpoint="/pet"  
+  method="PUT"  
+  specFile="ErdSpec1.json"  
+  linkText="Full Details"  
+  displayMode="inline"  
+  websiteBaseUrl="https://erdtest123.readme.io"  
+  apiTargetUrl="https://api.erdman.com"  
+  theme="card-simple"  
+  labels={true}  
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: false,  
+    responses: true,  
+    security: false,  
+    example: false,  
+    readmeUrl: false,  
+    apiUrl: false  
+  }}  
+/>
+
+</Column>
+
 </Columns>
 
 ---
@@ -717,7 +559,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   websiteBaseUrl="https://erdtest123.readme.io"  
   apiTargetUrl="https://api.novatest.com"  
   displayMode="inline"  
-  theme="simple"  
+  theme="card-simple"  
   labels={true}  
   show={{  
     summary: true,  
@@ -733,6 +575,8 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   }}  
 />
 
+---
+
 ## 🧱 ReadMe Cards
 
 <Cards columns={2}>  
@@ -742,7 +586,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
       method="GET"  
       specFile="NovaTest.json"  
       displayMode="inline"  
-      theme="simple"  
+      theme="card-simple"  
       linkText="List Users"  
       show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
     />  
@@ -754,7 +598,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
       method="POST"  
       specFile="NovaTest.json"  
       displayMode="inline"  
-      theme="simple"  
+      theme="card-simple"  
       linkText="Create Post"  
       show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }}  
     />  
@@ -799,7 +643,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
       specFile="ErdSpec1.json"  
       displayMode="inline"  
       linkText="Find by Tags"  
-      show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }}
+      show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }}  
     />  
   </Column>  
   <Column>  
@@ -809,7 +653,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
       specFile="ErdSpec1.json"  
       displayMode="inline"  
       linkText="Find by Tags"  
-      show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }} 
+      show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }}  
     />  
   </Column>  
   <Column>  
@@ -819,10 +663,10 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
       specFile="ErdSpec1.json"  
       displayMode="inline"  
       linkText="Find by Tags"  
-      show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }}
+      show={{ summary: true, description: true, readmeUrl: false, apiUrl: true }}  
     />  
   </Column>  
-</Columns>
+</Columns>  
 
 
 <Accordion title="All props/default values">
@@ -847,4 +691,4 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
 | `show.example`     | `boolean`     | `false`                              | Toggles display of a sample JSON response.                                     |
 | `show.readmeUrl`   | `boolean`     | `false`                              | Toggles display of the ReadMe reference doc URL.                               |
 | `show.apiUrl`      | `boolean`     | `false`                              | Toggles display of the full API call URL (with method and `apiTargetUrl`).     |
-</Accordion> 
+</Accordion>
