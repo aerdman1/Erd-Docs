@@ -154,7 +154,13 @@ export const EndpointEmbed = ({
       .popup-card.simple {
         border: none;
         border-radius: 0;
+        background: var(--white);
       }
+      
+/* Make block‐themed popups use the same grey background as endpoint‐block */
+.popup-card:not(.simple) {
+  background: var(--gray-light);
+}
       /* Neutralize container colors */
       .CardsGrid .Card,
       .Accordion .Accordion-title,
@@ -362,47 +368,36 @@ export const EndpointEmbed = ({
   );
 
   // Fallback card when no data is available.
-  const fallbackCard = (
-    <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
-      <div
-        className={("popup-card " + (theme === "simple" ? "simple" : "")).trim()}
-        style={{ position: "relative" }}
-      >
-        {show.summary && method && (
-          <div className="header-row" style={{ width: "100%" }}>
-            <MethodTag method={method} />
-            <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
-          </div>
-        )}
-        <div style={{ flexGrow: 1 }}>
-          <h3 style={{ margin: "0.5em 0 0.5em" }}>
-            {linkText || displayLinkText}
-          </h3>
+const fallbackCard = (
+  <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
+    <Card>
+      {show.summary && method && (
+        <div className="header-row" style={{ width: "100%" }}>
+          <MethodTag method={method} />
+          <ConnectionIndicator connected={!!endpointData && !loading} inline={true} />
+        </div>
+      )}
+      <div style={{ flexGrow: 1 }}>
+        <h3 style={{ margin: "0.5em 0 0.5em" }}>{linkText || displayLinkText}</h3>
+        <div style={{ fontFamily: "monospace", fontSize: "0.9rem", color: "#6b7280" }}>
+          {endpoint}
+        </div>
+        {show.apiUrl && apiTargetUrl && (
           <div
             style={{
               fontFamily: "monospace",
               fontSize: "0.9rem",
-              color: "#6b7280",
+              color: "#4b5563",
             }}
           >
-            {endpoint}
+            API: {method ? method.toUpperCase() : ""} {apiTargetUrl + endpoint}
           </div>
-          {show.apiUrl && apiTargetUrl && (
-            <div
-              style={{
-                fontFamily: "monospace",
-                fontSize: "0.9rem",
-                color: "#4b5563",
-              }}
-            >
-              API: {method ? method.toUpperCase() : ""} {apiTargetUrl + endpoint}
-            </div>
-          )}
-          {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-        </div>
+        )}
+        {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
       </div>
-    </a>
-  );
+    </Card>
+  </a>
+);
 
   // Full rendered content (all extra fields) used for inline mode.
   const renderedContent =
