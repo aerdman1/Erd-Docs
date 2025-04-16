@@ -3,5 +3,5 @@
 - loginuser
 - logoutuser
 - getuserbyname
-- updateuser
 - deleteuser
+- put_user-username
