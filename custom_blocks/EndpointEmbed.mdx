@@ -55,7 +55,6 @@ export const EndpointEmbed = ({
         --shadow-default: 0 8px 16px rgba(0, 0, 0, 0.1);
         --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
       }
-
       /* Base block styles */
       .endpoint-block,
       .endpoint-simple {
@@ -68,25 +67,21 @@ export const EndpointEmbed = ({
         max-width: 100%;
         position: relative;
       }
-
       .endpoint-block {
         background: var(--gray-light);
         border: 1px solid #d1d5db;
         border-radius: 8px;
         padding: 16px;
       }
-
       .endpoint-block:hover {
         background: var(--blue-hover);
         border-color: var(--gray-500);
       }
-
       .endpoint-simple {
         background: transparent;
         border: none;
         padding: 16px;
       }
-
       /* Shared arrow indicator */
       .endpoint-block::after,
       .endpoint-simple::after,
@@ -100,13 +95,11 @@ export const EndpointEmbed = ({
         color: var(--gray-500);
         transition: opacity 0.2s ease;
       }
-
       .endpoint-block:hover::after,
       .endpoint-simple:hover::after,
       .popup-card:hover::after {
         opacity: 1;
       }
-
       /* Header section */
       .header-row {
         display: flex;
@@ -116,7 +109,6 @@ export const EndpointEmbed = ({
         padding-bottom: 3px;
         border-bottom: 0.5px solid #6b728057;
       }
-
       /* Text and metadata */
       .endpoint-block h3 {
         margin: 0 0 0.5em;
@@ -124,26 +116,22 @@ export const EndpointEmbed = ({
         font-weight: bold;
         color: var(--gray-800);
       }
-
       .method {
         font-weight: bold;
         text-transform: uppercase;
         font-size: 0.85rem;
         display: inline-block;
       }
-
       .method.get { color: #2563eb; }
       .method.post { color: #16a34a; }
       .method.put { color: #ca8a04; }
       .method.delete { color: #dc2626; }
-
       .path {
         font-family: monospace;
         font-size: 0.9rem;
         color: var(--gray-500);
         word-break: break-word;
       }
-
       /* Popup-specific styling */
       .popup-card {
         position: relative;
@@ -158,19 +146,16 @@ export const EndpointEmbed = ({
         box-shadow: var(--shadow-default);
         transition: box-shadow 0.2s ease, background 0.2s ease;
       }
-
       .popup-card:hover {
         background: var(--blue-hover);
         box-shadow: var(--shadow-hover);
       }
-
       /* When using the "simple" theme, the popup-card gets minimal styling */
       .popup-card.simple {
         border: none;
         border-radius: 0;
         padding: 0;
       }
-
       /* Neutralize container colors */
       .CardsGrid .Card,
       .Accordion .Accordion-title,
@@ -179,14 +164,12 @@ export const EndpointEmbed = ({
         background: inherit;
         color: inherit;
       }
-
       /* Skeleton animation & styling */
       @keyframes pulse {
         0% { opacity: 1; }
         50% { opacity: 0.4; }
         100% { opacity: 1; }
       }
-      
       .skeleton-card {
         animation: pulse 1.5s infinite ease-in-out;
       }
@@ -293,6 +276,23 @@ export const EndpointEmbed = ({
       if (vals.length > 0 && vals[0].value) return vals[0].value;
     }
     return resolveSchema(media.schema, comps);
+  }
+
+  // Custom parser to handle date strings in the forced format "YYYY-MM-D"
+  function parseCustomDate(dateStr) {
+    const parts = dateStr.split("-");
+    if (parts.length !== 3) return new Date(dateStr);
+    const [year, month, day] = parts;
+    const paddedMonth = month.padStart(2, "0");
+    const paddedDay = day.padStart(2, "0");
+    const isoDate = `${year}-${paddedMonth}-${paddedDay}`;
+    return new Date(isoDate);
+  }
+
+  function formatLastUpdated(dateStr) {
+    // Assumes dateStr is in the forced format "YYYY-MM-D"
+    const date = parseCustomDate(dateStr);
+    return date.toLocaleString();
   }
 
   const readmeDocUrl =
@@ -490,8 +490,7 @@ export const EndpointEmbed = ({
                 </div>
               )}
               {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
-              {/* Render the updated bubble.
-                  If the endpoint has a specific timestamp, show that; otherwise, if available, show the file-level timestamp. */}
+              {/* Render the updated bubble using the custom date parser */}
               {endpointData.endpointLastUpdated ? (
                 <div
                   style={{
@@ -505,7 +504,7 @@ export const EndpointEmbed = ({
                   }}
                 >
                   Endpoint Last Updated:{" "}
-                  {new Date(endpointData.endpointLastUpdated).toLocaleString()}
+                  {formatLastUpdated(endpointData.endpointLastUpdated)}
                 </div>
               ) : (
                 endpointData.fileLastUpdated && (
@@ -521,7 +520,7 @@ export const EndpointEmbed = ({
                     }}
                   >
                     File Last Updated:{" "}
-                    {new Date(endpointData.fileLastUpdated).toLocaleString()}
+                    {formatLastUpdated(endpointData.fileLastUpdated)}
                   </div>
                 )
               )}
@@ -587,7 +586,7 @@ export const EndpointEmbed = ({
   return renderedContent;
 };
 
-## 💬 Popup Mode
+## 💬 Popup Mode 
 
 <EndpointEmbed  
   endpoint="/user/{username}"  
