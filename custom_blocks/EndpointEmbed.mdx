@@ -222,6 +222,11 @@ export const EndpointEmbed = ({
         const opMethod = (m && ops[m]) ? m : Object.keys(ops)[0];
         const op = ops[opMethod];
         const example = extractExample(op, spec.components);
+        // Extract the spec's last updated timestamp from your custom extension, if available.
+        const specLastUpdated =
+          spec["x-readme"] && spec["x-readme"]["x-last-updated"]
+            ? spec["x-readme"]["x-last-updated"]
+            : null;
         setEndpointData({
           path: endpoint,
           method: opMethod.toUpperCase(),
@@ -233,7 +238,8 @@ export const EndpointEmbed = ({
           requestBody: op.requestBody || null,
           responses: op.responses || {},
           security: op.security || [],
-          tags: op.tags || []
+          tags: op.tags || [],
+          specLastUpdated: specLastUpdated,
         });
       } catch (e) {
         console.error("Error fetching or processing spec:", e);
@@ -479,6 +485,23 @@ export const EndpointEmbed = ({
                 </div>
               )}
               {show.readmeUrl && <div className="path">{readmeDocUrl}</div>}
+              {/* Render the spec last updated bubble if available */}
+              {endpointData.specLastUpdated && (
+                <div
+                  style={{
+                    fontSize: "0.75rem",
+                    color: "#6b7280",
+                    marginTop: 8,
+                    textAlign: "right",
+                    background: "#f9f9f9",
+                    padding: "2px 4px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  Spec Last Updated:{" "}
+                  {new Date(endpointData.specLastUpdated).toLocaleString()}
+                </div>
+              )}
             </div>
           </Card>
         </a>
