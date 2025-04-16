@@ -201,8 +201,6 @@ export const EndpointEmbed = ({
     const run = async () => {
       setLoading(true);
       try {
-        // Disable the internal cache by not using window.__endpointSpecCache,
-        // or if you prefer to keep it, you could comment the next two lines out.
         if (!window.__endpointSpecCache) window.__endpointSpecCache = {};
         let spec = window.__endpointSpecCache[fullSpecUrl];
         if (spec) {
@@ -214,7 +212,6 @@ export const EndpointEmbed = ({
           console.log(`[FETCH] New spec retrieved from ${fullSpecUrl}:`, spec);
           window.__endpointSpecCache[fullSpecUrl] = spec;
         }
-        // Log the full spec for debugging
         if (!spec.paths || !spec.paths[endpoint]) {
           console.error(`Spec does not contain endpoint "${endpoint}":`, spec);
           throw new Error("missing path");
@@ -293,7 +290,7 @@ export const EndpointEmbed = ({
   const apiFullUrl = apiTargetUrl ? (apiTargetUrl + endpoint) : null;
   const label = txt => (labels ? <strong>{txt}: </strong> : null);
 
-  // ConnectionIndicator renders as a small inline-block element when inline.
+  // ConnectionIndicator renders as a small inline-block element.
   const ConnectionIndicator = ({ connected, inline }) => {
     const style = inline
       ? {
@@ -336,7 +333,7 @@ export const EndpointEmbed = ({
     return <span className={"method " + method.toLowerCase()}>{method}</span>;
   };
 
-  // Skeleton placeholder to show while loading
+  // Skeleton placeholder while loading.
   const SkeletonCard = () => (
     <div
       className="skeleton-card"
@@ -354,7 +351,7 @@ export const EndpointEmbed = ({
     </div>
   );
 
-  // Fallback card when no data is available (used only if not loading)
+  // Fallback card when no data is available.
   const fallbackCard = (
     <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
       <div
@@ -397,7 +394,7 @@ export const EndpointEmbed = ({
     </a>
   );
 
-  // Full rendered card (when data is loaded) with fade-in transition
+  // Full rendered content (with all extra fields) used for inline mode.
   const renderedContent =
     endpointData && (
       <div
@@ -503,12 +500,8 @@ export const EndpointEmbed = ({
     return (
       <span
         style={{ display: "inline-block", position: "relative" }}
-        onMouseEnter={() => {
-          setIsHovered(true);
-        }}
-        onMouseLeave={() => {
-          setIsHovered(false);
-        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <a href={readmeDocUrl} style={linkStyle}>
           {displayLinkText}
@@ -526,27 +519,8 @@ export const EndpointEmbed = ({
                   }}
                 >
                   <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit" }}>
-                    <Card extra={("popup-card " + (theme === "simple" ? "simple" : "")).trim()}>
-                      {show.summary && endpointData.method && (
-                        <div className="header-row" style={{ width: "100%" }}>
-                          <MethodTag method={endpointData.method} />
-                          <ConnectionIndicator
-                            connected={!!endpointData && !loading}
-                            inline={true}
-                          />
-                        </div>
-                      )}
-                      <div style={{ flexGrow: 1 }}>
-                        <h3 style={{ margin: "0.5em 0 0.5em" }}>
-                          {linkText || endpointData.summary || displayLinkText}
-                        </h3>
-                        {show.description && endpointData.description && (
-                          <p style={{ margin: "0 0 0.5em", fontSize: "0.9rem", color: "#374151" }}>
-                            {endpointData.description}
-                          </p>
-                        )}
-                      </div>
-                    </Card>
+                    {/* Render the full rich markup */}
+                    {renderedContent}
                   </a>
                 </div>
               ) : (
@@ -559,13 +533,9 @@ export const EndpointEmbed = ({
     );
   }
 
-  // Inline mode: Always show Skeleton if loading; show fallback if no data.
-  if (loading) {
-    return <div style={{ position: "relative" }}><SkeletonCard /></div>;
-  }
-  if (!endpointData) {
-    return <div style={{ position: "relative" }}>{fallbackCard}</div>;
-  }
+  // Inline mode: show fallback if no data.
+  if (loading) return <div style={{ position: "relative" }}><SkeletonCard /></div>;
+  if (!endpointData) return <div style={{ position: "relative" }}>{fallbackCard}</div>;
   return renderedContent;
 };
 
@@ -664,7 +634,6 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   websiteBaseUrl="https://erdtest123.readme.io"  
   apiTargetUrl="https://api.novatest.com"  
   displayMode="inline"  
-  linkText="Create User (NovaTest)"  
   theme="simple"  
   labels={true}  
   show={{  
@@ -681,7 +650,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   }}  
 />
 
-## 🧱 ReadMe Cards!
+## 🧱 ReadMe Cards
 
 <Cards columns={2}>  
   <Card title="User Management" icon="fa-user-cog">  
