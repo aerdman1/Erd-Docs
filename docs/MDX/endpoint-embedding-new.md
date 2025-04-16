@@ -7,10 +7,21 @@ metadata:
 ---
 ## 💬 Popup Mode
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" /> Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{
+    summary: true,
+    description: true,
+    parameters: true,
+    tags: true,
+    requestBody: true,
+    responses: true,
+    security: true,
+    example: true,
+    readmeUrl: true,
+    apiUrl: true
+  }} />  Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. (Renders a clickable label. On hover, a card appears with endpoint details.)
 
 On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Full Details" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="endpoint-block" labels={true} show={{  
+<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Full Details" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{  
     summary: true,  
     description: true,  
     parameters: true,  
@@ -96,7 +107,6 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   websiteBaseUrl="https://erdtest123.readme.io"
   apiTargetUrl="https://api.novatest.com"
   displayMode="inline"
-  linkText="Create User (NovaTest)"
   theme="simple"
   labels={true}
   show={{  
@@ -113,7 +123,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   }}
 />
 
-## 🧱 ReadMe Cards!
+## 🧱 ReadMe Cards
 
 <Cards columns={2}>
   <Card title="User Management" icon="fa-user-cog">
