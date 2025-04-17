@@ -72,35 +72,35 @@ export const ProgressMeter_Automatic = ({
     if (!dynamicValues.length) return;
     const interval = setInterval(() => {
       setAnimatedValues(prev =>
-        prev.map((v, i) => Math.min(v + 2, dynamicValues[i].value))
+        prev.map((val, i) => Math.min(val + 2, dynamicValues[i].value))
       );
     }, 50);
-    const timeout = setTimeout(() => setShowLabels(true), 500);
+    const labelTimeout = setTimeout(() => setShowLabels(true), 500);
     return () => {
       clearInterval(interval);
-      clearTimeout(timeout);
+      clearTimeout(labelTimeout);
     };
   }, [dynamicValues]);
 
-  // 4) Render
+  // 4) Render (match ProgressMeter_Simple exactly)
   return (
     <div className="w-full flex flex-col items-start">
       {showCards && (
         <div className="flex gap-4 mb-3 w-full">
-          {dynamicValues.map((item, i) => (
+          {dynamicValues.map((item, index) => (
             <div
-              key={i}
-              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border border-gray-200"
+              key={index}
+              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border"
               style={{ backgroundColor: item.cardBackgroundColor || item.meterBackgroundColor }}
             >
-              <span className="text-sm" style={{ color: item.cardTextColor }}>
-                {item.cardLabel}
+              <span className="text-sm" style={{ color: item.cardTextColor || item.textColor }}>
+                {item.cardLabel || item.label}
               </span>
-              <span className="text-lg font-bold" style={{ color: item.cardTextColor }}>
+              <span className="text-lg font-bold" style={{ color: item.cardTextColor || item.textColor }}>
                 {item.value}%
               </span>
               {item.icon && (
-                <i className={`${item.icon} text-2xl mt-2`} style={{ color: item.cardTextColor }}></i>
+                <i className={`${item.icon} text-2xl mt-2`} style={{ color: item.cardTextColor || item.textColor }} />
               )}
             </div>
           ))}
@@ -109,11 +109,11 @@ export const ProgressMeter_Automatic = ({
 
       {labelPosition === "above" && (
         <div
-          className="flex justify-between w-full mb-1 transition-opacity duration-500"
+          className="flex justify-between w-full mb-1 opacity-0 transition-opacity duration-500"
           style={{ opacity: showLabels ? 1 : 0 }}
         >
-          {dynamicValues.map((item, i) => (
-            <span key={i} className="text-sm font-medium" style={{ color: item.textColor }}>
+          {dynamicValues.map((item, index) => (
+            <span key={index} className="text-sm font-medium" style={{ color: item.textColor }}>
               {item.label}
             </span>
           ))}
@@ -121,11 +121,11 @@ export const ProgressMeter_Automatic = ({
       )}
 
       <div className="relative w-full bg-gray-200 rounded-md overflow-hidden h-6 flex items-center">
-        {dynamicValues.map((item, i) => (
+        {dynamicValues.map((item, index) => (
           <div
-            key={i}
+            key={index}
             className="h-full transition-all duration-500 flex items-center justify-center relative"
-            style={{ width: `${(animatedValues[i] / max) * 100}%`, backgroundColor: item.meterBackgroundColor }}
+            style={{ width: `${(animatedValues[index] / max) * 100}%`, backgroundColor: item.meterBackgroundColor }}
           >
             {labelPosition === "inside" && showLabels && (
               <span className="text-xs font-semibold absolute left-2" style={{ color: item.textColor }}>
@@ -146,12 +146,25 @@ export const ProgressMeter_Automatic = ({
 
       {labelPosition === "below" && (
         <div
-          className="flex justify-between w-full mt-1 transition-opacity duration-500"
+          className="flex justify-between w-full mt-1 opacity-0 transition-opacity duration-500"
           style={{ opacity: showLabels ? 1 : 0 }}
         >
-          {dynamicValues.map((item, i) => (
-            <span key={i} className="text-sm font-medium" style={{ color: item.textColor }}>
+          {dynamicValues.map((item, index) => (
+            <span key={index} className="text-sm font-medium" style={{ color: item.textColor }}>
               {item.label} ({item.value}%)
+            </span>
+          ))}
+        </div>
+      )}
+
+      {labelPosition === "side" && (
+        <div
+          className="flex flex-col items-start mt-2 opacity-0 transition-opacity duration-500"
+          style={{ opacity: showLabels ? 1 : 0 }}
+        >
+          {dynamicValues.map((item, index) => (
+            <span key={index} className="text-sm font-medium" style={{ color: item.textColor }}>
+              {item.label}
             </span>
           ))}
         </div>
@@ -159,7 +172,7 @@ export const ProgressMeter_Automatic = ({
     </div>
   );
 };
-
+ 
 <ProgressMeter_Automatic
   websiteBaseUrl="https://erdtest123.readme.io"
   specFile="ErdSpec1.json"
