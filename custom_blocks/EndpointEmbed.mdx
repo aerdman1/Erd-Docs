@@ -8,12 +8,12 @@ export const EndpointEmbed = ({
   displayMode = "popup",            // "popup" or "inline"
   theme = "card-block",             // "card-block" or "card-simple"
   cardBg,                           // optional override for background
-  cardPadding,                      // optional override for padding
+  cardPadding = "15px",        // optional override for padding 
   apiTargetUrl,
   endpoint,
   method,
   linkText,
-  specFile,
+  specFile, 
   labels = true,
   show = {
     summary: true,
