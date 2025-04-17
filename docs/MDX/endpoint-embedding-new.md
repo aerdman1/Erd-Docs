@@ -7,8 +7,6 @@ metadata:
 ---
 ## 💬 Popup Mode
 
-Default:
-
 <EndpointEmbed endpoint="/user/{username}" specFile="ErdSpec1.json" />
 
 ALL PROPS:
