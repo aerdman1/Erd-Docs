@@ -18,11 +18,11 @@ metadata:
 ---
 <KeywordSearch />
 
-> 📘 test
+> 📘 Sample Callout
 >
-> test
+> Testing
 >
-> * test Authentication
+> * Authentication
 > * Authentication
 
 ## Sample Heading
