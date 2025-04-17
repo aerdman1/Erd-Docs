@@ -44,7 +44,7 @@ export const ProgressMeter = ({
 .then(data => {
   // your API returns { search: [ { searchTerm, count }, … ] }
   const top4 = (data.search || []).slice(0, 4);
-  const total = top4.reduce((sum, e) => sum + e.count, 1);
+  const total = top4.reduce((sum, e) => sum + e.count, 0) || 1;
   setMetricsValues(
     top4.map((e, i) => ({
       label: e.searchTerm,
