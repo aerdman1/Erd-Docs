@@ -2,10 +2,6 @@
 title: Sample Page 1
 deprecated: false
 ---
-> 📘
-
-<br />
-
 ---
 title: "start2 – The Henry Howler"
 date: "2017-01-07T21:36:02.000Z"
