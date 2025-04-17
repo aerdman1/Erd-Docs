@@ -90,10 +90,10 @@ export const ProgressMeter_Automatic = ({
           {dynamicValues.map((item, i) => (
             <div
               key={i}
-              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border"
-              style={{ backgroundColor: item.cardBackgroundColor }}
+              className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border border-gray-200"
+              style={{ backgroundColor: item.cardBackgroundColor || item.meterBackgroundColor }}
             >
-              <span className="text-sm font-medium" style={{ color: item.cardTextColor }}>
+              <span className="text-sm" style={{ color: item.cardTextColor }}>
                 {item.cardLabel}
               </span>
               <span className="text-lg font-bold" style={{ color: item.cardTextColor }}>
