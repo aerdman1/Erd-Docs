@@ -4,14 +4,17 @@ name: ProgressMeter
 import React, { useEffect, useState, useMemo } from "react";
 
 export const ProgressMeter = ({
-  // Pass this exactly like ProgressMeter_Simple if you want full control:
-  //   values={[{ label, cardLabel, value, meterBackgroundColor, cardBackgroundColor, textColor, cardTextColor, icon }, …]}
+  // 1) Manual override just like ProgressMeter_Simple:
+  //    values={[{ label, cardLabel, value, meterBackgroundColor, cardBackgroundColor, textColor, cardTextColor, icon }, …]}
   values = null,
 
-  // —OR— leave `values` null and auto‑load from your OpenAPI spec:
+  // 2) Or pull from your OpenAPI spec:
   websiteBaseUrl = "https://yourproject.readme.io",
   specFile,    // e.g. "ErdSpec1.json"
   apiGroup,    // optional tag filter
+
+  // 3) Or pull live from Metrics API:
+  metricsApiKey = null,
 
   // Common props:
   max = 100,
@@ -19,10 +22,11 @@ export const ProgressMeter = ({
   showCards = false,
 }) => {
   const [specData, setSpecData] = useState(null);
+  const [metricsValues, setMetricsValues] = useState(null);
   const [animatedValues, setAnimatedValues] = useState([]);
   const [showLabels, setShowLabels] = useState(false);
 
-  // 1) Fetch spec only if you’re *not* passing manual `values`
+  // Fetch OpenAPI spec if no manual values and no metrics
   useEffect(() => {
     if (values && values.length) return;
     if (!specFile) return;
@@ -30,7 +34,7 @@ export const ProgressMeter = ({
     (async () => {
       try {
         const res = await fetch(url);
-        if (!res.ok) throw new Error(`Failed to load spec: ${res.status}`);
+        if (!res.ok) throw new Error(`Spec load failed: ${res.status}`);
         setSpecData(await res.json());
       } catch (err) {
         console.error(err);
@@ -38,49 +42,91 @@ export const ProgressMeter = ({
     })();
   }, [values, websiteBaseUrl, specFile]);
 
-  // 2) Build `dynamicValues` from `values` *or* from the spec
+  // Fetch Metrics API if no manual values and no spec
+  useEffect(() => {
+    if (values && values.length) return;
+    if (specFile) return;
+    if (!metricsApiKey) return;
+
+    const METRICS_URL =
+      "https://metrics.readme.io/v2/search/top-search-terms?rangeLength=20&resolution=day";
+
+    (async () => {
+      try {
+        const res = await fetch(METRICS_URL, {
+          headers: {
+            Authorization: `Basic ${btoa(metricsApiKey + ":")}`,
+          },
+        });
+        if (!res.ok) throw new Error(`Metrics API failed: ${res.status}`);
+        const data = await res.json();
+        // assume `data.results` is an array of { term, count }
+        const top4 = (data.results || []).slice(0, 4);
+        const total = top4.reduce((sum, e) => sum + e.count, 1);
+        setMetricsValues(
+          top4.map((e, i) => ({
+            label: e.term,
+            cardLabel: `Top Search #${i + 1}`,
+            value: Math.round((e.count / total) * 100),
+            meterBackgroundColor: "#6C63FF",
+            cardBackgroundColor: "#E6E6FA",
+            textColor: "#fff",
+            cardTextColor: "#1A1A7F",
+            icon: "fas fa-search",
+          }))
+        );
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [values, specFile, metricsApiKey]);
+
+  // Build dynamicValues from manual → spec → metrics
   const dynamicValues = useMemo(() => {
     if (values && values.length) return values;
+    if (specData) {
+      const counts = { get: 0, post: 0, patch: 0, delete: 0 };
+      Object.values(specData.paths || {}).forEach((pathItem) =>
+        Object.entries(pathItem).forEach(([method, op]) => {
+          const m = method.toLowerCase();
+          if (
+            counts[m] !== undefined &&
+            (!apiGroup || (op.tags || []).includes(apiGroup))
+          ) {
+            counts[m]++;
+          }
+        })
+      );
+      const total = Object.values(counts).reduce((sum, v) => sum + v, 0) || 1;
+      const colorMap = {
+        get:    { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-arrow-down" },
+        post:   { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-arrow-up" },
+        patch:  { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-edit" },
+        delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" },
+      };
+      return Object.entries(counts)
+        .filter(([, c]) => c > 0)
+        .map(([method, count]) => ({
+          label: method.toUpperCase(),
+          cardLabel: `${method.toUpperCase()} Requests`,
+          value: Math.round((count / total) * 100),
+          meterBackgroundColor: colorMap[method].meter,
+          cardBackgroundColor: colorMap[method].card,
+          textColor: "#fff",
+          cardTextColor: colorMap[method].text,
+          icon: colorMap[method].icon,
+        }));
+    }
+    if (metricsValues) return metricsValues;
+    return [];
+  }, [values, specData, metricsValues, apiGroup]);
 
-    if (!specData) return [];
-    const counts = { get: 0, post: 0, patch: 0, delete: 0 };
-    Object.values(specData.paths || {}).forEach(pathItem =>
-      Object.entries(pathItem).forEach(([method, op]) => {
-        const m = method.toLowerCase();
-        if (counts[m] !== undefined && (!apiGroup || (op.tags||[]).includes(apiGroup))) {
-          counts[m]++;
-        }
-      })
-    );
-
-    const total = Object.values(counts).reduce((sum, v) => sum + v, 0) || 1;
-    const colorMap = {
-      get:    { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-arrow-down" },
-      post:   { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-arrow-up" },
-      patch:  { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-edit" },
-      delete: { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-trash" },
-    };
-
-    return Object.entries(counts)
-      .filter(([, c]) => c > 0)
-      .map(([method, count]) => ({
-        label: method.toUpperCase(),
-        cardLabel: `${method.toUpperCase()} Requests`,
-        value: Math.round((count / total) * 100),
-        meterBackgroundColor: colorMap[method].meter,
-        cardBackgroundColor: colorMap[method].card,
-        textColor: "#fff",
-        cardTextColor: colorMap[method].text,
-        icon: colorMap[method].icon,
-      }));
-  }, [values, specData, apiGroup]);
-
-  // 3) Animate bars & labels
+  // Animate bars & labels
   useEffect(() => {
     setAnimatedValues(dynamicValues.map(() => 0));
     if (!dynamicValues.length) return;
     const iv = setInterval(() => {
-      setAnimatedValues(prev =>
+      setAnimatedValues((prev) =>
         prev.map((v, i) => Math.min(v + 2, dynamicValues[i].value))
       );
     }, 50);
@@ -91,37 +137,27 @@ export const ProgressMeter = ({
     };
   }, [dynamicValues]);
 
-  // 4) Render *exactly* like ProgressMeter_Simple
+  // Render exactly like ProgressMeter_Simple
   return (
     <div className="w-full flex flex-col items-start">
       {showCards && (
         <div className="flex gap-4 mb-3 w-full">
-          {dynamicValues.map((item, index) => (
+          {dynamicValues.map((item, idx) => (
             <div
-              key={index}
+              key={idx}
               className="shadow-md rounded-lg p-4 flex flex-col items-center w-1/4 border"
               style={{
-                backgroundColor:
-                  item.cardBackgroundColor || item.meterBackgroundColor,
+                backgroundColor: item.cardBackgroundColor || item.meterBackgroundColor,
               }}
             >
-              <span
-                className="text-sm"
-                style={{ color: item.cardTextColor || item.textColor }}
-              >
+              <span className="text-sm" style={{ color: item.cardTextColor || item.textColor }}>
                 {item.cardLabel || item.label}
               </span>
-              <span
-                className="text-lg font-bold"
-                style={{ color: item.cardTextColor || item.textColor }}
-              >
+              <span className="text-lg font-bold" style={{ color: item.cardTextColor || item.textColor }}>
                 {item.value}%
               </span>
               {item.icon && (
-                <i
-                  className={`${item.icon} text-2xl mt-2`}
-                  style={{ color: item.cardTextColor || item.textColor }}
-                />
+                <i className={`${item.icon} text-2xl mt-2`} style={{ color: item.cardTextColor || item.textColor }} />
               )}
             </div>
           ))}
@@ -129,16 +165,10 @@ export const ProgressMeter = ({
       )}
 
       {labelPosition === "above" && (
-        <div
-          className="flex justify-between w-full mb-1 opacity-0 transition-opacity duration-500"
-          style={{ opacity: showLabels ? 1 : 0 }}
-        >
-          {dynamicValues.map((item, index) => (
-            <span
-              key={index}
-              className="text-sm font-medium"
-              style={{ color: item.textColor }}
-            >
+        <div className="flex justify-between w-full mb-1 opacity-0 transition-opacity duration-500"
+             style={{ opacity: showLabels ? 1 : 0 }}>
+          {dynamicValues.map((item, idx) => (
+            <span key={idx} className="text-sm font-medium" style={{ color: item.textColor }}>
               {item.label}
             </span>
           ))}
@@ -146,28 +176,18 @@ export const ProgressMeter = ({
       )}
 
       <div className="relative w-full bg-gray-200 rounded-md overflow-hidden h-6 flex items-center">
-        {dynamicValues.map((item, index) => (
-          <div
-            key={index}
-            className="h-full transition-all duration-500 flex items-center justify-center relative"
-            style={{
-              width: `${(animatedValues[index] / max) * 100}%`,
-              backgroundColor: item.meterBackgroundColor,
-            }}
-          >
+        {dynamicValues.map((item, idx) => (
+          <div key={idx}
+               className="h-full transition-all duration-500 flex items-center justify-center relative"
+               style={{ width: `${(animatedValues[idx] / max) * 100}%`, backgroundColor: item.meterBackgroundColor }}>
             {labelPosition === "inside" && showLabels && (
-              <span
-                className="text-xs font-semibold absolute left-2"
-                style={{ color: item.textColor }}
-              >
+              <span className="text-xs font-semibold absolute left-2" style={{ color: item.textColor }}>
                 {item.label}
               </span>
             )}
             {labelPosition === "overlay" && showLabels && (
-              <span
-                className="text-xs font-semibold absolute inset-0 flex items-center justify-center"
-                style={{ color: item.textColor }}
-              >
+              <span className="text-xs font-semibold absolute inset-0 flex items-center justify-center"
+                    style={{ color: item.textColor }}>
                 {item.label} ({item.value}%)
               </span>
             )}
@@ -176,16 +196,10 @@ export const ProgressMeter = ({
       </div>
 
       {labelPosition === "below" && (
-        <div
-          className="flex justify-between w-full mt-1 opacity-0 transition-opacity duration-500"
-          style={{ opacity: showLabels ? 1 : 0 }}
-        >
-          {dynamicValues.map((item, index) => (
-            <span
-              key={index}
-              className="text-sm font-medium"
-              style={{ color: item.textColor }}
-            >
+        <div className="flex justify-between w-full mt-1 opacity-0 transition-opacity duration-500"
+             style={{ opacity: showLabels ? 1 : 0 }}>
+          {dynamicValues.map((item, idx) => (
+            <span key={idx} className="text-sm font-medium" style={{ color: item.textColor }}>
               {item.label} ({item.value}%)
             </span>
           ))}
@@ -193,16 +207,10 @@ export const ProgressMeter = ({
       )}
 
       {labelPosition === "side" && (
-        <div
-          className="flex flex-col items-start mt-2 opacity-0 transition-opacity duration-500"
-          style={{ opacity: showLabels ? 1 : 0 }}
-        >
-          {dynamicValues.map((item, index) => (
-            <span
-              key={index}
-              className="text-sm font-medium"
-              style={{ color: item.textColor }}
-            >
+        <div className="flex flex-col items-start mt-2 opacity-0 transition-opacity duration-500"
+             style={{ opacity: showLabels ? 1 : 0 }}>
+          {dynamicValues.map((item, idx) => (
+            <span key={idx} className="text-sm font-medium" style={{ color: item.textColor }}>
               {item.label}
             </span>
           ))}
@@ -212,7 +220,15 @@ export const ProgressMeter = ({
   );
 };
 
-# Pull from OAS File
+# 1) Pull from your Metrics API (requires metricsApiKey):
+<ProgressMeter
+  metricsApiKey="rdme_xn8s9h4bc406cec07bd081cc3351813607c7e5f8686ceeaf5b4fb9f1f8bf8e9bcf82a0"
+  max={100}
+  labelPosition="overlay"
+  showCards={true}
+/>
+
+# 2) Pull from OAS file:
 <ProgressMeter
   websiteBaseUrl="https://erdtest123.readme.io"
   specFile="ErdSpec1.json"
@@ -222,8 +238,7 @@ export const ProgressMeter = ({
   showCards={true}
 />
 
-# Manual Entry
-
+# 3) Manual entry:
 <ProgressMeter
   values={[
     {
@@ -271,4 +286,3 @@ export const ProgressMeter = ({
   labelPosition="overlay"
   showCards={true}
 />
-
