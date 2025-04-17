@@ -41,21 +41,24 @@ export const ProgressMeter = ({
     const url = "https://metrics.readme.io/v2/search/top-search-terms?rangeLength=20&resolution=day";
     fetch(url, { headers: { Authorization: `Basic ${btoa(metricsApiKey + ":")}` } })
       .then(res => res.ok ? res.json() : Promise.reject(res.status))
-      .then(data => {
-        const top4 = (data.results || []).slice(0, 4);
-        const total = top4.reduce((sum, e) => sum + e.count, 1);
-        setMetricsValues(top4.map((e,i) => ({
-          label: e.term,
-          cardLabel: `Top #${i+1}`,
-          value: Math.round((e.count/total)*100),
-          meterBackgroundColor: "#6C63FF",
-          cardBackgroundColor: "#E6E6FA",
-          textColor: "#fff",
-          cardTextColor: "#1A1A7F",
-          icon: "fas fa-search",
-        })));
-      })
-      .catch(console.error);
+.then(data => {
+  // your API returns { search: [ { searchTerm, count }, … ] }
+  const top4 = (data.search || []).slice(0, 4);
+  const total = top4.reduce((sum, e) => sum + e.count, 1);
+  setMetricsValues(
+    top4.map((e, i) => ({
+      label: e.searchTerm,
+      cardLabel: `Top #${i + 1}`,
+      value: Math.round((e.count / total) * 100),
+      meterBackgroundColor: "#6C63FF",
+      cardBackgroundColor: "#E6E6FA",
+      textColor: "#fff",
+      cardTextColor: "#1A1A7F",
+      icon: "fas fa-search",
+    }))
+  );
+})
+ .catch(console.error);
   }, [values, specFile, metricsApiKey]);
 
   const dynamicValues = useMemo(() => {
