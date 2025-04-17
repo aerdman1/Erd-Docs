@@ -7,33 +7,49 @@ metadata:
 ---
 ## 💬 Popup Mode
 
-This should show the endpoint info and when it was  <EndpointEmbed endpoint="/user/{username}" method="PUT" specFile="ErdSpec1.json" linkText="last updated!" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{  
-    summary: true,  
-    description: true,  
-    parameters: true,  
-    tags: true,  
-    requestBody: false,  
-    responses: true,  
-    security: false,  
-    example: false,  
-    readmeUrl: false,  
-    apiUrl: false  
-  }} />
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.  <EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Pet Endpoint" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{
-    summary: true,
-    description: true,
-    parameters: true,
-    tags: true,
-    requestBody: true,
-    responses: true,
-    security: true,
-    example: true,
-    readmeUrl: true,
-    apiUrl: true
-  }} />  Donec finibus eu sapien vel vulputate. Nam est tortor, posuere vitae blandit a, ultricies semper diam. Proin sed metus et tellus imperdiet ultrices sit amet a justo. Mauris mattis enim ac nisi tincidunt, et scelerisque urna pellentesque. Curabitur vitae dapibus ligula. Mauris ornare ullamcorper diam a vestibulum. Praesent suscipit purus id arcu volutpat suscipit. (Renders a clickable label. On hover, a card appears with endpoint details.)
+Default:
 
-On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
-<EndpointEmbed endpoint="/pet" method="PUT" specFile="ErdSpec1.json" linkText="Full Details" displayMode="popup" websiteBaseUrl="https://erdtest123.readme.io" apiTargetUrl="https://api.erdman.com" theme="simple" labels={true} show={{  
+<EndpointEmbed endpoint="/user/{username}" specFile="ErdSpec1.json" />
+
+ALL PROPS:
+
+<EndpointEmbed
+  websiteBaseUrl="https://erdtest123.readme.io"
+  displayMode="popup"
+  theme="card-block"
+  cardBg="#f9f9f9"
+  cardPadding="20px"
+  apiTargetUrl="https://api.erdman.com"
+  endpoint="/user/{username}"
+  method="PUT"
+  linkText="Update User"
+  specFile="ErdSpec1.json"
+  labels={false}
+  show={{
+        summary:    true,
+        description:true,
+        parameters: true,
+        tags:       true,
+        requestBody:true,
+        responses:  true,
+        security:   true,
+        example:    true,
+        readmeUrl:  true,
+        apiUrl:     true
+      }}
+/>
+
+<EndpointEmbed
+  endpoint="/pet"
+  method="PUT"
+  specFile="ErdSpec1.json"
+  linkText="Pet Endpoint"
+  displayMode="popup"
+  websiteBaseUrl="https://erdtest123.readme.io"
+  apiTargetUrl="https://api.erdman.com"
+  theme="card-block"
+  labels={true}
+  show={{  
     summary: true,  
     description: true,  
     parameters: true,  
@@ -44,7 +60,34 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
     example: true,  
     readmeUrl: true,  
     apiUrl: true  
-  }} /> - Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit. Renders a clickable label. On hover, a card appears with endpoint details. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam.
+  }}
+/>
+
+<EndpointEmbed
+  endpoint="/pet"
+  method="PUT"
+  specFile="ErdSpec1.json"
+  linkText="Full Details"
+  displayMode="popup"
+  websiteBaseUrl="https://erdtest123.readme.io"
+  apiTargetUrl="https://api.erdman.com"
+  theme="card-simple"
+  labels={true}
+  show={{  
+    summary: true,  
+    description: true,  
+    parameters: true,  
+    tags: true,  
+    requestBody: true,  
+    responses: true,  
+    security: true,  
+    example: true,  
+    readmeUrl: true,  
+    apiUrl: true  
+  }}
+/>
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Praesent suscipit purus id arcu volutpat suscipit.
 
 ***
 
@@ -62,7 +105,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
       displayMode="inline"
       websiteBaseUrl="https://erdtest123.readme.io"
       apiTargetUrl="https://api.erdman.com"
-      theme="endpoint-block"
+      theme="card-block"
       labels={true}
       show={{  
     summary: true,  
@@ -72,7 +115,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
     requestBody: false,  
     responses: true,  
     security: false,  
-    example: false,
+    example: false,  
     readmeUrl: false,  
     apiUrl: false  
   }}
@@ -90,7 +133,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
       displayMode="inline"
       websiteBaseUrl="https://erdtest123.readme.io"
       apiTargetUrl="https://api.erdman.com"
-      theme="simple"
+      theme="card-simple"
       labels={true}
       show={{  
     summary: true,  
@@ -119,7 +162,7 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   websiteBaseUrl="https://erdtest123.readme.io"
   apiTargetUrl="https://api.novatest.com"
   displayMode="inline"
-  theme="simple"
+  theme="card-simple"
   labels={true}
   show={{  
     summary: true,  
@@ -135,15 +178,17 @@ On Hover a card appears with endpoint details. Lorem ipsum dolor sit amet, conse
   }}
 />
 
+***
+
 ## 🧱 ReadMe Cards
 
 <Cards columns={2}>
   <Card title="User Management" icon="fa-user-cog">
-    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" theme="simple" linkText="List Users" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} />
+    <EndpointEmbed endpoint="/v1/users" method="GET" specFile="NovaTest.json" displayMode="inline" theme="card-simple" linkText="List Users" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} />
   </Card>
 
   <Card title="Posts API" icon="fa-file-alt">
-    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" theme="simple" linkText="Create Post" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} />
+    <EndpointEmbed endpoint="/v1/posts" method="POST" specFile="NovaTest.json" displayMode="inline" theme="card-simple" linkText="Create Post" show={{ summary: true, description: true, readmeUrl: true, apiUrl: true }} />
   </Card>
 </Cards>
 
