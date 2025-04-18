@@ -7,7 +7,7 @@ metadata:
 ---
 # 1) Pull from your Metrics API (requires metricsApiKey):
 
-<ProgressMeter metricsApiKey="rdme_xn8s9h4bc406cec07bd081cc3351813607c7e5f8686ceeaf5b4fb9f1f8bf8e9bcf82a0" max={100} labelPosition="overlay" showCards={true} />
+<ProgressMeter max={100} labelPosition="overlay" showCards={true} />
 
 # 2) Pull from OAS file:
 
