@@ -3,7 +3,7 @@ name: ProgressMeter
 ---
 import React, { useEffect, useState, useMemo } from "react";
 
-export const ProgressMeter = ({
+export const DataMeter = ({
   values = null,
   websiteBaseUrl = "https://yourproject.readme.io",
   specFile,
@@ -157,7 +157,7 @@ export const ProgressMeter = ({
     );
   }
 
-  // 6) Render like ProgressMeter_Simple
+  // 6) Render like DataMeter_Simple
   return (
     <div className="w-full flex flex-col items-start">
       {showCards && (
@@ -281,10 +281,10 @@ export const ProgressMeter = ({
 
 
 # 1) Pull Top Page Searches (API Key Required)
-<ProgressMeter max={100} labelPosition="overlay" showCards={true} />
+<DataMeter max={100} labelPosition="overlay" showCards={true} />
 
 # 2) Pull from OAS file (Admin Only)
-<ProgressMeter
+<DataMeter
   websiteBaseUrl="https://erdtest123.readme.io"
   specFile="ErdSpec1.json"
   apiGroup="pet"
@@ -294,7 +294,7 @@ export const ProgressMeter = ({
 />
 
 # 3) Manual entry (Public)
-<ProgressMeter
+<DataMeter
   values={[
     {
       label: "Written",
