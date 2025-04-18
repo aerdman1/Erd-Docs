@@ -36,6 +36,14 @@ export const ProgressMeter = ({
     if (!metricsApiKey) return;
     const url =
       "https://metrics.readme.io/v2/search/top-search-terms?rangeLength=20&resolution=day";
+
+    const palettes = [
+      { meter: "#4285F4", card: "#D2E3FC", text: "#174EA6", icon: "fas fa-search" },
+      { meter: "#34A853", card: "#DFF6DD", text: "#0D652D", icon: "fas fa-eye" },
+      { meter: "#FBBC05", card: "#FEF7E0", text: "#B06000", icon: "fas fa-file-alt" },
+      { meter: "#EA4335", card: "#FCE8E6", text: "#A50E0E", icon: "fas fa-exclamation-circle" },
+    ];
+
     fetch(url, {
       headers: { Authorization: `Basic ${btoa(metricsApiKey + ":")}` },
     })
@@ -44,16 +52,19 @@ export const ProgressMeter = ({
         const top4 = (data.search || []).slice(0, 4);
         const total = top4.reduce((sum, e) => sum + e.count, 0) || 1;
         setMetricsValues(
-          top4.map((e, i) => ({
-            label: e.searchTerm,
-            cardLabel: `Top #${i + 1}`,
-            value: Math.round((e.count / total) * 100),
-            meterBackgroundColor: "#6C63FF",
-            cardBackgroundColor: "#E6E6FA",
-            textColor: "#fff",
-            cardTextColor: "#1A1A7F",
-            icon: "fas fa-search",
-          }))
+          top4.map((e, i) => {
+            const p = palettes[i % palettes.length];
+            return {
+              label: e.searchTerm,
+              cardLabel: `Top #${i + 1}`,
+              value: Math.round((e.count / total) * 100),
+              meterBackgroundColor: p.meter,
+              cardBackgroundColor: p.card,
+              textColor: "#fff",
+              cardTextColor: p.text,
+              icon: p.icon,
+            };
+          })
         );
       })
       .catch(console.error);
@@ -267,12 +278,10 @@ export const ProgressMeter = ({
   );
 };
 
-# 1) Pull Top Page Searches (API Key Required):
-<ProgressMeter
-  max={100}
-  labelPosition="overlay"
-  showCards={true}
-/>
+
+
+# 1) Pull Top Page Searches (API Key Required)
+<ProgressMeter max={100} labelPosition="overlay" showCards={true} />
 
 # 2) Pull from OAS file (Admin Only)
 <ProgressMeter
@@ -295,7 +304,7 @@ export const ProgressMeter = ({
       cardBackgroundColor: "#D2E3FC",
       textColor: "#fff",
       cardTextColor: "#174EA6",
-      icon: "fas fa-pen-nib"
+      icon: "fas fa-pen-nib",
     },
     {
       label: "Reviewed",
@@ -305,7 +314,7 @@ export const ProgressMeter = ({
       cardBackgroundColor: "#DFF6DD",
       textColor: "#fff",
       cardTextColor: "#0D652D",
-      icon: "fas fa-user-check"
+      icon: "fas fa-user-check",
     },
     {
       label: "Updated",
@@ -315,7 +324,7 @@ export const ProgressMeter = ({
       cardBackgroundColor: "#FEF7E0",
       textColor: "#fff",
       cardTextColor: "#B06000",
-      icon: "fas fa-sync-alt"
+      icon: "fas fa-sync-alt",
     },
     {
       label: "Missing",
@@ -325,8 +334,8 @@ export const ProgressMeter = ({
       cardBackgroundColor: "#FCE8E6",
       textColor: "#fff",
       cardTextColor: "#A50E0E",
-      icon: "fas fa-exclamation-triangle"
-    }
+      icon: "fas fa-exclamation-triangle",
+    },
   ]}
   max={100}
   labelPosition="overlay"
