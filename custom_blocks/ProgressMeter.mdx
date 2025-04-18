@@ -267,14 +267,14 @@ export const ProgressMeter = ({
   );
 };
 
-# 1) Pull from your Metrics API (requires metricsApiKey):
+# 1) Pull Top Page Searches (API Key Required):
 <ProgressMeter
   max={100}
   labelPosition="overlay"
   showCards={true}
 />
 
-# 2) Pull from OAS file:
+# 2) Pull from OAS file (Admin Only)
 <ProgressMeter
   websiteBaseUrl="https://erdtest123.readme.io"
   specFile="ErdSpec1.json"
@@ -284,7 +284,7 @@ export const ProgressMeter = ({
   showCards={true}
 />
 
-# 3) Manual entry:
+# 3) Manual entry (Public)
 <ProgressMeter
   values={[
     {
