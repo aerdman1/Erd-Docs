@@ -1,6 +1,7 @@
 ---
 title: Sample Page 1
 deprecated: false
+hidden: false
 ---
 ---
 title: "start2 – The Henry Howler"
