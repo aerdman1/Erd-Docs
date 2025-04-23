@@ -1,5 +1,5 @@
 ---
-title: NF Plugins
+title: Plugins
 deprecated: false
 hidden: true
 metadata:
