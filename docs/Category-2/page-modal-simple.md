@@ -1,5 +1,5 @@
 ---
-title: Page Modal (Simple)
+title: Page Modal
 deprecated: false
 hidden: false
 metadata:
