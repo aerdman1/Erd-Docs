@@ -1,7 +1,7 @@
 ---
 name: LinkScanner
 ---
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export function LinkScannerV2({
   initialApiKey = "",
@@ -9,88 +9,96 @@ export function LinkScannerV2({
 }) {
   const [apiKey, setApiKey] = useState(initialApiKey);
   const [version, setVersion] = useState(initialVersion);
-  const [issues, setIssues] = useState(null);
+  const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const scanLinks = async () => {
-    setLoading(true);
-    setIssues(null);
-    try {
-      const headers = new Headers({ Accept: "application/json" });
-      headers.set("Authorization", `Bearer ${apiKey}`);
+  // Only start scanning once we have a key
+  useEffect(() => {
+    if (!apiKey) return;
 
-      // 1) fetch all guides via proxy
-      const listRes = await fetch(
-        `/api/v2/versions/${encodeURIComponent(version)}/guides`,
-        { headers, credentials: "include" }
-      );
-      if (!listRes.ok) throw new Error("Could not fetch guides");
-      const { data: guides } = await listRes.json();
+    (async () => {
+      setLoading(true);
+      try {
+        const origin = "https://api.readme.com";
+        const headers = new Headers({ Accept: "application/json" });
+        headers.set("Authorization", `Bearer ${apiKey}`);
 
-      // 2) scan each guide
-      const hrefRegex = /<a\s+[^>]*href="([^"]+)"/g;
-      const found = [];
-
-      for (const g of guides) {
-        const pageRes = await fetch(
-          `/api/v2/versions/${encodeURIComponent(version)}/guides/${g.slug}`,
-          { headers, credentials: "include" }
+        // 1) get guides list
+        const listRes = await fetch(
+          `${origin}/v2/versions/${encodeURIComponent(version)}/guides`,
+          { headers }
         );
-        if (!pageRes.ok) continue;
-        const { data } = await pageRes.json();
-        let m;
-        while ((m = hrefRegex.exec(data.content.body))) {
-          let href = m[1];
-          // make absolute
-          if (!/^https?:\/\//.test(href)) {
-            href = window.location.origin + (href.startsWith("/") ? "" : "/") + href;
-          }
-          try {
-            const head = await fetch(href, { method: "HEAD", redirect: "manual" });
-            if (!(head.status >= 200 && head.status < 300)) {
-              found.push({ slug: g.slug, href, status: head.status });
+        if (!listRes.ok) throw new Error("Fetch guides failed");
+        const { data: guides } = await listRes.json();
+
+        // 2) fetch each guide’s body and scan
+        const hrefRegex = /<a\s+[^>]*href="([^"]+)"/g;
+        const found = [];
+
+        for (const g of guides) {
+          const slug = g.slug;
+          const pageRes = await fetch(
+            `${origin}/v2/versions/${encodeURIComponent(version)}/guides/${slug}`,
+            { headers }
+          );
+          if (!pageRes.ok) continue;
+          const { data } = await pageRes.json();
+          let m;
+          while ((m = hrefRegex.exec(data.content.body))) {
+            let href = m[1];
+            // absolute URL
+            if (!/^https?:\/\//.test(href)) {
+              href = window.location.origin + (href.startsWith("/") ? "" : "/") + href;
             }
-          } catch {
-            found.push({ slug: g.slug, href, status: "ERR" });
+            try {
+              const head = await fetch(href, { method: "HEAD", redirect: "manual" });
+              if (!(head.status >= 200 && head.status < 300)) {
+                found.push({ slug, href, status: head.status });
+              }
+            } catch {
+              found.push({ slug, href, status: "ERR" });
+            }
           }
         }
+
+        setIssues(found);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
+    })();
+  }, [apiKey, version]);
 
-      setIssues(found);
-    } catch (err) {
-      console.error(err);
-      setIssues([]); // treat as “no results” to avoid endless loading
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Prompt until user clicks Scan
-  if (issues === null && !loading) {
+  // If no key yet, prompt for it (and optionally version)
+  if (!apiKey) {
     return (
       <div className="mb-4 w-full">
         <label className="block text-sm font-medium mb-1">ReadMe API Key</label>
-        <input
-          type="password"
-          className="w-full border rounded p-2 mb-3"
-          placeholder="Paste your API key…"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value.trim())}
-        />
+        <div className="flex gap-2 mb-3">
+          <input
+            type="password"
+            className="flex-1 border rounded p-2"
+            placeholder="Paste your API key…"
+            value={initialApiKey}
+            onChange={(e) => setApiKey(e.target.value.trim())}
+          />
+        </div>
         <label className="block text-sm font-medium mb-1">Project Version (branch)</label>
-        <input
-          type="text"
-          className="w-full border rounded p-2 mb-3"
-          placeholder="e.g. stable or v2.0.0"
-          value={version}
-          onChange={(e) => setVersion(e.target.value.trim())}
-        />
+        <div className="flex gap-2 mb-3">
+          <input
+            type="text"
+            className="flex-1 border rounded p-2"
+            placeholder="e.g. stable or v2.0.0"
+            value={version}
+            onChange={(e) => setVersion(e.target.value.trim())}
+          />
+        </div>
         <button
-          onClick={scanLinks}
-          disabled={!apiKey || !version}
-          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          onClick={() => apiKey && setApiKey(apiKey)}
+          className="px-4 py-2 bg-blue-600 text-white rounded"
         >
-          Scan
+          Load
         </button>
       </div>
     );
@@ -100,14 +108,13 @@ export function LinkScannerV2({
     return <p>Scanning for broken links…</p>;
   }
 
-  // After scan completes
-  if (issues && issues.length === 0) {
+  if (issues.length === 0) {
     return <p>No broken links found!</p>;
   }
 
   return (
     <div className="mt-4">
-      <h4 className="font-medium mb-2">Broken Links Detected:</h4>
+      <h4 className="font-medium mb-2">Broken Links:</h4>
       <ul className="list-disc ml-6">
         {issues.map((b, i) => (
           <li key={i}>
@@ -123,4 +130,4 @@ export function LinkScannerV2({
   );
 }
 
-<LinkScannerV2 /> 
+<LinkScannerV2 />
