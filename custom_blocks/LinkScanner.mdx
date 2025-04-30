@@ -4,61 +4,66 @@ name: LinkScanner
 import React, { useState } from "react";
 
 export function LinkScannerV2({
-  basePath      = "/", // your project subpath
-  initialVersion = "1.0",         // branch name
-  initialApiKey  = "",            // required rdme_xxxxx key
+  // your project docs live under /docs/, so leave basePath for sidebar scraping only
+  basePath       = "/docs",
+  initialVersion = "1.0",
+  initialApiKey  = "",
 }) {
-  const [version, setVersion]   = useState(initialVersion);
-  const [apiKey, setApiKey]     = useState(initialApiKey);
-  const [foundLinks, setFoundLinks] = useState(null); // null = not run yet
-  const [issues, setIssues]         = useState(null); // null = not checked yet
-  const [loading, setLoading]       = useState(false);
+  const [version,    setVersion]    = useState(initialVersion);
+  const [apiKey,     setApiKey]     = useState(initialApiKey);
+  const [foundLinks, setFoundLinks] = useState(null);
+  const [issues,     setIssues]     = useState(null);
+  const [loading,    setLoading]    = useState(false);
 
-  // Step 1: sidebar → slugs → fetch JSON → parse Markdown links
+  // Step 1: scrape sidebar <a> slugs → fetch each guide JSON → extract Markdown links
   const findLinks = async () => {
     setLoading(true);
     setFoundLinks(null);
     setIssues(null);
 
-    // collect unique slugs from sidebar nav
-    const navAs = document.querySelectorAll(`a[href^="${basePath}/docs/"]`);
+    // 1a) get unique slugs from your sidebar nav
+    const navAs = document.querySelectorAll(`a[href^="${basePath}/"]`);
     const pages = Array.from(navAs)
-      .map((a) => a.href.split("/").pop())
-      .filter((v, i, arr) => arr.indexOf(v) === i);
+      .map((a) => a.getAttribute("href").split("/").pop())
+      .filter((slug, i, arr) => arr.indexOf(slug) === i);
 
-    // prepare auth header
+    // 1b) auth header
     const hdrs = new Headers({ Accept: "application/json" });
     hdrs.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
 
-    // regex to match Markdown links: [text](URL)
-    const mdLinkRe = /\[[^\]]+\]\((https?:\/\/[^\s)]+)\)/g;
+    // 1c) regex for Markdown links
+    const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
     const links = [];
 
-    for (const slug of pages) {
-      try {
-        const res = await fetch(
-          `${window.location.origin}${basePath}/api-next/v2/branches/${encodeURIComponent(
+    // 1d) fetch each page’s Markdown via the v2 Refactored branch endpoint
+    await Promise.all(
+      pages.map(async (slug) => {
+        try {
+          const url = `${window.location.origin}/api-next/v2/branches/${encodeURIComponent(
             version
-          )}/guides/${slug}`,
-          { credentials: "include", headers: hdrs }
-        );
-        if (!res.ok) continue;
-        const { data } = await res.json();
-        const md = data.content.body || "";
-        let m;
-        while ((m = mdLinkRe.exec(md))) {
-          links.push({ slug, href: m[1] });
+          )}/guides/${slug}`;
+          const res = await fetch(url, { headers: hdrs });
+          if (!res.ok) {
+            console.warn(`404 for ${slug}, skipping`);
+            return;
+          }
+          const { data } = await res.json();
+          const md = data.content.body || "";
+          let m;
+          while ((m = mdLinkRe.exec(md))) {
+            links.push({ slug, href: m[2] });
+          }
+        } catch (e) {
+          console.error(`Error fetching ${slug}:`, e);
         }
-      } catch (e) {
-        console.error(`Error fetching ${slug}:`, e);
-      }
-    }
+      })
+    );
 
     setFoundLinks(links);
     setLoading(false);
   };
 
-  // Step 2: HEAD-check each link
+  // Step 2: HEAD-check each extracted link
   const checkBroken = async () => {
     setLoading(true);
     const bad = [];
@@ -84,15 +89,13 @@ export function LinkScannerV2({
     setLoading(false);
   };
 
-  // -- RENDER FLOW --
+  // — RENDER FLOW —
 
-  // 0) inputs + Find Links
+  // 0) Inputs + Find Links
   if (foundLinks === null && !loading) {
     return (
       <div className="mb-4 w-full">
-        <label className="block text-sm font-medium mb-1">
-          Project Branch
-        </label>
+        <label className="block text-sm font-medium mb-1">Project Branch</label>
         <input
           type="text"
           className="w-full border rounded p-2 mb-3"
@@ -123,12 +126,12 @@ export function LinkScannerV2({
     );
   }
 
-  // 1) loading
+  // 1) Loading
   if (loading) {
     return <p>Working…</p>;
   }
 
-  // 2) show found links + Check Broken
+  // 2) Found links → show list + “Check Broken”
   if (foundLinks !== null && issues === null) {
     return (
       <div className="mt-4">
@@ -155,7 +158,7 @@ export function LinkScannerV2({
     );
   }
 
-  // 3) show broken results
+  // 3) Show broken results
   if (issues !== null) {
     if (issues.length === 0) {
       return <p>No broken links found!</p>;
@@ -181,4 +184,4 @@ export function LinkScannerV2({
   return null;
 }
 
-<LinkScannerV2 />
+<LinkScannerV2 basePath="/erdfactored/docs" initialVersion="1.0" />
