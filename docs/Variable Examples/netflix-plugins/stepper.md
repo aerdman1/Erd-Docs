@@ -23,3 +23,12 @@ metadata:
 <Accordion title="My Accordion Title" icon="fa-solid fa-robot-astromech">
   This is the accordion.
 </Accordion>
+
+<br />
+
+```mermaid
+flowchart LR 
+ A --- B[fa:fa-spinner B] 
+ B --> C[fa:fa-check C] 
+ B --> D[fa:fa-ban D]
+```
