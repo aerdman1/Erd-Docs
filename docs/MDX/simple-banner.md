@@ -1,7 +1,7 @@
 ---
 title: Page Banner (Simple)
 deprecated: false
-hidden: false
+hidden: true
 metadata:
   robots: index
 ---
