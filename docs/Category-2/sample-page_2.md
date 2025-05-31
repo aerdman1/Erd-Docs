@@ -37,3 +37,5 @@ deprecated: false
   </table>
 </div>
 `}</HTMLBlock>
+
+$E=mc^2$
