@@ -3,6 +3,11 @@ title: Sample Page 2
 deprecated: false
 ---
 <HTMLBlock>{`
+
+`}</HTMLBlock>
+
+<br />
+
 <html>
   <body>
     <h3>iframe test</h3>
@@ -12,4 +17,3 @@ deprecated: false
     <p>— end of page —</p>
   </body>
 </html>
-`}</HTMLBlock>
