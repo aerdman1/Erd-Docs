@@ -13,3 +13,12 @@ metadata:
 > 👍 TEST
 
 > ❗️ TEST
+
+
+> ℹ️ ALT
+
+> ⚠️ TEST
+
+> ✅ TEST
+
+> 🛑 TEST
