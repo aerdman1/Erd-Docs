@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: Fake Demo API
+  version: "1.0.0"
+  description: |
+    This is a mock API spec for testing ReadMe’s rendering of inline schemas vs.
+    externalDocs links.
+
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+  - url: https://staging-api.example.com/v1
+    description: Staging server
+
+paths:
+  /person/inline:
+    get:
+      summary: Get a person (inline schema)
+      description: Returns a full Person object, inlined in the spec.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+
+  /person/external:
+    get:
+      summary: Get a person (external schema link)
+      description: Returns a link to the Person schema instead of inlining.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json: {}      # empty to avoid inlining
+      externalDocs:
+        description: View the full Person schema
+        url: https://example.com/schemas/Person.json
+
+  /pets:
+    post:
+      summary: Create a pet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pet'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+
+  /pets/{petId}:
+    get:
+      summary: Get a pet by ID
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+    delete:
+      summary: Delete a pet
+      parameters:
+        - name: petId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+
+components:
+  schemas:
+    # Simulate a large schema
+    Person:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        dateOfBirth:
+          type: string
+          format: date
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            zip:
+              type: string
+        phoneNumbers:
+          type: array
+          items:
+            type: string
+        # … imagine dozens more fields here …
+    Pet:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        tag:
+          type: string
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+
+security:
+  - ApiKeyAuth: []
