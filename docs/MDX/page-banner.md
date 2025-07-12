@@ -2,7 +2,7 @@
 title: Page Banner (Advanced)
 deprecated: false
 hidden: false
-icon: ⚠️
+icon: fad fa-file-lines
 metadata:
   robots: index
 ---
