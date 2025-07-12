@@ -2,6 +2,7 @@
 title: Data Meter
 deprecated: false
 hidden: false
+icon: fad fa-temperature-list
 metadata:
   robots: index
 ---
