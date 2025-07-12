@@ -1,205 +1,332 @@
 ---
 name: LinkScanner
 ---
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
-export function LinkScannerV3({
-  basePath        = "/erdfactored", // your project subpath
-  initialVersion  = "1.0",          // branch name
-  initialApiKey   = "",             // required rdme_xxxxx key
+export const DataTableLinkScan = ({ children }) => {
+  const containerRef = useRef(null);
+  const dtCustomStyles = `
+    .dt-flex-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+    .dt-buttons { display: flex; gap: 5px; }
+    .dataTables_wrapper .dataTables_filter input {
+      border: 1px solid #aaa;
+      border-radius: 3px;
+      padding: 5px;
+      background-color: transparent;
+      margin-left: 0;
+    }
+    .dataTables_wrapper table.dataTable th,
+    .dataTables_wrapper table.dataTable td { font-size: 12px; }
+  `;
+  const loadScript = src => new Promise((res, rej) => {
+    if (document.querySelector(`script[src='${src}']`)) return res();
+    const s = document.createElement("script");
+    s.src = src; s.async = true;
+    s.onload = res; s.onerror = () => rej();
+    document.body.appendChild(s);
+  });
+  const loadCSS = href => {
+    if (!document.querySelector(`link[href='${href}']`)) {
+      const l = document.createElement("link");
+      l.rel = "stylesheet"; l.href = href;
+      document.head.appendChild(l);
+    }
+  };
+  const init = table => {
+    if (table.getAttribute("data-dt-processed")) return;
+    table.setAttribute("data-dt-processed", "true");
+    window.jQuery(table).DataTable({
+      paging: false, info: false,
+      dom: "<'dt-flex-container'<'dt-search'f><'dt-buttons'B>>",
+      language: { search: "", searchPlaceholder: "Search Table:" },
+      buttons: [
+        { extend: "colvis", text: '<i class="fa fa-columns"></i>' },
+        { extend: "copy",   text: '<i class="fa fa-copy"></i>' },
+        { extend: "csv",    text: '<i class="fa fa-file-csv"></i>' },
+        { extend: "excel",  text: '<i class="fa fa-file-excel"></i>' },
+        { extend: "pdf",    text: '<i class="fa fa-file-pdf"></i>' },
+        { extend: "print",  text: '<i class="fa fa-print"></i>', action() { setTimeout(() => window.print(), 100); } },
+      ],
+      initComplete() {
+        const inp = containerRef.current.querySelector(".dataTables_filter input");
+        if (inp) inp.setAttribute("aria-label", "Search table");
+      },
+    });
+  };
+  useEffect(() => {
+    (async () => {
+      await loadScript("https://code.jquery.com/jquery-3.6.0.min.js");
+      await loadScript("https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js");
+      loadCSS("https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/pdfmake.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.8/vfs_fonts.js");
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js");
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js");
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js");
+      await loadScript("https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js");
+      loadCSS("https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css");
+      const apply = () => {
+        containerRef.current
+          ?.querySelectorAll("table#link-validation-table")
+          .forEach(init);
+      };
+      apply();
+      const obs = new MutationObserver(apply);
+      obs.observe(containerRef.current, { childList: true, subtree: true });
+      return () => obs.disconnect();
+    })();
+  }, []);
+  return (
+    <div ref={containerRef}>
+      <style>{dtCustomStyles}</style>
+      {children}
+    </div>
+  );
+};
+
+export function LinkValidation({
+  basePath      = "/docs",
+  initialBranch = "1.0",
+  initialApiKey = "",
 }) {
-  const [version, setVersion]       = useState(initialVersion);
-  const [apiKey, setApiKey]         = useState(initialApiKey);
-  const [foundLinks, setFoundLinks] = useState(null);  // null = not run yet
-  const [issues, setIssues]         = useState(null);  // null = not checked yet
-  const [loading, setLoading]       = useState(false);
+  const [branch, setBranch]       = useState(initialBranch);
+  const [apiKey, setApiKey]       = useState(initialApiKey);
+  const [records, setRecords]     = useState([]);
+  const [loading, setLoading]     = useState(false);
+  const [stepIndex, setStepIndex] = useState(0);
+  const steps = [
+    "Gathering your page list…",
+    "Loading each page’s content…",
+    "Checking each link…",
+    "Finalizing results…",
+  ];
+  const wait = ms => new Promise(res => setTimeout(res, ms));
 
-  const findLinks = async () => {
-    console.clear();
-    console.log("🔍 Starting findLinks()");
+  const scanLinks = async () => {
     setLoading(true);
-    setFoundLinks(null);
-    setIssues(null);
-
-    // collect unique slugs from sidebar nav
-    const navAs = Array.from(
-      document.querySelectorAll(`a[href^="${basePath}/docs/"]`)
-    );
-    console.log(`📑 Sidebar <a> count: ${navAs.length}`);
-
-    const pages = navAs
-      .map((a) => a.href.split("/").pop())
-      .filter((v, i, arr) => arr.indexOf(v) === i);
-    console.log("✅ Unique pages/slugs:", pages);
-
-    // prepare auth header
-    const hdrs = new Headers({ Accept: "application/json" });
-    hdrs.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
-    console.log("🔑 Using API key:", apiKey);
-
-    // regex to match Markdown links: [text](URL)
-    const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
-    const links = [];
-
-    for (const slug of pages) {
-      const url = `${window.location.origin}${basePath}/api-next/v2/branches/${encodeURIComponent(
-        version
-      )}/guides/${slug}`;
-      console.log(`\n📥 Fetching JSON for slug="${slug}":`, url);
+    setRecords([]);
+    setStepIndex(0);
+    await wait(300);
+    const navEls = document.querySelectorAll(`nav#hub-sidebar a[href^="${basePath}/"]`);
+    const slugs = Array.from(navEls)
+      .map(a => a.getAttribute("href").split("/").pop())
+      .filter((s,i,a) => s && a.indexOf(s)===i);
+    if (!slugs.length) { setLoading(false); return; }
+    setStepIndex(1); await wait(300);
+    const out = [];
+    for (const slug of slugs) {
+      const url = `/api-next/v2/branches/${encodeURIComponent(branch)}/guides/${encodeURIComponent(slug)}`;
       try {
         const res = await fetch(url, {
           credentials: "include",
-          headers: hdrs,
+          headers: {
+            Accept:        "application/json",
+            Authorization: `Basic ${btoa(apiKey + ":")}`,
+          },
         });
-        console.log(`   ↳ HTTP ${res.status} ${res.statusText}`);
-        if (!res.ok) {
-          console.warn(`   ⚠️ skipping slug="${slug}" due to non-OK status`);
-          continue;
-        }
-        const json = await res.json();
-        const md = json.data.content.body || "";
-        console.log(`   ↳ content.body length: ${md.length}`);
-
+        if (!res.ok) continue;
+        const data = (await res.json()).data;
+        const anchors = [];
+        const re = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g;
         let m;
-        let countThisPage = 0;
-        while ((m = mdLinkRe.exec(md))) {
-          const text = m[1], href = m[2];
-          links.push({ slug, href });
-          countThisPage++;
-          console.log(`     • [${text}](${href})`);
+        while ((m = re.exec(data.content.body || ""))) {
+          anchors.push({ text: m[1], href: m[2] });
         }
-        console.log(`   ↳ found ${countThisPage} Markdown links in "${slug}"`);
-      } catch (e) {
-        console.error(`   ❌ Error fetching/parsing slug="${slug}":`, e);
-      }
-    }
-
-    console.log("\n🎯 Total links found:", links.length);
-    setFoundLinks(links);
-    setLoading(false);
-  };
-
-  const checkBroken = async () => {
-    console.log("\n🔍 Starting checkBroken()");
-    setLoading(true);
-    const bad = [];
-    const hdrs = new Headers();
-    hdrs.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
-
-    for (const { slug, href } of foundLinks) {
-      console.log(`\nHEAD-checking: ${href} (from "${slug}")`);
-      try {
-        const head = await fetch(href, {
-          method: "HEAD",
-          headers: hdrs,
-          redirect: "manual",
+        out.push({
+          slug,
+          title:     data.metadata.title || data.title,
+          category:  data.category?.uri || "",
+          updatedAt: data.updated_at,
+          anchors,
         });
-        console.log(`   ↳ status ${head.status}`);
-        if (!(head.status >= 200 && head.status < 300)) {
-          bad.push({ slug, href, status: head.status });
-          console.warn(`   ⚠️ marked broken: ${head.status}`);
-        }
-      } catch (e) {
-        bad.push({ slug, href, status: "ERR" });
-        console.error(`   ❌ error on HEAD:`, e);
+      } catch {}
+    }
+    setStepIndex(2); await wait(300);
+    const results = [];
+    for (const { slug, title, category, updatedAt, anchors } of out) {
+      for (const a of anchors) {
+        let status = "ERR", valid = false;
+        try {
+          const h = await fetch(a.href, { method: "HEAD", redirect: "manual" });
+          status = h.status;
+          valid = status >= 200 && status < 300;
+        } catch {}
+        results.push({ slug, title, category, updatedAt, linkText: a.text, url: a.href, status, valid });
       }
     }
-
-    console.log("\n🎯 Total broken links:", bad.length);
-    setIssues(bad);
+    setStepIndex(3); await wait(200);
+    setRecords(results);
     setLoading(false);
   };
 
-  // -- RENDER FLOW --
+  const total  = records.length;
+  const valid  = records.filter(r => r.valid).length;
+  const broken = total - valid;
+  const formatCategory = uri => {
+    const parts = uri.split("/");
+    const last  = parts.pop() || parts.pop();
+    return last.charAt(0).toUpperCase() + last.slice(1);
+  };
 
-  if (foundLinks === null && !loading) {
-    return (
-      <div style={{ fontFamily: "sans-serif" }}>
-        <div style={{ marginBottom: 12 }}>
-          <label>Project Branch</label><br/>
-          <input
-            type="text"
-            value={version}
-            onChange={(e) => setVersion(e.target.value.trim())}
-            placeholder="e.g. 1.0"
-            style={{ width: "100%", padding: 6, marginTop: 4 }}
-          />
+  const tableJSX = (
+    <DataTableLinkScan>
+      <p style={{ fontWeight: 500 }}>
+        Results: Total {total} | ✔️ {valid} valid | ❌ {broken} broken
+      </p>
+      <div style={{ marginBottom: 16 }}>
+        <div style={{
+          display: "flex", height: 12, borderRadius: 6, overflow: "hidden", background: "#eee"
+        }}>
+          <div style={{
+            width: `${Math.round((valid/total)*100)}%`,
+            transition: "width 0.3s", background: "#28a745"
+          }} />
+          <div style={{
+            width: `${Math.round((broken/total)*100)}%`,
+            transition: "width 0.3s", background: "#dc3545"
+          }} />
         </div>
-        <div style={{ marginBottom: 12 }}>
-          <label>API Key (Basic auth)</label><br/>
+      </div>
+      <table id="link-validation-table" style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            {[
+              "Page Title","Page Slug","Last Update","Category",
+              "Link Text","Link URL","Status","Valid"
+            ].map(h => (
+              <th key={h} style={{
+                border: "1px solid #ddd", padding: 8,
+                background: "#f5f5f5", textAlign: "left",
+                fontWeight: 600, color: "#555"
+              }}>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {records.map((r,i) => (
+            <tr key={i}>
+              <td style={{ border: "1px solid #eee", padding: 6 }}>{r.title}</td>
+              <td style={{ border: "1px solid #eee", padding: 6 }}>
+                <a
+                  href={`${window.location.origin}${basePath}/${r.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {r.slug}
+                </a>
+              </td>
+              <td style={{ border: "1px solid #eee", padding: 6 }}>
+                {new Date(r.updatedAt).toLocaleString()}
+              </td>
+              <td style={{ border: "1px solid #eee", padding: 6 }}>
+                {formatCategory(r.category)}
+              </td>
+              <td style={{ border: "1px solid #eee", padding: 6 }}>{r.linkText}</td>
+              <td style={{
+                border: "1px solid #eee", padding: 6, wordBreak: "break-all"
+              }}>
+                <a href={r.url} target="_blank" rel="noopener noreferrer">{r.url}</a>
+              </td>
+              <td style={{ border: "1px solid #eee", padding: 6 }}>{r.status}</td>
+              <td style={{ border: "1px solid #eee", padding: 6 }}>
+                {r.valid ? "✔️" : "❌"}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </DataTableLinkScan>
+  );
+
+  return (
+    <div style={{
+      padding: "40px 20px", minHeight: "100vh", boxSizing: "border-box"
+    }}>
+      <div style={{
+        position: "relative", background: "#fff", borderRadius: 8,
+        maxWidth: 800, margin: "0 auto", padding: 24,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+      }}>
+        <h2 style={{
+          textAlign: "center", margin: "0 0 16px",
+          fontSize: 24, fontWeight: 600
+        }}>
+          Page Validator
+        </h2>
+        <div style={{ marginBottom: 24 }}>
+          <label style={{
+            display: "block", fontWeight: 600, marginBottom: 4, color: "#555"
+          }}>
+            API KEY
+          </label>
           <input
             type="password"
             value={apiKey}
-            onChange={(e) => setApiKey(e.target.value.trim())}
+            onChange={e => setApiKey(e.target.value.trim())}
             placeholder="rdme_xxxxx"
-            style={{ width: "100%", padding: 6, marginTop: 4 }}
+            style={{
+              width: "100%", padding: 10, marginBottom: 16,
+              border: "1px solid #ccc", borderRadius: 4
+            }}
           />
+          <label style={{
+            display: "block", fontWeight: 600, marginBottom: 4, color: "#555"
+          }}>
+            Version (optional)
+          </label>
+          <input
+            type="text"
+            value={branch}
+            onChange={e => setBranch(e.target.value.trim())}
+            placeholder="e.g. 1.0"
+            style={{
+              width: "100%", padding: 10, marginBottom: 16,
+              border: "1px solid #ccc", borderRadius: 4
+            }}
+          />
+          <button
+            onClick={scanLinks}
+            disabled={!apiKey || loading}
+            style={{
+              width: "100%", padding: 12, background: "#007bff",
+              color: "#fff", fontSize: 16, fontWeight: 600,
+              border: "none", borderRadius: 4,
+              cursor: loading ? "default" : "pointer",
+              opacity: loading ? 0.6 : 1
+            }}
+          >
+            {loading ? "Scanning…" : "Scan All Links"}
+          </button>
         </div>
-        <button
-          onClick={findLinks}
-          disabled={!version || !apiKey}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#007bff",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-            opacity: !version || !apiKey ? 0.5 : 1,
-          }}
-        >
-          Find Links in Content
-        </button>
+        {loading && (
+          <div style={{
+            display: "flex", flexDirection: "column",
+            alignItems: "center", marginBottom: 24
+          }}>
+            <div style={{
+              width: 48, height: 48, border: "6px solid rgba(0,0,0,0.1)",
+              borderTopColor: "#007bff", borderRadius: "50%",
+              animation: "spin 1s linear infinite"
+            }} />
+            <p style={{ marginTop: 12, color: "#666" }}>{steps[stepIndex]}</p>
+            <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+          </div>
+        )}
+        {!loading && records.length > 0 && tableJSX}
       </div>
-    );
-  }
-
-  if (loading) {
-    return <p style={{ fontFamily: "sans-serif" }}>Working…</p>;
-  }
-
-  if (foundLinks !== null && issues === null) {
-    return (
-      <div style={{ fontFamily: "sans-serif" }}>
-        <h4>Found {foundLinks.length} Content Links</h4>
-        <button
-          onClick={checkBroken}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#dc3545",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Check Broken
-        </button>
-      </div>
-    );
-  }
-
-  if (issues !== null) {
-    return issues.length === 0 ? (
-      <p style={{ fontFamily: "sans-serif" }}>No broken links found!</p>
-    ) : (
-      <div style={{ fontFamily: "sans-serif" }}>
-        <h4>Broken Links Detected:</h4>
-        <ul>
-          {issues.map((b, i) => (
-            <li key={i}>
-              <code>{b.slug}</code>:{" "}
-              <a href={b.href} target="_blank" rel="noopener noreferrer">
-                {b.href}
-              </a>{" "}
-              [{b.status}]
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 }
 
+<LinkValidation />
 
-<LinkScannerV3 />
+<HTMLBlock>{`
+<style>
+  .content-toc { display: none; }
+  .content-body { max-width: 100% !important; }
+  table { font-size:12px !important; }
+</style>
+`}</HTMLBlock>
