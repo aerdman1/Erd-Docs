@@ -3,10 +3,10 @@ name: LinkScanner
 ---
 import React, { useState } from "react";
 
-export function LinkScannerV3({
-  basePath       = "/erdfactored",
-  initialBranch  = "1.0",
-  initialApiKey  = "",    // your rdme_xxxxx key
+export function LinkScanner({
+  basePath      = "/erdfactored/docs", // adjust to your sidebar prefix
+  initialBranch = "1.0",               // default branch/version
+  initialApiKey = "",                  // user-entered rdme_xxxxx
 }) {
   const [branch, setBranch]   = useState(initialBranch);
   const [apiKey, setApiKey]   = useState(initialApiKey);
@@ -17,55 +17,86 @@ export function LinkScannerV3({
     setLoading(true);
     setRecords([]);
 
-    // 1) collect unique slugs from the sidebar
-    const navAs = Array.from(
-      document.querySelectorAll(`a[href^="${basePath}/docs/"]`)
-    );
-    const slugs = [...new Set(navAs.map(a => a.href.split("/").pop()))];
+    // 1) scrape sidebar slugs
+    const els = document.querySelectorAll(`a[href^="${basePath}/"]`);
+    const slugs = Array.from(els)
+      .map((a) => a.getAttribute("href").split("/").pop())
+      .filter((s, i, all) => all.indexOf(s) === i);
 
-    // 2) prepare Basic auth header
-    const headers = new Headers({ Accept: "application/json" });
-    headers.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
+    console.log("🔍 Found slugs:", slugs);
+    if (!slugs.length) {
+      console.warn("No slugs found—check your basePath!");
+      setLoading(false);
+      return;
+    }
 
-    // 3) regex for Markdown links
-    const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
-
+    // 2) fetch each guide JSON and extract links from the raw Markdown body
+    const hdrs = {
+      Accept:        "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    };
     const out = [];
 
-    // 4) fetch each page via the proxy /api-next/… endpoint
     for (const slug of slugs) {
-      const url = `${basePath}/api-next/v2/branches/${encodeURIComponent(branch)}/guides/${slug}`;
+      const guideUrl = `/erdfactored/api-next/v2/versions/${encodeURIComponent(branch)}/guides/${encodeURIComponent(slug)}`;
+      console.log(`➡️ Fetching guide for slug "${slug}":`, guideUrl);
+
+      let data;
       try {
-        const res = await fetch(url, {
-          credentials: "include", // proxy will attach your dash session
-          headers,
-        });
+        const res = await fetch(guideUrl, { credentials: "include", headers: hdrs });
+        console.log(`   ← status for "${slug}":`, res.status);
         if (!res.ok) continue;
-        const { data } = await res.json();
-        const body = data.content.body || "";
-
-        let m;
-        while ((m = mdLinkRe.exec(body))) {
-          const linkText = m[1];
-          const fullUrl  = m[2];
-
-          // HEAD-check that link
-          let status = "ERR";
-          try {
-            const h = await fetch(fullUrl, { method: "HEAD" });
-            status = h.status;
-          } catch {}
-
-          out.push({
-            page:  slug,
-            text:  linkText,
-            url:   fullUrl,
-            status,
-            valid: typeof status === "number" && status >= 200 && status < 300,
-          });
-        }
+        const json = await res.json();
+        data = json.data;
       } catch (e) {
-        console.error("Error loading", slug, e);
+        console.error("   ✖️ Error fetching guide JSON for", slug, e);
+        continue;
+      }
+
+      // 3) pull links directly from the Markdown body
+      const md = data.content?.body || "";
+      const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g;
+      const anchors = [];
+      let m, mdCount = 0;
+      while ((m = mdLinkRe.exec(md))) {
+        mdCount++;
+        anchors.push({
+          text: m[1],
+          href: m[2],
+          _fromMarkdown: true,
+        });
+      }
+      console.log(`   🔄 Parsed ${mdCount} links from Markdown for "${slug}"`);
+
+      // 4) HEAD-check each anchor, but only if it's on your root domain
+      for (const a of anchors) {
+        const linkText = a._fromMarkdown ? a.text : a.textContent.trim();
+        const fullUrl  = a._fromMarkdown ? a.href : a.href;
+
+        // **NEW:** accept any URL on your root domain
+        const urlObj = new URL(fullUrl, location.href);
+        const isInternal = urlObj.hostname === "erdman-refactored-group.readme.io";
+        if (!isInternal) {
+          console.log(`   ⏭️ Skipping external link: ${fullUrl}`);
+          continue;
+        }
+
+        let status = "ERR", valid = false;
+        try {
+          const headRes = await fetch(fullUrl, {
+            method:   "HEAD",
+            redirect: "manual",
+            mode:     "cors",
+            headers:  { Authorization: `Bearer ${apiKey}` },
+          });
+          console.log(`   ↪️ HEAD ${fullUrl} → status: ${headRes.status}`);
+          status = headRes.status;
+          valid  = status >= 200 && status < 300;
+        } catch (e) {
+          console.warn(`   ✖️ HEAD failed for ${fullUrl}`, e);
+        }
+
+        out.push({ page: slug, text: linkText, url: fullUrl, status, valid });
       }
     }
 
@@ -77,8 +108,18 @@ export function LinkScannerV3({
   const valid  = records.filter(r => r.valid).length;
   const broken = total - valid;
 
+  // If records is empty (table isn't rendering), also log a Markdown version:
+  if (!loading && records.length) {
+    console.log("## Link Scanner Results (Markdown)\n");
+    console.log("| Page | Text | URL | Status | Valid |");
+    console.log("| ---- | ---- | --- | ------ | ----- |");
+    records.forEach(r => {
+      console.log(`| ${r.page} | ${r.text} | ${r.url} | ${r.status} | ${r.valid ? "✔️" : "❌"} |`);
+    });
+  }
+
   return (
-    <div style={{ fontFamily: "sans-serif", maxWidth: 700, margin: "auto" }}>
+    <div style={{ fontFamily: "sans-serif", maxWidth: 800, margin: "auto" }}>
       <h3>Link Scanner</h3>
 
       <div style={{ marginBottom: 16 }}>
@@ -126,7 +167,7 @@ export function LinkScannerV3({
           <p>
             <strong>Results:</strong> Total: {total} | Valid: {valid} | Broken: {broken}
           </p>
-          <div style={{ maxHeight: 280, overflow: "auto" }}>
+          <div style={{ maxHeight: 300, overflow: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
@@ -146,15 +187,19 @@ export function LinkScannerV3({
                 </tr>
               </thead>
               <tbody>
-                {records.map((r,i) => (
+                {records.map((r, i) => (
                   <tr key={i}>
                     <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.page}</td>
                     <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.text}</td>
                     <td style={{ border: "1px solid #ccc", padding: 6 }}>
-                      <a href={r.url} target="_blank" rel="noopener noreferrer">{r.url}</a>
+                      <a href={r.url} target="_blank" rel="noopener noreferrer">
+                        {r.url}
+                      </a>
                     </td>
                     <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.status}</td>
-                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.valid ? "✔️" : "❌"}</td>
+                    <td style={{ border: "1px solid #ccc", padding: 6 }}>
+                      {r.valid ? "✔️" : "❌"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -166,4 +211,4 @@ export function LinkScannerV3({
   );
 }
 
-<LinkScannerV3 />
+<LinkScanner />
