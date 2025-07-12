@@ -4,118 +4,148 @@ name: LinkScanner
 import React, { useState } from "react";
 
 export function LinkScannerV3({
-  basePath      = "/erdfactored", // your project subpath
-  initialVersion = "1.0",         // branch name
-  initialApiKey  = "",            // required rdme_xxxxx key
+  basePath        = "/erdfactored", // your project subpath
+  initialVersion  = "1.0",          // branch name
+  initialApiKey   = "",             // required rdme_xxxxx key
 }) {
-  const [version, setVersion]   = useState(initialVersion);
-  const [apiKey, setApiKey]     = useState(initialApiKey);
-  const [foundLinks, setFoundLinks] = useState(null); // null = not run yet
-  const [issues, setIssues]         = useState(null); // null = not checked yet
+  const [version, setVersion]       = useState(initialVersion);
+  const [apiKey, setApiKey]         = useState(initialApiKey);
+  const [foundLinks, setFoundLinks] = useState(null);  // null = not run yet
+  const [issues, setIssues]         = useState(null);  // null = not checked yet
   const [loading, setLoading]       = useState(false);
 
-  // Step 1: sidebar → slugs → fetch JSON → parse Markdown links
   const findLinks = async () => {
+    console.clear();
+    console.log("🔍 Starting findLinks()");
     setLoading(true);
     setFoundLinks(null);
     setIssues(null);
 
     // collect unique slugs from sidebar nav
-    const navAs = document.querySelectorAll(`a[href^="${basePath}/docs/"]`);
-    const pages = Array.from(navAs)
+    const navAs = Array.from(
+      document.querySelectorAll(`a[href^="${basePath}/docs/"]`)
+    );
+    console.log(`📑 Sidebar <a> count: ${navAs.length}`);
+
+    const pages = navAs
       .map((a) => a.href.split("/").pop())
       .filter((v, i, arr) => arr.indexOf(v) === i);
+    console.log("✅ Unique pages/slugs:", pages);
 
     // prepare auth header
     const hdrs = new Headers({ Accept: "application/json" });
     hdrs.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
+    console.log("🔑 Using API key:", apiKey);
 
     // regex to match Markdown links: [text](URL)
-    const mdLinkRe = /\[[^\]]+\]\((https?:\/\/[^\s)]+)\)/g;
+    const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
     const links = [];
 
     for (const slug of pages) {
+      const url = `${window.location.origin}${basePath}/api-next/v2/branches/${encodeURIComponent(
+        version
+      )}/guides/${slug}`;
+      console.log(`\n📥 Fetching JSON for slug="${slug}":`, url);
       try {
-        const res = await fetch(
-          `${window.location.origin}${basePath}/api-next/v2/branches/${encodeURIComponent(
-            version
-          )}/guides/${slug}`,
-          { credentials: "include", headers: hdrs }
-        );
-        if (!res.ok) continue;
-        const { data } = await res.json();
-        const md = data.content.body || "";
-        let m;
-        while ((m = mdLinkRe.exec(md))) {
-          links.push({ slug, href: m[1] });
+        const res = await fetch(url, {
+          credentials: "include",
+          headers: hdrs,
+        });
+        console.log(`   ↳ HTTP ${res.status} ${res.statusText}`);
+        if (!res.ok) {
+          console.warn(`   ⚠️ skipping slug="${slug}" due to non-OK status`);
+          continue;
         }
+        const json = await res.json();
+        const md = json.data.content.body || "";
+        console.log(`   ↳ content.body length: ${md.length}`);
+
+        let m;
+        let countThisPage = 0;
+        while ((m = mdLinkRe.exec(md))) {
+          const text = m[1], href = m[2];
+          links.push({ slug, href });
+          countThisPage++;
+          console.log(`     • [${text}](${href})`);
+        }
+        console.log(`   ↳ found ${countThisPage} Markdown links in "${slug}"`);
       } catch (e) {
-        console.error(`Error fetching ${slug}:`, e);
+        console.error(`   ❌ Error fetching/parsing slug="${slug}":`, e);
       }
     }
 
+    console.log("\n🎯 Total links found:", links.length);
     setFoundLinks(links);
     setLoading(false);
   };
 
-  // Step 2: HEAD-check each link
   const checkBroken = async () => {
+    console.log("\n🔍 Starting checkBroken()");
     setLoading(true);
     const bad = [];
     const hdrs = new Headers();
     hdrs.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
 
     for (const { slug, href } of foundLinks) {
+      console.log(`\nHEAD-checking: ${href} (from "${slug}")`);
       try {
         const head = await fetch(href, {
           method: "HEAD",
           headers: hdrs,
           redirect: "manual",
         });
+        console.log(`   ↳ status ${head.status}`);
         if (!(head.status >= 200 && head.status < 300)) {
           bad.push({ slug, href, status: head.status });
+          console.warn(`   ⚠️ marked broken: ${head.status}`);
         }
-      } catch {
+      } catch (e) {
         bad.push({ slug, href, status: "ERR" });
+        console.error(`   ❌ error on HEAD:`, e);
       }
     }
 
+    console.log("\n🎯 Total broken links:", bad.length);
     setIssues(bad);
     setLoading(false);
   };
 
   // -- RENDER FLOW --
 
-  // 0) inputs + Find Links
   if (foundLinks === null && !loading) {
     return (
-      <div className="mb-4 w-full">
-        <label className="block text-sm font-medium mb-1">
-          Project Branch
-        </label>
-        <input
-          type="text"
-          className="w-full border rounded p-2 mb-3"
-          placeholder="e.g. 1.0"
-          value={version}
-          onChange={(e) => setVersion(e.target.value.trim())}
-        />
-
-        <label className="block text-sm font-medium mb-1">
-          API Key (Basic auth, required)
-        </label>
-        <input
-          type="password"
-          className="w-full border rounded p-2 mb-3"
-          placeholder="rdme_xxxxx"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value.trim())}
-        />
-
+      <div style={{ fontFamily: "sans-serif" }}>
+        <div style={{ marginBottom: 12 }}>
+          <label>Project Branch</label><br/>
+          <input
+            type="text"
+            value={version}
+            onChange={(e) => setVersion(e.target.value.trim())}
+            placeholder="e.g. 1.0"
+            style={{ width: "100%", padding: 6, marginTop: 4 }}
+          />
+        </div>
+        <div style={{ marginBottom: 12 }}>
+          <label>API Key (Basic auth)</label><br/>
+          <input
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value.trim())}
+            placeholder="rdme_xxxxx"
+            style={{ width: "100%", padding: 6, marginTop: 4 }}
+          />
+        </div>
         <button
           onClick={findLinks}
           disabled={!version || !apiKey}
-          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            opacity: !version || !apiKey ? 0.5 : 1,
+          }}
         >
           Find Links in Content
         </button>
@@ -123,31 +153,23 @@ export function LinkScannerV3({
     );
   }
 
-  // 1) loading
   if (loading) {
-    return <p>Working…</p>;
+    return <p style={{ fontFamily: "sans-serif" }}>Working…</p>;
   }
 
-  // 2) show found links + Check Broken
   if (foundLinks !== null && issues === null) {
     return (
-      <div className="mt-4">
-        <h4 className="font-medium mb-2">
-          Found {foundLinks.length} Content Links
-        </h4>
-        <ul className="list-disc ml-6 max-h-48 overflow-auto mb-3">
-          {foundLinks.map((l, i) => (
-            <li key={i}>
-              <code>{l.slug}</code>:{" "}
-              <a href={l.href} target="_blank" rel="noopener noreferrer">
-                {l.href}
-              </a>
-            </li>
-          ))}
-        </ul>
+      <div style={{ fontFamily: "sans-serif" }}>
+        <h4>Found {foundLinks.length} Content Links</h4>
         <button
           onClick={checkBroken}
-          className="px-4 py-2 bg-red-600 text-white rounded"
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#dc3545",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+          }}
         >
           Check Broken
         </button>
@@ -155,15 +177,13 @@ export function LinkScannerV3({
     );
   }
 
-  // 3) show broken results
   if (issues !== null) {
-    if (issues.length === 0) {
-      return <p>No broken links found!</p>;
-    }
-    return (
-      <div className="mt-4">
-        <h4 className="font-medium mb-2">Broken Links Detected:</h4>
-        <ul className="list-disc ml-6">
+    return issues.length === 0 ? (
+      <p style={{ fontFamily: "sans-serif" }}>No broken links found!</p>
+    ) : (
+      <div style={{ fontFamily: "sans-serif" }}>
+        <h4>Broken Links Detected:</h4>
+        <ul>
           {issues.map((b, i) => (
             <li key={i}>
               <code>{b.slug}</code>:{" "}
@@ -181,4 +201,5 @@ export function LinkScannerV3({
   return null;
 }
 
+// Render
 <LinkScannerV3 />
