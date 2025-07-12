@@ -5,4 +5,4 @@ hidden: false
 metadata:
   robots: index
 ---
-<LinkScannerV2 />
+<LinkScannerV3 />
