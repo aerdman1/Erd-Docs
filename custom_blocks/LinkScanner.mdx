@@ -3,212 +3,182 @@ name: LinkScanner
 ---
 import React, { useState } from "react";
 
-export function LinkScanner({
-  basePath      = "/erdfactored/docs", // adjust to your sidebar prefix
-  initialBranch = "1.0",               // default branch/version
-  initialApiKey = "",                  // user-entered rdme_xxxxx
+export function LinkScannerV3({
+  basePath      = "/erdfactored", // your project subpath
+  initialVersion = "1.0",         // branch name
+  initialApiKey  = "",            // required rdme_xxxxx key
 }) {
-  const [branch, setBranch]   = useState(initialBranch);
-  const [apiKey, setApiKey]   = useState(initialApiKey);
-  const [records, setRecords] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [version, setVersion]   = useState(initialVersion);
+  const [apiKey, setApiKey]     = useState(initialApiKey);
+  const [foundLinks, setFoundLinks] = useState(null); // null = not run yet
+  const [issues, setIssues]         = useState(null); // null = not checked yet
+  const [loading, setLoading]       = useState(false);
 
-  const scanLinks = async () => {
+  // Step 1: sidebar → slugs → fetch JSON → parse Markdown links
+  const findLinks = async () => {
     setLoading(true);
-    setRecords([]);
+    setFoundLinks(null);
+    setIssues(null);
 
-    // 1) scrape sidebar slugs
-    const els = document.querySelectorAll(`a[href^="${basePath}/"]`);
-    const slugs = Array.from(els)
-      .map((a) => a.getAttribute("href").split("/").pop())
-      .filter((s, i, all) => all.indexOf(s) === i);
+    // collect unique slugs from sidebar nav
+    const navAs = document.querySelectorAll(`a[href^="${basePath}/docs/"]`);
+    const pages = Array.from(navAs)
+      .map((a) => a.href.split("/").pop())
+      .filter((v, i, arr) => arr.indexOf(v) === i);
 
-    console.log("🔍 Found slugs:", slugs);
-    if (!slugs.length) {
-      console.warn("No slugs found—check your basePath!");
-      setLoading(false);
-      return;
-    }
+    // prepare auth header
+    const hdrs = new Headers({ Accept: "application/json" });
+    hdrs.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
 
-    // 2) fetch each guide JSON and extract links from the raw Markdown body
-    const hdrs = {
-      Accept:        "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    };
-    const out = [];
+    // regex to match Markdown links: [text](URL)
+    const mdLinkRe = /\[[^\]]+\]\((https?:\/\/[^\s)]+)\)/g;
+    const links = [];
 
-    for (const slug of slugs) {
-      const guideUrl = `/erdfactored/api-next/v2/versions/${encodeURIComponent(branch)}/guides/${encodeURIComponent(slug)}`;
-      console.log(`➡️ Fetching guide for slug "${slug}":`, guideUrl);
-
-      let data;
+    for (const slug of pages) {
       try {
-        const res = await fetch(guideUrl, { credentials: "include", headers: hdrs });
-        console.log(`   ← status for "${slug}":`, res.status);
+        const res = await fetch(
+          `${window.location.origin}${basePath}/api-next/v2/branches/${encodeURIComponent(
+            version
+          )}/guides/${slug}`,
+          { credentials: "include", headers: hdrs }
+        );
         if (!res.ok) continue;
-        const json = await res.json();
-        data = json.data;
+        const { data } = await res.json();
+        const md = data.content.body || "";
+        let m;
+        while ((m = mdLinkRe.exec(md))) {
+          links.push({ slug, href: m[1] });
+        }
       } catch (e) {
-        console.error("   ✖️ Error fetching guide JSON for", slug, e);
-        continue;
-      }
-
-      // 3) pull links directly from the Markdown body
-      const md = data.content?.body || "";
-      const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]+)\)/g;
-      const anchors = [];
-      let m, mdCount = 0;
-      while ((m = mdLinkRe.exec(md))) {
-        mdCount++;
-        anchors.push({
-          text: m[1],
-          href: m[2],
-          _fromMarkdown: true,
-        });
-      }
-      console.log(`   🔄 Parsed ${mdCount} links from Markdown for "${slug}"`);
-
-      // 4) HEAD-check each anchor, but only if it's on your root domain
-      for (const a of anchors) {
-        const linkText = a._fromMarkdown ? a.text : a.textContent.trim();
-        const fullUrl  = a._fromMarkdown ? a.href : a.href;
-
-        // **NEW:** accept any URL on your root domain
-        const urlObj = new URL(fullUrl, location.href);
-        const isInternal = urlObj.hostname === "erdman-refactored-group.readme.io";
-        if (!isInternal) {
-          console.log(`   ⏭️ Skipping external link: ${fullUrl}`);
-          continue;
-        }
-
-        let status = "ERR", valid = false;
-        try {
-          const headRes = await fetch(fullUrl, {
-            method:   "HEAD",
-            redirect: "manual",
-            mode:     "cors",
-            headers:  { Authorization: `Bearer ${apiKey}` },
-          });
-          console.log(`   ↪️ HEAD ${fullUrl} → status: ${headRes.status}`);
-          status = headRes.status;
-          valid  = status >= 200 && status < 300;
-        } catch (e) {
-          console.warn(`   ✖️ HEAD failed for ${fullUrl}`, e);
-        }
-
-        out.push({ page: slug, text: linkText, url: fullUrl, status, valid });
+        console.error(`Error fetching ${slug}:`, e);
       }
     }
 
-    setRecords(out);
+    setFoundLinks(links);
     setLoading(false);
   };
 
-  const total  = records.length;
-  const valid  = records.filter(r => r.valid).length;
-  const broken = total - valid;
+  // Step 2: HEAD-check each link
+  const checkBroken = async () => {
+    setLoading(true);
+    const bad = [];
+    const hdrs = new Headers();
+    hdrs.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
 
-  // If records is empty (table isn't rendering), also log a Markdown version:
-  if (!loading && records.length) {
-    console.log("## Link Scanner Results (Markdown)\n");
-    console.log("| Page | Text | URL | Status | Valid |");
-    console.log("| ---- | ---- | --- | ------ | ----- |");
-    records.forEach(r => {
-      console.log(`| ${r.page} | ${r.text} | ${r.url} | ${r.status} | ${r.valid ? "✔️" : "❌"} |`);
-    });
-  }
+    for (const { slug, href } of foundLinks) {
+      try {
+        const head = await fetch(href, {
+          method: "HEAD",
+          headers: hdrs,
+          redirect: "manual",
+        });
+        if (!(head.status >= 200 && head.status < 300)) {
+          bad.push({ slug, href, status: head.status });
+        }
+      } catch {
+        bad.push({ slug, href, status: "ERR" });
+      }
+    }
 
-  return (
-    <div style={{ fontFamily: "sans-serif", maxWidth: 800, margin: "auto" }}>
-      <h3>Link Scanner</h3>
+    setIssues(bad);
+    setLoading(false);
+  };
 
-      <div style={{ marginBottom: 16 }}>
-        <label>
-          Branch/Version:<br/>
-          <input
-            type="text"
-            value={branch}
-            onChange={e => setBranch(e.target.value.trim())}
-            placeholder="e.g. 1.0"
-            style={{ width: "100%", padding: 6, marginTop: 4 }}
-          />
+  // -- RENDER FLOW --
+
+  // 0) inputs + Find Links
+  if (foundLinks === null && !loading) {
+    return (
+      <div className="mb-4 w-full">
+        <label className="block text-sm font-medium mb-1">
+          Project Branch
         </label>
+        <input
+          type="text"
+          className="w-full border rounded p-2 mb-3"
+          placeholder="e.g. 1.0"
+          value={version}
+          onChange={(e) => setVersion(e.target.value.trim())}
+        />
 
-        <label style={{ display: "block", marginTop: 12 }}>
-          API Key:<br/>
-          <input
-            type="password"
-            value={apiKey}
-            onChange={e => setApiKey(e.target.value.trim())}
-            placeholder="rdme_xxxxx"
-            style={{ width: "100%", padding: 6, marginTop: 4 }}
-          />
+        <label className="block text-sm font-medium mb-1">
+          API Key (Basic auth, required)
         </label>
+        <input
+          type="password"
+          className="w-full border rounded p-2 mb-3"
+          placeholder="rdme_xxxxx"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value.trim())}
+        />
 
         <button
-          onClick={scanLinks}
-          disabled={!branch || !apiKey || loading}
-          style={{
-            marginTop: 16,
-            padding: "8px 16px",
-            backgroundColor: "#007bff",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-            opacity: (!branch || !apiKey || loading) ? 0.5 : 1,
-          }}
+          onClick={findLinks}
+          disabled={!version || !apiKey}
+          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
         >
-          {loading ? "Scanning…" : "Scan Links"}
+          Find Links in Content
         </button>
       </div>
+    );
+  }
 
-      {records.length > 0 && !loading && (
-        <>
-          <p>
-            <strong>Results:</strong> Total: {total} | Valid: {valid} | Broken: {broken}
-          </p>
-          <div style={{ maxHeight: 300, overflow: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr>
-                  {["Page","Text","URL","Status","Valid"].map(h => (
-                    <th
-                      key={h}
-                      style={{
-                        border: "1px solid #ccc",
-                        padding: 6,
-                        background: "#f9f9f9",
-                        textAlign: "left",
-                      }}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {records.map((r, i) => (
-                  <tr key={i}>
-                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.page}</td>
-                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.text}</td>
-                    <td style={{ border: "1px solid #ccc", padding: 6 }}>
-                      <a href={r.url} target="_blank" rel="noopener noreferrer">
-                        {r.url}
-                      </a>
-                    </td>
-                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.status}</td>
-                    <td style={{ border: "1px solid #ccc", padding: 6 }}>
-                      {r.valid ? "✔️" : "❌"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-    </div>
-  );
+  // 1) loading
+  if (loading) {
+    return <p>Working…</p>;
+  }
+
+  // 2) show found links + Check Broken
+  if (foundLinks !== null && issues === null) {
+    return (
+      <div className="mt-4">
+        <h4 className="font-medium mb-2">
+          Found {foundLinks.length} Content Links
+        </h4>
+        <ul className="list-disc ml-6 max-h-48 overflow-auto mb-3">
+          {foundLinks.map((l, i) => (
+            <li key={i}>
+              <code>{l.slug}</code>:{" "}
+              <a href={l.href} target="_blank" rel="noopener noreferrer">
+                {l.href}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <button
+          onClick={checkBroken}
+          className="px-4 py-2 bg-red-600 text-white rounded"
+        >
+          Check Broken
+        </button>
+      </div>
+    );
+  }
+
+  // 3) show broken results
+  if (issues !== null) {
+    if (issues.length === 0) {
+      return <p>No broken links found!</p>;
+    }
+    return (
+      <div className="mt-4">
+        <h4 className="font-medium mb-2">Broken Links Detected:</h4>
+        <ul className="list-disc ml-6">
+          {issues.map((b, i) => (
+            <li key={i}>
+              <code>{b.slug}</code>:{" "}
+              <a href={b.href} target="_blank" rel="noopener noreferrer">
+                {b.href}
+              </a>{" "}
+              [{b.status}]
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  return null;
 }
 
-<LinkScanner />
+<LinkScannerV3 />
