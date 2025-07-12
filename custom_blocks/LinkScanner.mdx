@@ -1,0 +1,169 @@
+---
+name: LinkScanner
+---
+import React, { useState } from "react";
+
+export function LinkScannerV3({
+  basePath       = "/erdfactored",
+  initialBranch  = "1.0",
+  initialApiKey  = "",    // your rdme_xxxxx key
+}) {
+  const [branch, setBranch]   = useState(initialBranch);
+  const [apiKey, setApiKey]   = useState(initialApiKey);
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const scanLinks = async () => {
+    setLoading(true);
+    setRecords([]);
+
+    // 1) collect unique slugs from the sidebar
+    const navAs = Array.from(
+      document.querySelectorAll(`a[href^="${basePath}/docs/"]`)
+    );
+    const slugs = [...new Set(navAs.map(a => a.href.split("/").pop()))];
+
+    // 2) prepare Basic auth header
+    const headers = new Headers({ Accept: "application/json" });
+    headers.set("Authorization", `Basic ${btoa(apiKey + ":")}`);
+
+    // 3) regex for Markdown links
+    const mdLinkRe = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+    const out = [];
+
+    // 4) fetch each page via the proxy /api-next/… endpoint
+    for (const slug of slugs) {
+      const url = `${basePath}/api-next/v2/branches/${encodeURIComponent(branch)}/guides/${slug}`;
+      try {
+        const res = await fetch(url, {
+          credentials: "include", // proxy will attach your dash session
+          headers,
+        });
+        if (!res.ok) continue;
+        const { data } = await res.json();
+        const body = data.content.body || "";
+
+        let m;
+        while ((m = mdLinkRe.exec(body))) {
+          const linkText = m[1];
+          const fullUrl  = m[2];
+
+          // HEAD-check that link
+          let status = "ERR";
+          try {
+            const h = await fetch(fullUrl, { method: "HEAD" });
+            status = h.status;
+          } catch {}
+
+          out.push({
+            page:  slug,
+            text:  linkText,
+            url:   fullUrl,
+            status,
+            valid: typeof status === "number" && status >= 200 && status < 300,
+          });
+        }
+      } catch (e) {
+        console.error("Error loading", slug, e);
+      }
+    }
+
+    setRecords(out);
+    setLoading(false);
+  };
+
+  const total  = records.length;
+  const valid  = records.filter(r => r.valid).length;
+  const broken = total - valid;
+
+  return (
+    <div style={{ fontFamily: "sans-serif", maxWidth: 700, margin: "auto" }}>
+      <h3>Link Scanner</h3>
+
+      <div style={{ marginBottom: 16 }}>
+        <label>
+          Branch/Version:<br/>
+          <input
+            type="text"
+            value={branch}
+            onChange={e => setBranch(e.target.value.trim())}
+            placeholder="e.g. 1.0"
+            style={{ width: "100%", padding: 6, marginTop: 4 }}
+          />
+        </label>
+
+        <label style={{ display: "block", marginTop: 12 }}>
+          API Key:<br/>
+          <input
+            type="password"
+            value={apiKey}
+            onChange={e => setApiKey(e.target.value.trim())}
+            placeholder="rdme_xxxxx"
+            style={{ width: "100%", padding: 6, marginTop: 4 }}
+          />
+        </label>
+
+        <button
+          onClick={scanLinks}
+          disabled={!branch || !apiKey || loading}
+          style={{
+            marginTop: 16,
+            padding: "8px 16px",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            border: "none",
+            cursor: "pointer",
+            opacity: (!branch || !apiKey || loading) ? 0.5 : 1,
+          }}
+        >
+          {loading ? "Scanning…" : "Scan Links"}
+        </button>
+      </div>
+
+      {records.length > 0 && !loading && (
+        <>
+          <p>
+            <strong>Results:</strong> Total: {total} | Valid: {valid} | Broken: {broken}
+          </p>
+          <div style={{ maxHeight: 280, overflow: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr>
+                  {["Page","Text","URL","Status","Valid"].map(h => (
+                    <th
+                      key={h}
+                      style={{
+                        border: "1px solid #ccc",
+                        padding: 6,
+                        background: "#f9f9f9",
+                        textAlign: "left",
+                      }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {records.map((r,i) => (
+                  <tr key={i}>
+                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.page}</td>
+                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.text}</td>
+                    <td style={{ border: "1px solid #ccc", padding: 6 }}>
+                      <a href={r.url} target="_blank" rel="noopener noreferrer">{r.url}</a>
+                    </td>
+                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.status}</td>
+                    <td style={{ border: "1px solid #ccc", padding: 6 }}>{r.valid ? "✔️" : "❌"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+<LinkScannerV3 />
