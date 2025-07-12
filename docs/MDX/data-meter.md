@@ -5,15 +5,15 @@ hidden: false
 metadata:
   robots: index
 ---
-# 1) Pull Top Page Searches (API Key Required)
+# 1. Pull Top Page Searches (API Key Required)
 
 <DataMeter max={100} labelPosition="overlay" showCards={true} />
 
-# 2) Pull from OAS file (Admin Only)
+# 2. Pull from OAS file
 
 <DataMeter websiteBaseUrl="https://erdtest123.readme.io" specFile="ErdSpec1.json" apiGroup="pet" max={100} labelPosition="overlay" showCards={true} />
 
-# 3) Manual entry (Public)
+# 3. Manual entry (Public)
 
 <DataMeter
   values={[
