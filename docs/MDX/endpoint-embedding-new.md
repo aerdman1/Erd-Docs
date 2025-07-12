@@ -2,6 +2,7 @@
 title: Endpoint Embedding
 deprecated: false
 hidden: false
+icon: fad fa-diagram-predecessor
 metadata:
   robots: index
 ---
