@@ -2,6 +2,7 @@
 title: Stepper (Simple)
 deprecated: false
 hidden: false
+icon: far fa-distribute-spacing-vertical
 metadata:
   robots: index
 ---
