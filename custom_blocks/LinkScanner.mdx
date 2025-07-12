@@ -108,12 +108,24 @@ export function LinkValidation({
     setRecords([]);
     setStepIndex(0);
     await wait(300);
-    const navEls = document.querySelectorAll(`nav#hub-sidebar a[href^="${basePath}/"]`);
-    const slugs = Array.from(navEls)
-      .map(a => a.getAttribute("href").split("/").pop())
-      .filter((s,i,a) => s && a.indexOf(s)===i);
-    if (!slugs.length) { setLoading(false); return; }
-    setStepIndex(1); await wait(300);
+    const listRes = await fetch(
+      `/api-next/v2/branches/${encodeURIComponent(branch)}/guides`,
+      {
+        credentials: "include",
+        headers: {
+          Accept:        "application/json",
+          Authorization: `Basic ${btoa(apiKey + ":")}`,
+        },
+      }
+    );
+    if (!listRes.ok) {
+      setLoading(false);
+      return;
+    }
+    const { data: guides } = await listRes.json();
+    const slugs = guides.map(g => g.slug);
+    setStepIndex(1);
+    await wait(300);
     const out = [];
     for (const slug of slugs) {
       const url = `/api-next/v2/branches/${encodeURIComponent(branch)}/guides/${encodeURIComponent(slug)}`;
@@ -142,7 +154,8 @@ export function LinkValidation({
         });
       } catch {}
     }
-    setStepIndex(2); await wait(300);
+    setStepIndex(2);
+    await wait(300);
     const results = [];
     for (const { slug, title, category, updatedAt, anchors } of out) {
       for (const a of anchors) {
@@ -155,7 +168,8 @@ export function LinkValidation({
         results.push({ slug, title, category, updatedAt, linkText: a.text, url: a.href, status, valid });
       }
     }
-    setStepIndex(3); await wait(200);
+    setStepIndex(3);
+    await wait(200);
     setRecords(results);
     setLoading(false);
   };
@@ -250,6 +264,11 @@ export function LinkValidation({
         maxWidth: 800, margin: "0 auto", padding: 24,
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
       }}>
+        <img
+          src="https://readme.com/static/brandkit/readme-blue.png"
+          alt="ReadMe Logo"
+          style={{ position: "absolute", top: 16, left: 16, height: 16 }}
+        />
         <h2 style={{
           textAlign: "center", margin: "0 0 16px",
           fontSize: 24, fontWeight: 600
