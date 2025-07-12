@@ -2,6 +2,7 @@
 title: Stepper (Advanced)
 deprecated: false
 hidden: false
+icon: fad fa-distribute-spacing-vertical
 metadata:
   robots: index
 ---
