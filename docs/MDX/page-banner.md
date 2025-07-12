@@ -2,6 +2,7 @@
 title: Page Banner (Advanced)
 deprecated: false
 hidden: false
+icon: ⚠️
 metadata:
   robots: index
 ---
