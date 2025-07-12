@@ -86,14 +86,13 @@ export const DataTableLinkScan = ({ children }) => {
 };
 
 export function LinkValidation({
-  basePath      = "/docs",
   initialBranch = "1.0",
   initialApiKey = "",
 }) {
-  const [branch, setBranch]       = useState(initialBranch);
-  const [apiKey, setApiKey]       = useState(initialApiKey);
-  const [records, setRecords]     = useState([]);
-  const [loading, setLoading]     = useState(false);
+  const [branch, setBranch]   = useState(initialBranch);
+  const [apiKey, setApiKey]   = useState(initialApiKey);
+  const [records, setRecords] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const steps = [
     "Gathering your page list…",
@@ -107,11 +106,11 @@ export function LinkValidation({
     setLoading(true);
     setRecords([]);
     setStepIndex(0);
-    await wait(300);
+
+    // -- Step 1: list all guides from the central API --
     const listRes = await fetch(
-      `/api-next/v2/branches/${encodeURIComponent(branch)}/guides`,
+      `https://api.readme.com/v2/branches/${encodeURIComponent(branch)}/guides`,
       {
-        credentials: "include",
         headers: {
           Accept:        "application/json",
           Authorization: `Basic ${btoa(apiKey + ":")}`,
@@ -119,19 +118,22 @@ export function LinkValidation({
       }
     );
     if (!listRes.ok) {
+      console.warn("Could not list guides:", listRes.status);
       setLoading(false);
       return;
     }
     const { data: guides } = await listRes.json();
     const slugs = guides.map(g => g.slug);
+
     setStepIndex(1);
     await wait(300);
+
+    // -- Step 2: fetch each guide and extract links --
     const out = [];
     for (const slug of slugs) {
-      const url = `/api-next/v2/branches/${encodeURIComponent(branch)}/guides/${encodeURIComponent(slug)}`;
+      const url = `https://api.readme.com/v2/branches/${encodeURIComponent(branch)}/guides/${encodeURIComponent(slug)}`;
       try {
         const res = await fetch(url, {
-          credentials: "include",
           headers: {
             Accept:        "application/json",
             Authorization: `Basic ${btoa(apiKey + ":")}`,
@@ -154,8 +156,11 @@ export function LinkValidation({
         });
       } catch {}
     }
+
     setStepIndex(2);
     await wait(300);
+
+    // -- Step 3: HEAD-check each link --
     const results = [];
     for (const { slug, title, category, updatedAt, anchors } of out) {
       for (const a of anchors) {
@@ -168,8 +173,10 @@ export function LinkValidation({
         results.push({ slug, title, category, updatedAt, linkText: a.text, url: a.href, status, valid });
       }
     }
+
     setStepIndex(3);
     await wait(200);
+
     setRecords(results);
     setLoading(false);
   };
@@ -225,7 +232,7 @@ export function LinkValidation({
               <td style={{ border: "1px solid #eee", padding: 6 }}>{r.title}</td>
               <td style={{ border: "1px solid #eee", padding: 6 }}>
                 <a
-                  href={`${window.location.origin}${basePath}/${r.slug}`}
+                  href={`https://erdtest123.readme.io/docs/${r.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
