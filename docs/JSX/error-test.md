@@ -6,11 +6,8 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-### Example Fees Request
-
-```
-{
-  "productCode": "A30",
-  "interestRate": 7.625
-}
-```
+<Anchor
+  label="/products/pricing-scenarios/&#123;scenario-id&#125;/fees"
+  href="https://developers.mortgageapi.rocket.mortgage/reference/get-pricing-scenario-fees#/products/pricing-scenarios/&#123;scenario-id&#125;/fees"
+  target="_blank"
+/>
