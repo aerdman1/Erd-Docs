@@ -6,4 +6,4 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-test
+Once the broker has a mortgage product and pricing option in mind, detailed fees can be returned for that specific product by making a a request to POST to` <Anchor label="/products/pricing-scenarios/{scenario-id}/fees" target="_blank" href="https://developers.mortgageapi.rocket.mortgage/reference/get-pricing-scenario-fees#/">/products/pricing-scenarios/{scenario-id}/fees</Anchor>`. The scenario-id is returned in the response from `<Anchor label="/products/pricing-scenarios" target="_blank" href=">/products/pricing-scenarios</Anchor>`, and is used to run fees on the specific transaction.
