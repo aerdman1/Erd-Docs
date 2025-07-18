@@ -13,12 +13,13 @@ assert (!condition) throw 404;
 
 <HTMLBlock>{`
 <style>
-  /* Base color (punctuation, plain text, spacing) */
+  /* Charcoal-black background */
   .cm-s-neo {
-    color: rgb(178, 204, 214) !important;
+    background-color: #2d2d2d !important;
+    color: rgb(178, 204, 214) !important; /* fallback/base text color */
   }
 
-  /* Keywords & “throw”/“assert” (CodeMirror uses cm-variable for these) */
+  /* Keywords & “throw”/“assert” */
   .cm-s-neo .cm-variable {
     color: rgb(199, 146, 234) !important;
   }
