@@ -3,16 +3,10 @@ title: Test
 fullscreen: false
 hidden: false
 ---
-<Columns layout="auto">
-  <Column>
-    ![](https://owlbertsio-resized.s3.amazonaws.com/Reading.psd.png)
-  </Column>
+```
+throw 404; // Throw exception with code
+throw (404, "Not found"); // Throw with data
 
-  <Column>
-    ![](https://owlbertsio-resized.s3.amazonaws.com/Reading.psd.png)
-  </Column>
-
-  <Column>
-    ![](https://owlbertsio-resized.s3.amazonaws.com/Reading.psd.png)
-  </Column>
-</Columns>
+assert (condition) throw 404; 
+assert (!condition) throw 404;
+```
