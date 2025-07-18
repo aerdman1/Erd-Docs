@@ -13,18 +13,47 @@ assert (!condition) throw 404;
 
 <HTMLBlock>{`
 <style>
-  /* Charcoal-black background */
-  .cm-s-neo {
+  /* Entire tabs container */
+  .CodeTabs {
     background-color: #2d2d2d !important;
-    color: rgb(178, 204, 214) !important; /* fallback/base text color */
+    border-radius: 8px !important;
+    overflow: hidden;
   }
 
-  /* Keywords & “throw”/“assert” */
+  /* Toolbar at top */
+  .CodeTabs-toolbar {
+    background-color: #1f1f1f !important;
+    border-bottom: 1px solid #444 !important;
+    padding: 0.5rem 1rem;
+  }
+  .CodeTabs-toolbar button {
+    background: transparent !important;
+    color: #ccc !important;
+    border: none !important;
+  }
+
+  /* Inner wrapper and pre/code */
+  .CodeTabs-inner,
+  .CodeTabs-inner pre,
+  .CodeTabs-inner code {
+    background-color: transparent !important;
+    margin: 0 !important;
+    padding: 1rem !important;
+    font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  /* CodeMirror surface */
+  .cm-s-neo {
+    background-color: transparent !important;
+    color: rgb(178, 204, 214) !important; /* base/punctuation */
+  }
+
+  /* Keywords (throw/assert) */
   .cm-s-neo .cm-variable {
     color: rgb(199, 146, 234) !important;
   }
 
-  /* Numbers like 404 */
+  /* Numbers (404) */
   .cm-s-neo .cm-number {
     color: rgb(247, 140, 108) !important;
   }
@@ -34,13 +63,13 @@ assert (!condition) throw 404;
     color: rgb(195, 232, 141) !important;
   }
 
-  /* Comments (italic) */
+  /* Comments */
   .cm-s-neo .cm-comment {
     color: rgb(105, 112, 152) !important;
     font-style: italic !important;
   }
 
-  /* Operators like ! */
+  /* Operators (the !) */
   .cm-s-neo .cm-operator {
     color: rgb(137, 221, 255) !important;
   }
