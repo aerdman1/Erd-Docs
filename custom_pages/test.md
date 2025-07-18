@@ -3,7 +3,7 @@ title: Test
 fullscreen: false
 hidden: false
 ---
-```asp
+```text
 throw 404; // Throw exception with code
 throw (404, "Not found"); // Throw with data
 
