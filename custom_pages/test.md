@@ -24,7 +24,7 @@ assert (!condition) throw 404;
   .CodeTabs-toolbar {
     background-color: #1f1f1f !important;
     border-bottom: 1px solid #444 !important;
-    padding: 0.5rem 1rem;
+    padding: 0.3rem .5rem;
   }
   .CodeTabs-toolbar button {
     background: transparent !important;
