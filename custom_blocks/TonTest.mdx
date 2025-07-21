@@ -1,55 +1,45 @@
 ---
 name: TonTest
 ---
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
 export const CodeBlock = ({ language = 'typescript', inline = false, children }) => {
   // @ts-ignore
-  if (!globalThis.Prism) return (<>Loading Prism.js…</>)
+  if (!globalThis.Prism) return <>Loading Prism.js…</>
+
   if (!Object.keys(globalThis.Prism.languages).includes(language)) {
-    const component = (<code
-      className={`language-${language}`}>
-      Language {language} was not found in globalThis.Prism.languages
-    </code>)
-    return <>{inline ? component : <pre>{component}</pre>}</>
+    const fallback = (
+      <code className={`language-${language}`}>
+        Language {language} was not found in globalThis.Prism.languages
+      </code>
+    )
+    return inline ? fallback : <pre>{fallback}</pre>
   }
-  const dedent = (str) => {
-    const lines = str.split('\n');
-    const nonEmpty = lines.filter(line => line.trim());
-    if (!nonEmpty.length) return str;
 
-    const minIndent = Math.min(...nonEmpty.map(line => 
-      line.match(/^ */)[0].length
-    ));
+  const highlighted = globalThis.Prism.highlight(
+    children.toString(),
+    globalThis.Prism.languages[language],
+    language
+  )
 
-    return lines.map(line => line.slice(minIndent)).join('\n');
-  }
-  const component = (<code
-    className={`language-${language}`}
-    dangerouslySetInnerHTML={{
-      __html: globalThis.Prism.highlight(
-        dedent(children.toString()),
-        globalThis.Prism.languages[language],
-        language,
-      )
-    }}
-  />)
+  const component = (
+    <code
+      className={`language-${language}`}
+      dangerouslySetInnerHTML={{ __html: highlighted }}
+    />
+  )
 
   if (inline) return component
+
   return (
-    <>
-      <div className="relative group">
-        <pre>{component}</pre>
-        <button
-          onClick={() => navigator.clipboard.writeText(children.toString())}
-          className="absolute top-2 right-2 bg-neutral-100 dark:bg-[var(--gray20)] text-slate-600 dark:text-white px-2 py-1 text-xs font-inherit rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-200 dark:hover:bg-[var(--gray30)]"
-        >
-          Copy
-        </button>
-      </div>
-    </>
+    <div className="relative group">
+      <pre>{component}</pre>
+      <button
+        onClick={() => navigator.clipboard.writeText(children.toString())}
+        className="absolute top-2 right-2 bg-neutral-100 dark:bg-[var(--gray20)] text-slate-600 dark:text-white px-2 py-1 text-xs font-inherit rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-200 dark:hover:bg-[var(--gray30)]"
+      >
+        Copy
+      </button>
+    </div>
   )
 }
-
-
-<CodeBlock language="javascript">console.log()</CodeBlock>
