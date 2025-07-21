@@ -1,45 +1,58 @@
 ---
 name: TonTest
 ---
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 export const CodeBlock = ({ language = 'typescript', inline = false, children }) => {
   // @ts-ignore
   if (!globalThis.Prism) return <>Loading Prism.js…</>
 
-  if (!Object.keys(globalThis.Prism.languages).includes(language)) {
-    const fallback = (
-      <code className={`language-${language}`}>
-        Language {language} was not found in globalThis.Prism.languages
-      </code>
-    )
-    return inline ? fallback : <pre>{fallback}</pre>
-  }
+  // 1. Turn the children into a raw string
+  const raw = children.toString()
 
+  // 2. Log it on every render so you see "\n    console.log…"
+  useEffect(() => {
+    console.log('🔍 CodeBlock raw children:', JSON.stringify(raw))
+  }, [raw])
+
+  // 3. Show visible markers for spaces so you can spot leading dots
+  const markerText = raw.replace(/ /g, '·')
+
+  // 4. Highlight normally
   const highlighted = globalThis.Prism.highlight(
-    children.toString(),
-    globalThis.Prism.languages[language],
+    raw,
+    globalThis.Prism.languages[language] || {},
     language
   )
 
-  const component = (
+  const codeComponent = (
     <code
       className={`language-${language}`}
       dangerouslySetInnerHTML={{ __html: highlighted }}
     />
   )
 
-  if (inline) return component
+  // Inline mode: just show the highlighted code
+  if (inline) return codeComponent
 
+  // Block mode: render both debug and real versions
   return (
-    <div className="relative group">
-      <pre>{component}</pre>
-      <button
-        onClick={() => navigator.clipboard.writeText(children.toString())}
-        className="absolute top-2 right-2 bg-neutral-100 dark:bg-[var(--gray20)] text-slate-600 dark:text-white px-2 py-1 text-xs font-inherit rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-200 dark:hover:bg-[var(--gray30)]"
-      >
-        Copy
-      </button>
+    <div className="relative group space-y-4">
+      {/* DEBUG view: shows dots for spaces */}
+      <pre style={{ background: '#f0f0f0', padding: '8px', fontSize: '12px' }}>
+        {markerText}
+      </pre>
+
+      {/* “Real” highlighted block */}
+      <div className="relative group">
+        <pre>{codeComponent}</pre>
+        <button
+          onClick={() => navigator.clipboard.writeText(raw)}
+          className="absolute top-2 right-2 bg-neutral-100 dark:bg-[var(--gray20)] text-slate-600 dark:text-white px-2 py-1 text-xs font-inherit rounded opacity-0 group-hover:opacity-100 transition-opacity hover:bg-neutral-200 dark:hover:bg-[var(--gray30)]"
+        >
+          Copy
+        </button>
+      </div>
     </div>
   )
 }
