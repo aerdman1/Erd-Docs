@@ -12,9 +12,9 @@ You're on your way to building an awesome developer hub! Here's some of the thin
 
 <CodeBlock language="tact">
   {`\
-                            contract Tact(someField: Int? as uint65) {
-                                receive("hello there!") { cashback(sender()) }
-                            }`}
+                        contract Tact(someField: Int? as uint65) {
+                            receive("hello there!") { cashback(sender()) }
+                        }`}
 </CodeBlock>
 
 ```javascript
@@ -27,11 +27,11 @@ class Person {
 
 <CodeBlock>
   {`\
-                          console.log("TEST" + 10);  
-                          log("HEEE");
-                          class Person {
-                            constructor();
-                          }`}
+                      console.log("TEST" + 10);  
+                      log("HEEE");
+                      class Person {
+                        constructor();
+                      }`}
 </CodeBlock>
 
 <CodeBlock>console.log("TEST" + 10);</CodeBlock>
