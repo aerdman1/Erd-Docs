@@ -7,6 +7,13 @@ metadata:
 ---
 <PageModal_Simple title="System Update" message="We will be performing scheduled maintenance at 12 AM UTC." />
 
+<HTMLBlock>{`
+<div style="background:yellow:padding:10px;text-align:center;">
+(Internal) (Internal note) The first time you login ...
+</div>
+`}</HTMLBlock>
+
+
 <br />
 
 Sed quam leo, sodales et varius et, posuere aliquam felis. Praesent volutpat ex vel ipsum venenatis sodales. Maecenas mollis feugiat lorem ullamcorper pretium. Nullam efficitur ornare orci eget viverra.tswrwsdfasdfa
