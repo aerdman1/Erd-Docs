@@ -8,11 +8,10 @@ metadata:
 <PageModal_Simple title="System Update" message="We will be performing scheduled maintenance at 12 AM UTC." />
 
 <HTMLBlock>{`
-<div style="background:yellow:padding:10px;text-align:center;">
+<div style="background:yellow;padding:10px;text-align:center;">
 (Internal) (Internal note) The first time you login ...
 </div>
 `}</HTMLBlock>
-
 
 <br />
 
