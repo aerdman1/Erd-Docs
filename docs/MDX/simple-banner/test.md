@@ -9,6 +9,6 @@ metadata:
 <HTMLBlock>{`
 <div style="background:yellow;padding:10px;text-align:center;">
 (Internal) (Private notes)
-hidden page
+blah blah
 </div>
 `}</HTMLBlock>
