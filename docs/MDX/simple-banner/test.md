@@ -12,3 +12,14 @@ flowchart LR
  B --> C[fa:fa-check C] 
  B --> D[fa:fa-ban D]
 ```
+
+<br />
+
+```mermaid
+flowchart LR
+    A[fa:fa-user  User] --> B[fa:fa-cog  Settings]
+    B --> C[fa:fa-check  Success]
+    B --> D[fa:fa-ban  Error]
+    A --> E[fa:fa-github  GitHub]
+
+```
