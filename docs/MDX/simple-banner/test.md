@@ -10,7 +10,7 @@ iconify
 
 ```mermaid
 flowchart LR
-  A[<span style="width:400px;" class="iconify" data-icon="mingcute:rocket-line"></span> Launch]
+  A[<span class="iconify" data-icon="mingcute:rocket-line"></span> Launch]
   A --> B[<span class="iconify" data-icon="tabler:circle-check"></span> Done]
 
 ```
