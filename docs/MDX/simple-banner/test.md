@@ -17,9 +17,9 @@ flowchart LR
 <br />
 
 ```mermaid
-flowchart TD
-  Start[heroicons-outline:play Start] --> Build[bi:braces Code]
-  Build --> Test[heroicons-outline:beaker Testing]
-  Test --> Ship[logos:vercel Deploy]
+flowchart LR
+  A --- B[mingcute:rocket-line Rocket]
+  B --> C[tabler:circle-check Done]
+  B --> D[mdi:close-thick Cancel]
 
 ```
