@@ -8,9 +8,9 @@ metadata:
 ---
 ```mermaid
 flowchart LR
-  A[<span class="iconify" data-icon="mingcute:rocket-line"></span> Launch] 
-    --> B[<span class="iconify" data-icon="mingcute:planet-line"></span> Orbit] 
-    --> C[<span class="iconify" data-icon="mingcute:flag-line"></span> Mission]
+  A --- B[mingcute:rocket-line Rocket]
+  B --> C[tabler:circle-check Done]
+  B --> D[mdi:close-thick Cancel]
 
 ```
 
@@ -52,4 +52,13 @@ flowchart LR
     --> B[<span class="iconify" data-icon="mdi:magnify"></span> Search] 
     --> C[<span class="iconify" data-icon="mdi:logout"></span> Logout]
 
+```
+
+<br />
+
+```mermaid
+flowchart LR 
+ A --- B[fa:fa-spinner B] 
+ B --> C[fa:fa-check C] 
+ B --> D[fa:fa-ban D]
 ```
