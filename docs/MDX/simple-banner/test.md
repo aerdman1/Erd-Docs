@@ -17,22 +17,21 @@ flowchart LR
 
 <HTMLBlock>{`
 <style>
-/* Let Mermaid's HTML label content expand naturally */
-.nodeLabel foreignObject > div,
-.nodeLabel foreignObject > p,
-.nodeLabel foreignObject > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25em; /* space between icon and text */
+/* Keep icon inline and text-aligned */
+.iconify {
+  width: 1em;     /* important: size like a character */
+  height: 1em;
+  vertical-align: -0.125em;
+  line-height: 1;
 }
 
-/* Make icons consistent size and prevent overflow */
-.iconify {
-  width: 1em;
-  height: 1em;
-  vertical-align: middle;
-  flex-shrink: 0;
+/* Tighten label contents */
+svg .label foreignObject > div { 
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
 }
+svg .label p { margin: 0; display: inline-flex; align-items: center; gap: 0.25em; }
 
 </style>
 `}</HTMLBlock>
