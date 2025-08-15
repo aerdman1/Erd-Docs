@@ -7,20 +7,10 @@ metadata:
   robots: index
 ---
 ```mermaid
-flowchart LR 
- A --- B[fa:fa-spinner B] 
- B --> C[fa:fa-check C] 
- B --> D[fa:fa-ban D]
-```
-
-<br />
-
-```mermaid
 flowchart LR
-    A[fa:fa-user  User] --> B[fa:fa-cog  Settings]
-    B --> C[fa:fa-check  Success]
-    B --> D[fa:fa-ban  Error]
-    A --> E[fa:fa-github  GitHub]
+  A[<span class="iconify" data-icon="mingcute:rocket-line"></span> Launch] 
+    --> B[<span class="iconify" data-icon="mingcute:planet-line"></span> Orbit] 
+    --> C[<span class="iconify" data-icon="mingcute:flag-line"></span> Mission]
 
 ```
 
@@ -28,7 +18,38 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  A[<span class="iconify" data-icon="mdi:cloud"></span>  MDI Cloud] --> B[<span class="iconify" data-icon="logos:aws-lambda"></span>  AWS Lambda]
-  B --> C[<span class="iconify" data-icon="mdi:check-circle"></span>  Success]
+  A[<span class="iconify" data-icon="tabler:player-play"></span> Start] 
+    --> B[<span class="iconify" data-icon="tabler:code"></span> Code] 
+    --> C[<span class="iconify" data-icon="tabler:circle-check"></span> Done]
+
+```
+
+<br />
+
+```mermaid
+flowchart LR
+  A[<span class="iconify" data-icon="heroicons-outline:light-bulb"></span> Idea] 
+    --> B[<span class="iconify" data-icon="heroicons-outline:clipboard-document-check"></span> Plan] 
+    --> C[<span class="iconify" data-icon="heroicons-outline:wrench-screwdriver"></span> Build]
+
+```
+
+<br />
+
+```mermaid
+flowchart LR
+  A[<span class="iconify" data-icon="bi:person-circle"></span> User] 
+    --> B[<span class="iconify" data-icon="bi:cart"></span> Shop] 
+    --> C[<span class="iconify" data-icon="bi:credit-card"></span> Pay]
+
+```
+
+<br />
+
+```mermaid
+flowchart LR
+  A[<span class="iconify" data-icon="mdi:login"></span> Login] 
+    --> B[<span class="iconify" data-icon="mdi:magnify"></span> Search] 
+    --> C[<span class="iconify" data-icon="mdi:logout"></span> Logout]
 
 ```
