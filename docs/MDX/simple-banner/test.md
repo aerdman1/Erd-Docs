@@ -12,7 +12,6 @@ flowchart LR
   B --> C[tabler:circle-check Done]
   B --> D[mdi:close-thick Cancel]
 
-
 ```
 
 <br />
