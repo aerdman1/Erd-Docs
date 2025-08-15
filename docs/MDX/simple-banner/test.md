@@ -14,3 +14,13 @@ flowchart LR
 
 
 ```
+
+<br />
+
+```mermaid
+flowchart TD
+  Start[heroicons-outline:play Start] --> Build[bi:braces Code]
+  Build --> Test[heroicons-outline:beaker Testing]
+  Test --> Ship[logos:vercel Deploy]
+
+```
