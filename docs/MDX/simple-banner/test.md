@@ -10,7 +10,7 @@ iconify
 
 ```mermaid
 flowchart LR
-  A[simple:si-github GitHub] --> B[simple:si-slack Slack]
-  B --> C[simple:si-spotify Spotify]
+  A[<span class="iconify" data-icon="mdi:cloud"></span>  MDI Cloud] --> B[<span class="iconify" data-icon="logos:aws-lambda"></span>  AWS Lambda]
+  B --> C[<span class="iconify" data-icon="mdi:check-circle"></span>  Success]
 
 ```
