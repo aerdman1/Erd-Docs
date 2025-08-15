@@ -29,7 +29,7 @@ flowchart LR
 svg .label foreignObject > div { 
   display: inline-flex;
   align-items: center;
-  gap: 0.25em;
+
 }
 svg .label p { margin: 0; display: inline-flex; align-items: center; gap: 0.25em; }
 
