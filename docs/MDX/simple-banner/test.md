@@ -6,11 +6,11 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-test
+iconify
 
 ```mermaid
 flowchart LR
-  A[mdi:mdi-rocket Launch] --> B[mdi:mdi-check Success]
-  A --> C[mdi:mdi-close Cancel]
+  A[<span class="iconify" data-icon="mingcute:rocket-line"></span> Launch]
+  A --> B[<span class="iconify" data-icon="tabler:circle-check"></span> Done]
 
 ```
