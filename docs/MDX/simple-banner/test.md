@@ -6,19 +6,11 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-```mermaid
-flowchart LR
-  A[simple:si-github GitHub] --> B[simple:si-slack Slack]
-  B --> C[simple:si-spotify Spotify]
-
-```
-
-<br />
+iconify
 
 ```mermaid
-flowchart LR
-  A --- B[mingcute:rocket-line Rocket]
-  B --> C[tabler:circle-check Done]
-  B --> D[mdi:close-thick Cancel]
-
+flowchart LR 
+ A --- B[fa:fa-spinner B] 
+ B --> C[fa:fa-check C] 
+ B --> D[fa:fa-ban D]
 ```
