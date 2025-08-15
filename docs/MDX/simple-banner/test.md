@@ -9,8 +9,8 @@ metadata:
 iconify
 
 ```mermaid
-flowchart LR 
- A --- B[fa:fa-spinner B] 
- B --> C[fa:fa-check C] 
- B --> D[fa:fa-ban D]
+flowchart LR
+  A[simple:si-github GitHub] --> B[simple:si-slack Slack]
+  B --> C[simple:si-spotify Spotify]
+
 ```
