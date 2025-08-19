@@ -97,29 +97,33 @@ You can’t add custom icons to the built-in `:emoji:` system, but you can mimic
 
 **Live Result in ReadMe:**
 
-## 5. External Libraries
+## 5. External Libraries (GOOGLE MATERIAL EXAMPLE)
 
 If your product already has an icon library (like FontAwesome), pull it in with a CDN:
 
-**EXAMPLE SYNTAX (for copy/paste):**
+IN HEADER OF YOUR SITE:
 
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
 ```
+
+**SYNTAX FOR THE PAGE (for copy/paste):**
+
+```html
 <HTMLBlock>{`
-<link rel="stylesheet" href="https://cdn.example.com/icons.css" />
-<p>Click <i class="icon-users"></i> to continue.</p>
+<p>
+  Click <i class="bi bi-people"></i> to continue.
+</p>
 `}</HTMLBlock>
 ```
 
-**Live Result in ReadMe:**
-
-<br />
+**Live Result in ReadMe**
 
 <HTMLBlock>{`
-<link rel="stylesheet" href="https://cdn.example.com/icons.css" />
-<p>Click <i class="icon-users"></i> to continue.</p>
+<p>
+  Click <i class="material-icons">people</i> to continue.
+</p>
 `}</HTMLBlock>
-
-<br />
 
 ***
 
