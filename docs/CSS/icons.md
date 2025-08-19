@@ -79,7 +79,7 @@ If you need more control (e.g. alignment), wrap your HTML in `<HTMLBlock>`.
 You can’t add custom icons to the built-in `:emoji:` system, but you can mimic it with CSS:
 
 ```
-<HTMLBlock>
+<HTMLBlock>{`
 <style>
 .icon-users::before {
   content: url("https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg");
@@ -90,10 +90,10 @@ You can’t add custom icons to the built-in `:emoji:` system, but you can mimic
 </style>
 
 <p>Click <span class="icon-users"></span> to open the Users panel.</p>
-</HTMLBlock>
+`}</HTMLBlock>
 ```
+**Result in ReadMe:**
 
-## **Result in ReadMe:**
 
 ## 5. External Libraries
 
