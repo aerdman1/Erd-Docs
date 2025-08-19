@@ -125,7 +125,27 @@ IN HEADER OF YOUR SITE:
 </p>
 `}</HTMLBlock>
 
-***
+<br />
+
+## 5. Use our Built in Font-Awesome icons
+
+```html
+<i class="fa-solid fa-gear"></i>  
+<i class="fa-solid fa-house"></i>  
+<i class="fa-solid fa-cloud"></i>
+```
+
+<br />
+
+<HTMLBlock>{`
+<i class="fa-solid fa-gear"></i>  
+<i class="fa-solid fa-house"></i>  
+<i class="fa-solid fa-cloud"></i>
+`}</HTMLBlock>
+
+<br />
+
+<br />
 
 ### Takeaway
 
