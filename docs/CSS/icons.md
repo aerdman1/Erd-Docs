@@ -19,7 +19,7 @@ Upload your icon (SVG/PNG) to ReadMe (or a hidden “Assets” page), then use M
 ![](https://files.readme.io/ec086cdf823db1e0ed64d98c6c85dcd48fda2e0e85f020a1c48e19102d693c7e-devices.svg) Devices
 ![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
 
-⚠️ **Note:** If you paste the same image using raw HTML (`<img>`), ReadMe will wrap it in a *lightbox* container (meant for screenshots). That’s why it may look bigger or styled differently. Markdown syntax (`![]()`) avoids the lightbox and is the best way to get “inline icon” behavior.
+⚠️ **Note:** These will inherently "stack" in ReadMe's editor due to how we handle images in the editor but on the public site, they will be side by side.
 
 ***
 
