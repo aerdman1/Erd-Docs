@@ -6,15 +6,13 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-Perfect — here’s a **full example Markdown page** you could hand him that shows all the different approaches (from simplest to fancier). This way he sees the tradeoffs and can pick what works best.
 
-***
 
 # Using Icons in ReadMe
 
 There are a few ways to include icons inline with your docs.
 
-***
+---
 
 ## 1. Inline Images (simplest)
 
@@ -25,10 +23,10 @@ Upload your icon (SVG/PNG) to ReadMe (or a hidden “Assets” page), then use M
 ![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
 ```
 
-**Result:**\
+**Result:**
 📱 Devices  👤 Users
 
-***
+---
 
 ## 2. Inline with Spacing
 
@@ -38,10 +36,10 @@ If they’re dropping to new lines, make sure there’s no blank line between th
 ![](https://files.readme.io/devices.svg) Devices&nbsp;&nbsp;![](https://files.readme.io/users.svg) Users
 ```
 
-**Result:**\
+**Result:**
 📱 Devices  👤 Users
 
-***
+---
 
 ## 3. Styled Inline Icons
 
@@ -55,7 +53,7 @@ Click the
 button to continue.
 ```
 
-***
+---
 
 ## 4. Emoji-style (Custom CSS)
 
@@ -76,10 +74,10 @@ If you want them to behave more “emoji-like,” you could load your icons from
 <p>Click <span class="icon-users"></span> to open the Users panel.</p>
 ```
 
-**Result:**\
+**Result:**
 Click 👤 to open the Users panel.
 
-***
+---
 
 ## 5. External Libraries
 
@@ -90,7 +88,7 @@ If your product already has an icon library (like FontAwesome or your own design
 <p>Click <i class="icon-users"></i> to continue.</p>
 ```
 
-***
+---
 
 ### Takeaway
 
@@ -98,6 +96,3 @@ If your product already has an icon library (like FontAwesome or your own design
 * ✅ **Reusable/Emoji-like:** If you really want shorthand (`<span class="icon-users"></span>`), you’ll need to load your own CSS.
 * ❌ Not recommended: making a Reusable Block per icon — too much overhead.
 
-***
-
-Do you want me to make this **customer-facing polished** (like a doc you could paste in Slack/ReadMe as an internal “best practices for icons” guide), or keep it raw/dev-y like above?
