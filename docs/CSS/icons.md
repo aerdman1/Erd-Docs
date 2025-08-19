@@ -10,6 +10,8 @@ metadata:
 
 Upload your icon (SVG/PNG) to ReadMe (or a hidden “Assets” page), then use Markdown image syntax.
 
+**EXAMPLE SYNTAX (for copy/paste):**
+
 ```
 ![](https://files.readme.io/ec086cdf823db1e0ed64d98c6c85dcd48fda2e0e85f020a1c48e19102d693c7e-devices.svg) Devices  
 ![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
@@ -27,6 +29,8 @@ Upload your icon (SVG/PNG) to ReadMe (or a hidden “Assets” page), then use M
 
 If they’re dropping to new lines, make sure there’s no blank line between them. You can also add spaces with `&nbsp;`:
 
+**EXAMPLE SYNTAX (for copy/paste):**
+
 ```
 ![](https://files.readme.io/ec086cdf823db1e0ed64d98c6c85dcd48fda2e0e85f020a1c48e19102d693c7e-devices.svg) Devices&nbsp;&nbsp;![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
 ```
@@ -38,10 +42,12 @@ If they’re dropping to new lines, make sure there’s no blank line between th
 
 ## 3. Styled Inline Icons (with `<HTMLBlock>`)
 
-If you need more control (e.g. alignment), wrap your HTML in `<HTMLBlock>`.
+If you need more control (e.g. alignment), wrap your HTML in a readme html block.
 
-```
-<HTMLBlock>
+**EXAMPLE SYNTAX (for copy/paste):**
+
+```html
+<HTMLBlock>{`
 <p>
   Click the 
   <span style="display:inline-block; vertical-align:middle;">
@@ -49,7 +55,7 @@ If you need more control (e.g. alignment), wrap your HTML in `<HTMLBlock>`.
   </span> 
   button to continue.
 </p>
-</HTMLBlock>
+`}</HTMLBlock>
 ```
 
 **Live Result in ReadMe:**
@@ -72,6 +78,8 @@ If you need more control (e.g. alignment), wrap your HTML in `<HTMLBlock>`.
 
 You can’t add custom icons to the built-in `:emoji:` system, but you can mimic it with CSS:
 
+**EXAMPLE SYNTAX (for copy/paste):**
+
 ```html
 <HTMLBlock>{`
 <style>
@@ -93,14 +101,25 @@ You can’t add custom icons to the built-in `:emoji:` system, but you can mimic
 
 If your product already has an icon library (like FontAwesome), pull it in with a CDN:
 
+**EXAMPLE SYNTAX (for copy/paste):**
+
 ```
-<HTMLBlock>
+<HTMLBlock>{`
 <link rel="stylesheet" href="https://cdn.example.com/icons.css" />
 <p>Click <i class="icon-users"></i> to continue.</p>
-</HTMLBlock>
+`}</HTMLBlock>
 ```
 
 **Live Result in ReadMe:**
+
+<br />
+
+<HTMLBlock>{`
+<link rel="stylesheet" href="https://cdn.example.com/icons.css" />
+<p>Click <i class="icon-users"></i> to continue.</p>
+`}</HTMLBlock>
+
+<br />
 
 ***
 
