@@ -41,27 +41,33 @@ If they’re dropping to new lines, make sure there’s no blank line between th
 
 ---
 
-## 3. Styled Inline Icons
+## 3. Styled Inline Icons (with `<HTMLBlock>`)
 
-You can wrap them in `<span>` to adjust alignment:
+If you need more control (e.g. alignment), you can use HTML inside a block:
 
 ```md
-Click the 
-<span style="display:inline-block; vertical-align:middle;">
-  <img src="https://files.readme.io/users.svg" width="20" alt="Users">
-</span> 
-button to continue.
+<HTMLBlock>{`
+<p>
+  Click the 
+  <span style="display:inline-block; vertical-align:middle;">
+    <img src="https://files.readme.io/users.svg" width="20" alt="Users" />
+  </span> 
+  button to continue.
+</p>
+`}</HTMLBlock>
 ```
+
+**Result:**
+Click 👤 button to continue.
 
 ---
 
 ## 4. Emoji-style (Custom CSS)
 
-ReadMe supports native emojis like `:rocket:` → 🚀, but custom icons can’t be added to the `:emoji:` system.
-
-If you want them to behave more “emoji-like,” you could load your icons from a CDN and map them with CSS:
+ReadMe supports native emojis like `:rocket:` → 🚀, but you can’t add custom icons to that system. If you want them to behave like emojis, you’d need to load them via CSS:
 
 ```html
+<HTMLBlock>{`
 <style>
 .icon-users::before {
   content: url("https://files.readme.io/users.svg");
@@ -72,6 +78,7 @@ If you want them to behave more “emoji-like,” you could load your icons from
 </style>
 
 <p>Click <span class="icon-users"></span> to open the Users panel.</p>
+`}</HTMLBlock>
 ```
 
 **Result:**
@@ -81,11 +88,13 @@ Click 👤 to open the Users panel.
 
 ## 5. External Libraries
 
-If your product already has an icon library (like FontAwesome or your own design system), you can pull that in via a CDN:
+If your product already has an icon library (like FontAwesome or your own set), you can pull that in via a CDN:
 
 ```html
+<HTMLBlock>{`
 <link rel="stylesheet" href="https://cdn.example.com/icons.css" />
 <p>Click <i class="icon-users"></i> to continue.</p>
+`}</HTMLBlock>
 ```
 
 ---
@@ -93,6 +102,6 @@ If your product already has an icon library (like FontAwesome or your own design
 ### Takeaway
 
 * ✅ **Easiest:** Upload icons as images and reference with Markdown.
-* ✅ **Reusable/Emoji-like:** If you really want shorthand (`<span class="icon-users"></span>`), you’ll need to load your own CSS.
-* ❌ Not recommended: making a Reusable Block per icon — too much overhead.
+* ✅ **Reusable/Emoji-like:** Load them with CSS if you want `<span class="icon-users"></span>` shorthand.
+* ❌ Not recommended: creating a Reusable Block per icon — too much overhead.
 
