@@ -24,6 +24,8 @@ Upload your icon (SVG/PNG) to ReadMe (or a hidden “Assets” page), then use M
 **Result:**
 📱 Devices  👤 Users
 
+⚠️ **Note:** If you paste the same image using raw HTML (`<img>`), ReadMe will wrap it in a *lightbox* container (meant for screenshots). That’s why it may look bigger or styled differently. Markdown syntax (`![]()`) avoids the lightbox and is the best way to get “inline icon” behavior.
+
 ---
 
 ## 2. Inline with Spacing
@@ -102,4 +104,3 @@ If your product already has an icon library (like FontAwesome or your own set), 
 * ✅ **Easiest:** Upload icons as images and reference with Markdown.
 * ✅ **Reusable/Emoji-like:** Load them with CSS if you want `<span class="icon-users"></span>` shorthand.
 * ❌ Not recommended: creating a Reusable Block per icon — too much overhead.
-
