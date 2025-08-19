@@ -6,8 +6,6 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-
-
 # Using Icons in ReadMe
 
 There are a few ways to include icons inline with your docs.
