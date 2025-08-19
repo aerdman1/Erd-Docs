@@ -6,12 +6,6 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-# Using Icons in ReadMe
-
-There are a few ways to include icons inline with your docs.
-
-***
-
 ## 1. Inline Images (simplest)
 
 Upload your icon (SVG/PNG) to ReadMe (or a hidden “Assets” page), then use Markdown image syntax.
@@ -21,7 +15,7 @@ Upload your icon (SVG/PNG) to ReadMe (or a hidden “Assets” page), then use M
 ![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
 ```
 
-**Result in ReadMe:**\
+**Live Result in ReadMe:**\
 ![](https://files.readme.io/ec086cdf823db1e0ed64d98c6c85dcd48fda2e0e85f020a1c48e19102d693c7e-devices.svg) Devices
 ![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
 
@@ -37,7 +31,7 @@ If they’re dropping to new lines, make sure there’s no blank line between th
 ![](https://files.readme.io/ec086cdf823db1e0ed64d98c6c85dcd48fda2e0e85f020a1c48e19102d693c7e-devices.svg) Devices&nbsp;&nbsp;![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
 ```
 
-**Result in ReadMe:**\
+**Live Result in ReadMe:**\
 ![](https://files.readme.io/ec086cdf823db1e0ed64d98c6c85dcd48fda2e0e85f020a1c48e19102d693c7e-devices.svg) Devices  ![](https://files.readme.io/3df2652b3ae372a16f17272613c0d7ca2c6495ed1eee7d209569c3860086ebd1-users.svg) Users
 
 ***
@@ -58,7 +52,7 @@ If you need more control (e.g. alignment), wrap your HTML in `<HTMLBlock>`.
 </HTMLBlock>
 ```
 
-**Result in ReadMe:**
+**Live Result in ReadMe:**
 
 <HTMLBlock>{`
 <p>
@@ -78,7 +72,7 @@ If you need more control (e.g. alignment), wrap your HTML in `<HTMLBlock>`.
 
 You can’t add custom icons to the built-in `:emoji:` system, but you can mimic it with CSS:
 
-```
+```html
 <HTMLBlock>{`
 <style>
 .icon-users::before {
@@ -92,8 +86,8 @@ You can’t add custom icons to the built-in `:emoji:` system, but you can mimic
 <p>Click <span class="icon-users"></span> to open the Users panel.</p>
 `}</HTMLBlock>
 ```
-**Result in ReadMe:**
 
+**Live Result in ReadMe:**
 
 ## 5. External Libraries
 
@@ -106,7 +100,7 @@ If your product already has an icon library (like FontAwesome), pull it in with 
 </HTMLBlock>
 ```
 
-**Result in ReadMe:**
+**Live Result in ReadMe:**
 
 ***
 
