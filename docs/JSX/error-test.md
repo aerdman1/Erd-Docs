@@ -10,13 +10,11 @@ You can configure fields that generally appear in JSON to appear in Basic view. 
 
 <br />
 
-<Image max-width="500px" align="left" alt="AdvancedFieldsBasic" className="border" border={true} width="100% " src="https://files.readme.io/24dc07e9c742b90178faa7e1afe4872c2b4c2f546fd55d35db44bc07b7b2b706-image.png" />
+<Image align="left" alt="AdvancedFieldsBasic" className="border" border={true} width="100px" src="https://files.readme.io/24dc07e9c742b90178faa7e1afe4872c2b4c2f546fd55d35db44bc07b7b2b706-image.png" />
 
 <br />
 
-<Image max-width="500px" align="left" alt="ServiceNow JSONFieldsBasic Users" className="border" border={true} width="100% " src="https://files.readme.io/ddf5e313b889483227b7917cd10b8c45af34c9314110941d88bc30567985a767-image.png" />
-
-<br />
+<Image align="left" alt="ServiceNow JSONFieldsBasic Users" className="border" border={true} width="100px" src="https://files.readme.io/ddf5e313b889483227b7917cd10b8c45af34c9314110941d88bc30567985a767-image.png" />
 
 <br />
 
