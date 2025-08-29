@@ -8,4 +8,4 @@ metadata:
 ---
 <br />
 
-<HereContextMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" />
+<br />
