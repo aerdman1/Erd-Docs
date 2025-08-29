@@ -6,7 +6,7 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-<BerlinOverlay header="Berlin Historical Overlay (1789)" apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" />
+<br />
 
 <HTMLBlock>{`
   <body>
