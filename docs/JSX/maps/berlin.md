@@ -11,22 +11,6 @@ metadata:
 <BerlinOverlay header="Berlin Historical Overlay (1789)" apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" />
 
 <HTMLBlock>{`
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-    <meta name="description" content="Display custom map tiles as an overlay">
-    <title>Adding an Overlay to the Map</title>
-    <link rel="stylesheet" type="text/css" href="https://js.api.here.com/v3/3.1/mapsjs-ui.css" />
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-core.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-service.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-ui.js"></script>
-    <script type="text/javascript" src="https://js.api.here.com/v3/3.1/mapsjs-mapevents.js"></script>
-    <link rel="stylesheet" type="text/css" href="../template.css" />
-    <link rel="stylesheet" type="text/css" href="demo.css" />
-    <script type="text/javascript" src='../test-credentials.js'></script>
-  </head>
   <body>
     <div class="page-header">
         <h1>Adding an Overlay to the Map</h1>
@@ -46,9 +30,8 @@ metadata:
     <p>
         The example uses the <a target="_blank" rel="nofollow" href="https://www.here.com/docs/bundle/maps-api-for-javascript-api-reference/page/H.map.provider.ImageTileProvider.html"><code>H.map.provider.ImageTileProvider</code></a> class for fetching our custom tiles. The <code>getUrl()</code> method constructs the URL of the tile for the specified column/row/zoom position. The result is displayed on the map as an additional layer using an instance of the <a target="_blank" rel="nofollow" href="https://www.here.com/docs/bundle/maps-api-for-javascript-api-reference/page/H.map.layer.TileLayer.html"><code>H.map.layer.TileLayer</code></a> class which has been created by passing in the image tile provider object.
     </p>
-    <script type="text/javascript" src='demo.js'></script>
+
   </body>
-</html>
 `}</HTMLBlock>
 
 <br />
