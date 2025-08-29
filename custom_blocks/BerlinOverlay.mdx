@@ -12,6 +12,7 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
       return;
     }
 
+    // Resolve API key: prop → global var → meta tag
     const resolvedKey =
       apiKey ||
       window.HERE_API_KEY ||
@@ -26,10 +27,10 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
     const platform = new H.service.Platform({ apikey: resolvedKey });
     const defaultLayers = platform.createDefaultLayers();
 
-    // Use RASTER base to avoid Tangram/vector errors
+    // Use VECTOR like the original raw JS
     const map = new H.Map(
       el,
-      defaultLayers.raster.normal.map,
+      defaultLayers.vector.normal.map,
       {
         center: new H.geo.Point(52.515, 13.405),
         zoom: 14,
@@ -37,7 +38,7 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
       }
     );
 
-    // Resize handler like the raw example
+    // Make map responsive (like the raw example)
     el._onResize = () => map.getViewPort().resize();
     window.addEventListener("resize", el._onResize);
 
@@ -45,33 +46,38 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
     new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
     H.ui.UI.createDefault(map, defaultLayers);
 
-    // === Overlay (aligned 1:1 with your raw JS, but do NOT return a blank tile) ===
+    // === 1:1 overlay logic, but transparent tile for out-of-bounds ===
     function overlayHistoricalBerlin(map) {
+      // Fully transparent 1x1 PNG (base64)
+      const TRANSPARENT_PX =
+        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9YcQmFgAAAAASUVORK5CYII=";
+
       var tileProvider = new H.map.provider.ImageTileProvider({
+        // We have tiles only for zoom levels 12–15
         min: 12,
         max: 15,
         opacity: 0.5,
         getURL: function (column, row, zoom) {
-          const outOfBounds =
+          // If Berlin is not displayed, return a transparent tile (NOT an opaque blank)
+          if (
             (zoom == 12 && (row != 1343 || column != 2200)) ||
             (zoom == 13 &&
               (row < 2686 || column < 4400 || row > 2687 || column > 4401)) ||
             (zoom == 14 &&
               (row < 5372 || column < 8800 || row > 5375 || column > 8803)) ||
             (zoom == 15 &&
-              (row < 10744 || column < 17601 || row > 10750 || column > 17607));
-
-          if (outOfBounds) {
-            // IMPORTANT: return no tile so the base map shows through
-            return null; // if null misbehaves in your setup, use the transparent data URI below
-            // return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9YcQmFgAAAAASUVORK5CYII=";
+              (row < 10744 || column < 17601 || row > 10750 || column > 17607))
+          ) {
+            // ← change from the sample: was a "blank.png" (opaque),
+            // now a transparent 1x1 tile so the base map shows through
+            return TRANSPARENT_PX;
+          } else {
+            // TMS format: /zoom/x(row)/y(column).png
+            return (
+              "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/" +
+              zoom + "/" + row + "/" + column + ".png"
+            );
           }
-
-          // TMS format
-          return (
-            "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/" +
-            zoom + "/" + row + "/" + column + ".png"
-          );
         },
       });
 
@@ -89,6 +95,7 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
       map.addLayer(overlayLayer);
     }
 
+    // Apply overlay
     overlayHistoricalBerlin(map);
 
     el._map = map;
