@@ -1,14 +1,10 @@
 ---
 name: HereContextMap
 ---
-export const HereContextMap = ({ 
-  header = "Context menu demo", 
-  apiKey, 
-  height = 500 
-}) => {
-  // Inject HERE SDK CSS/JS only once
-  const loadOnce = (tag, attr, url) => {
-    return new Promise((resolve, reject) => {
+export const HereMapPage = ({ apiKey, height = 500 }) => {
+  // --- Loader helpers
+  const loadOnce = (tag, attr, url) =>
+    new Promise((resolve, reject) => {
       if ([...document.querySelectorAll(tag)].some(n => n[attr] === url)) return resolve();
       const el = document.createElement(tag);
       el[attr] = url;
@@ -16,7 +12,6 @@ export const HereContextMap = ({
       el.onerror = reject;
       document.head.appendChild(el);
     });
-  };
 
   const ensureHereLoaded = async () => {
     if (window.H?.service && window.H.Map) return;
@@ -34,17 +29,11 @@ export const HereContextMap = ({
     try {
       await ensureHereLoaded();
     } catch (e) {
-      console.error("HERE SDK load failed", e);
-      el.innerHTML = "<div style='padding:8px;color:#b91c1c;'>Failed to load HERE SDK assets.</div>";
+      el.innerHTML = "<div style='padding:8px;color:#b91c1c;'>HERE SDK failed to load.</div>";
       return;
     }
 
-    const key =
-      apiKey ||
-      window.HERE_API_KEY ||
-      document.querySelector("meta[name='here-apikey']")?.content ||
-      "";
-
+    const key = apiKey || window.HERE_API_KEY || "";
     if (!key) {
       el.innerHTML = "<div style='padding:8px;color:#b91c1c;'>HERE API key missing.</div>";
       return;
@@ -55,68 +44,48 @@ export const HereContextMap = ({
     const defaultLayers = platform.createDefaultLayers();
 
     const map = new H.Map(el, defaultLayers.vector.normal.map, {
-      center: { lat: 52.55, lng: 13.27 },
-      zoom: 9,
+      center: { lat: 52.5148, lng: 13.3984 },
+      zoom: 13,
       pixelRatio: window.devicePixelRatio || 1,
     });
 
-    // resize + interactions
-    const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+    new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
     H.ui.UI.createDefault(map, defaultLayers);
+
     const onResize = () => map.getViewPort().resize();
     window.addEventListener("resize", onResize);
-
-    // context menu
-    map.addEventListener("contextmenu", (e) => {
-      if (e.target instanceof H.map.Circle) {
-        e.items.push(
-          new H.util.ContextItem({
-            label: "Remove circle",
-            callback: () => map.removeObject(e.target),
-          })
-        );
-      } else {
-        const coord = map.screenToGeo(e.viewportX, e.viewportY);
-        e.items.push(
-          new H.util.ContextItem({
-            label: `${Math.abs(coord.lat.toFixed(4))}${coord.lat > 0 ? "N" : "S"}, ` +
-                   `${Math.abs(coord.lng.toFixed(4))}${coord.lng > 0 ? "E" : "W"}`,
-          }),
-          new H.util.ContextItem({
-            label: "Center map here",
-            callback: () => map.setCenter(coord, true),
-          }),
-          H.util.ContextItem.SEPARATOR,
-          new H.util.ContextItem({
-            label: "Add circle",
-            callback: () => map.addObject(new H.map.Circle(coord, 5000)),
-          })
-        );
-      }
-    });
-
-    // store cleanup hooks
-    el._dispose = () => {
-      try { map.dispose(); } catch {}
-      window.removeEventListener("resize", onResize);
-      delete el.dataset.inited;
-    };
+    el._dispose = () => { map.dispose(); window.removeEventListener("resize", onResize); };
   };
 
   return (
-    <div className="flex justify-center">
-      <div className="rounded-md p-6 m-4 w-full max-w-3xl shadow-md border border-gray-300 dark:bg-gray-800 dark:border-gray-600">
-        <p className="text-lg font-bold mb-2">{header}</p>
-        <p className="mb-4">
-          Right-click the map to open a context menu. Add/remove circles or re-center.
-        </p>
-        <div
-          ref={refCb}
-          style={{ width: "100%", height: `${height}px`, borderRadius: "8px", background: "grey" }}
-        />
-      </div>
+    <div style={{ fontFamily: "sans-serif" }}>
+      <h1>Set a map style exported from the HERE Style Editor</h1>
+      <p>
+        Set a style created in the{" "}
+        <a href="https://platform.here.com/style-editor" target="_blank">HERE Style Editor</a> during the map instantiation.
+      </p>
+      <p>
+        This example shows how to set a map style that was created in the{" "}
+        <a href="https://platform.here.com/style-editor" target="_blank">HERE Style Editor</a>.
+      </p>
+      <h3>Code</h3>
+      <p>
+        The code below creates a new <code>H.Map</code> instance with a custom style.
+      </p>
+
+      {/* Map container */}
+      <div
+        ref={refCb}
+        style={{
+          width: "95%",
+          height: `${height}px`,
+          background: "grey",
+          borderRadius: "6px",
+          margin: "1rem 0"
+        }}
+      />
     </div>
   );
 };
 
-<HereContextMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" />
+<HereContextMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" /> 
