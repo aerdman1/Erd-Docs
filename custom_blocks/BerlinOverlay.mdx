@@ -6,89 +6,115 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
     if (!el || el.dataset.inited) return;
     el.dataset.inited = "1";
 
-    try {
-      // Ensure HERE SDK is present
-      if (!window.H) {
-        console.error("HERE SDK not loaded. Add mapsjs scripts to <head>.");
-        el.innerHTML = '<div style="padding:8px;color:#b91c1c;">HERE SDK not loaded.</div>';
-        return;
+    // SDK guard
+    if (!window.H) {
+      console.error("HERE SDK not loaded. Add mapsjs scripts to <head>.");
+      el.innerHTML = '<div style="padding:8px;color:#b91c1c;">HERE SDK not loaded.</div>';
+      return;
+    }
+
+    // Resolve API key: prop → global → meta
+    const resolvedKey =
+      apiKey ||
+      window.HERE_API_KEY ||
+      (document.querySelector('meta[name="here-apikey"]')?.content || "");
+
+    if (!resolvedKey) {
+      console.error("HERE API key missing. Provide via prop, window.HERE_API_KEY, or <meta name='here-apikey'>.");
+      el.innerHTML = '<div style="padding:8px;color:#b91c1c;">HERE API key missing.</div>';
+      return;
+    }
+
+    const H = window.H;
+
+    // --- Boilerplate (aligned to your raw JS), but using RASTER base map ---
+    const platform = new H.service.Platform({ apikey: resolvedKey });
+    const defaultLayers = platform.createDefaultLayers();
+
+    const map = new H.Map(
+      el,
+      defaultLayers.raster.normal.map,   // ✅ raster (not vector) avoids Tangram errors
+      {
+        center: new H.geo.Point(52.515, 13.405),
+        zoom: 14,
+        pixelRatio: window.devicePixelRatio || 1,
       }
+    );
 
-      // Resolve API key: prop → global → meta
-      const resolvedKey =
-        apiKey ||
-        window.HERE_API_KEY ||
-        (document.querySelector('meta[name="here-apikey"]')?.content || "");
+    // Resize like raw snippet
+    el._onResize = () => map.getViewPort().resize();
+    window.addEventListener("resize", el._onResize);
 
-      if (!resolvedKey) {
-        console.error("HERE API key missing. Provide via prop, window.HERE_API_KEY, or <meta name='here-apikey'>.");
-        el.innerHTML = '<div style="padding:8px;color:#b91c1c;">HERE API key missing.</div>';
-        return;
-      }
+    // Interactions + UI
+    new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+    H.ui.UI.createDefault(map, defaultLayers);
 
-      const H = window.H;
-      const platform = new H.service.Platform({ apikey: resolvedKey });
-      const defaultLayers = platform.createDefaultLayers();
+    // --- Your overlay function (1:1 logic) ---
+    function overlayHistoricalBerlin(map) {
+      // Create a tile provider from images of historical Berlin
+      var tileProvider = new H.map.provider.ImageTileProvider({
+        // We have tiles only for zoom levels 12–15,
+        // so on all other zoom levels only base map will be visible
+        min: 12,
+        max: 15,
+        opacity: 0.5,
+        getURL: function (column, row, zoom) {
+          // If Berlin is not displayed, return a blank tile.
+          if (
+            (zoom == 12 && (row != 1343 || column != 2200)) ||
+            (zoom == 13 &&
+              (row < 2686 || column < 4400 || row > 2687 || column > 4401)) ||
+            (zoom == 14 &&
+              (row < 5372 || column < 8800 || row > 5375 || column > 8803)) ||
+            (zoom == 15 &&
+              (row < 10744 || column < 17601 || row > 10750 || column > 17607))
+          ) {
+            return "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/blank.png";
+          } else {
+            // TMS format: /zoom/x(row)/y(column).png
+            return (
+              "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/" +
+              zoom +
+              "/" +
+              row +
+              "/" +
+              column +
+              ".png"
+            );
+          }
+        },
+      });
 
-      const map = new H.Map(
-        el,
-        defaultLayers.vector.normal.map,
-        {
-          center: { lat: 52.515, lng: 13.405 },
-          zoom: 14,
-          pixelRatio: window.devicePixelRatio || 1,
-        }
-      );
-
-      // Interactions + UI
-      new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
-      H.ui.UI.createDefault(map, defaultLayers);
-
-      // === Historical overlay (your logic) ===
-      function overlayHistoricalBerlin(map) {
-        const tileProvider = new H.map.provider.ImageTileProvider({
-          min: 12,
-          max: 15,
-          opacity: 0.5,
-          getURL: (column, row, zoom) => {
-            const outOfBounds =
-              (zoom === 12 && (row !== 1343 || column !== 2200)) ||
-              (zoom === 13 && (row < 2686 || column < 4400 || row > 2687 || column > 4401)) ||
-              (zoom === 14 && (row < 5372 || column < 8800 || row > 5375 || column > 8803)) ||
-              (zoom === 15 && (row < 10744 || column < 17601 || row > 10750 || column > 17607));
-            return outOfBounds
-              ? "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/blank.png"
-              : `https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/${zoom}/${row}/${column}.png`;
-          },
-        });
-
-        tileProvider.getCopyrights = () => [
+      // Licensing/attribution
+      tileProvider.getCopyrights = function () {
+        return [
           {
             label:
               "Overlay derived from <a href='http://commons.wikimedia.org/wiki/File%3AMap_de_berlin_1789_%28georeferenced%29.jpg' target='_blank' rel='noopener noreferrer'>WikiMedia Commons</a>",
             alt: "Overlay Based on a WikiMedia Commons Image in the Public Domain",
           },
         ];
+      };
 
-        const overlayLayer = new H.map.layer.TileLayer(tileProvider, { opacity: 0.5 });
-        map.addLayer(overlayLayer);
-      }
+      // Layer consuming our provider (semi-transparent)
+      var overlayLayer = new H.map.layer.TileLayer(tileProvider, {
+        opacity: 0.5,
+      });
 
-      overlayHistoricalBerlin(map);
-
-      // Keep refs for cleanup + responsive
-      el._map = map;
-      el._onResize = () => map.getViewPort().resize();
-      window.addEventListener("resize", el._onResize);
-    } catch (err) {
-      console.error(err);
-      el.innerHTML = '<div style="padding:8px;color:#b91c1c;">Map failed to initialize.</div>';
+      // Add old Berlin to the map
+      map.addLayer(overlayLayer);
     }
+
+    // Main logic
+    overlayHistoricalBerlin(map);
+
+    // Keep references for cleanup
+    el._map = map;
   };
 
   const cleanup = (el) => {
     if (el && el._map) {
-      window.removeEventListener("resize", el._onResize);
+      if (el._onResize) window.removeEventListener("resize", el._onResize);
       try { el._map.dispose(); } catch {}
       delete el._map;
       delete el._onResize;
@@ -112,4 +138,4 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
   );
 };
 
-<BerlinOverlay header="Berlin Historical Overlay (1789)" apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" /> 
+<BerlinOverlay header="Berlin Historical Overlay (1789)" apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" />
