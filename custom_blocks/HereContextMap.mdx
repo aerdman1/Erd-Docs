@@ -6,129 +6,69 @@ import React, { useEffect, useRef } from 'react';
 export const HereContextMenuMap = ({ apiKey, height = 500 }) => {
   const mapRef = useRef(null);
 
-  const css = `
-    #here-map {
-      width: 100%;
-      height: ${height}px;
-      background: grey;
-      border-radius: 6px;
-    }
-  `;
-
   useEffect(() => {
-    let disposed = false;
     const el = mapRef.current;
-    if (!el) return;
+    if (!el || !window.H) return;
 
-    const loadCSS = (href) =>
-      new Promise((resolve, reject) => {
-        if (document.querySelector(`link[href="${href}"]`)) return resolve();
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = href;
-        link.onload = resolve;
-        link.onerror = reject;
-        document.head.appendChild(link);
-      });
+    // Init platform + layers
+    const platform = new H.service.Platform({ apikey: apiKey });
+    const defaultLayers = platform.createDefaultLayers();
 
-    const loadScript = (src) =>
-      new Promise((resolve, reject) => {
-        if (document.querySelector(`script[src="${src}"]`)) return resolve();
-        const s = document.createElement('script');
-        s.src = src;
-        s.async = false;
-        s.onload = resolve;
-        s.onerror = reject;
-        document.head.appendChild(s);
-      });
+    // Create the map (try raster if vector gives 401)
+    const map = new H.Map(el, defaultLayers.vector.normal.map, {
+      center: { lat: 52.55, lng: 13.27 },
+      zoom: 9,
+      pixelRatio: window.devicePixelRatio || 1,
+    });
 
-    async function ensureHere() {
-      if (window.H?.service && window.H.Map) return;
-      await loadCSS('https://js.api.here.com/v3/3.1/mapsjs-ui.css');
-      await loadScript('https://js.api.here.com/v3/3.1/mapsjs-core.js');
-      await loadScript('https://js.api.here.com/v3/3.1/mapsjs-service.js');
-      await loadScript('https://js.api.here.com/v3/3.1/mapsjs-ui.js');
-      await loadScript('https://js.api.here.com/v3/3.1/mapsjs-mapevents.js');
-    }
+    new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+    H.ui.UI.createDefault(map, defaultLayers);
 
-    function addContextMenus(map) {
-      map.addEventListener('contextmenu', (e) => {
-        if (e.target instanceof H.map.Circle) {
-          e.items.push(
-            new H.util.ContextItem({
-              label: 'Remove circle',
-              callback: () => map.removeObject(e.target),
-            })
-          );
-        } else {
-          const coord = map.screenToGeo(e.viewportX, e.viewportY);
-          e.items.push(
-            new H.util.ContextItem({
-              label: `${Math.abs(coord.lat.toFixed(4))}${coord.lat > 0 ? 'N' : 'S'}, ${Math.abs(coord.lng.toFixed(4))}${coord.lng > 0 ? 'E' : 'W'}`,
-            }),
-            new H.util.ContextItem({
-              label: 'Center map here',
-              callback: () => map.setCenter(coord, true),
-            }),
-            H.util.ContextItem.SEPARATOR,
-            new H.util.ContextItem({
-              label: 'Add circle',
-              callback: () => map.addObject(new H.map.Circle(coord, 5000)),
-            })
-          );
-        }
-      });
-    }
-
-    async function init() {
-      try {
-        await ensureHere();
-      } catch (err) {
-        el.innerHTML = "<div style='padding:8px;color:#b91c1c;'>HERE SDK failed to load.</div>";
-        return;
+    // Add context menu
+    map.addEventListener('contextmenu', (e) => {
+      if (e.target instanceof H.map.Circle) {
+        e.items.push(
+          new H.util.ContextItem({
+            label: 'Remove circle',
+            callback: () => map.removeObject(e.target),
+          })
+        );
+      } else {
+        const coord = map.screenToGeo(e.viewportX, e.viewportY);
+        e.items.push(
+          new H.util.ContextItem({
+            label: `${Math.abs(coord.lat.toFixed(4))}${coord.lat > 0 ? 'N' : 'S'}, ${Math.abs(coord.lng.toFixed(4))}${coord.lng > 0 ? 'E' : 'W'}`,
+          }),
+          new H.util.ContextItem({
+            label: 'Center map here',
+            callback: () => map.setCenter(coord, true),
+          }),
+          H.util.ContextItem.SEPARATOR,
+          new H.util.ContextItem({
+            label: 'Add circle',
+            callback: () => map.addObject(new H.map.Circle(coord, 5000)),
+          })
+        );
       }
-      if (disposed) return;
+    });
 
-      const key = apiKey || document.querySelector('meta[name="here-apikey"]')?.content || window.HERE_API_KEY || '';
-      if (!key) {
-        el.innerHTML = "<div style='padding:8px;color:#b91c1c;'>HERE API key missing.</div>";
-        return;
-      }
-
-      const platform = new H.service.Platform({ apikey: key });
-      const defaultLayers = platform.createDefaultLayers();
-
-      const map = new H.Map(el, defaultLayers.vector.normal.map, {
-        center: { lat: 52.55006203880433, lng: 13.27548854220585 },
-        zoom: 9,
-        pixelRatio: window.devicePixelRatio || 1,
-      });
-
-      new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
-      H.ui.UI.createDefault(map, defaultLayers);
-      addContextMenus(map);
-
-      const onResize = () => map.getViewPort().resize();
-      window.addEventListener('resize', onResize);
-
-      el._dispose = () => {
-        window.removeEventListener('resize', onResize);
-        try { map.dispose(); } catch {}
-      };
-    }
-
-    init();
+    // Handle resize
+    const onResize = () => map.getViewPort().resize();
+    window.addEventListener('resize', onResize);
 
     return () => {
-      disposed = true;
-      if (mapRef.current?._dispose) mapRef.current._dispose();
+      window.removeEventListener('resize', onResize);
+      map.dispose();
     };
-  }, [apiKey, height]);
+  }, [apiKey]);
 
   return (
     <div>
-      <style>{css}</style>
-      <div id="here-map" ref={mapRef}></div>
+      <div
+        id="here-map"
+        ref={mapRef}
+        style={{ width: '100%', height: `${height}px`, background: 'grey', borderRadius: '6px' }}
+      />
     </div>
   );
 };
