@@ -6,10 +6,10 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-<HereContextMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" />
+<br />
 
 <HTMLBlock>{`
 
 `}</HTMLBlock>
 
-<br />
+<HereContextMenuMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" height={500} layer="raster" />
