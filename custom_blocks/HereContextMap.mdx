@@ -32,7 +32,7 @@ export const HereContextMap = ({ header = "Context menu", apiKey, height = 500 }
     await loadScript("https://js.api.here.com/v3/3.1/mapsjs-service.js");
     await loadScript("https://js.api.here.com/v3/3.1/mapsjs-ui.js");
     await loadScript("https://js.api.here.com/v3/3.1/mapsjs-mapevents.js");
-  };
+  }; 
 
   const initMap = async (el) => {
     if (!el || el.dataset.inited) return;
@@ -162,4 +162,3 @@ export const HereContextMap = ({ header = "Context menu", apiKey, height = 500 }
 };
 
 <HereContextMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" />
-
