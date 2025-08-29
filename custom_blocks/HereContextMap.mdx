@@ -14,7 +14,6 @@ export const HereContextMenuMap = ({ apiKey, height = 500, layer = 'raster' }) =
     const platform = new H.service.Platform({ apikey: apiKey });
     const defaultLayers = platform.createDefaultLayers();
 
-    // choose base layer (raster works even if vector is unauthorized)
     const base =
       layer === 'vector'
         ? (defaultLayers.vector && defaultLayers.vector.normal && defaultLayers.vector.normal.map) || defaultLayers.raster.normal.map
@@ -31,29 +30,16 @@ export const HereContextMenuMap = ({ apiKey, height = 500, layer = 'raster' }) =
 
     map.addEventListener('contextmenu', (e) => {
       if (e.target instanceof H.map.Circle) {
-        e.items.push(
-          new H.util.ContextItem({
-            label: 'Remove circle',
-            callback: () => map.removeObject(e.target)
-          })
-        );
+        e.items.push(new H.util.ContextItem({ label: 'Remove circle', callback: () => map.removeObject(e.target) }));
       } else {
         const coord = map.screenToGeo(e.viewportX, e.viewportY);
         e.items.push(
           new H.util.ContextItem({
-            label:
-              `${Math.abs(coord.lat.toFixed(4))}${coord.lat > 0 ? 'N' : 'S'}, ` +
-              `${Math.abs(coord.lng.toFixed(4))}${coord.lng > 0 ? 'E' : 'W'}`
+            label: `${Math.abs(coord.lat.toFixed(4))}${coord.lat > 0 ? 'N' : 'S'}, ${Math.abs(coord.lng.toFixed(4))}${coord.lng > 0 ? 'E' : 'W'}`
           }),
-          new H.util.ContextItem({
-            label: 'Center map here',
-            callback: () => map.setCenter(coord, true)
-          }),
+          new H.util.ContextItem({ label: 'Center map here', callback: () => map.setCenter(coord, true) }),
           H.util.ContextItem.SEPARATOR,
-          new H.util.ContextItem({
-            label: 'Add circle',
-            callback: () => map.addObject(new H.map.Circle(coord, 5000))
-          })
+          new H.util.ContextItem({ label: 'Add circle', callback: () => map.addObject(new H.map.Circle(coord, 5000)) })
         );
       }
     });
@@ -77,6 +63,5 @@ export const HereContextMenuMap = ({ apiKey, height = 500, layer = 'raster' }) =
     </div>
   );
 };
-
 
 <HereContextMenuMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" height={500} layer="raster" />
