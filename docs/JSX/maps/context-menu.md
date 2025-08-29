@@ -12,4 +12,4 @@ metadata:
 
 `}</HTMLBlock>
 
-<HereContextMenuMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" height={500} layer="raster" />
+<HereContextMenuMap apiKey="rVczblKDUJs-XSyUkLooaPkP4wcqHPaOB3oFvO1on3M" height={500} layer="vector" />
