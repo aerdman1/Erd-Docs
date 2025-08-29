@@ -12,13 +12,12 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
       return;
     }
 
-    // Resolve API key: prop → global var → meta tag
     const resolvedKey =
       apiKey ||
       window.HERE_API_KEY ||
       (document.querySelector('meta[name="here-apikey"]')?.content || "");
     if (!resolvedKey) {
-      console.error("HERE API key missing. Provide via prop, window.HERE_API_KEY, or <meta name='here-apikey'>.");
+      console.error("HERE API key missing.");
       el.innerHTML = '<div style="padding:8px;color:#b91c1c;">HERE API key missing.</div>';
       return;
     }
@@ -27,7 +26,7 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
     const platform = new H.service.Platform({ apikey: resolvedKey });
     const defaultLayers = platform.createDefaultLayers();
 
-    // Use VECTOR like the original raw JS
+    // Use VECTOR base map to match the raw sample
     const map = new H.Map(
       el,
       defaultLayers.vector.normal.map,
@@ -38,7 +37,7 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
       }
     );
 
-    // Make map responsive (like the raw example)
+    // Resize like the sample
     el._onResize = () => map.getViewPort().resize();
     window.addEventListener("resize", el._onResize);
 
@@ -46,19 +45,13 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
     new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
     H.ui.UI.createDefault(map, defaultLayers);
 
-    // === 1:1 overlay logic, but transparent tile for out-of-bounds ===
+    // === EXACT overlay logic (keeps their blank.png) ===
     function overlayHistoricalBerlin(map) {
-      // Fully transparent 1x1 PNG (base64)
-      const TRANSPARENT_PX =
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9YcQmFgAAAAASUVORK5CYII=";
-
       var tileProvider = new H.map.provider.ImageTileProvider({
-        // We have tiles only for zoom levels 12–15
         min: 12,
         max: 15,
         opacity: 0.5,
         getURL: function (column, row, zoom) {
-          // If Berlin is not displayed, return a transparent tile (NOT an opaque blank)
           if (
             (zoom == 12 && (row != 1343 || column != 2200)) ||
             (zoom == 13 &&
@@ -68,16 +61,13 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
             (zoom == 15 &&
               (row < 10744 || column < 17601 || row > 10750 || column > 17607))
           ) {
-            // ← change from the sample: was a "blank.png" (opaque),
-            // now a transparent 1x1 tile so the base map shows through
-            return TRANSPARENT_PX;
-          } else {
-            // TMS format: /zoom/x(row)/y(column).png
-            return (
-              "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/" +
-              zoom + "/" + row + "/" + column + ".png"
-            );
+            // Use the same blank tile the sample uses
+            return "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/blank.png";
           }
+          return (
+            "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/" +
+            zoom + "/" + row + "/" + column + ".png"
+          );
         },
       });
 
@@ -93,9 +83,39 @@ export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
 
       var overlayLayer = new H.map.layer.TileLayer(tileProvider, { opacity: 0.5 });
       map.addLayer(overlayLayer);
+
+      // 🔑 KEY FIX: only show overlay when it actually has tiles (zoom 12–15 AND within bounds)
+      const hasTilesAt = (zoom, row, col) => {
+        if (zoom === 12) return row === 1343 && col === 2200;
+        if (zoom === 13) return row >= 2686 && row <= 2687 && col >= 4400 && col <= 4401;
+        if (zoom === 14) return row >= 5372 && row <= 5375 && col >= 8800 && col <= 8803;
+        if (zoom === 15) return row >= 10744 && row <= 10750 && col >= 17601 && col <= 17607;
+        return false;
+      };
+
+      const toggleOverlay = () => {
+        const z = Math.round(map.getZoom());
+        if (z < 12 || z > 15) {
+          overlayLayer.setVisibility(false);
+          return;
+        }
+        // Roughly estimate current tile (column/row) for the map center to decide visibility.
+        const center = map.getCenter(); // {lat, lng}
+        // HERE uses a Web Mercator-style scheme; for visibility, we only need a coarse check:
+        const n = 1 << z;
+        const col = Math.floor(((center.lng + 180) / 360) * n); // X
+        const latRad = center.lat * Math.PI / 180;
+        const row = Math.floor(
+          (1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2 * n
+        ); // Y
+        overlayLayer.setVisibility(hasTilesAt(z, row, col));
+      };
+
+      // Init + react on zoom/pan end
+      toggleOverlay();
+      map.addEventListener("mapviewchangeend", toggleOverlay);
     }
 
-    // Apply overlay
     overlayHistoricalBerlin(map);
 
     el._map = map;
