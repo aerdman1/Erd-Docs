@@ -1,90 +1,103 @@
 ---
 name: BerlinOverlay
 ---
-export const BerlinOverlay = ({ header }) => {
-  // Historical overlay function
-  function overlayHistoricalBerlin(map) {
-    const H = window.H;
-    const tileProvider = new H.map.provider.ImageTileProvider({
-      min: 12,
-      max: 15,
-      opacity: 0.5,
-      getURL: function (column, row, zoom) {
-        const outOfBounds =
-          (zoom === 12 && (row !== 1343 || column !== 2200)) ||
-          (zoom === 13 &&
-            (row < 2686 || column < 4400 || row > 2687 || column > 4401)) ||
-          (zoom === 14 &&
-            (row < 5372 || column < 8800 || row > 5375 || column > 8803)) ||
-          (zoom === 15 &&
-            (row < 10744 || column < 17601 || row > 10750 || column > 17607));
-        return outOfBounds
-          ? "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/blank.png"
-          : `https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/${zoom}/${row}/${column}.png`;
-      },
-    });
+export const BerlinOverlay = ({ header, apiKey, height = 400 }) => {
+  // Runs once when the DIV ref attaches; avoids hooks entirely.
+  const initMap = (el) => {
+    if (!el || el.dataset.inited) return;
+    if (!window.H) {
+      console.error("HERE SDK not loaded. Add script tags to <head>.");
+      return;
+    }
+    el.dataset.inited = "1"; // prevent double init
 
-    tileProvider.getCopyrights = function () {
-      return [
+    const H = window.H;
+    const platform = new H.service.Platform({ apikey: apiKey });
+    const defaultLayers = platform.createDefaultLayers();
+
+    const map = new H.Map(
+      el,
+      defaultLayers.vector.normal.map,
+      {
+        center: { lat: 52.515, lng: 13.405 },
+        zoom: 14,
+        pixelRatio: window.devicePixelRatio || 1,
+      }
+    );
+
+    // Make map interactive + UI
+    new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+    H.ui.UI.createDefault(map, defaultLayers);
+
+    // === Historical overlay (your function, unchanged in behavior) ===
+    function overlayHistoricalBerlin(map) {
+      const tileProvider = new H.map.provider.ImageTileProvider({
+        min: 12,
+        max: 15,
+        opacity: 0.5,
+        getURL: (column, row, zoom) => {
+          const outOfBounds =
+            (zoom === 12 && (row !== 1343 || column !== 2200)) ||
+            (zoom === 13 &&
+              (row < 2686 || column < 4400 || row > 2687 || column > 4401)) ||
+            (zoom === 14 &&
+              (row < 5372 || column < 8800 || row > 5375 || column > 8803)) ||
+            (zoom === 15 &&
+              (row < 10744 || column < 17601 || row > 10750 || column > 17607));
+          return outOfBounds
+            ? "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/blank.png"
+            : `https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/${zoom}/${row}/${column}.png`;
+        },
+      });
+
+      tileProvider.getCopyrights = () => [
         {
           label:
             "Overlay derived from <a href='http://commons.wikimedia.org/wiki/File%3AMap_de_berlin_1789_%28georeferenced%29.jpg' target='_blank' rel='noopener noreferrer'>WikiMedia Commons</a>",
           alt: "Overlay Based on a WikiMedia Commons Image in the Public Domain",
         },
       ];
-    };
 
-    const overlayLayer = new H.map.layer.TileLayer(tileProvider, {
-      opacity: 0.5,
-    });
-    map.addLayer(overlayLayer);
-  }
+      const overlayLayer = new H.map.layer.TileLayer(tileProvider, { opacity: 0.5 });
+      map.addLayer(overlayLayer);
+    }
+
+    overlayHistoricalBerlin(map);
+
+    // Store for optional cleanup/resizing
+    el._map = map;
+    el._onResize = () => map.getViewPort().resize();
+    window.addEventListener("resize", el._onResize);
+  };
+
+  // Optional cleanup if the component is removed from DOM later
+  const cleanup = (el) => {
+    if (el && el._map) {
+      window.removeEventListener("resize", el._onResize);
+      try { el._map.dispose(); } catch (e) {}
+      delete el._map;
+      delete el._onResize;
+      delete el.dataset.inited;
+    }
+  };
 
   return (
     <div className="flex justify-center">
       <div className="rounded-md p-6 m-4 w-full max-w-3xl shadow-md border border-gray-300 dark:bg-gray-800 dark:border-gray-600">
         <p className="text-lg font-bold mb-2">{header}</p>
         <p className="mb-4">
-          This component attaches a <strong>1789 Berlin overlay</strong> to any HERE map instance.
+          Interactive HERE Map centered on Berlin with the <strong>1789 historical overlay</strong>.
         </p>
-        <pre className="bg-gray-900 text-green-200 p-4 text-sm rounded-md overflow-x-auto">
-{`function overlayHistoricalBerlin(map) {
-  const H = window.H;
-  const tileProvider = new H.map.provider.ImageTileProvider({
-    min: 12,
-    max: 15,
-    opacity: 0.5,
-    getURL: function (column, row, zoom) {
-      const outOfBounds =
-        (zoom === 12 && (row !== 1343 || column !== 2200)) ||
-        (zoom === 13 &&
-          (row < 2686 || column < 4400 || row > 2687 || column > 4401)) ||
-        (zoom === 14 &&
-          (row < 5372 || column < 8800 || row > 5375 || column > 8803)) ||
-        (zoom === 15 &&
-          (row < 10744 || column < 17601 || row > 10750 || column > 17607));
-      return outOfBounds
-        ? "https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/blank.png"
-        : \`https://heremaps.github.io/maps-api-for-javascript-examples/custom-tile-overlay/tiles/\${zoom}/\${row}/\${column}.png\`;
-    },
-  });
-
-  tileProvider.getCopyrights = function () {
-    return [
-      {
-        label: "Overlay derived from WikiMedia Commons",
-        alt: "Overlay Based on a WikiMedia Commons Image in the Public Domain",
-      },
-    ];
-  };
-
-  const overlayLayer = new H.map.layer.TileLayer(tileProvider, { opacity: 0.5 });
-  map.addLayer(overlayLayer);
-}`}
-        </pre>
+        <div
+          ref={(el) => {
+            // init on mount, best-effort cleanup if re-attached
+            if (el) initMap(el); else cleanup(el);
+          }}
+          style={{ width: "100%", height: `${height}px`, borderRadius: "8px" }}
+        />
       </div>
     </div>
   );
 };
 
-<BerlinOverlay header="Berlin Historical Overlay (1789)" />
+<BerlinOverlay header="Berlin Historical Overlay (1789)" apiKey="YOUR_HERE_API_KEY" />
