@@ -1,148 +1,106 @@
 ---
 name: HereContextMap
 ---
-export const HereContextMap = ({ header = "Context menu", apiKey, height = 500 }) => {
-  // Lightweight loader that injects CSS/JS once
-  const loadCss = (href) =>
-    new Promise((resolve, reject) => {
-      if ([...document.styleSheets].some(s => s.href === href)) return resolve();
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = href;
-      link.onload = resolve;
-      link.onerror = reject;
-      document.head.appendChild(link);
+export const HereContextMap = ({ 
+  header = "Context menu demo", 
+  apiKey, 
+  height = 500 
+}) => {
+  // Inject HERE SDK CSS/JS only once
+  const loadOnce = (tag, attr, url) => {
+    return new Promise((resolve, reject) => {
+      if ([...document.querySelectorAll(tag)].some(n => n[attr] === url)) return resolve();
+      const el = document.createElement(tag);
+      el[attr] = url;
+      el.onload = resolve;
+      el.onerror = reject;
+      document.head.appendChild(el);
     });
-
-  const loadScript = (src) =>
-    new Promise((resolve, reject) => {
-      if ([...document.scripts].some(s => s.src === src)) return resolve();
-      const s = document.createElement("script");
-      s.src = src;
-      s.defer = true;
-      s.onload = resolve;
-      s.onerror = reject;
-      document.head.appendChild(s);
-    });
+  };
 
   const ensureHereLoaded = async () => {
-    if (window.H && window.H.service && window.H.Map) return;
-    await loadCss("https://js.api.here.com/v3/3.1/mapsjs-ui.css");
-    await loadScript("https://js.api.here.com/v3/3.1/mapsjs-core.js");
-    await loadScript("https://js.api.here.com/v3/3.1/mapsjs-service.js");
-    await loadScript("https://js.api.here.com/v3/3.1/mapsjs-ui.js");
-    await loadScript("https://js.api.here.com/v3/3.1/mapsjs-mapevents.js");
-  }; 
+    if (window.H?.service && window.H.Map) return;
+    await loadOnce("link", "href", "https://js.api.here.com/v3/3.1/mapsjs-ui.css");
+    await loadOnce("script", "src", "https://js.api.here.com/v3/3.1/mapsjs-core.js");
+    await loadOnce("script", "src", "https://js.api.here.com/v3/3.1/mapsjs-service.js");
+    await loadOnce("script", "src", "https://js.api.here.com/v3/3.1/mapsjs-ui.js");
+    await loadOnce("script", "src", "https://js.api.here.com/v3/3.1/mapsjs-mapevents.js");
+  };
 
-  const initMap = async (el) => {
+  const refCb = async (el) => {
     if (!el || el.dataset.inited) return;
     el.dataset.inited = "1";
 
     try {
       await ensureHereLoaded();
     } catch (e) {
-      console.error("Failed to load HERE SDK assets.", e);
-      el.innerHTML = '<div style="padding:8px;color:#b91c1c;">Failed to load HERE SDK assets.</div>';
+      console.error("HERE SDK load failed", e);
+      el.innerHTML = "<div style='padding:8px;color:#b91c1c;'>Failed to load HERE SDK assets.</div>";
       return;
     }
 
     const key =
       apiKey ||
       window.HERE_API_KEY ||
-      (document.querySelector('meta[name="here-apikey"]')?.content || "");
+      document.querySelector("meta[name='here-apikey']")?.content ||
+      "";
 
     if (!key) {
-      console.error("HERE API key missing. Provide via prop, window.HERE_API_KEY, or <meta name='here-apikey'>.");
-      el.innerHTML = '<div style="padding:8px;color:#b91c1c;">HERE API key missing.</div>';
+      el.innerHTML = "<div style='padding:8px;color:#b91c1c;'>HERE API key missing.</div>";
       return;
     }
 
     const H = window.H;
-
-    // Step 1: platform + layers
     const platform = new H.service.Platform({ apikey: key });
     const defaultLayers = platform.createDefaultLayers();
 
-    // Step 2: map (vector normal map like the sample)
-    const map = new H.Map(
-      el,
-      defaultLayers.vector.normal.map,
-      {
-        center: { lat: 52.55006203880433, lng: 13.27548854220585 },
-        zoom: 9,
-        pixelRatio: window.devicePixelRatio || 1,
-      }
-    );
+    const map = new H.Map(el, defaultLayers.vector.normal.map, {
+      center: { lat: 52.55, lng: 13.27 },
+      zoom: 9,
+      pixelRatio: window.devicePixelRatio || 1,
+    });
 
-    // Keep responsive
-    el._onResize = () => map.getViewPort().resize();
-    window.addEventListener("resize", el._onResize);
-
-    // Step 3: interactive
+    // resize + interactions
     const behavior = new H.mapevents.Behavior(new H.mapevents.MapEvents(map));
+    H.ui.UI.createDefault(map, defaultLayers);
+    const onResize = () => map.getViewPort().resize();
+    window.addEventListener("resize", onResize);
 
-    // Step 4: default UI (includes context menu container)
-    const ui = H.ui.UI.createDefault(map, defaultLayers);
+    // context menu
+    map.addEventListener("contextmenu", (e) => {
+      if (e.target instanceof H.map.Circle) {
+        e.items.push(
+          new H.util.ContextItem({
+            label: "Remove circle",
+            callback: () => map.removeObject(e.target),
+          })
+        );
+      } else {
+        const coord = map.screenToGeo(e.viewportX, e.viewportY);
+        e.items.push(
+          new H.util.ContextItem({
+            label: `${Math.abs(coord.lat.toFixed(4))}${coord.lat > 0 ? "N" : "S"}, ` +
+                   `${Math.abs(coord.lng.toFixed(4))}${coord.lng > 0 ? "E" : "W"}`,
+          }),
+          new H.util.ContextItem({
+            label: "Center map here",
+            callback: () => map.setCenter(coord, true),
+          }),
+          H.util.ContextItem.SEPARATOR,
+          new H.util.ContextItem({
+            label: "Add circle",
+            callback: () => map.addObject(new H.map.Circle(coord, 5000)),
+          })
+        );
+      }
+    });
 
-    // Step 5: main logic — context menus (1:1 with your raw JS)
-    function addContextMenus(mapInstance) {
-      mapInstance.addEventListener("contextmenu", function (e) {
-        if (e.target instanceof H.map.Circle) {
-          e.items.push(
-            new H.util.ContextItem({
-              label: "Remove circle",
-              callback: function () {
-                mapInstance.removeObject(e.target);
-              },
-            })
-          );
-        } else {
-          const coord = mapInstance.screenToGeo(e.viewportX, e.viewportY);
-
-          e.items.push(
-            new H.util.ContextItem({
-              label: [
-                Math.abs(coord.lat.toFixed(4)) + (coord.lat > 0 ? "N" : "S"),
-                Math.abs(coord.lng.toFixed(4)) + (coord.lng > 0 ? "E" : "W"),
-              ].join(" "),
-            }),
-            new H.util.ContextItem({
-              label: "Center map here",
-              callback: function () {
-                mapInstance.setCenter(coord, true);
-              },
-            }),
-            H.util.ContextItem.SEPARATOR,
-            new H.util.ContextItem({
-              label: "Add circle",
-              callback: function () {
-                mapInstance.addObject(new H.map.Circle(coord, 5000));
-              },
-            })
-          );
-        }
-      });
-    }
-
-    addContextMenus(map);
-
-    // Save for cleanup
-    el._map = map;
-    el._behavior = behavior;
-    el._ui = ui;
-  };
-
-  const cleanup = (el) => {
-    if (!el) return;
-    if (el._onResize) window.removeEventListener("resize", el._onResize);
-    if (el._map) {
-      try { el._map.dispose(); } catch {}
-    }
-    delete el._map;
-    delete el._behavior;
-    delete el._ui;
-    delete el._onResize;
-    delete el.dataset.inited;
+    // store cleanup hooks
+    el._dispose = () => {
+      try { map.dispose(); } catch {}
+      window.removeEventListener("resize", onResize);
+      delete el.dataset.inited;
+    };
   };
 
   return (
@@ -150,10 +108,10 @@ export const HereContextMap = ({ header = "Context menu", apiKey, height = 500 }
       <div className="rounded-md p-6 m-4 w-full max-w-3xl shadow-md border border-gray-300 dark:bg-gray-800 dark:border-gray-600">
         <p className="text-lg font-bold mb-2">{header}</p>
         <p className="mb-4">
-          Right-click the map to see the custom context menu. Add circles, center map, or remove circles via the menu.
+          Right-click the map to open a context menu. Add/remove circles or re-center.
         </p>
         <div
-          ref={(el) => { if (el) initMap(el); else cleanup(el); }}
+          ref={refCb}
           style={{ width: "100%", height: `${height}px`, borderRadius: "8px", background: "grey" }}
         />
       </div>
