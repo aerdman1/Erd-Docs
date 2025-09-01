@@ -7,8 +7,5 @@ metadata:
   robots: index
 ---
 <HTMLBlock>{`
-<!-- Any guide/MDX page works. Height is up to you. -->
-<div id="here-map" data-here-map style="height: 480px; width: 100%;"></div>
+<div id="demo-map" data-demo-map style="height:480px;width:100%"></div>
 `}</HTMLBlock>
-
- 
