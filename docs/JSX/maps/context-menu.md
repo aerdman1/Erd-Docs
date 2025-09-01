@@ -11,4 +11,4 @@ metadata:
 <div id="here-map" data-here-map style="height: 480px; width: 100%;"></div>
 `}</HTMLBlock>
 
-<br />
+ 
