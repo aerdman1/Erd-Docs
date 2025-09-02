@@ -107,6 +107,12 @@ showGeoJSONData(map);
 <HTMLBlock>{`
 <style>
   #content-container > section.content-toc.grid-25 {display:none}
+.rm-Guides .content-body {
+    -ms-flex-negative: 1;
+    flex-shrink: 1;
+    max-width: 100%;
+    width: 100%;
+}
 </style>
 `}</HTMLBlock>
 
