@@ -6,7 +6,9 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-test
+This example shows how to display objects from GeoJSON file on the map using built in parser.
+
+In order to work with GeoJSON files we have to additionally load data module of the API. Than we use H.data.geojson.Reader class, which downloads and parses the file. Than we add a layer on the map using addLayer method to see the results.
 
 <HTMLBlock>{`
 <div id="demo-map" data-demo-map style="height:480px;width:100%"></div>
