@@ -104,4 +104,10 @@ showGeoJSONData(map);
 </html>
 ```
 
+<HTMLBlock>{`
+<style>
+  #content-container > section.content-toc.grid-25 {display:none}
+</style>
+`}</HTMLBlock>
+
 <br />
