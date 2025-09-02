@@ -6,6 +6,8 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
+test
+
 <HTMLBlock>{`
 <div id="demo-map" data-demo-map style="height:480px;width:100%"></div>
 `}</HTMLBlock>
