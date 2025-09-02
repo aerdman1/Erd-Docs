@@ -8,24 +8,30 @@ metadata:
 ---
 <br />
 
+<br />
+
+| Release Date | Feature                 | Potential Impact | Description                                                                                                                                                         |
+| ------------ | ----------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Aug 26       | PayPal Complete gateway | Medium           | We are updating... To learn more about [PayPal Complete](https://docs.recurly.com/recurly-subscriptions/docs/paypal-complete#/), visit our dedicated documentation. |
+
 ## August
 
 <Table align={["left","left","left","left"]}>
   <thead>
     <tr>
-      <th style={{ textAlign: "left" }}>
+      <th>
         Release Date
       </th>
 
-      <th style={{ textAlign: "left" }}>
+      <th>
         **Feature**
       </th>
 
-      <th style={{ textAlign: "left" }}>
+      <th>
         **Potential Impact**
       </th>
 
-      <th style={{ textAlign: "left" }}>
+      <th>
         **Description / Overview**
       </th>
     </tr>
@@ -33,19 +39,19 @@ metadata:
 
   <tbody>
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 29
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Revenue Recognition**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         * Added deleted order lines to Order Stage History as archived data.
         * Introduced Bundle Rule ID field in order lines for mapping.
         * Extended Account Type table with 10 additional segment columns to support new segments.Added a data sync API check to update client indicators only when a job is set; revalidates before saving to prevent duplicate job updates.Implemented validation for VC date.
@@ -57,55 +63,55 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 26
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Recurly Engage**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Minor updates to segment data CSV exports to better handle special characters in titles.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 26
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Recurly Engage**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Enhance experiment window user experience by preventing auto-close on save.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 26
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **PayPal Complete gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         We are updating our currency support to include BRL, CNY, HDK, ILS, MXN, and THB to enable more processing opportunities for merchants. We will also be making minor tweaks to onboarding in Recurly Admin to allow merchants in several other countries to view PayPal Complete and onboarding without regional warnings. To learn more about
 
         [PayPal Complete](https://docs.recurly.com/recurly-subscriptions/docs/paypal-complete#/)
@@ -115,37 +121,37 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 26
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **v3 API**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Adding a new optional proration setting to several v3 endpoints.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 26
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Stripe gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         We will be adding support for Indian e-mandates to support recurring processing for credit cards. This will enable Merchants who wish to expand into India with subscriptions the ability to stay compliant with RBI mandates. For more information on
 
         [Stripe](https://docs.recurly.com/recurly-subscriptions/docs/stripe#/)
@@ -159,19 +165,19 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 20
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Kount Fraud Management**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Updated to account code handling to avoid errors in rare cases. To learn more about
 
         [Kount Fraud management](https://docs.recurly.com/recurly-subscriptions/docs/kount#/)
@@ -181,37 +187,37 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 20
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **PayPal Complete gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         If PayPal (the digital wallet) is the primary payment method for a subscription and the PayPal subscription agreement is cancelled by the subscriber within their PayPal app or otherwise outside of Recurly, Recurly will now cancel that related subscription.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 19
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Revenue Recognition**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         *Added display of the Initial Financial Open Period to the Revenue Settings page.
         *Synced RevRec activation email timing with site activation to prevent premature sends. Introduced `enabled_email_sent_at `to track email dispatch after data sync, updated cron to handle unsent emails, and modified the Snappy Activate Site endpoint to respect sync status.
         *Fixed overlap issue where the Recurly Resources button on the Home page covered the wizard when opened.
@@ -223,19 +229,19 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 12
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Adyen gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Minor updates to
 
         [iDeal](https://docs.recurly.com/recurly-subscriptions/docs/adyen#/adyen-ideal)
@@ -245,55 +251,55 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 12
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Ebanx gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Minor updates to Pause events on UPI AutoPay mandates. Consumer-driven mandate pauses will be automatically paused for 1 year. Subscription pause lengths can be updated by a merchant after confirming length of pause with the consumer.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 12
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Ebanx gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Minor updates to trial handling to avoid a 1 INR charge.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 12
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Adyen gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Updated handling of
 
         [ACH](https://docs.recurly.com/recurly-subscriptions/docs/adyen#/adyen-ach)
@@ -303,55 +309,55 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 12
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **V3 Client Libraries**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Updated to support returning enhanced Google Pay indicators when a DPAN is in use.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 12
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Revenue Recognition**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         High
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Added scroll-to-top behavior when opening the Configuration of Default Rules section.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 12
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Anomaly Insights**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Introducing Anomaly Insights available on all subdomains. Anomaly insights to help merchants act instantly when transactional issues arise.
 
         [Anomaly Insights](https://docs.recurly.com/recurly-subscriptions/docs/recurly-compass#/anomaly-insights) documentation.
@@ -359,19 +365,19 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 11
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Ebanx gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         High
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Updates to mandate handling related to plan amount. Mandates will be sent with a dynamic plan + 18% tolerance for amount updates. This will support add-ons and trials where taxation is necessary. Read more about mandates in our
 
         [UPI AutoPay payment method](https://docs.recurly.com/recurly-subscriptions/docs/upi-autopay#/) documentation.
@@ -379,37 +385,37 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 5
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Compass Assistant**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Low
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         We're excited to announce the launch of Compass Assistant, now available across all active subdomains! This new conversational chatbot provides instant access to information from our product documentation and knowledge base, and can even furnish helpful code snippets for our APIs. You'll also notice that AI Answers will now direct you to Compass Assistant for a more comprehensive experience; should a merchant wish to opt-out, please contact Support.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 5
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Revenue Recognition**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Revrec Enhancements in Recurly and RevRec-
         Removed Auto Period Close Delay for Advanced Merchants in Revenue Settings.
 
@@ -426,19 +432,19 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 1
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **MasterCard Account Updater**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Updates to flow involving querying the network for updates. This modification will be in addition to the current behavior where Recurly receives push notifications on registered cards. Please see our dedicated
 
         [Account Updater documentation](https://docs.recurly.com/recurly-subscriptions/docs/account-updater#/)
@@ -448,38 +454,38 @@ metadata:
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 1
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Revenue Recognition**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         High
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Updates - removed open period logic from infra/revrecStart to prevent the period from reverting to the initial period.
         Fixed bundle rule addition issue when only one bundle rule exists under a parent item by grouping the count by bundle ID.
       </td>
     </tr>
 
     <tr>
-      <td style={{ textAlign: "left" }}>
+      <td>
         Aug 1
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         **Ebanx Gateway**
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Medium
       </td>
 
-      <td style={{ textAlign: "left" }}>
+      <td>
         Updates to mandate handling related to plan amount. Mandates will be sent with a dynamic plan + 10% tolerance for amount updates.
       </td>
     </tr>
