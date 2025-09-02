@@ -1,5 +1,5 @@
 ---
-title: Context menu
+title: Display GeoJSON data
 deprecated: false
 hidden: false
 icon: fad fa-file-lines
