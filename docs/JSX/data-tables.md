@@ -7,7 +7,7 @@ metadata:
 ---
 <DataTables />
 
-<br />
+{user.api_key}
 
 ### **Table 1: API Endpoints**
 
