@@ -6,22 +6,20 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-<Callout icon="🚧">
-  Connection and Credentials
+<Callout icon="⚠️" theme="warning">
+<br />
 
-  When Use stored credentials from the adapter is toggled off, some of the connection fields below are required to create the connection, while other fields are optional.
 
-  * OnePassword Address - The domain of the OnePassword server
+* **OnePassword Address** - The domain of the OnePassword server. 
 
-<Callout icon="📘" theme="info">
-  Test
+    <Callout icon="📘" theme="info">
+    Note:
+
+    * The address should not contain a prefix of _http://_ or _https://_.
+    * Do not add any specific endpoint after the domain.
+    * For example: _agilebits.1password.com_
+    </Callout>
+
+* **Email** - The user's email address.
+...
 </Callout>
-
-  * The address should not contain a prefix of _http://_ or _https://_.
-
-  * Do not add any specific endpoint after the domain.
-
-  * For example: _agilebits.1password.com_
-</Callout>
-
-
