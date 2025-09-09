@@ -27,4 +27,6 @@ metadata:
 
 <ReusableTesting />
 
+<GlobalTesting />
+
 <br />
