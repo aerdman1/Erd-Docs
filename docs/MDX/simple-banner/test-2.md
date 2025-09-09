@@ -1,6 +1,6 @@
 ---
 title: test
-excerpt: KEYWORDHERE
+excerpt: Tag1 Tag2 Tag3
 deprecated: false
 hidden: false
 icon: fad fa-file-lines
