@@ -1,5 +1,6 @@
 ---
 title: test
+excerpt: KEYWORDHERE
 deprecated: false
 hidden: false
 icon: fad fa-file-lines
