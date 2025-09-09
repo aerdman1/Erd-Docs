@@ -1,10 +1,10 @@
 ---
 title: test
-excerpt: Tag1 Tag2 Tag3
 deprecated: false
 hidden: false
 icon: fad fa-file-lines
 metadata:
+  description: Tag100
   robots: index
 ---
 ```Text Custom_Tags
