@@ -6,6 +6,4 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-This is a new page, should show history of changes.
-
-*I'm now ADDING something and changing my page.
+I TOTALLY CHANGED THIS PAGE FROM THE BRANCH AND MERGED IT!
