@@ -11,6 +11,12 @@ metadata:
 
 <SimpleBanner isHeader={true} message="isHeader is set to true, so this banner is now integrated into your site's header!" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="14px" fontWeight="bold" />
 
+```
+Test
+```
+
+<br />
+
 `<test>`
 
 {user.api_key}
