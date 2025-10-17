@@ -11,7 +11,7 @@ metadata:
 
 <SimpleBanner isHeader={true} message="isHeader is set to true, so this banner is now integrated into your site's header!" bannerColor="#00bcff" bannerTextColor="#ffffff" fontSize="14px" fontWeight="bold" />
 
-<br />
+`<test>`
 
 {user.api_key}
 
@@ -19,7 +19,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacus sapien, co
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacus sapien, consequat in est at, sagittis imperdiet leo. Proin vulputate nisi in rhoncus lacinia. Morbi at tortor in felis commodo faucibus non id orci. Proin in mollis nulla, id elementum enim. Nunc malesuada sem iaculis urna sagittis, vitae finibus ante molestie. Sed egestas id dui vel porta. Mauris vitae volutpat sapien. Morbi cursus, libero a eleifend efficitur, orci neque mollis sapien, et malesuada mi mi quis ipsum. Nulla eu lorem non eros fermentum suscipit. Phasellus hendrerit blandit tellus vel sollicitudin. Proin nisi est, ornare eu cursus eu, varius ac leo. Proin interdum quam eget tincidunt venenatis. Fusce lacinia malesuada quam eget molestie. Aenean dictum dictum mattis.
 
-<Image align="center" width="200px" src="https://github.com/Axonius/ax-docs-pub/blob/main/Images/10.%20Critical%20severity%20with%20open%20firewall.PNG?raw=true" />
+<Image align="center" border={false} width="200px" src="https://github.com/Axonius/ax-docs-pub/blob/main/Images/10.%20Critical%20severity%20with%20open%20firewall.PNG?raw=true" />
 
 [Testing Broken Link](https://www.asdfasdfasdfasdfsadfdswww.com)
 
