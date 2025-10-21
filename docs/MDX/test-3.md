@@ -8,113 +8,60 @@ metadata:
 ---
 <br />
 
-# Artifactory Gradle Plugin
+# Bamboo JFrog Plugin
 
 ### Overview
 
-The Gradle Artifactory Plugin provides tight integration with Gradle. All that is needed is a simple modification of your `build.gradle` script file with a few configuration parameters, and you can deploy your build artifacts and build information to Artifactory.
+The **Bamboo JFrog Plugin** is designed to provide an easy integration between Bamboo and the [JFrog Platform](https://jfrog.com/solution-sheet/jfrog-platform/).
 
-The plugin adds the `artifactoryPublish` task for each project, in the `publishing` group. The task performs the following actions on the project and its submodules:
+Unlike the legacy [Bamboo Artifactory Plugin](https://plugins.atlassian.com/plugin/details/27818), the new **Bamboo JFrog Plugin** focuses on a single task that runs [JFrog CLI](https://docs.jfrog-applications.jfrog.io/jfrog-applications/jfrog-cli) commands. Worth mentioning that both JFrog plugins, can work side by side.
 
-1. Extracting the [build-info](https://www.buildinfo.org/) file located in the root project. This file contains comprehensive information about the build, such as its configuration, dependencies, and other relevant details.
-2. Deploying both the generated artifacts and the build-info file to your Artifactory repository. This ensures that the artifacts, which are the output of the build process, and the accompanying build-info file are stored and organized in your Artifactory repository for easy access and management.
+The advantage of this approach is that JFrog CLI is a powerful and versatile tool that integrates with all JFrog capabilities. It offers extensive features and is constantly updated with the latest enhancements from JFrog. This ensures that the Bamboo JFrog Plugin is always up-to-date with the newest features and improvements.
 
-> _**NOTE:**_ The minimum supported Gradle version to use version 6 of this plugin is v8
+With the Bamboo JFrog Plugin, you can easily deploy artifacts, resolve dependencies, and link them to the build jobs that created them. Additionally, you can scan your artifacts and builds for vulnerabilities using [JFrog Xray](https://jfrog.com/xray/) and distribute your software packages to remote locations using [JFrog Distribution](https://jfrog.com/distribution/).
 
-<details>
-  <summary>🚚 Migrating from Version 5 to Version 6 of the Plugin</summary>
+#### Key Features
 
-  ***
+* Artifact Management: Manage build artifacts with Artifactory.
+* Dependency Resolution: Resolve dependencies from Artifactory for reliable builds.
+* Build Traceability: Link artifacts to their corresponding build jobs for better traceability.
+* Security Scanning: Scan artifacts and builds with JFrog Xray for vulnerabilities.
+* Software Distribution: Distribute software packages to remote locations using JFrog Distribution.
 
-  **Version 6 of the Gradle Artifactory Plugin includes the following breaking changes compared to version 5**
+### Installation and Configuration
 
-  * Introduced support for Gradle 9.
-  * The minimum version of Java required to use this plugin has been upgraded to version 17.
-  * The minimum version of Gradle required to use this plugin has been upgraded to version 8.
-</details>
-
-> _**NOTE:**_ The minimum supported Gradle version to use version 5 of this plugin is v6.9
-
-<details>
-  <summary>🚚 Migrating from Version 4 to Version 5 of the Plugin</summary>
-
-  ***
-
-  **Version 5 of the Gradle Artifactory Plugin includes the following breaking changes compared to version 4**
-
-  * The minimum version of Gradle required to use this plugin has been upgraded to version 6.9.
-  * The below convention attributes have been removed:
-
-    | Attribute | Migration action                                                                                                                                                                                                                             |
-    | :-------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    |   parent  | No longer supported.                                                                                                                                                                                                                         |
-    |  resolve  | To define the Artifactory resolution repositories for your build, declare the repositories under the repositories section as described [here](https://docs.gradle.org/current/userguide/declaring_repositories.html#declaring-repositories). |
-</details>
+1. Download the plugin from the [Bamboo Marketplace](https://marketplace.atlassian.com/). 
+2. Install the plugin on your Bamboo server.
+3. In the _Bamboo Administration_ section, go to _Manage Apps_ and select _JFrog Configuration_.
+4. Click on _New JFrog Platform Configuration_.
+5. Configure your credentials details and run a _Test Connection_, then click _Save_.
 
 ***
 
-### 📦 Installation
+### Important Upgrade Instructions
 
-<details>
-  <summary>Step 1 - Add the plugin to your project</summary>
+#### For Bamboo 10.0.0 and Above
 
-  ***
+* Upgrade to Version 1.0.6 or Higher: If you are using Bamboo version 10.0.0 or later, upgrade your JFrog Bamboo Plugin to version 1.0.6 or above.
+* Post-Upgrade Configuration: After upgrading, you must restart Bamboo for any new or modified configurations to take effect. This issue will be resolved in a future release.
 
-  Add the following snippet to your build script:
+#### For Bamboo 9.x.x and Below
 
-  ***
-</details>
+Warning: Do not upgrade to version 1.0.6 if your Bamboo version is 9.x.x or lower, as it is not compatible.
 
-<details>
-  <summary>Step 2 - Configure the plugin with your Artifactory</summary>
+### JFrog CLI Settings
 
-  ***
+1. By default, the JFrog CLI task installs and uses the latest version of JFrog CLI. You can specify a different version to be used.
+2. If your Bamboo agents have internet access, you can set the plugin to download JFrog CLI directly from `https://releases.jfrog.io`. If not, you can configure the plugin to download JFrog CLI through a configured Artifactory instance. To do this, set the Repository Name field to the name of a Remote or Virtual repository in your Artifactory instance that proxies `https://releases.jfrog.io/`.
 
-  To configure the plugin with your Artifactory, add the following basic snippet to your project root build script, and make the necessary adjustments based on your platform information:
+### Usage
 
-  #### ⚙️ Advance Configurations
+After the plugin is installed and configured, use the JFrog CLI task in your Bamboo build plans.
 
-  For advanced configurations and finer control over the plugin's operations, refer to the following documentation that outlines all the available configuration options. These options allow you to customize the behavior of the plugin according to your specific needs.
-</details>
+To add the JFrog CLI task:
 
-***
-
-### 🚀 Usage
-
-To deploy the project artifacts and build info to Artifactory, execute the following Gradle task
-
-```bash
-./gradlew artifactoryPublish
-```
-
-***
-
-### 💡 Examples
-
-The following are links to the build scripts of different types of projects that are configured to use the plugin.
-
-**Multi Modules Project (Groovy)**
-
-Sample project that uses the Gradle Artifactory Plugin with Gradle Publications.
-
-**Multi Modules Project (Kotlin)**
-
-Sample project that configures the Gradle Artifactory Plugin with the Gradle Kotlin DSL.
-
-We highly recommend also using our [gradle project examples](https://github.com/JFrog/project-examples/tree/master/gradle-examples?_gl=1*pgsvlz*_ga*MTc3OTI0ODE4NS4xNjYyMjgxMjI1*_ga_SQ1NR9VTFJ*MTY4NTM2OTcwMC4yNi4wLjE2ODUzNjk3MDAuNjAuMC4w) as a reference when configuring your build scripts.
-
-***
-
-### 🐞 Reporting Issues
-
-We highly recommend running Gradle with the `-d` option to get useful and readable debug information if something goes wrong with your build.
-
-Please help us improve the plugin by [reporting any issues](https://github.com/jfrog/artifactory-gradle-plugin/issues/new/choose) you encounter.
-
-***
-
-### 🫱🏻‍🫲🏼 Contributions
-
-We welcome pull requests from the community. To help us improve this project, please read our Contribution guide.
+1. Go to the Tasks section of your build plan.
+2. Add the JFrog CLI task to your plan.
+3. Configure the task by selecting the appropriate Server ID.
 
 <br />
