@@ -41,7 +41,7 @@ metadata:
   modalId="TransactionsModal"
   size="lg"
   content={
-    <>
+
 <HTMLBlock>{`
 <table xmlns="http://www.w3.org/1999/xhtml" cellspacing="0" cellpadding="0" dir="ltr" border="1" style="table-layout: fixed; font-size: 10pt; font-family: Arial; width: 0px; border-collapse: collapse; border: none;">
   <thead>
@@ -177,6 +177,6 @@ metadata:
 </table>
 `}</HTMLBlock>
 
-    </>
+
   }
 />
