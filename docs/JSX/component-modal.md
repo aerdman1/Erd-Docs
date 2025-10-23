@@ -176,7 +176,5 @@ metadata:
   </tbody>
 </table>
 `}</HTMLBlock>
-
-
   }
 />
