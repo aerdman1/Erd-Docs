@@ -24,10 +24,10 @@ export const ContentModal = function ContentModal(props) {
     if (typeof document === "undefined") return;
     if (document.getElementById("content-modal-styles")) return;
     var css = [
-      ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;}",
-      '.cm-Backdrop[aria-hidden="false"]{display:block;}',
+      ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;z-index:999998!important;}",
+      '.cm-Backdrop[aria-hidden=\"false\"]{display:block;}',
       '.cm-Backdrop::before{content:\"\";position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
-      ".cm-DialogWrap{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:9999;}",
+      ".cm-DialogWrap{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
       '.cm-DialogWrap[aria-hidden=\"false\"]{display:flex;}',
       ".cm-Dialog{width:100%;max-height:86vh;overflow:hidden;background:#fff;color:inherit;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;outline:none;}",
       ".cm-size-sm{max-width:420px;}",
@@ -41,6 +41,10 @@ export const ContentModal = function ContentModal(props) {
       ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;text-align:center;}",
       ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;}",
       ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
+
+      /* ✅ Default orange CTA button styling */
+      ".cm-TriggerBtnDefault{font-family:Lato;font-style:normal;font-weight:700;font-size:16px;line-height:20px;color:#fff;background-color:#fe8d53;justify-content:space-evenly;display:inline-flex;box-sizing:border-box;border:2px solid #fe8d53;border-radius:6px;height:46px;padding:17px 19px;align-items:center;cursor:pointer;}",
+
       ".modal{display:contents;}"
     ].join("");
     var style = document.createElement("style");
@@ -105,7 +109,7 @@ export const ContentModal = function ContentModal(props) {
   var modalIdAttr = modalId ? modalId : undefined;
   var ariaLabelledBy = modalId ? modalId + "-title" : undefined;
   var ariaExpanded = open ? "true" : "false";
-  var triggerClass = "modal-button " + buttonClassName;
+  var triggerClass = "modal-button " + (buttonClassName || "cm-TriggerBtnDefault");
   var dialogClass = "cm-Dialog " + sizeClass;
 
   return (
@@ -184,23 +188,23 @@ export const ContentModal = function ContentModal(props) {
   label="Open Example Modal"
   title="Example Modal"
   modalId="exampleModal"
-	content={
-  <>
-    <p>This is just some plain text but you can add tables too:</p>
-    <table border="1" cellSpacing="0" cellPadding="0">
-      <thead>
-        <tr>
-          <th>Column A</th>
-          <th>Column B</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Value 1</td>
-          <td>Value 2</td>
-        </tr>
-      </tbody>
-    </table>
-  </>
-}
-/> 
+  content={
+    <>
+      <p>This is just some plain text but you can add tables too:</p>
+      <table border="1" cellSpacing="0" cellPadding="0">
+        <thead>
+          <tr>
+            <th>Column A</th>
+            <th>Column B</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Value 1</td>
+            <td>Value 2</td>
+          </tr>
+        </tbody>
+      </table>
+    </>
+  }
+/>
