@@ -36,10 +36,10 @@ metadata:
 <br />
 
 <ContentModal
-  label="Open Example Modal"
-  title="Example Modal"
-  modalId="exampleModal"
-  size="lg"   
+  label="Transactions details"
+  title="Transactions details"
+  modalId="TransactionsModal"
+  size="lg"
   content={
     <>
       <p>This is just some plain text but you can add tables too:</p>
