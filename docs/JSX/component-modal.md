@@ -39,6 +39,7 @@ metadata:
   label="Open Example Modal"
   title="Example Modal"
   modalId="exampleModal"
+  size="lg"   
   content={
     <>
       <p>This is just some plain text but you can add tables too:</p>
