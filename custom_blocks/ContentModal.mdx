@@ -243,7 +243,7 @@ export const ContentModal = function ContentModal(props) {
   size="lg"
   content={
     <>
-      <p>This is just some plain text but you can add tables too:</p>
+<HTMLBlock>{`
       <table border="1" cellSpacing="0" cellPadding="0">
         <thead>
           <tr>
@@ -258,6 +258,7 @@ export const ContentModal = function ContentModal(props) {
           </tr>
         </tbody>
       </table>
+`}</HTMLBlock>
     </>
   }
 />
