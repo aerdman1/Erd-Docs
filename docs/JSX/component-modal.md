@@ -10,11 +10,12 @@ metadata:
 
 <ContentModal
   label="Open Example Modal"
-  title="Example Modal Title (editable)"
+  title="Example Modal"
   modalId="exampleModal"
+  size="xl"
   content={
     <>
-      <p>This is just some plain text but you can add tables too:</p>
+<HTMLBlock>{`
       <table border="1" cellSpacing="0" cellPadding="0">
         <thead>
           <tr>
@@ -29,11 +30,10 @@ metadata:
           </tr>
         </tbody>
       </table>
+`}</HTMLBlock>
     </>
   }
 />
-
-<br />
 
 <ContentModal
   label="Transactions details"
