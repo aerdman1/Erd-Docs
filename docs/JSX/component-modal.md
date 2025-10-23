@@ -9,7 +9,11 @@ metadata:
 <br />
 
 <ContentModal
-  label="Open Example Modal" title="Example Modal" modalId="exampleModal" size="xl" content={
+  label="Open Example Modal"
+  title="Example Modal"
+  modalId="exampleModal"
+  size="xl"
+  content={
 <HTMLBlock>{`
       <table border="1" cellSpacing="0" cellPadding="0">
         <thead>
@@ -35,7 +39,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at lacinia urna. 
   label="Transactions details"
   title="Transactions details"
   modalId="TransactionsModal"
-  size="lg"
+  size="xl"
   content={
 
 <HTMLBlock>{`
@@ -181,7 +185,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at lacinia urna. 
   label="Open Example Modal"
   title="Example Modal"
   modalId="exampleModal"
-  size="xl"
+  size="lg"
   content={
 <HTMLBlock>{`
       <table border="1" cellSpacing="0" cellPadding="0">
