@@ -42,23 +42,6 @@ metadata:
   content={
     <>
       <p>This is just some plain text but you can add tables too:</p>
-      <table border="1" cellSpacing="0" cellPadding="0">
-        <thead>
-          <tr>
-            <th>Column A</th>
-            <th>Column B</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Value 1</td>
-            <td>Value 2</td>
-          </tr>
-        </tbody>
-      </table>
-    </>
-  }
-/>
 
 <HTMLBlock>{`
 <table xmlns="http://www.w3.org/1999/xhtml" cellspacing="0" cellpadding="0" dir="ltr" border="1" style="table-layout: fixed; font-size: 10pt; font-family: Arial; width: 0px; border-collapse: collapse; border: none;">
@@ -195,4 +178,6 @@ metadata:
 </table>
 `}</HTMLBlock>
 
-<br />
+    </>
+  }
+/>
