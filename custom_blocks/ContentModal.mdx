@@ -1,12 +1,11 @@
 ---
 name: ContentModal
 ---
-import React, { useEffect, useRef, useState, useRef as useRefAlias } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export const ContentModal = function ContentModal(props) {
-  var label = props.label;
-  var title = props.title;
-  var modalId = props.modalId;
+  var label = props.label || "Open";
+  var title = props.title || "Modal";
   var content = props.content;
   var size = props.size === undefined ? "lg" : props.size;
   var buttonClassName = props.buttonClassName || "";
@@ -14,33 +13,49 @@ export const ContentModal = function ContentModal(props) {
   var closeOnBackdrop =
     props.closeOnBackdrop === undefined ? true : !!props.closeOnBackdrop;
 
-  // Compute initial open synchronously (pre-paint) to avoid flicker on #hash deep-links
+  // NEW props
+  var useNextTable = !!props.useNextTable;
+  var keepOriginalVisible = !!props.keepOriginalVisible;
+  var targetSelector = props.targetSelector || "table";
+
+  // Stable auto ID (MDX-safe; no top-level helpers)
+  var autoIdRef = useRef(
+    (typeof crypto !== "undefined" && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : "cm-" + Math.random().toString(36).slice(2)
+  );
+  var modalId = props.modalId || autoIdRef.current;
+
+  // Initial open (avoid flicker for deep-links)
   var initialOpen =
     typeof window !== "undefined" &&
     openOnHash &&
     modalId &&
     (window.location.hash || "").replace(/^#/, "") === modalId;
 
-  var stateArray = useState(initialOpen);
-  var open = stateArray[0];
-  var setOpen = stateArray[1];
+  var [open, setOpen] = useState(initialOpen);
+  var [ready, setReady] = useState(!useNextTable);
+  var [foundTarget, setFoundTarget] = useState(false);
+  var [capturedHTML, setCapturedHTML] = useState("");
 
   var dialogRef = useRef(null);
   var btnRef = useRef(null);
-  var didMountRef = useRef(false); // prevent focus on first render
+  var didMountRef = useRef(false);
+  var anchorRef = useRef(null);
+  var hiddenTargetRef = useRef(null);
 
-  // --- Styles (inline in render to avoid post-paint injection) ---
+  // Critical CSS (pre-paint)
   var css = [
     ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;z-index:999998!important;}",
     '.cm-Backdrop[aria-hidden="false"]{display:block;}',
-    '.cm-Backdrop::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
-    ".cm-DialogWrap{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
+    '.cm-Backdrop::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
+    ".cm-DialogWrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
     '.cm-DialogWrap[aria-hidden="false"]{display:flex;}',
     ".cm-Dialog{width:100%;max-height:86vh;overflow:hidden;background:#fff;color:inherit;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;outline:none;}",
-    ".cm-size-sm{max-width:620px;}",
-    ".cm-size-md{max-width:840px;}",
-    ".cm-size-lg{max-width:1140px;}",
-    ".cm-size-xl{max-width:1380px;}",
+    ".cm-size-sm{max-width:40%;}",
+    ".cm-size-md{max-width:60%;}",
+    ".cm-size-lg{max-width:80%;}",
+    ".cm-size-xl{max-width:100%;}",
     ".cm-Header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.08);background:#fff;position:sticky;top:0;z-index:1;}",
     ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
     ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
@@ -49,106 +64,131 @@ export const ContentModal = function ContentModal(props) {
     ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;}",
     ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
     ".cm-TriggerBtnDefault{font-family:Lato;font-style:normal;font-weight:700;font-size:16px;line-height:20px;color:#fff;background-color:#fe8d53;justify-content:space-evenly;display:inline-flex;box-sizing:border-box;border:2px solid #fe8d53;border-radius:6px;height:46px;padding:17px 19px;align-items:center;cursor:pointer;}",
-    ".modal{display:contents;}"
+    ".modal{display:contents;}",
+    ".cm-hide-origin{display:none!important;}"
   ].join("");
 
-  // --- Open on hashchange (runtime) ---
-  useEffect(
-    function () {
-      if (!openOnHash || !modalId || typeof window === "undefined") return;
-      function maybeOpen() {
-        var hash = (window.location.hash || "").replace(/^#/, "");
-        if (hash && hash === modalId) setOpen(true);
-      }
-      window.addEventListener("hashchange", maybeOpen);
-      return function () {
-        window.removeEventListener("hashchange", maybeOpen);
-      };
-    },
-    [openOnHash, modalId]
-  );
+  // Capture the next table after this component (if enabled)
+  useEffect(function () {
+    if (!useNextTable || typeof document === "undefined") return;
 
-  // --- Lock/unlock page scroll when open ---
-  useEffect(
-    function () {
-      if (typeof document === "undefined") return;
-      var html = document.documentElement;
-      var prev = html.style.overflow;
-      if (open) html.style.overflow = "hidden";
-      return function () {
-        html.style.overflow = prev;
-      };
-    },
-    [open]
-  );
+    var anchor = anchorRef.current;
+    if (!anchor) return;
 
-  // --- Manage focus (skip first render to avoid focusing the trigger on page load) ---
-  useEffect(
-    function () {
-      if (!didMountRef.current) {
-        didMountRef.current = true;
-        return;
-      }
-      if (open) {
-        var el = dialogRef.current;
-        var firstFocusable = el
-          ? el.querySelector(
-              'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-            )
-          : null;
-        if (firstFocusable && firstFocusable.focus) firstFocusable.focus();
-        else if (el && el.focus) el.focus();
-      } else {
-        // only restore focus after closing (not on initial mount)
-        if (btnRef.current && btnRef.current.focus) btnRef.current.focus();
-      }
-    },
-    [open]
-  );
+    var root =
+      anchor.closest('[data-testid="RDMD"]') ||
+      anchor.closest(".markdown-body") ||
+      document.body;
 
-  // --- Close on Escape only while open ---
-  useEffect(
-    function () {
-      if (!open || typeof window === "undefined") return;
-      function onKey(e) {
-        if (e.key === "Escape") setOpen(false);
+    var candidates = Array.from(root.querySelectorAll(targetSelector));
+    var chosen = null;
+
+    for (var i = 0; i < candidates.length; i++) {
+      var el = candidates[i];
+      var rel = anchor.compareDocumentPosition(el);
+      var isFollowing = (rel & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+      if (isFollowing) { chosen = el; break; }
+    }
+
+    if (chosen) {
+      setFoundTarget(true);
+
+      var wrapper = chosen.closest(".rdmd-table-inner, .rdmd-table");
+
+      if (!keepOriginalVisible) {
+        if (wrapper) {
+          wrapper.classList.add("cm-hide-origin");
+          hiddenTargetRef.current = wrapper;
+        } else {
+          chosen.classList.add("cm-hide-origin");
+          hiddenTargetRef.current = chosen;
+        }
       }
-      window.addEventListener("keydown", onKey);
-      return function () {
-        window.removeEventListener("keydown", onKey);
-      };
-    },
-    [open]
-  );
+
+      setCapturedHTML(chosen.outerHTML);
+    } else {
+      setFoundTarget(false);
+    }
+
+    setReady(true);
+
+    return function () {
+      if (hiddenTargetRef.current && !keepOriginalVisible) {
+        hiddenTargetRef.current.classList.remove("cm-hide-origin");
+      }
+    };
+  }, [useNextTable, keepOriginalVisible, targetSelector]);
+
+  // Open on hash links
+  useEffect(function () {
+    if (!openOnHash || !modalId || typeof window === "undefined") return;
+    function maybeOpen() {
+      var hash = (window.location.hash || "").replace(/^#/, "");
+      if (hash && hash === modalId) setOpen(true);
+    }
+    window.addEventListener("hashchange", maybeOpen);
+    return function () { window.removeEventListener("hashchange", maybeOpen); };
+  }, [openOnHash, modalId]);
+
+  // Lock/unlock page scroll
+  useEffect(function () {
+    if (typeof document === "undefined") return;
+    var html = document.documentElement;
+    var prev = html.style.overflow;
+    if (open) html.style.overflow = "hidden";
+    return function () { html.style.overflow = prev; };
+  }, [open]);
+
+  // Focus mgmt (skip first render)
+  useEffect(function () {
+    if (!didMountRef.current) { didMountRef.current = true; return; }
+    if (open) {
+      var el = dialogRef.current;
+      var firstFocusable = el
+        ? el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+        : null;
+      if (firstFocusable && firstFocusable.focus) firstFocusable.focus();
+      else if (el && el.focus) el.focus();
+    } else {
+      if (btnRef.current && btnRef.current.focus) btnRef.current.focus();
+    }
+  }, [open]);
+
+  // Close on Escape (only while open)
+  useEffect(function () {
+    if (!open || typeof window === "undefined") return;
+    function onKey(e) { if (e.key === "Escape") setOpen(false); }
+    window.addEventListener("keydown", onKey);
+    return function () { window.removeEventListener("keydown", onKey); };
+  }, [open]);
 
   function handleBackdropMouseDown(e) {
     if (!closeOnBackdrop) return;
     var target = e && e.target ? e.target : null;
-    var isBackdrop = false;
-    if (target && target.getAttribute) {
-      isBackdrop = target.getAttribute("data-cm-backdrop") === "1";
-    }
+    var isBackdrop = target && target.getAttribute && target.getAttribute("data-cm-backdrop") === "1";
     if (isBackdrop) setOpen(false);
   }
 
   var sizeClass =
-    size === "sm"
-      ? "cm-size-sm"
-      : size === "md"
-      ? "cm-size-md"
-      : size === "xl"
-      ? "cm-size-xl"
-      : "cm-size-lg";
-  var modalIdAttr = modalId ? modalId : undefined;
+    size === "sm" ? "cm-size-sm"
+    : size === "md" ? "cm-size-md"
+    : size === "xl" ? "cm-size-xl"
+    : "cm-size-lg";
+
+  var modalIdAttr = modalId || undefined;
   var ariaLabelledBy = modalId ? modalId + "-title" : undefined;
   var ariaExpanded = open ? "true" : "false";
-  var triggerClass =
-    "modal-button " + (buttonClassName || "cm-TriggerBtnDefault");
+  var triggerClass = "modal-button " + (buttonClassName || "cm-TriggerBtnDefault");
   var dialogClass = "cm-Dialog " + sizeClass;
+
+  var usingCaptured = useNextTable && !!capturedHTML;
 
   return (
     <div data-cm-root="">
-      {/* Critical CSS pre-paint to prevent FOUC */}
+      {/* Anchor to determine "next table" position */}
+      <span ref={anchorRef} style={{ display: "none" }} />
+
+      {/* Critical CSS pre-paint */}
       <style id="content-modal-styles">{css}</style>
 
       <button
@@ -158,6 +198,7 @@ export const ContentModal = function ContentModal(props) {
         aria-haspopup="dialog"
         aria-expanded={ariaExpanded}
         onClick={function () {
+          if (useNextTable && !foundTarget) return;
           if (modalId && typeof window !== "undefined") {
             var url = new URL(window.location.href);
             url.hash = modalId;
@@ -166,19 +207,26 @@ export const ContentModal = function ContentModal(props) {
           setOpen(true);
         }}
         data-modal-id={modalIdAttr}
+        disabled={useNextTable ? (!ready || !foundTarget) : false}
+        title={
+          useNextTable
+            ? (foundTarget ? "Open table" : "No table found after this component")
+            : undefined
+        }
       >
         {label}
         <i
           className="fa-solid fa-up-right-from-square"
           onClick={function (e) {
             e.stopPropagation();
+            if (useNextTable && !foundTarget) return;
             setOpen(true);
           }}
           aria-hidden="true"
         />
       </button>
 
-      {/* Inline display guard prevents any flash before CSS applies */}
+      {/* Backdrop + dialog with display guards to prevent any flash */}
       <div
         className="cm-Backdrop"
         aria-hidden={open ? "false" : "true"}
@@ -223,10 +271,13 @@ export const ContentModal = function ContentModal(props) {
               ×
             </button>
           </div>
+
           <div className="cm-Body">
             <div className="table-wrapper">
-              {content || (
-                <div className="placeholder">Paste your content here</div>
+              {usingCaptured ? (
+                <div dangerouslySetInnerHTML={{ __html: capturedHTML }} />
+              ) : (
+                content || <div className="placeholder">Paste your content here</div>
               )}
             </div>
           </div>
@@ -237,22 +288,25 @@ export const ContentModal = function ContentModal(props) {
 };
 
 <ContentModal
-  label="Open Example Modal" title="Example Modal" modalId="exampleModal" size="xl" content={
-<HTMLBlock>{`
-      <table border="1" cellSpacing="0" cellPadding="0">
-        <thead>
-          <tr>
-            <th>Column A</th>
-            <th>Column B</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Value 1</td>
-            <td>Value 2</td>
-          </tr>
-        </tbody>
+  label="Open Example Modal"
+  title="Example Modal"
+  modalId="exampleModal"
+  size="lg"
+  content={
+    <HTMLBlock>{`
+      <table>
+        <thead><tr><th>Column A</th><th>Column B</th></tr></thead>
+        <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
       </table>
-`}</HTMLBlock>
+    `}</HTMLBlock>
   }
+/>
+
+
+<ContentModal
+  label="View table"
+  title="Results"
+  modalId="resultsTable"
+  useNextTable
+  TargetSelector=".rdmd-table-inner > table"
 />
