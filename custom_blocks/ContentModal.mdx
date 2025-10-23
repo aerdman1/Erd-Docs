@@ -1,4 +1,218 @@
 ---
 name: ContentModal
 ---
-test123
+import React, { useEffect, useRef, useState } from "react";
+
+export const ContentModal = function ContentModal(props) {
+  var label = props.label;
+  var title = props.title;
+  var modalId = props.modalId;
+  var content = props.content;
+  var size = props.size === undefined ? "lg" : props.size;
+  var buttonClassName = props.buttonClassName || "";
+  var openOnHash = props.openOnHash === undefined ? true : !!props.openOnHash;
+  var closeOnBackdrop = props.closeOnBackdrop === undefined ? true : !!props.closeOnBackdrop;
+
+  var stateArray = useState(false);
+  var open = stateArray[0];
+  var setOpen = stateArray[1];
+
+  var dialogRef = useRef(null);
+  var btnRef = useRef(null);
+
+  useEffect(function () {
+    if (typeof document === "undefined") return;
+    if (document.getElementById("content-modal-styles")) return;
+    var css = [
+      ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;}",
+      '.cm-Backdrop[aria-hidden="false"]{display:block;}',
+      '.cm-Backdrop::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
+      ".cm-DialogWrap{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:9999;}",
+      '.cm-DialogWrap[aria-hidden="false"]{display:flex;}',
+      ".cm-Dialog{width:100%;max-height:86vh;overflow:hidden;background:#fff;color:inherit;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;outline:none;}",
+      ".cm-size-sm{max-width:420px;}",
+      ".cm-size-md{max-width:640px;}",
+      ".cm-size-lg{max-width:940px;}",
+      ".cm-size-xl{max-width:1180px;}",
+      ".cm-Header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.08);background:#fff;position:sticky;top:0;z-index:1;}",
+      ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
+      ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
+      ".cm-CloseBtn:hover{opacity:1;}",
+      ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;}",
+      ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
+      ".modal{display:contents;}",
+      ".table-wrapper{overflow:auto;}",
+      ".cm-Body table{width:100%;border-collapse:collapse;}",
+      ".cm-Body th,.cm-Body td{border:1px solid #ccc;padding:6px 8px;vertical-align:top;}"
+    ].join("");
+    var style = document.createElement("style");
+    style.id = "content-modal-styles";
+    style.textContent = css;
+    document.head.appendChild(style);
+  }, []);
+
+  useEffect(function () {
+    if (!openOnHash || !modalId) return;
+    function maybeOpen() {
+      if (typeof window === "undefined") return;
+      var hash = (window.location.hash || "").replace(/^#/, "");
+      if (hash && hash === modalId) setOpen(true);
+    }
+    maybeOpen();
+    if (typeof window !== "undefined") {
+      window.addEventListener("hashchange", maybeOpen);
+      return function () { window.removeEventListener("hashchange", maybeOpen); };
+    }
+  }, [openOnHash, modalId]);
+
+  useEffect(function () {
+    if (typeof document === "undefined") return;
+    var html = document.documentElement;
+    var prev = html.style.overflow;
+    if (open) html.style.overflow = "hidden";
+    return function () { html.style.overflow = prev; };
+  }, [open]);
+
+  useEffect(function () {
+    if (open) {
+      var el = dialogRef.current;
+      var firstFocusable = el ? el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') : null;
+      if (firstFocusable && firstFocusable.focus) firstFocusable.focus();
+      else if (el && el.focus) el.focus();
+    } else {
+      if (btnRef.current && btnRef.current.focus) btnRef.current.focus();
+    }
+  }, [open]);
+
+  useEffect(function () {
+    if (!open || typeof window === "undefined") return;
+    function onKey(e) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return function () { window.removeEventListener("keydown", onKey); };
+  }, [open]);
+
+  function handleBackdropMouseDown(e) {
+    if (!closeOnBackdrop) return;
+    var target = e && e.target ? e.target : null;
+    var isBackdrop = false;
+    if (target && target.getAttribute) {
+      isBackdrop = target.getAttribute("data-cm-backdrop") === "1";
+    }
+    if (isBackdrop) setOpen(false);
+  }
+
+  var sizeClass = size === "sm" ? "cm-size-sm" : size === "md" ? "cm-size-md" : size === "xl" ? "cm-size-xl" : "cm-size-lg";
+  var modalIdAttr = modalId ? modalId : undefined;
+  var ariaLabelledBy = modalId ? modalId + "-title" : undefined;
+  var ariaExpanded = open ? "true" : "false";
+  var triggerClass = "modal-button " + buttonClassName;
+  var dialogClass = "cm-Dialog " + sizeClass;
+
+  return (
+    <div data-cm-root="">
+      <button
+        ref={btnRef}
+        type="button"
+        className={triggerClass}
+        aria-haspopup="dialog"
+        aria-expanded={ariaExpanded}
+        onClick={function () {
+          if (modalId && typeof window !== "undefined") {
+            var url = new URL(window.location.href);
+            url.hash = modalId;
+            history.replaceState(null, "", url);
+          }
+          setOpen(true);
+        }}
+        data-modal-id={modalIdAttr}
+      >
+        {label}
+        <i
+          className="icon-maximize2"
+          onClick={function (e) { e.stopPropagation(); setOpen(true); }}
+          aria-hidden="true"
+        />
+      </button>
+
+      <div className="cm-Backdrop" aria-hidden={open ? "false" : "true"} />
+
+      <div
+        className="cm-DialogWrap"
+        aria-hidden={open ? "false" : "true"}
+        data-cm-backdrop="1"
+        onMouseDown={handleBackdropMouseDown}
+      >
+        <div
+          className={dialogClass}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={ariaLabelledBy}
+          ref={dialogRef}
+          tabIndex={-1}
+          id={modalIdAttr}
+        >
+          <div className="cm-Header modal-header">
+            <h2 id={ariaLabelledBy}>{title}</h2>
+            <button
+              className="cm-CloseBtn close"
+              type="button"
+              aria-label="Close"
+              onClick={function () {
+                setOpen(false);
+                if (modalId && typeof window !== "undefined" && window.location.hash === "#" + modalId) {
+                  var url = new URL(window.location.href);
+                  url.hash = "";
+                  history.replaceState(null, "", url);
+                }
+              }}
+            >
+              ×
+            </button>
+          </div>
+          <div className="cm-Body">
+            <div className="table-wrapper">
+              {content}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+<ContentModal
+  label="Transactions and accounting events details"
+  title="Transactions and accounting events details"
+  modalId="htmlTable2"
+  size="xl"
+  content={(
+    <table border="1" cellSpacing="0" cellPadding="0">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Transaction type</th>
+          <th>Event type</th>
+          <th>Entry type</th>
+          <th>Description</th>
+          <th>Cycle stage</th>
+          <th>When it happens</th>
+          <th>What is accounted</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1 July</td>
+          <td>701</td>
+          <td>701</td>
+          <td>701</td>
+          <td>Refinancing credit</td>
+          <td>Contract</td>
+          <td>Refinancing credit: transaction creation</td>
+          <td>Principal amount</td>
+        </tr>
+      </tbody>
+    </table>
+  )}
+/>
