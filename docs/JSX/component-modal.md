@@ -35,6 +35,10 @@ metadata:
   }
 />
 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at lacinia urna. In elementum, risus venenatis elementum aliquam, ante enim dapibus purus, eget elementum mi mauris sed arcu. Ut accumsan, leo sed porta porttitor, velit quam maximus tortor, at tempus enim mauris vitae est. Pellentesque id aliquet sem, sed accumsan libero. Vivamus convallis ultrices risus, sit amet luctus velit lacinia id. Praesent sed ullamcorper sem. Ut vitae ipsum eu mi pellentesque gravida luctus vel est. Proin pulvinar feugiat dolor, efficitur gravida lectus. Sed quis interdum ex. In at ex quis arcu convallis molestie ac sit amet ex. Interdum et malesuada fames ac ante ipsum primis in faucibus. In nec efficitur sapien. Sed felis enim, aliquet eget mi sed, ullamcorper placerat elit. Quisque sit amet magna sem. Praesent interdum lacus vitae justo euismod, et sollicitudin ligula sagittis.
+
+<br />
+
 <ContentModal
   label="Transactions details"
   title="Transactions details"
