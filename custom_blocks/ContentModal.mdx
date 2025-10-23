@@ -17,7 +17,7 @@ export const ContentModal = function ContentModal(props) {
   var open = stateArray[0];
   var setOpen = stateArray[1];
 
-  var dialogRef = useRef(null); 
+  var dialogRef = useRef(null);
   var btnRef = useRef(null);
 
   useEffect(function () {
@@ -26,9 +26,9 @@ export const ContentModal = function ContentModal(props) {
     var css = [
       ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;}",
       '.cm-Backdrop[aria-hidden="false"]{display:block;}',
-      '.cm-Backdrop::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
+      '.cm-Backdrop::before{content:\"\";position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
       ".cm-DialogWrap{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:9999;}",
-      '.cm-DialogWrap[aria-hidden="false"]{display:flex;}',
+      '.cm-DialogWrap[aria-hidden=\"false\"]{display:flex;}',
       ".cm-Dialog{width:100%;max-height:86vh;overflow:hidden;background:#fff;color:inherit;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;outline:none;}",
       ".cm-size-sm{max-width:420px;}",
       ".cm-size-md{max-width:640px;}",
@@ -38,12 +38,10 @@ export const ContentModal = function ContentModal(props) {
       ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
       ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
       ".cm-CloseBtn:hover{opacity:1;}",
-      ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;}",
+      ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;text-align:center;}",
+      ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;}",
       ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
-      ".modal{display:contents;}",
-      ".table-wrapper{overflow:auto;}",
-      ".cm-Body table{width:100%;border-collapse:collapse;}",
-      ".cm-Body th,.cm-Body td{border:1px solid #ccc;padding:6px 8px;vertical-align:top;}"
+      ".modal{display:contents;}"
     ].join("");
     var style = document.createElement("style");
     style.id = "content-modal-styles";
@@ -76,7 +74,7 @@ export const ContentModal = function ContentModal(props) {
   useEffect(function () {
     if (open) {
       var el = dialogRef.current;
-      var firstFocusable = el ? el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])') : null;
+      var firstFocusable = el ? el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])') : null;
       if (firstFocusable && firstFocusable.focus) firstFocusable.focus();
       else if (el && el.focus) el.focus();
     } else {
@@ -173,7 +171,7 @@ export const ContentModal = function ContentModal(props) {
           </div>
           <div className="cm-Body">
             <div className="table-wrapper">
-              {content}
+              {content || <div className="placeholder">Paste your content here</div>}
             </div>
           </div>
         </div>
@@ -183,36 +181,8 @@ export const ContentModal = function ContentModal(props) {
 };
 
 <ContentModal
-  label="Transactions and accounting events details"
-  title="Transactions and accounting events details"
-  modalId="htmlTable2"
-  size="xl"
-  content={(
-    <table border="1" cellSpacing="0" cellPadding="0">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Transaction type</th>
-          <th>Event type</th>
-          <th>Entry type</th>
-          <th>Description</th>
-          <th>Cycle stage</th>
-          <th>When it happens</th>
-          <th>What is accounted</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1 July</td>
-          <td>701</td>
-          <td>701</td>
-          <td>701</td>
-          <td>Refinancing credit</td>
-          <td>Contract</td>
-          <td>Refinancing credit: transaction creation</td>
-          <td>Principal amount</td>
-        </tr>
-      </tbody>
-    </table>
-  )}
+  label="Open Example Modal"
+  title="Example Modal"
+  modalId="exampleModal"
+  content={<table>...</table>}
 />
