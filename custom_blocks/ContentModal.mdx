@@ -1,7 +1,7 @@
 ---
 name: ContentModal
 ---
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useRef as useRefAlias } from "react";
 
 export const ContentModal = function ContentModal(props) {
   var label = props.label;
@@ -14,63 +14,61 @@ export const ContentModal = function ContentModal(props) {
   var closeOnBackdrop =
     props.closeOnBackdrop === undefined ? true : !!props.closeOnBackdrop;
 
-  var stateArray = useState(false);
+  // Compute initial open synchronously (pre-paint) to avoid flicker on #hash deep-links
+  var initialOpen =
+    typeof window !== "undefined" &&
+    openOnHash &&
+    modalId &&
+    (window.location.hash || "").replace(/^#/, "") === modalId;
+
+  var stateArray = useState(initialOpen);
   var open = stateArray[0];
   var setOpen = stateArray[1];
 
   var dialogRef = useRef(null);
   var btnRef = useRef(null);
+  var didMountRef = useRef(false); // prevent focus on first render
 
-  useEffect(function () {
-    if (typeof document === "undefined") return;
-    if (document.getElementById("content-modal-styles")) return;
-    var css = [
-      ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;z-index:999998!important;}",
-      '.cm-Backdrop[aria-hidden="false"]{display:block;}',
-      '.cm-Backdrop::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
-      ".cm-DialogWrap{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
-      '.cm-DialogWrap[aria-hidden="false"]{display:flex;}',
-      ".cm-Dialog{width:100%;max-height:86vh;overflow:hidden;background:#fff;color:inherit;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;outline:none;}",
-      ".cm-size-sm{max-width:420px;}",
-      ".cm-size-md{max-width:640px;}",
-      ".cm-size-lg{max-width:940px;}",
-      ".cm-size-xl{max-width:1180px;}",
-      ".cm-Header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.08);background:#fff;position:sticky;top:0;z-index:1;}",
-      ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
-      ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
-      ".cm-CloseBtn:hover{opacity:1;}",
-      ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;text-align:center;}",
-      ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;}",
-      ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
-      /* ✅ Default orange CTA button styling */
-      ".cm-TriggerBtnDefault{font-family:Lato;font-style:normal;font-weight:700;font-size:16px;line-height:20px;color:#fff;background-color:#fe8d53;justify-content:space-evenly;display:inline-flex;box-sizing:border-box;border:2px solid #fe8d53;border-radius:6px;height:46px;padding:17px 19px;align-items:center;cursor:pointer;}",
-      ".modal{display:contents;}"
-    ].join("");
-    var style = document.createElement("style");
-    style.id = "content-modal-styles";
-    style.textContent = css;
-    document.head.appendChild(style);
-  }, []);
+  // --- Styles (inline in render to avoid post-paint injection) ---
+  var css = [
+    ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;z-index:999998!important;}",
+    '.cm-Backdrop[aria-hidden="false"]{display:block;}',
+    '.cm-Backdrop::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
+    ".cm-DialogWrap{position:fixed;top:0;right:0;bottom:0;left:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
+    '.cm-DialogWrap[aria-hidden="false"]{display:flex;}',
+    ".cm-Dialog{width:100%;max-height:86vh;overflow:hidden;background:#fff;color:inherit;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;outline:none;}",
+    ".cm-size-sm{max-width:420px;}",
+    ".cm-size-md{max-width:640px;}",
+    ".cm-size-lg{max-width:940px;}",
+    ".cm-size-xl{max-width:1180px;}",
+    ".cm-Header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.08);background:#fff;position:sticky;top:0;z-index:1;}",
+    ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
+    ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
+    ".cm-CloseBtn:hover{opacity:1;}",
+    ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;text-align:center;}",
+    ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;}",
+    ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
+    ".cm-TriggerBtnDefault{font-family:Lato;font-style:normal;font-weight:700;font-size:16px;line-height:20px;color:#fff;background-color:#fe8d53;justify-content:space-evenly;display:inline-flex;box-sizing:border-box;border:2px solid #fe8d53;border-radius:6px;height:46px;padding:17px 19px;align-items:center;cursor:pointer;}",
+    ".modal{display:contents;}"
+  ].join("");
 
+  // --- Open on hashchange (runtime) ---
   useEffect(
     function () {
-      if (!openOnHash || !modalId) return;
+      if (!openOnHash || !modalId || typeof window === "undefined") return;
       function maybeOpen() {
-        if (typeof window === "undefined") return;
         var hash = (window.location.hash || "").replace(/^#/, "");
         if (hash && hash === modalId) setOpen(true);
       }
-      maybeOpen();
-      if (typeof window !== "undefined") {
-        window.addEventListener("hashchange", maybeOpen);
-        return function () {
-          window.removeEventListener("hashchange", maybeOpen);
-        };
-      }
+      window.addEventListener("hashchange", maybeOpen);
+      return function () {
+        window.removeEventListener("hashchange", maybeOpen);
+      };
     },
     [openOnHash, modalId]
   );
 
+  // --- Lock/unlock page scroll when open ---
   useEffect(
     function () {
       if (typeof document === "undefined") return;
@@ -84,8 +82,13 @@ export const ContentModal = function ContentModal(props) {
     [open]
   );
 
+  // --- Manage focus (skip first render to avoid focusing the trigger on page load) ---
   useEffect(
     function () {
+      if (!didMountRef.current) {
+        didMountRef.current = true;
+        return;
+      }
       if (open) {
         var el = dialogRef.current;
         var firstFocusable = el
@@ -96,12 +99,14 @@ export const ContentModal = function ContentModal(props) {
         if (firstFocusable && firstFocusable.focus) firstFocusable.focus();
         else if (el && el.focus) el.focus();
       } else {
+        // only restore focus after closing (not on initial mount)
         if (btnRef.current && btnRef.current.focus) btnRef.current.focus();
       }
     },
     [open]
   );
 
+  // --- Close on Escape only while open ---
   useEffect(
     function () {
       if (!open || typeof window === "undefined") return;
@@ -143,6 +148,9 @@ export const ContentModal = function ContentModal(props) {
 
   return (
     <div data-cm-root="">
+      {/* Critical CSS pre-paint to prevent FOUC */}
+      <style id="content-modal-styles">{css}</style>
+
       <button
         ref={btnRef}
         type="button"
@@ -170,13 +178,19 @@ export const ContentModal = function ContentModal(props) {
         />
       </button>
 
-      <div className="cm-Backdrop" aria-hidden={open ? "false" : "true"} />
+      {/* Inline display guard prevents any flash before CSS applies */}
+      <div
+        className="cm-Backdrop"
+        aria-hidden={open ? "false" : "true"}
+        style={{ display: open ? undefined : "none" }}
+      />
 
       <div
         className="cm-DialogWrap"
         aria-hidden={open ? "false" : "true"}
         data-cm-backdrop="1"
         onMouseDown={handleBackdropMouseDown}
+        style={{ display: open ? undefined : "none" }}
       >
         <div
           className={dialogClass}
@@ -221,28 +235,3 @@ export const ContentModal = function ContentModal(props) {
     </div>
   );
 };
-
-<ContentModal
-  label="Open Example Modal"
-  title="Example Modal"
-  modalId="exampleModal"
-  content={
-    <>
-      <p>This is just some plain text but you can add tables too:</p>
-      <table border="1" cellSpacing="0" cellPadding="0">
-        <thead>
-          <tr>
-            <th>Column A</th>
-            <th>Column B</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Value 1</td>
-            <td>Value 2</td>
-          </tr>
-        </tbody>
-      </table>
-    </>
-  }
-/>
