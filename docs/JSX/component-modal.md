@@ -10,7 +10,7 @@ metadata:
 
 <ContentModal
   label="Open Example Modal"
-  title="Example Modal"
+  title="Example Modal Title (editable)"
   modalId="exampleModal"
   content={
     <>
