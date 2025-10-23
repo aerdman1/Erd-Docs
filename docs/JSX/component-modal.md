@@ -9,12 +9,7 @@ metadata:
 <br />
 
 <ContentModal
-  label="Open Example Modal"
-  title="Example Modal"
-  modalId="exampleModal"
-  size="xl"
-  content={
-    <>
+  label="Open Example Modal" title="Example Modal" modalId="exampleModal" size="xl" content={
 <HTMLBlock>{`
       <table border="1" cellSpacing="0" cellPadding="0">
         <thead>
@@ -31,7 +26,6 @@ metadata:
         </tbody>
       </table>
 `}</HTMLBlock>
-    </>
   }
 />
 
