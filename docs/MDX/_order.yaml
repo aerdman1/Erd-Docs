@@ -1,3 +1,4 @@
+- content-modal
 - changelog-widget
 - simple-banner
 - page-banner
@@ -5,7 +6,6 @@
 - advanced-stepper
 - endpoint-embedding-new
 - data-meter
-- content-modal
 - page-searching
 - keyword-testing
 - data-tables
