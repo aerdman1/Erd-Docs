@@ -2,7 +2,7 @@
 title: Content Modal
 deprecated: false
 hidden: false
-icon: fad fa-file-lines
+icon: far fa-arrows-maximize
 metadata:
   robots: index
 ---
