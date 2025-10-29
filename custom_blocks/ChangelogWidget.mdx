@@ -1,0 +1,316 @@
+---
+name: ChangelogWidget
+---
+---
+title: "ChangelogWidget"
+description: "A dark, floating bell widget that pulls your RSS/Atom changelog and shows a badge + panel."
+author: "@erdman"
+version: "1.0.0"
+---
+
+import React, { useEffect, useRef } from 'react';
+
+export const ChangelogWidget = ({
+  feedUrl = 'https://erdtest123.readme.io/changelog.rss',
+  position = 'bottom-right',           // 'bottom-right' | 'bottom-left'
+  maxItems = 20,
+  badgeMode = 'unread',                 // 'unread' | 'new-since-last-open'
+  excerptMaxChars = 160,
+  newIsYoungerThanDays = 30,
+  useProxy = true,
+  proxy = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  widgetId = 'changelog-widget',
+  adminOnly = false                     // if true, render only for logged-in admins (checks #hub-me)
+}) => {
+  const mountRef = useRef(null);
+
+  useEffect(() => {
+    if (!mountRef.current) return;
+
+    function getHubData() {
+      const el = document.getElementById('hub-me');
+      if (!el) return null;
+      const raw = el.dataset.json || el.textContent || '';
+      try { return JSON.parse(raw); } catch {
+        try {
+          const ta = document.createElement('textarea');
+          ta.innerHTML = raw;
+          return JSON.parse(ta.value);
+        } catch { return null; }
+      }
+    }
+
+    if (adminOnly) {
+      const hub = getHubData();
+      if (!(hub && hub.loggedIn && hub.isAdmin)) return;
+    }
+
+    const CONFIG = {
+      feedUrl,
+      useProxy,
+      proxy,
+      maxItems,
+      badgeMode,
+      excerptMaxChars,
+      position,
+      widgetId,
+      lsKeys: { readIds: `${widgetId}_read_ids`, lastOpenISO: `${widgetId}_last_open_iso` },
+      newIsYoungerThanDays
+    };
+
+    const state = {
+      items: [],
+      readIds: new Set(JSON.parse(localStorage.getItem(CONFIG.lsKeys.readIds) || '[]')),
+      lastOpenISO: localStorage.getItem(CONFIG.lsKeys.lastOpenISO) || null,
+      panelOpen: false
+    };
+
+    // host inside the component (not body) to ensure clean teardown
+    const host = document.createElement('div');
+    host.id = CONFIG.widgetId;
+    mountRef.current.appendChild(host);
+    const root = host.attachShadow({ mode: 'open' });
+
+    const isLeft = CONFIG.position === 'bottom-left';
+    const css = [
+      ':host{all:initial;color-scheme:dark;--bg-1:#0b1020;--bg-2:#0e1426;--bg-3:#141a33;--fg-1:#ecf0ff;--fg-2:#a9b2d0;--accent:#20c997;--badge:#ec554d;--link:#8fb3ff;--border:#1f2642;--shadow:0 20px 50px rgba(3,6,20,.6),0 2px 10px rgba(10,15,35,.5);--radius:16px;--font:ui-sans-serif,system-ui,-apple-system,Segoe UI,Inter,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";}',
+      `.wrap{position:fixed;bottom:18px;${isLeft ? 'left:18px;' : 'right:30px;'}z-index:999999;font-family:var(--font);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}`,
+      '.bell{position:relative;width:58px;height:58px;border-radius:50%;background:radial-gradient(120% 120% at 70% 20%,#1b2244 0%,#0d1327 50%,#0a0f22 100%);box-shadow:var(--shadow);border:1px solid var(--border);display:grid;place-items:center;cursor:pointer;outline:none;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;}',
+      '.bell:hover{transform:translateY(-2px);filter:brightness(1.05);} .bell:focus-visible{box-shadow:0 0 0 3px rgba(143,179,255,.35),var(--shadow);} .bell svg path{fill:#fff;}',
+      `.badge{position:absolute;top:-6px;${isLeft ? 'left:-6px;' : 'right:-6px;'}min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:linear-gradient(180deg,#ff746c 0%,var(--badge) 100%);color:#fff;font-size:12px;line-height:22px;text-align:center;box-shadow:0 8px 16px rgba(236,85,77,.35);border:2px solid #0a0f22;}`,
+      `.panel{position:absolute;${isLeft ? 'left:0;' : 'right:0;'}bottom:74px;width:min(400px,calc(100vw - 36px));max-height:min(72vh,660px);background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0) 20%),linear-gradient(180deg,#0f1530,#0c1229);color:var(--fg-1);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:none;}`,
+      '.panel.open{display:grid;grid-template-rows:auto 1fr auto;}',
+      '.header{display:flex;align-items:center;gap:8px;padding:12px 14px;background:linear-gradient(180deg,#151c3d 0%,#0f1530 100%);border-bottom:1px solid var(--border);} .title{font-size:14px;font-weight:700;margin:0;} .actions{margin-left:auto;display:flex;gap:8px;}',
+      '.btn{appearance:none;cursor:pointer;border-radius:10px;border:1px solid var(--border);padding:6px 10px;background:#141a33;color:var(--fg-1);font-size:12px;} .btn:hover{background:#182042;}',
+      '.list{overflow:auto;max-height:100%;background:var(--bg-2);} .item{padding:12px 14px;border-bottom:1px solid var(--border);display:grid;gap:6px;} .item:last-child{border-bottom:0;}',
+      '.rowTitle{display:flex;gap:8px;align-items:center;} .pill{font-size:11px;font-weight:700;background:linear-gradient(180deg,#25d2a1,var(--accent));color:#061217;border-radius:999px;padding:2px 8px;}',
+      '.meta{font-size:12px;color:var(--fg-2);} .excerpt{font-size:13px;color:#dfe4ff;opacity:.92;} .link{font-size:12px;color:var(--link);text-decoration:none;} .link:hover{text-decoration:underline;}',
+      '.footer{border-top:1px solid var(--border);background:#0f1530;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;color:var(--fg-2);font-size:12px;}',
+      '@media (max-width:520px){.panel{width:min(94vw,420px);} .bell{width:54px;height:54px;}}'
+    ].join('');
+
+    const html = [
+      '<div class="wrap">',
+        '<button class="bell" aria-expanded="false" title="What’s new">',
+          '<svg width="26" height="26" viewBox="0 0 24 24"><path d="M12 2a6 6 0 0 0-6 6v2.586l-.707.707A1 1 0 0 0 6 14h12a1 1 0 0 0 .707-1.707L18 10.586V8a6 6 0 0 0-6-6zm0 20a3 3 0 0 0 2.995-2.824L15 19h-6a3 3 0 0 0 2.824 2.995L12 22z"/></svg>',
+          '<span class="badge" hidden>0</span>',
+        '</button>',
+        '<section class="panel" id="cl-panel">',
+          '<header class="header">',
+            '<h3 class="title">What’s new</h3>',
+            '<div class="actions">',
+              '<button class="btn" data-action="mark-all">Mark all read</button>',
+              '<button class="btn" data-action="refresh">Refresh</button>',
+            '</div>',
+          '</header>',
+          '<div class="list" role="list"></div>',
+          '<footer class="footer">',
+            '<span>Changelog</span>',
+            `<a class="link" target="_blank" rel="noreferrer" href="${CONFIG.feedUrl.replace(/\\.rss\\b/, '')}">Open full feed</a>`,
+          '</footer>',
+        '</section>',
+      '</div>'
+    ].join('');
+
+    const style = document.createElement('style');
+    style.textContent = css;
+    root.append(style);
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    root.append(container);
+
+    const els = {
+      bell: root.querySelector('.bell'),
+      badge: root.querySelector('.badge'),
+      panel: root.querySelector('.panel'),
+      list: root.querySelector('.list'),
+      markAll: root.querySelector('[data-action="mark-all"]'),
+      refresh: root.querySelector('[data-action="refresh"]')
+    };
+
+    function stripHtml(h) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = h;
+      tmp.querySelectorAll('img,iframe,script,style').forEach(n => n.remove());
+      return tmp.textContent || '';
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => (
+        m === '&' ? '&amp;' :
+        m === '<' ? '&lt;' :
+        m === '>' ? '&gt;' :
+        m === '"' ? '&quot;' : '&#39;'
+      ));
+    }
+
+    function truncate(s, n) {
+      const t = String(s);
+      return t.length > n ? t.slice(0, n - 1) + '…' : t;
+    }
+
+    function isFreshItem(it) {
+      if (!it.pubDate) return false;
+      const threshold = Date.now() - (CONFIG.newIsYoungerThanDays * 24 * 60 * 60 * 1000);
+      return it.pubDate.getTime() >= threshold;
+    }
+
+    function setLastOpenNow() {
+      const iso = new Date().toISOString();
+      state.lastOpenISO = iso;
+      localStorage.setItem(CONFIG.lsKeys.lastOpenISO, iso);
+    }
+
+    function markRead(guid) {
+      state.readIds.add(guid);
+      localStorage.setItem(CONFIG.lsKeys.readIds, JSON.stringify([...state.readIds]));
+      render();
+    }
+
+    function markAllRead() {
+      state.items.forEach(i => state.readIds.add(i.guid));
+      localStorage.setItem(CONFIG.lsKeys.readIds, JSON.stringify([...state.readIds]));
+      render();
+    }
+
+    function updateBadge() {
+      const lastOpen = state.lastOpenISO ? new Date(state.lastOpenISO) : null;
+      let count = 0;
+      if (CONFIG.badgeMode === 'new-since-last-open' && lastOpen) {
+        count = state.items.filter(i => i.pubDate && i.pubDate > lastOpen && isFreshItem(i)).length;
+      } else {
+        count = state.items.filter(i => !state.readIds.has(i.guid) && isFreshItem(i)).length;
+      }
+      els.badge.hidden = count <= 0;
+      els.badge.textContent = String(count);
+    }
+
+    function render() {
+      els.list.innerHTML = '';
+      state.items.forEach(it => {
+        const isRead = state.readIds.has(it.guid);
+        const fresh = isFreshItem(it);
+        const row = document.createElement('article');
+        row.className = 'item';
+        const dateStr = it.pubDate ? it.pubDate.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' }) : '';
+        row.innerHTML = [
+          '<div class="rowTitle">',
+            `<span style="font-size:16px;font-weight:700;">${escapeHtml(it.title)}</span>`,
+            ((!isRead && fresh) ? '<span class="pill" title="Unread">NEW</span>' : ''),
+          '</div>',
+          `<div class="meta">${dateStr}</div>`,
+          (it.excerpt ? `<div class="excerpt">${escapeHtml(truncate(it.excerpt, CONFIG.excerptMaxChars))}</div>` : ''),
+          `<div><a href="${it.link}" class="link" target="_blank" rel="noreferrer">Open update</a></div>`
+        ].join('');
+        const linkEl = row.querySelector('.link');
+        if (linkEl) linkEl.addEventListener('click', () => markRead(it.guid));
+        if (isRead || !fresh) row.style.opacity = '.82';
+        els.list.appendChild(row);
+      });
+      updateBadge();
+    }
+
+    async function fetchRss() {
+      const url = CONFIG.useProxy ? CONFIG.proxy(CONFIG.feedUrl) : CONFIG.feedUrl;
+      const res = await fetch(url, { headers: { 'Accept': 'application/rss+xml, application/xml, text/xml, */*' } });
+      if (!res.ok) throw new Error(`RSS fetch failed: ${res.status}`);
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, 'application/xml');
+      if (doc.querySelector('parsererror')) throw new Error('Could not parse RSS/Atom XML');
+
+      let items = Array.from(doc.querySelectorAll('item')).map(item => {
+        const title = (item.querySelector('title')?.textContent || '').trim() || 'Untitled';
+        const link  = (item.querySelector('link')?.textContent || '').trim() || '#';
+        const guid  = (item.querySelector('guid')?.textContent || '').trim() || link || title;
+        const pubDateStr = (item.querySelector('pubDate')?.textContent || '').trim();
+        const d = pubDateStr ? new Date(pubDateStr) : null;
+        const pubDate = (d && !isNaN(d)) ? d : null;
+        const descRaw = item.querySelector('description')?.textContent || '';
+        const excerpt = stripHtml(descRaw).replace(/\s+/g,' ').trim();
+        return { guid, title, link, pubDate, pubDateStr, excerpt };
+      });
+
+      if (items.length === 0) {
+        items = Array.from(doc.querySelectorAll('entry')).map(entry => {
+          const title = (entry.querySelector('title')?.textContent || '').trim() || 'Untitled';
+          const linkEl = entry.querySelector('link');
+          const link = (linkEl?.getAttribute('href') || linkEl?.textContent || '').trim() || '#';
+          const guid = (entry.querySelector('id')?.textContent || '').trim() || link || title;
+          const pubDateStr = (entry.querySelector('updated, published')?.textContent || '').trim();
+          const d = pubDateStr ? new Date(pubDateStr) : null;
+          const pubDate = (d && !isNaN(d)) ? d : null;
+          const descRaw = entry.querySelector('summary, content')?.textContent || '';
+          const excerpt = stripHtml(descRaw).replace(/\s+/g,' ').trim();
+          return { guid, title, link, pubDate, pubDateStr, excerpt };
+        });
+      }
+
+      items.sort((a, b) => {
+        const ta = a.pubDate ? a.pubDate.getTime() : 0;
+        const tb = b.pubDate ? b.pubDate.getTime() : 0;
+        return tb - ta;
+      });
+
+      state.items = items.slice(0, CONFIG.maxItems);
+    }
+
+    function togglePanel(force) {
+      const open = (force !== undefined) ? force : !state.panelOpen;
+      state.panelOpen = open;
+      els.panel.classList.toggle('open', open);
+      els.bell.setAttribute('aria-expanded', String(open));
+      if (open) { setLastOpenNow(); updateBadge(); }
+    }
+
+    function handleDocClick(e) {
+      if (!host.contains(e.target) && state.panelOpen) togglePanel(false);
+    }
+    function handleEsc(e) {
+      if (e.key === 'Escape' && state.panelOpen) togglePanel(false);
+    }
+
+    els.bell.addEventListener('click', () => togglePanel());
+    els.markAll.addEventListener('click', () => markAllRead());
+    els.refresh.addEventListener('click', async () => {
+      try { await fetchRss(); render(); } catch { alert('Could not refresh changelog.'); }
+    });
+    document.addEventListener('click', handleDocClick);
+    document.addEventListener('keydown', handleEsc);
+
+    (async () => {
+      try {
+        await fetchRss();
+        render();
+      } catch (e) {
+        if (!CONFIG.useProxy) {
+          try { await fetchRss(); render(); } catch { /* ignore */ }
+        } else {
+          els.list.innerHTML = '<div class="item"><div class="excerpt">No updates available right now.</div></div>';
+          els.badge.hidden = true;
+          // console.warn('[Changelog Widget]', e);
+        }
+      }
+    })();
+
+    return () => {
+      document.removeEventListener('click', handleDocClick);
+      document.removeEventListener('keydown', handleEsc);
+      if (host && host.parentNode) host.parentNode.removeChild(host);
+    };
+  }, [feedUrl, position, maxItems, badgeMode, excerptMaxChars, newIsYoungerThanDays, useProxy, proxy, widgetId, adminOnly]);
+
+  // Shadow host target (kept empty; widget lives in shadow DOM)
+  return <div ref={mountRef} />;
+};
+
+
+<ChangelogWidget
+  feedUrl="https://erdman-refactored-group.readme.io/changelog.rss"
+  position="bottom-right"
+  maxItems={20}
+  badgeMode="unread"
+  excerptMaxChars={160}
+  newIsYoungerThanDays={30}
+  useProxy={true}
+  adminOnly={false}
+/>
