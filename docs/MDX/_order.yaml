@@ -1,4 +1,5 @@
 - page-modal-simple
+- changelog-widget
 - simple-banner
 - page-banner
 - simple-stepper
@@ -12,4 +13,3 @@
 - dashboard-mdx
 - customer-quotes
 - display-geojson-data
-- changelog-widget
