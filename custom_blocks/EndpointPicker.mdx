@@ -1,4 +1,268 @@
 ---
 name: EndpointPicker
 ---
-test
+---
+title: "EndpointPicker"
+description: "Auto-detect ReadMe OpenAPI specs from /openapi, select a spec + endpoint, and view key details."
+author: "@andrewerdman"
+version: "1.0.3"
+---
+
+import React, { useEffect, useMemo, useState } from "react";
+
+export const EndpointPicker = props => {
+  const { websiteBaseUrl } = props;
+
+  const base = useMemo(() => {
+    if (websiteBaseUrl) return websiteBaseUrl.replace(/\/$/, "");
+    if (typeof window !== "undefined") return window.location.protocol + "//" + window.location.host;
+    return "";
+  }, [websiteBaseUrl]);
+
+  const [specs, setSpecs] = useState([]);
+  const [specUrl, setSpecUrl] = useState("");
+  const [loadingIndex, setLoadingIndex] = useState(true);
+
+  const [endpoints, setEndpoints] = useState([]);
+  const [loadingSpec, setLoadingSpec] = useState(false);
+
+  const [selectedPath, setSelectedPath] = useState("");
+  const [selectedMethod, setSelectedMethod] = useState("");
+  const [search, setSearch] = useState("");
+
+  const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+
+  async function fetchSpecIndex(indexUrl) {
+    const res = await fetch(indexUrl, { headers: { Accept: "text/html,*/*" } });
+    if (!res.ok) throw new Error("Failed to load /openapi");
+    const html = await res.text();
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const links = Array.from(doc.querySelectorAll('.container .item a[href^="/openapi/"]'));
+    return links.map(a => ({ name: (a.textContent || "").trim(), href: a.getAttribute("href") }));
+  }
+
+  async function fetchSpecJson(url) {
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error("OpenAPI fetch failed");
+    return res.json();
+  }
+
+  function listPathsAndMethods(spec) {
+    const out = [];
+    const paths = spec && spec.paths ? spec.paths : {};
+    Object.keys(paths).forEach(p => {
+      const ops = paths[p] || {};
+      Object.keys(ops).forEach(m => {
+        if (["get","post","put","delete","patch","head","options","trace"].includes(m)) {
+          const op = ops[m] || {};
+          out.push({ path: p, method: m.toUpperCase(), summary: op.summary || "", description: op.description || "", operationId: op.operationId || "" });
+        }
+      });
+    });
+    return out.sort((a,b) => a.path === b.path ? a.method.localeCompare(b.method) : a.path.localeCompare(b.path));
+  }
+
+  function slugForReference(path, opId) {
+    if (opId) return opId;
+    return String(path || "").replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "") || "endpoint";
+  }
+
+  useEffect(() => {
+    let did = false;
+    (async () => {
+      try {
+        const list = await fetchSpecIndex(base + "/openapi");
+        if (did) return;
+        setSpecs(list);
+        if (list && list[0]) setSpecUrl(base + list[0].href);
+      } catch {
+        setSpecs([]);
+      } finally {
+        if (!did) setLoadingIndex(false);
+      }
+    })();
+    return () => { did = true; };
+  }, [base]);
+
+  useEffect(() => {
+    if (!specUrl) { setEndpoints([]); return; }
+    let did = false;
+    setLoadingSpec(true);
+    (async () => {
+      try {
+        const spec = await fetchSpecJson(specUrl);
+        if (did) return;
+        const e = listPathsAndMethods(spec);
+        setEndpoints(e);
+        if (e[0]) {
+          setSelectedPath(e[0].path);
+          setSelectedMethod(e[0].method);
+        }
+      } catch {
+        setEndpoints([]);
+      } finally {
+        if (!did) setLoadingSpec(false);
+      }
+    })();
+    return () => { did = true; };
+  }, [specUrl]);
+
+  const filtered = useMemo(() => {
+    const q = (search || "").trim().toLowerCase();
+    if (!q) return endpoints;
+    return endpoints.filter(e =>
+      e.path.toLowerCase().includes(q) ||
+      e.method.toLowerCase().includes(q) ||
+      (e.summary || "").toLowerCase().includes(q)
+    );
+  }, [endpoints, search]);
+
+  const current = filtered.find(e => e.path === selectedPath && e.method === selectedMethod) || (filtered[0] || null);
+
+  useEffect(() => {
+    if (!current) return;
+    setSelectedPath(current.path);
+    setSelectedMethod(current.method);
+  }, [current && current.path, current && current.method]);
+
+  const referenceUrl = current ? `${base}/reference/${slugForReference(current.path, current.operationId)}` : "#";
+
+  return (
+    <div data-ee-picker="" style={{
+      display: "grid",
+      gap: 12,
+      padding: 12,
+      background: "var(--color-bg-page, #fff)",
+      color: "var(--color-text-default, #000)",
+      border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
+      borderRadius: 8
+    }}>
+      <style>{`
+        [data-ee-picker] input,
+        [data-ee-picker] select,
+        [data-ee-picker] a.button-link {
+          background: var(--color-bg-input, var(--color-bg-subtle, #f6f8fa));
+          color: var(--color-text-default, #111);
+          border: 1px solid var(--color-border-default, rgba(0,0,0,.15));
+        }
+        [data-ee-picker] input,
+        [data-ee-picker] select {
+          padding: 8px 10px;
+          border-radius: 6px;
+        }
+        [data-ee-picker] input::placeholder {
+          color: var(--color-text-muted, rgba(0,0,0,.55));
+          opacity: 1;
+        }
+        [data-ee-picker] option {
+          color: var(--color-text-default, #111);
+          background: var(--color-bg-page, #fff);
+        }
+        @media (prefers-color-scheme: dark) {
+          [data-ee-picker] option {
+            background: var(--color-bg-page, #0a0f1a);
+          }
+        }
+        [data-ee-picker] .muted {
+          opacity: .7;
+        }
+        [data-ee-picker] .panel {
+          border: 1px solid var(--color-border-default, rgba(0,0,0,.12));
+          border-radius: 8px;
+          padding: 12px;
+          background: var(--color-bg-default, var(--color-bg-page, #fff));
+        }
+        [data-ee-picker] .row {
+          display: grid;
+          gap: 6px;
+        }
+        [data-ee-picker] .button-link {
+          display: inline-block;
+          text-decoration: none;
+          font-weight: 700;
+          border-radius: 6px;
+          padding: 8px 10px;
+        }
+        [data-ee-picker] .code {
+          font-family: ${mono};
+          font-size: .9rem;
+          padding: 8px 10px;
+          border-radius: 6px;
+          background: var(--color-bg-subtle, #f6f8fa);
+          border: 1px solid var(--color-border-default, rgba(0,0,0,.12));
+          overflow-x: auto;
+        }
+      `}</style>
+
+      <div className="row">
+        <label style={{ fontWeight: 600 }}>OpenAPI file</label>
+        {loadingIndex ? (
+          <div>Loading spec list…</div>
+        ) : (specs && specs.length) ? (
+          <select value={specUrl} onChange={e => setSpecUrl(e.target.value)}>
+            {specs.map(s => (
+              <option key={s.href} value={base + s.href}>{s.name}</option>
+            ))}
+          </select>
+        ) : (
+          <div>No specs found at {base}/openapi</div>
+        )}
+      </div>
+
+      <div className="row">
+        <label style={{ fontWeight: 600 }}>Find endpoint</label>
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Filter by path, method, or summary"
+        />
+      </div>
+
+      {loadingSpec ? (
+        <div>Loading endpoints…</div>
+      ) : (filtered && filtered.length) ? (
+        <>
+          <div className="row">
+            <label style={{ fontWeight: 600 }}>Endpoint</label>
+            <select value={selectedPath} onChange={e => setSelectedPath(e.target.value)}>
+              {[...new Set(filtered.map(f => f.path))].map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="row">
+            <label style={{ fontWeight: 600 }}>Method</label>
+            <select value={selectedMethod} onChange={e => setSelectedMethod(e.target.value)}>
+              {filtered.filter(f => f.path === selectedPath).map(f => (
+                <option key={f.path + f.method} value={f.method}>{f.method}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="panel">
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+              <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: ".8rem" }}>{selectedMethod}</span>
+              <span style={{ fontFamily: mono, fontSize: ".9rem" }}>{selectedPath}</span>
+            </div>
+            <div className="muted" style={{ marginBottom: 10 }}>{current && current.summary ? current.summary : ""}</div>
+            {current && current.description ? (
+              <div className="muted" style={{ marginBottom: 10 }}>{current.description}</div>
+            ) : null}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <a className="button-link" href={referenceUrl} target="_blank" rel="noreferrer">Open reference</a>
+            </div>
+            <div style={{ marginTop: 10 }}>
+              <div style={{ fontWeight: 600, marginBottom: 6 }}>MDX link snippet</div>
+              <div className="code">[{current ? (current.summary || `${selectedMethod} ${selectedPath}`) : "Endpoint"}]({referenceUrl})</div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div>No matches.</div>
+      )}
+    </div>
+  );
+};
+
+<EndpointPicker />
