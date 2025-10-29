@@ -3,49 +3,40 @@ name: ContentModal
 ---
 import React, { useEffect, useRef, useState } from "react";
 
-export const ContentModal = function ContentModal(props) {
-  var label = props.label || "Open";
-  var title = props.title || "Modal";
-  var content = props.content;
-  var size = props.size === undefined ? "lg" : props.size;
-  var buttonClassName = props.buttonClassName || "";
-  var openOnHash = props.openOnHash === undefined ? true : !!props.openOnHash;
-  var closeOnBackdrop =
+export const ContentModal = props => {
+  const label = props.label || "Open";
+  const title = props.title || "Modal";
+  const content = props.content;
+  const size = props.size === undefined ? "lg" : props.size;
+  const buttonClassName = props.buttonClassName || "";
+  const openOnHash = props.openOnHash === undefined ? true : !!props.openOnHash;
+  const closeOnBackdrop =
     props.closeOnBackdrop === undefined ? true : !!props.closeOnBackdrop;
+  const showIcon = props.showIcon === undefined ? true : !!props.showIcon;
 
-  // NEW props
-  var useNextTable = !!props.useNextTable;
-  var keepOriginalVisible = !!props.keepOriginalVisible;
-  var targetSelector = props.targetSelector || "table";
+  const buttonColor = props.buttonColor || "#fe8d53";
+  const buttonPadding = props.buttonPadding || "17px 19px";
 
-  // Stable auto ID (MDX-safe; no top-level helpers)
-  var autoIdRef = useRef(
+  const autoIdRef = useRef(
     (typeof crypto !== "undefined" && crypto.randomUUID)
       ? crypto.randomUUID()
       : "cm-" + Math.random().toString(36).slice(2)
   );
-  var modalId = props.modalId || autoIdRef.current;
+  const modalId = props.modalId || autoIdRef.current;
 
-  // Initial open (avoid flicker for deep-links)
-  var initialOpen =
+  const initialOpen =
     typeof window !== "undefined" &&
     openOnHash &&
     modalId &&
     (window.location.hash || "").replace(/^#/, "") === modalId;
 
-  var [open, setOpen] = useState(initialOpen);
-  var [ready, setReady] = useState(!useNextTable);
-  var [foundTarget, setFoundTarget] = useState(false);
-  var [capturedHTML, setCapturedHTML] = useState("");
+  const [open, setOpen] = useState(initialOpen);
 
-  var dialogRef = useRef(null);
-  var btnRef = useRef(null);
-  var didMountRef = useRef(false);
-  var anchorRef = useRef(null);
-  var hiddenTargetRef = useRef(null);
+  const dialogRef = useRef(null);
+  const btnRef = useRef(null);
+  const didMountRef = useRef(false);
 
-  // Critical CSS (pre-paint)
-  var css = [
+  const css = [
     ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;z-index:999998!important;}",
     '.cm-Backdrop[aria-hidden="false"]{display:block;}',
     '.cm-Backdrop::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
@@ -60,91 +51,37 @@ export const ContentModal = function ContentModal(props) {
     ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
     ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
     ".cm-CloseBtn:hover{opacity:1;}",
-    ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;text-align:center;}",
-    ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;}",
+    ".cm-Body{overflow:auto;padding:16px 18px;background:#fff;text-align:left;}",
+    ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;text-align:center;}",
     ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
-    ".cm-TriggerBtnDefault{font-family:Lato;font-style:normal;font-weight:700;font-size:16px;line-height:20px;color:#fff;background-color:#fe8d53;justify-content:space-evenly;display:inline-flex;box-sizing:border-box;border:2px solid #fe8d53;border-radius:6px;height:46px;padding:17px 19px;align-items:center;cursor:pointer;}",
-    ".modal{display:contents;}",
-    ".cm-hide-origin{display:none!important;}"
+    `.cm-TriggerBtnDefault{line-height:20px;color:#fff;background-color:${buttonColor};justify-content:space-evenly;display:inline-flex;box-sizing:border-box;border:2px solid ${buttonColor};border-radius:6px;height:46px;padding:${buttonPadding};align-items:center;cursor:pointer;transition:opacity .2s ease;}`,
+    ".cm-TriggerBtnDefault:hover{opacity:0.85;}",
+    ".modal{display:contents;}"
   ].join("");
 
-  // Capture the next table after this component (if enabled)
-  useEffect(function () {
-    if (!useNextTable || typeof document === "undefined") return;
-
-    var anchor = anchorRef.current;
-    if (!anchor) return;
-
-    var root =
-      anchor.closest('[data-testid="RDMD"]') ||
-      anchor.closest(".markdown-body") ||
-      document.body;
-
-    var candidates = Array.from(root.querySelectorAll(targetSelector));
-    var chosen = null;
-
-    for (var i = 0; i < candidates.length; i++) {
-      var el = candidates[i];
-      var rel = anchor.compareDocumentPosition(el);
-      var isFollowing = (rel & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
-      if (isFollowing) { chosen = el; break; }
-    }
-
-    if (chosen) {
-      setFoundTarget(true);
-
-      var wrapper = chosen.closest(".rdmd-table-inner, .rdmd-table");
-
-      if (!keepOriginalVisible) {
-        if (wrapper) {
-          wrapper.classList.add("cm-hide-origin");
-          hiddenTargetRef.current = wrapper;
-        } else {
-          chosen.classList.add("cm-hide-origin");
-          hiddenTargetRef.current = chosen;
-        }
-      }
-
-      setCapturedHTML(chosen.outerHTML);
-    } else {
-      setFoundTarget(false);
-    }
-
-    setReady(true);
-
-    return function () {
-      if (hiddenTargetRef.current && !keepOriginalVisible) {
-        hiddenTargetRef.current.classList.remove("cm-hide-origin");
-      }
-    };
-  }, [useNextTable, keepOriginalVisible, targetSelector]);
-
-  // Open on hash links
-  useEffect(function () {
+  useEffect(() => {
     if (!openOnHash || !modalId || typeof window === "undefined") return;
     function maybeOpen() {
-      var hash = (window.location.hash || "").replace(/^#/, "");
+      const hash = (window.location.hash || "").replace(/^#/, "");
       if (hash && hash === modalId) setOpen(true);
     }
     window.addEventListener("hashchange", maybeOpen);
-    return function () { window.removeEventListener("hashchange", maybeOpen); };
+    return () => window.removeEventListener("hashchange", maybeOpen);
   }, [openOnHash, modalId]);
 
-  // Lock/unlock page scroll
-  useEffect(function () {
+  useEffect(() => {
     if (typeof document === "undefined") return;
-    var html = document.documentElement;
-    var prev = html.style.overflow;
+    const html = document.documentElement;
+    const prev = html.style.overflow;
     if (open) html.style.overflow = "hidden";
-    return function () { html.style.overflow = prev; };
+    return () => { html.style.overflow = prev; };
   }, [open]);
 
-  // Focus mgmt (skip first render)
-  useEffect(function () {
+  useEffect(() => {
     if (!didMountRef.current) { didMountRef.current = true; return; }
     if (open) {
-      var el = dialogRef.current;
-      var firstFocusable = el
+      const el = dialogRef.current;
+      const firstFocusable = el
         ? el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
         : null;
       if (firstFocusable && firstFocusable.focus) firstFocusable.focus();
@@ -154,41 +91,34 @@ export const ContentModal = function ContentModal(props) {
     }
   }, [open]);
 
-  // Close on Escape (only while open)
-  useEffect(function () {
+  useEffect(() => {
     if (!open || typeof window === "undefined") return;
     function onKey(e) { if (e.key === "Escape") setOpen(false); }
     window.addEventListener("keydown", onKey);
-    return function () { window.removeEventListener("keydown", onKey); };
+    return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
   function handleBackdropMouseDown(e) {
     if (!closeOnBackdrop) return;
-    var target = e && e.target ? e.target : null;
-    var isBackdrop = target && target.getAttribute && target.getAttribute("data-cm-backdrop") === "1";
+    const target = e?.target;
+    const isBackdrop = target?.getAttribute?.("data-cm-backdrop") === "1";
     if (isBackdrop) setOpen(false);
   }
 
-  var sizeClass =
+  const sizeClass =
     size === "sm" ? "cm-size-sm"
     : size === "md" ? "cm-size-md"
     : size === "xl" ? "cm-size-xl"
     : "cm-size-lg";
 
-  var modalIdAttr = modalId || undefined;
-  var ariaLabelledBy = modalId ? modalId + "-title" : undefined;
-  var ariaExpanded = open ? "true" : "false";
-  var triggerClass = "modal-button " + (buttonClassName || "cm-TriggerBtnDefault");
-  var dialogClass = "cm-Dialog " + sizeClass;
-
-  var usingCaptured = useNextTable && !!capturedHTML;
+  const modalIdAttr = modalId || undefined;
+  const ariaLabelledBy = modalId ? modalId + "-title" : undefined;
+  const ariaExpanded = open ? "true" : "false";
+  const triggerClass = "modal-button " + (buttonClassName || "cm-TriggerBtnDefault");
+  const dialogClass = "cm-Dialog " + sizeClass;
 
   return (
     <div data-cm-root="">
-      {/* Anchor to determine "next table" position */}
-      <span ref={anchorRef} style={{ display: "none" }} />
-
-      {/* Critical CSS pre-paint */}
       <style id="content-modal-styles">{css}</style>
 
       <button
@@ -197,36 +127,21 @@ export const ContentModal = function ContentModal(props) {
         className={triggerClass}
         aria-haspopup="dialog"
         aria-expanded={ariaExpanded}
-        onClick={function () {
-          if (useNextTable && !foundTarget) return;
+        onClick={() => {
           if (modalId && typeof window !== "undefined") {
-            var url = new URL(window.location.href);
+            const url = new URL(window.location.href);
             url.hash = modalId;
             history.replaceState(null, "", url);
           }
           setOpen(true);
         }}
         data-modal-id={modalIdAttr}
-        disabled={useNextTable ? (!ready || !foundTarget) : false}
-        title={
-          useNextTable
-            ? (foundTarget ? "Open table" : "No table found after this component")
-            : undefined
-        }
+        title={title}
       >
         {label}
-        <i
-          className="fa-solid fa-up-right-from-square"
-          onClick={function (e) {
-            e.stopPropagation();
-            if (useNextTable && !foundTarget) return;
-            setOpen(true);
-          }}
-          aria-hidden="true"
-        />
+        {showIcon && <i className="fa-solid fa-up-right-from-square" aria-hidden="true" />}
       </button>
 
-      {/* Backdrop + dialog with display guards to prevent any flash */}
       <div
         className="cm-Backdrop"
         aria-hidden={open ? "false" : "true"}
@@ -255,14 +170,14 @@ export const ContentModal = function ContentModal(props) {
               className="cm-CloseBtn close"
               type="button"
               aria-label="Close"
-              onClick={function () {
+              onClick={() => {
                 setOpen(false);
                 if (
                   modalId &&
                   typeof window !== "undefined" &&
                   window.location.hash === "#" + modalId
                 ) {
-                  var url = new URL(window.location.href);
+                  const url = new URL(window.location.href);
                   url.hash = "";
                   history.replaceState(null, "", url);
                 }
@@ -273,13 +188,9 @@ export const ContentModal = function ContentModal(props) {
           </div>
 
           <div className="cm-Body">
-            <div className="table-wrapper">
-              {usingCaptured ? (
-                <div dangerouslySetInnerHTML={{ __html: capturedHTML }} />
-              ) : (
-                content || <div className="placeholder">Paste your content here</div>
-              )}
-            </div>
+            {props.children
+              ? props.children
+              : content || <div className="placeholder">Paste your content here</div>}
           </div>
         </div>
       </div>
@@ -292,21 +203,17 @@ export const ContentModal = function ContentModal(props) {
   title="Example Modal"
   modalId="exampleModal"
   size="lg"
+  buttonColor="#2B6CB0"
+  buttonPadding="12px 28px"
   content={
     <HTMLBlock>{`
-      <table>
-        <thead><tr><th>Column A</th><th>Column B</th></tr></thead>
-        <tbody><tr><td>Value 1</td><td>Value 2</td></tr></tbody>
-      </table>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+    Fusce vel leo ut turpis feugiat commodo et in nunc. Phasellus imperdiet ut nunc vitae porta. 
+    Pellentesque sollicitudin, sapien sed dictum molestie, dolor enim vestibulum est, non facilisis libero nibh vel arcu. 
+    Fusce aliquam diam in velit vulputate luctus. Morbi sagittis erat eget est consectetur, a molestie dui sollicitudin. 
+    Mauris commodo lorem eros, a cursus tortor malesuada ac. Ut sit amet eros dictum, aliquet nisl rutrum, finibus nulla. 
+    Sed interdum commodo interdum. Quisque arcu diam, malesuada sit amet eros non, vulputate aliquet orci.
     `}</HTMLBlock>
   }
 />
 
-
-<ContentModal
-  label="View table"
-  title="Results"
-  modalId="resultsTable"
-  useNextTable
-  TargetSelector=".rdmd-table-inner > table"
-/>
