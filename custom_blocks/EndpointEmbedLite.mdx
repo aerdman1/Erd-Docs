@@ -16,10 +16,10 @@ export const EndpointEmbedLite = ({
   title,
   description,
   linkText,
-  displayMode = "popup",      // "popup" | "inline"
-  websiteBaseUrl,             // optional; auto-detects if omitted
-  docSlug,                    // optional; if provided, link to /reference/{docSlug}
-  apiBaseUrl,                 // optional; if provided, show "API: METHOD {apiBaseUrl}{endpoint}"
+  displayMode = "popup",
+  websiteBaseUrl,
+  docSlug,
+  apiBaseUrl,
   labels = true
 }) => {
   const baseUrl = useMemo(() => {
@@ -43,7 +43,6 @@ export const EndpointEmbedLite = ({
 
   const [hover, setHover] = useState(false);
 
-  // Always solid card styling
   const cardStyle = {
     position: "relative",
     background: "var(--color-bg-page, #fff)",
@@ -63,7 +62,6 @@ export const EndpointEmbedLite = ({
 
   const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
-  // Method pill
   const METHOD_RGB = {
     GET: [37, 99, 235],
     POST: [22, 163, 74],
@@ -75,7 +73,7 @@ export const EndpointEmbedLite = ({
 
   const MethodTag = ({ m }) => {
     const M = String(m).toUpperCase();
-    const [r, g, b] = METHOD_RGB[M] || [99, 102, 241]; // fallback indigo
+    const [r, g, b] = METHOD_RGB[M] || [99, 102, 241];
     return (
       <span
         title={M}
@@ -110,11 +108,11 @@ export const EndpointEmbedLite = ({
       }}
     >
       <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", ...dividerStyle }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", ...dividerStyle }}>
+          <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>{displayTitle}</h3>
           <MethodTag m={String(method).toUpperCase()} />
         </div>
         <div style={{ paddingTop: 8 }}>
-          <h3 style={{ margin: "6px 0 4px" }}>{displayTitle}</h3>
           {endpoint && (
             <div style={{ fontFamily: mono, fontSize: ".9rem", opacity: .8 }}>
               {endpoint}
