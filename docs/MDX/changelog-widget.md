@@ -7,7 +7,7 @@ metadata:
   robots: index
 ---
 <ChangelogWidget
-  feedUrl="https://erdman-refactored-group.readme.io/changelog.rss"
+  feedUrl="https://erdtest123.readme.io/changelog.rss"
   position="bottom-right"
   maxItems={20}
   badgeMode="unread"
