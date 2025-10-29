@@ -43,10 +43,10 @@ export const ContentModal = props => {
     ".cm-DialogWrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
     '.cm-DialogWrap[aria-hidden="false"]{display:flex;}',
     ".cm-Dialog{width:100%;max-height:86vh;overflow:hidden;background:#fff;color:inherit;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:flex;flex-direction:column;outline:none;}",
-    ".cm-size-sm{max-width:40%;}",
-    ".cm-size-md{max-width:60%;}",
-    ".cm-size-lg{max-width:80%;}",
-    ".cm-size-xl{max-width:100%;}",
+    ".cm-size-sm{max-width:480px;}",   // Updated
+    ".cm-size-md{max-width:720px;}",   // Updated
+    ".cm-size-lg{max-width:960px;}",   // Updated
+    ".cm-size-xl{max-width:1200px;}",  // Updated
     ".cm-Header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.08);background:#fff;position:sticky;top:0;z-index:1;}",
     ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
     ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
@@ -202,9 +202,9 @@ export const ContentModal = props => {
   label="Open Example Modal"
   title="Example Modal"
   modalId="exampleModal"
-  size="sm"
   buttonColor="#2B6CB0"
   buttonPadding="12px 18px"
+  size="sm"
   content={
     <HTMLBlock>{`
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
@@ -216,4 +216,3 @@ export const ContentModal = props => {
     `}</HTMLBlock>
   }
 />
-
