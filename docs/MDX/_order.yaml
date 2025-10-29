@@ -1,5 +1,6 @@
 - content-modal
 - changelog-widget
+- endpoint-embedding-lite
 - simple-banner
 - page-banner
 - simple-stepper
@@ -13,4 +14,3 @@
 - customer-quotes
 - page-modal-simple
 - display-geojson-data
-- endpoint-embedding-lite
