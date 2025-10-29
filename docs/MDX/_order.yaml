@@ -1,3 +1,4 @@
+- page-modal-simple
 - simple-banner
 - page-banner
 - simple-stepper
@@ -9,7 +10,6 @@
 - keyword-testing
 - data-tables
 - dashboard-mdx
-- page-modal-simple
 - customer-quotes
 - display-geojson-data
 - changelog-widget
