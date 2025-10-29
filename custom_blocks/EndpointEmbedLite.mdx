@@ -17,7 +17,6 @@ export const EndpointEmbedLite = ({
   description,
   linkText,
   displayMode = "popup",      // "popup" | "inline"
-  theme = "card-block",       // "card-block" | "card-simple"
   websiteBaseUrl,             // optional; auto-detects if omitted
   docSlug,                    // optional; if provided, link to /reference/{docSlug}
   apiBaseUrl,                 // optional; if provided, show "API: METHOD {apiBaseUrl}{endpoint}"
@@ -31,7 +30,10 @@ export const EndpointEmbedLite = ({
 
   const derivedSlug = useMemo(() => {
     if (docSlug) return docSlug;
-    const s = String(endpoint || "").replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "");
+    const s = String(endpoint || "")
+      .replace(/[{}]/g, "")
+      .replace(/\//g, "-")
+      .replace(/^-+|-+$/g, "");
     return s || "endpoint";
   }, [endpoint, docSlug]);
 
@@ -41,16 +43,15 @@ export const EndpointEmbedLite = ({
 
   const [hover, setHover] = useState(false);
 
+  // Always solid card styling
   const cardStyle = {
     position: "relative",
-    background: theme === "card-block"
-      ? "var(--color-bg-page, #fff)"
-      : "transparent",
+    background: "var(--color-bg-page, #fff)",
     color: "var(--color-text-default, #000)",
-    padding: theme === "card-block" ? "14px 16px" : "0",
-    borderRadius: theme === "card-block" ? 8 : 0,
-    border: theme === "card-block" ? "1px solid var(--color-border-default, rgba(0,0,0,.12))" : "none",
-    boxShadow: theme === "card-block" ? "0 6px 16px rgba(0,0,0,.06)" : "none",
+    padding: "14px 16px",
+    borderRadius: 8,
+    border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
+    boxShadow: "0 6px 16px rgba(0,0,0,.06)",
     minWidth: 240,
     maxWidth: "100%"
   };
@@ -62,17 +63,52 @@ export const EndpointEmbedLite = ({
 
   const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
-  const MethodTag = ({ m }) => (
-    <span style={{
-      fontWeight: 700, textTransform: "uppercase", fontSize: ".8rem",
-      color: m === "GET" ? "#2563eb" : m === "POST" ? "#16a34a" : m === "PUT" ? "#ca8a04" : m === "DELETE" ? "#dc2626" : "inherit"
-    }}>{m}</span>
-  );
+  // Method pill
+  const METHOD_RGB = {
+    GET: [37, 99, 235],
+    POST: [22, 163, 74],
+    PUT: [202, 138, 4],
+    PATCH: [217, 119, 6],
+    HEAD: [14, 116, 144],
+    OPTIONS: [107, 114, 128]
+  };
 
-  const Label = ({ children }) => labels ? <strong>{children}: </strong> : null;
+  const MethodTag = ({ m }) => {
+    const M = String(m).toUpperCase();
+    const [r, g, b] = METHOD_RGB[M] || [99, 102, 241]; // fallback indigo
+    return (
+      <span
+        title={M}
+        style={{
+          display: "inline-block",
+          fontWeight: 800,
+          textTransform: "uppercase",
+          fontSize: ".72rem",
+          lineHeight: "1.4",
+          padding: "3px 8px",
+          borderRadius: 999,
+          color: `rgb(${r}, ${g}, ${b})`,
+          background: `rgba(${r}, ${g}, ${b}, 0.12)`,
+          border: `1px solid rgba(${r}, ${g}, ${b}, 0.35)`,
+          letterSpacing: ".02em"
+        }}
+      >
+        {M}
+      </span>
+    );
+  };
+
+  const Label = ({ children }) => (labels ? <strong>{children}: </strong> : null);
 
   const CardContent = (
-    <a href={readmeDocUrl} style={{ textDecoration: "none", color: "var(--color-text-default, #000)", display: "block" }}>
+    <a
+      href={readmeDocUrl}
+      style={{
+        textDecoration: "none",
+        color: "var(--color-text-default, #000)",
+        display: "block"
+      }}
+    >
       <div style={cardStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", ...dividerStyle }}>
           <MethodTag m={String(method).toUpperCase()} />
@@ -104,14 +140,17 @@ export const EndpointEmbedLite = ({
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
       >
-        <a href={readmeDocUrl} style={{
-          textDecoration: "none",
-          fontWeight: 700,
-          borderRadius: 4,
-          padding: "2px 6px",
-          background: "var(--color-bg-muted, rgba(0,0,0,.06))",
-          color: "var(--color-text-default, #000)"
-        }}>
+        <a
+          href={readmeDocUrl}
+          style={{
+            textDecoration: "none",
+            fontWeight: 700,
+            borderRadius: 4,
+            padding: "2px 6px",
+            background: "var(--color-bg-muted, rgba(0,0,0,.06))",
+            color: "var(--color-text-default, #000)"
+          }}
+        >
           {displayLinkText}
         </a>
         {hover && (
@@ -126,8 +165,49 @@ export const EndpointEmbedLite = ({
   return CardContent;
 };
 
-<EndpointEmbedLite endpoint="/user/{username}" method="GET" title="Get User" description="Retrieve a user by username." />
+<EndpointEmbedLite
+  endpoint="/pet"
+  method="POST"
+  title="Create Pet"
+  displayMode="inline"
+  apiBaseUrl="https://api.example.com"
+/>
 
-<EndpointEmbedLite endpoint="/pet" method="POST" title="Create Pet" displayMode="inline" theme="card-block" apiBaseUrl="https://api.example.com" />
+<EndpointEmbedLite
+  endpoint="/user/{username}"
+  method="GET"
+  title="Get User"
+  description="Retrieve a user by username."
+/>
 
-<EndpointEmbedLite endpoint="/posts/{id}" method="DELETE" title="Delete Post" theme="card-simple" />
+<EndpointEmbedLite
+  endpoint="/pet/{id}"
+  method="PUT"
+  title="Update Pet"
+  description="Update an existing pet’s information."
+  apiBaseUrl="https://api.example.com"
+/>
+
+<EndpointEmbedLite
+  endpoint="/pet/{id}"
+  method="PATCH"
+  title="Partially Update Pet"
+  description="Update part of a pet record."
+  apiBaseUrl="https://api.example.com"
+/>
+
+<EndpointEmbedLite
+  endpoint="/pet/{id}"
+  method="DELETE"
+  title="Delete Pet"
+  description="Remove a pet from the database."
+  apiBaseUrl="https://api.example.com"
+/>
+
+<EndpointEmbedLite
+  endpoint="/options"
+  method="OPTIONS"
+  title="Get Allowed Methods"
+  description="View supported HTTP methods for a resource."
+  apiBaseUrl="https://api.example.com"
+/>
