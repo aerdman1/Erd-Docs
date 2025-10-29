@@ -5,7 +5,7 @@ name: EndpointPicker
 title: "EndpointPicker"
 description: "Auto-detect ReadMe OpenAPI specs from /openapi, select a spec + endpoint, and view key details."
 author: "@andrewerdman"
-version: "1.0.3"
+version: "1.0.4"
 ---
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -19,6 +19,8 @@ export const EndpointPicker = props => {
     return "";
   }, [websiteBaseUrl]);
 
+  const denySlugs = ["health"];
+
   const [specs, setSpecs] = useState([]);
   const [specUrl, setSpecUrl] = useState("");
   const [loadingIndex, setLoadingIndex] = useState(true);
@@ -31,6 +33,11 @@ export const EndpointPicker = props => {
   const [search, setSearch] = useState("");
 
   const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+
+  function slugForReference(path, opId) {
+    if (opId) return String(opId).trim();
+    return String(path || "").replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "") || "endpoint";
+  }
 
   async function fetchSpecIndex(indexUrl) {
     const res = await fetch(indexUrl, { headers: { Accept: "text/html,*/*" } });
@@ -55,16 +62,13 @@ export const EndpointPicker = props => {
       Object.keys(ops).forEach(m => {
         if (["get","post","put","delete","patch","head","options","trace"].includes(m)) {
           const op = ops[m] || {};
-          out.push({ path: p, method: m.toUpperCase(), summary: op.summary || "", description: op.description || "", operationId: op.operationId || "" });
+          const slug = slugForReference(p, op.operationId || "");
+          if (denySlugs.includes(slug.toLowerCase())) return;
+          out.push({ path: p, method: m.toUpperCase(), summary: op.summary || "", description: op.description || "", operationId: op.operationId || "", slug });
         }
       });
     });
     return out.sort((a,b) => a.path === b.path ? a.method.localeCompare(b.method) : a.path.localeCompare(b.path));
-  }
-
-  function slugForReference(path, opId) {
-    if (opId) return opId;
-    return String(path || "").replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "") || "endpoint";
   }
 
   useEffect(() => {
@@ -97,6 +101,9 @@ export const EndpointPicker = props => {
         if (e[0]) {
           setSelectedPath(e[0].path);
           setSelectedMethod(e[0].method);
+        } else {
+          setSelectedPath("");
+          setSelectedMethod("");
         }
       } catch {
         setEndpoints([]);
@@ -125,7 +132,7 @@ export const EndpointPicker = props => {
     setSelectedMethod(current.method);
   }, [current && current.path, current && current.method]);
 
-  const referenceUrl = current ? `${base}/reference/${slugForReference(current.path, current.operationId)}` : "#";
+  const referenceUrl = current ? `${base}/reference/${current.slug}` : "#";
 
   return (
     <div data-ee-picker="" style={{
