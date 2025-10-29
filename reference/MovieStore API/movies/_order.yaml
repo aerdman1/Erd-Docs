@@ -1,0 +1,6 @@
+- get_movies
+- post_movies
+- get_movies-id
+- patch_movies-id
+- delete_movies-id
+- post_movies-id-poster
