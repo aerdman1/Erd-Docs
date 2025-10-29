@@ -2,6 +2,7 @@
 title: Page Modal
 deprecated: false
 hidden: false
+icon: far fa-arrow-up-right
 metadata:
   robots: index
 ---
