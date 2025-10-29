@@ -8,25 +8,30 @@ author: "@andrewerdman"
 version: "1.0.0"
 ---
 
-
 import React, { useEffect, useRef } from 'react';
 
 export const ChangelogWidget = ({
-  feedUrl = 'https://<DOMAIN>/changelog.rss',
-  position = 'bottom-right',           // 'bottom-right' | 'bottom-left'
+  feedUrl,
+  position = 'bottom-right',
   maxItems = 20,
-  badgeMode = 'unread',                 // 'unread' | 'new-since-last-open'
+  badgeMode = 'unread',
   excerptMaxChars = 160,
   newIsYoungerThanDays = 30,
   useProxy = true,
   proxy = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   widgetId = 'changelog-widget',
-  adminOnly = false                     // if true, render only for logged-in admins (checks #hub-me)
+  adminOnly = false
 }) => {
   const mountRef = useRef(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
+
+    let effectiveFeedUrl = feedUrl;
+    if (!effectiveFeedUrl && typeof window !== 'undefined') {
+      const { protocol, host } = window.location;
+      effectiveFeedUrl = `${protocol}//${host}/changelog.rss`;
+    }
 
     function getHubData() {
       const el = document.getElementById('hub-me');
@@ -47,7 +52,7 @@ export const ChangelogWidget = ({
     }
 
     const CONFIG = {
-      feedUrl,
+      feedUrl: effectiveFeedUrl,
       useProxy,
       proxy,
       maxItems,
@@ -66,7 +71,6 @@ export const ChangelogWidget = ({
       panelOpen: false
     };
 
-    // host inside the component (not body) to ensure clean teardown
     const host = document.createElement('div');
     host.id = CONFIG.widgetId;
     mountRef.current.appendChild(host);
@@ -284,11 +288,10 @@ export const ChangelogWidget = ({
         render();
       } catch (e) {
         if (!CONFIG.useProxy) {
-          try { await fetchRss(); render(); } catch { /* ignore */ }
+          try { await fetchRss(); render(); } catch { }
         } else {
           els.list.innerHTML = '<div class="item"><div class="excerpt">No updates available right now.</div></div>';
           els.badge.hidden = true;
-          // console.warn('[Changelog Widget]', e);
         }
       }
     })();
@@ -300,13 +303,10 @@ export const ChangelogWidget = ({
     };
   }, [feedUrl, position, maxItems, badgeMode, excerptMaxChars, newIsYoungerThanDays, useProxy, proxy, widgetId, adminOnly]);
 
-  // Shadow host target (kept empty; widget lives in shadow DOM)
   return <div ref={mountRef} />;
 };
 
-
 <ChangelogWidget
-  feedUrl="https://<DOMAIN>/changelog.rss"
   position="bottom-right"
   maxItems={20}
   badgeMode="unread"
