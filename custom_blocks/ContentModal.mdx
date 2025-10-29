@@ -31,12 +31,12 @@ export const ContentModal = props => {
   const css = [
     ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;z-index:999998!important;}",
     '.cm-Backdrop[aria-hidden="false"]{display:block;}',
-    '.cm-Backdrop::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
+    '.cm-Backdrop::before{content:\"\";position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
     ".cm-DialogWrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
-    '.cm-DialogWrap[aria-hidden="false"]{display:flex;}',
+    '.cm-DialogWrap[aria-hidden=\"false\"]{display:flex;}',
     `.cm-Dialog{width:100%;max-height:86vh;overflow:hidden;
-      background:var(--v-background, inherit);
-      color:var(--v-foreground, inherit);
+      background:var(--color-bg-page, #fff);
+      color:var(--color-text-default, #000);
       border-radius:12px;
       box-shadow:0 10px 30px rgba(0,0,0,.25);
       display:flex;flex-direction:column;outline:none;}`,
@@ -46,15 +46,16 @@ export const ContentModal = props => {
     ".cm-size-xl{max-width:1200px;}",
     `.cm-Header{display:flex;align-items:center;justify-content:space-between;gap:12px;
       padding:14px 18px;
-      border-bottom:1px solid var(--v-border, rgba(0,0,0,.08));
-      background:var(--v-background, inherit);
+      border-bottom:1px solid rgba(0,0,0,.08);
+      background:var(--color-bg-page, #fff);
+      color:var(--color-text-default, #000);
       position:sticky;top:0;z-index:1;}`,
     ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
     ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
     ".cm-CloseBtn:hover{opacity:1;}",
     `.cm-Body{overflow:auto;padding:16px 18px;
-      background:var(--v-background, inherit);
-      color:var(--v-foreground, inherit);
+      background:var(--color-bg-page, #fff);
+      color:var(--color-text-default, #000);
       text-align:left;}`,
     ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;text-align:center;}",
     ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
