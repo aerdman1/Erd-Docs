@@ -1,4 +1,3 @@
-- page-modal-simple
 - changelog-widget
 - simple-banner
 - page-banner
@@ -12,4 +11,5 @@
 - data-tables
 - dashboard-mdx
 - customer-quotes
+- page-modal-simple
 - display-geojson-data
