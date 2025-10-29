@@ -2,50 +2,50 @@
 name: EndpointEmbedLite
 ---
 ---
-title: "EndpointEmbedPicker"
-description: "Auto-detect ReadMe OpenAPI specs from /openapi, select a spec + endpoint, and render a simple embed."
+title: "EndpointEmbedLite"
+description: "A minimal endpoint embed card for ReadMe: no spec fetch, auto-links to the current project. Theme-aware for light/dark."
 author: "@andrewerdman"
 version: "1.0.1"
 ---
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
-export const EndpointEmbedLite = props => {
-  const {
-    endpoint,
-    method = "GET",
-    title,
-    description,
-    linkText,
-    displayMode = "popup",
-    theme = "card-block",
-    websiteBaseUrl,
-    docSlug,
-    apiBaseUrl,
-    labels = true
-  } = props;
-
+export const EndpointEmbedLite = ({
+  endpoint,
+  method = "GET",
+  title,
+  description,
+  linkText,
+  displayMode = "popup",      // "popup" | "inline"
+  theme = "card-block",       // "card-block" | "card-simple"
+  websiteBaseUrl,             // optional; auto-detects if omitted
+  docSlug,                    // optional; if provided, link to /reference/{docSlug}
+  apiBaseUrl,                 // optional; if provided, show "API: METHOD {apiBaseUrl}{endpoint}"
+  labels = true
+}) => {
   const baseUrl = useMemo(() => {
     if (websiteBaseUrl) return websiteBaseUrl.replace(/\/$/, "");
-    if (typeof window !== "undefined") return window.location.protocol + "//" + window.location.host;
+    if (typeof window !== "undefined") return `${window.location.protocol}//${window.location.host}`;
     return "";
   }, [websiteBaseUrl]);
 
   const derivedSlug = useMemo(() => {
     if (docSlug) return docSlug;
-    var s = String(endpoint || "").replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "");
+    const s = String(endpoint || "").replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "");
     return s || "endpoint";
   }, [endpoint, docSlug]);
 
-  const readmeDocUrl = baseUrl ? (baseUrl + "/reference/" + derivedSlug) : "#";
+  const readmeDocUrl = baseUrl ? `${baseUrl}/reference/${derivedSlug}` : "#";
   const displayTitle = title || endpoint || "Endpoint";
   const displayLinkText = linkText || displayTitle;
+
   const [hover, setHover] = useState(false);
-  const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
   const cardStyle = {
     position: "relative",
-    background: theme === "card-block" ? "var(--color-bg-page, #fff)" : "transparent",
+    background: theme === "card-block"
+      ? "var(--color-bg-page, #fff)"
+      : "transparent",
     color: "var(--color-text-default, #000)",
     padding: theme === "card-block" ? "14px 16px" : "0",
     borderRadius: theme === "card-block" ? 8 : 0,
@@ -54,21 +54,24 @@ export const EndpointEmbedLite = props => {
     minWidth: 240,
     maxWidth: "100%"
   };
-  const dividerStyle = { borderBottom: "1px solid var(--color-border-default, rgba(0,0,0,.08))", paddingBottom: 6 };
 
-  const MethodTag = ({ m }) => {
-    var M = String(m || "").toUpperCase();
-    var color =
-      M === "GET" ? "#2563eb" :
-      M === "POST" ? "#16a34a" :
-      M === "PUT" ? "#ca8a04" :
-      M === "DELETE" ? "#dc2626" : "inherit";
-    return <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: ".8rem", color }}>{M || "GET"}</span>;
+  const dividerStyle = {
+    borderBottom: "1px solid var(--color-border-default, rgba(0,0,0,.08))",
+    paddingBottom: 6
   };
 
-  const Label = ({ children }) => (labels ? <strong>{children}: </strong> : null);
+  const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
-  const CardContent =
+  const MethodTag = ({ m }) => (
+    <span style={{
+      fontWeight: 700, textTransform: "uppercase", fontSize: ".8rem",
+      color: m === "GET" ? "#2563eb" : m === "POST" ? "#16a34a" : m === "PUT" ? "#ca8a04" : m === "DELETE" ? "#dc2626" : "inherit"
+    }}>{m}</span>
+  );
+
+  const Label = ({ children }) => labels ? <strong>{children}: </strong> : null;
+
+  const CardContent = (
     <a href={readmeDocUrl} style={{ textDecoration: "none", color: "var(--color-text-default, #000)", display: "block" }}>
       <div style={cardStyle}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", ...dividerStyle }}>
@@ -76,15 +79,23 @@ export const EndpointEmbedLite = props => {
         </div>
         <div style={{ paddingTop: 8 }}>
           <h3 style={{ margin: "6px 0 4px" }}>{displayTitle}</h3>
-          {endpoint && <div style={{ fontFamily: mono, fontSize: ".9rem", opacity: .8 }}>{endpoint}</div>}
-          {description && <p style={{ margin: "8px 0 0", fontSize: ".95rem", opacity: .9 }}>{description}</p>}
-          {apiBaseUrl && endpoint &&
+          {endpoint && (
+            <div style={{ fontFamily: mono, fontSize: ".9rem", opacity: .8 }}>
+              {endpoint}
+            </div>
+          )}
+          {description && (
+            <p style={{ margin: "8px 0 0", fontSize: ".95rem", opacity: .9 }}>{description}</p>
+          )}
+          {apiBaseUrl && endpoint && (
             <div style={{ marginTop: 8, fontFamily: mono, fontSize: ".9rem", opacity: .85 }}>
               <Label>API</Label>{String(method).toUpperCase()} {apiBaseUrl}{endpoint}
-            </div>}
+            </div>
+          )}
         </div>
       </div>
-    </a>;
+    </a>
+  );
 
   if (displayMode === "popup") {
     return (
@@ -103,10 +114,11 @@ export const EndpointEmbedLite = props => {
         }}>
           {displayLinkText}
         </a>
-        {hover &&
+        {hover && (
           <div style={{ position: "absolute", left: 0, top: "calc(100% + 6px)", zIndex: 1000 }}>
             {CardContent}
-          </div>}
+          </div>
+        )}
       </span>
     );
   }
@@ -114,210 +126,8 @@ export const EndpointEmbedLite = props => {
   return CardContent;
 };
 
-export const EndpointEmbedPicker = props => {
-  const { websiteBaseUrl, defaultTheme = "card-block", defaultDisplayMode = "popup" } = props;
+<EndpointEmbedLite endpoint="/user/{username}" method="GET" title="Get User" description="Retrieve a user by username." />
 
-  const base = useMemo(() => {
-    if (websiteBaseUrl) return websiteBaseUrl.replace(/\/$/, "");
-    if (typeof window !== "undefined") return window.location.protocol + "//" + window.location.host;
-    return "";
-  }, [websiteBaseUrl]);
+<EndpointEmbedLite endpoint="/pet" method="POST" title="Create Pet" displayMode="inline" theme="card-block" apiBaseUrl="https://api.example.com" />
 
-  const [specs, setSpecs] = useState([]);
-  const [specUrl, setSpecUrl] = useState("");
-  const [loadingIndex, setLoadingIndex] = useState(true);
-
-  const [endpoints, setEndpoints] = useState([]);
-  const [loadingSpec, setLoadingSpec] = useState(false);
-
-  const [selectedPath, setSelectedPath] = useState("");
-  const [selectedMethod, setSelectedMethod] = useState("");
-  const [search, setSearch] = useState("");
-
-  const fetchSpecIndex = async (indexUrl) => {
-    const res = await fetch(indexUrl, { headers: { Accept: "text/html,*/*" } });
-    if (!res.ok) throw new Error("Failed to load /openapi");
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    const links = Array.from(doc.querySelectorAll('.container .item a[href^="/openapi/"]'));
-    return links.map(a => ({ name: (a.textContent || "").trim(), href: a.getAttribute("href") }));
-  };
-
-  const fetchSpecJson = async (url) => {
-    const res = await fetch(url, { headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error("OpenAPI fetch failed");
-    return res.json();
-  };
-
-  const listPathsAndMethods = (spec) => {
-    const out = [];
-    const paths = spec && spec.paths ? spec.paths : {};
-    Object.keys(paths).forEach(p => {
-      const ops = paths[p] || {};
-      Object.keys(ops).forEach(m => {
-        if (["get","post","put","delete","patch","head","options","trace"].indexOf(m) >= 0) {
-          const op = ops[m] || {};
-          out.push({ path: p, method: m.toUpperCase(), summary: op.summary || "" });
-        }
-      });
-    });
-    return out.sort(function(a,b){
-      if (a.path < b.path) return -1;
-      if (a.path > b.path) return 1;
-      if (a.method < b.method) return -1;
-      if (a.method > b.method) return 1;
-      return 0;
-    });
-  };
-
-  useEffect(() => {
-    let did = false;
-    (async () => {
-      try {
-        const list = await fetchSpecIndex(base + "/openapi");
-        if (did) return;
-        setSpecs(list);
-        if (list && list[0]) setSpecUrl(base + list[0].href);
-      } catch (e) {
-        setSpecs([]);
-      } finally {
-        if (!did) setLoadingIndex(false);
-      }
-    })();
-    return () => { did = true; };
-  }, [base]);
-
-  useEffect(() => {
-    if (!specUrl) { setEndpoints([]); return; }
-    let did = false;
-    setLoadingSpec(true);
-    (async () => {
-      try {
-        const spec = await fetchSpecJson(specUrl);
-        if (did) return;
-        const e = listPathsAndMethods(spec);
-        setEndpoints(e);
-        if (e[0]) {
-          setSelectedPath(e[0].path);
-          setSelectedMethod(e[0].method);
-        }
-      } catch {
-        setEndpoints([]);
-      } finally {
-        if (!did) setLoadingSpec(false);
-      }
-    })();
-    return () => { did = true; };
-  }, [specUrl]);
-
-  const filtered = useMemo(() => {
-    const q = (search || "").trim().toLowerCase();
-    if (!q) return endpoints;
-    return endpoints.filter(e =>
-      e.path.toLowerCase().indexOf(q) >= 0 ||
-      e.method.toLowerCase().indexOf(q) >= 0 ||
-      (e.summary || "").toLowerCase().indexOf(q) >= 0
-    );
-  }, [endpoints, search]);
-
-  const current = filtered.find(e => e.path === selectedPath && e.method === selectedMethod) || (filtered[0] || null);
-
-  useEffect(() => {
-    if (!current) return;
-    setSelectedPath(current.path);
-    setSelectedMethod(current.method);
-  }, [current && current.path, current && current.method]);
-
-  return (
-    <div style={{
-      display: "grid",
-      gap: 12,
-      padding: 12,
-      background: "var(--color-bg-page, #fff)",
-      color: "var(--color-text-default, #000)",
-      border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
-      borderRadius: 8
-    }}>
-      <div style={{ display: "grid", gap: 8 }}>
-        <label style={{ fontWeight: 600 }}>OpenAPI file</label>
-        {loadingIndex ? (
-          <div>Loading spec list…</div>
-        ) : (specs && specs.length) ? (
-          <select
-            value={specUrl}
-            onChange={e => setSpecUrl(e.target.value)}
-            style={{ padding: "8px 10px", borderRadius: 6, border: "1px solid var(--color-border-default, rgba(0,0,0,.15))", background: "var(--color-bg-subtle, #f6f8fa)" }}
-          >
-            {specs.map(s => (
-              <option key={s.href} value={base + s.href}>{s.name}</option>
-            ))}
-          </select>
-        ) : (
-          <div>No specs found at {base}/openapi</div>
-        )}
-      </div>
-
-      <div style={{ display: "grid", gap: 8 }}>
-        <label style={{ fontWeight: 600 }}>Find endpoint</label>
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Filter by path, method, or summary"
-          style={{ padding: "8px 10px", borderRadius: 6, border: "1px solid var(--color-border-default, rgba(0,0,0,.15))", background: "var(--color-bg-subtle, #f6f8fa)" }}
-        />
-      </div>
-
-      {loadingSpec ? (
-        <div>Loading endpoints…</div>
-      ) : (filtered && filtered.length) ? (
-        <>
-          <div style={{ display: "grid", gap: 8 }}>
-            <label style={{ fontWeight: 600 }}>Endpoint</label>
-            <select
-              value={selectedPath}
-              onChange={e => setSelectedPath(e.target.value)}
-              style={{ padding: "8px 10px", borderRadius: 6, border: "1px solid var(--color-border-default, rgba(0,0,0,.15))", background: "var(--color-bg-subtle, #f6f8fa)" }}
-            >
-              {[...new Set(filtered.map(f => f.path))].map(p => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: 8 }}>
-            <label style={{ fontWeight: 600 }}>Method</label>
-            <select
-              value={selectedMethod}
-              onChange={e => setSelectedMethod(e.target.value)}
-              style={{ padding: "8px 10px", borderRadius: 6, border: "1px solid var(--color-border-default, rgba(0,0,0,.15))", background: "var(--color-bg-subtle, #f6f8fa)" }}
-            >
-              {filtered.filter(f => f.path === selectedPath).map(f => (
-                <option key={f.path + f.method} value={f.method}>{f.method}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: 6, fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontSize: ".9rem" }}>
-            <div><span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: ".8rem" }}>{selectedMethod}</span> {selectedPath}</div>
-            <div style={{ opacity: .7 }}>{current && current.summary ? current.summary : ""}</div>
-          </div>
-
-          <div style={{ paddingTop: 8 }}>
-            <EndpointEmbedLite
-              endpoint={selectedPath}
-              method={selectedMethod}
-              title={(current && current.summary) ? current.summary : selectedPath}
-              websiteBaseUrl={base}
-              displayMode={defaultDisplayMode}
-              theme={defaultTheme}
-            />
-          </div>
-        </>
-      ) : (
-        <div>No matches.</div>
-      )}
-    </div>
-  );
-};
-
-<EndpointEmbedPicker defaultDisplayMode="popup" defaultTheme="card-block" />
+<EndpointEmbedLite endpoint="/posts/{id}" method="DELETE" title="Delete Post" theme="card-simple" />
