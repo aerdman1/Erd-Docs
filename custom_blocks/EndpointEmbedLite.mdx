@@ -3,9 +3,9 @@ name: EndpointEmbedLite
 ---
 ---
 title: "EndpointEmbedLite"
-description: "A minimal endpoint embed card for ReadMe: no spec fetch, auto-links to the current project."
+description: "A minimal endpoint embed card for ReadMe: no spec fetch, auto-links to the current project. Theme-aware for light/dark."
 author: "@andrewerdman"
-version: "1.0.0"
+version: "1.0.1"
 ---
 
 import React, { useMemo, useState } from "react";
@@ -43,15 +43,24 @@ export const EndpointEmbedLite = ({
 
   const cardStyle = {
     position: "relative",
-    background: theme === "card-block" ? "var(--color-bg-subtle, #f6f8fa)" : "transparent",
-    color: "inherit",
+    background: theme === "card-block"
+      ? "var(--color-bg-page, #fff)"
+      : "transparent",
+    color: "var(--color-text-default, #000)",
     padding: theme === "card-block" ? "14px 16px" : "0",
     borderRadius: theme === "card-block" ? 8 : 0,
-    border: theme === "card-block" ? "1px solid var(--color-border-default, rgba(0,0,0,.1))" : "none",
+    border: theme === "card-block" ? "1px solid var(--color-border-default, rgba(0,0,0,.12))" : "none",
     boxShadow: theme === "card-block" ? "0 6px 16px rgba(0,0,0,.06)" : "none",
     minWidth: 240,
     maxWidth: "100%"
   };
+
+  const dividerStyle = {
+    borderBottom: "1px solid var(--color-border-default, rgba(0,0,0,.08))",
+    paddingBottom: 6
+  };
+
+  const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
   const MethodTag = ({ m }) => (
     <span style={{
@@ -63,15 +72,15 @@ export const EndpointEmbedLite = ({
   const Label = ({ children }) => labels ? <strong>{children}: </strong> : null;
 
   const CardContent = (
-    <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
+    <a href={readmeDocUrl} style={{ textDecoration: "none", color: "var(--color-text-default, #000)", display: "block" }}>
       <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", paddingBottom: 6, borderBottom: "1px solid rgba(0,0,0,.06)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", ...dividerStyle }}>
           <MethodTag m={String(method).toUpperCase()} />
         </div>
         <div style={{ paddingTop: 8 }}>
           <h3 style={{ margin: "6px 0 4px" }}>{displayTitle}</h3>
           {endpoint && (
-            <div style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontSize: ".9rem", opacity: .8 }}>
+            <div style={{ fontFamily: mono, fontSize: ".9rem", opacity: .8 }}>
               {endpoint}
             </div>
           )}
@@ -79,7 +88,7 @@ export const EndpointEmbedLite = ({
             <p style={{ margin: "8px 0 0", fontSize: ".95rem", opacity: .9 }}>{description}</p>
           )}
           {apiBaseUrl && endpoint && (
-            <div style={{ marginTop: 8, fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontSize: ".9rem", opacity: .85 }}>
+            <div style={{ marginTop: 8, fontFamily: mono, fontSize: ".9rem", opacity: .85 }}>
               <Label>API</Label>{String(method).toUpperCase()} {apiBaseUrl}{endpoint}
             </div>
           )}
@@ -100,8 +109,8 @@ export const EndpointEmbedLite = ({
           fontWeight: 700,
           borderRadius: 4,
           padding: "2px 6px",
-          background: "var(--color-bg-muted, #e8f0fe)",
-          color: "var(--color-fg-accent, #1a73e8)"
+          background: "var(--color-bg-muted, rgba(0,0,0,.06))",
+          color: "var(--color-text-default, #000)"
         }}>
           {displayLinkText}
         </a>
