@@ -1,0 +1,124 @@
+---
+name: EndpointEmbedLite
+---
+---
+title: "EndpointEmbedLite"
+description: "A minimal endpoint embed card for ReadMe: no spec fetch, auto-links to the current project."
+author: "@andrewerdman"
+version: "1.0.0"
+---
+
+import React, { useMemo, useState } from "react";
+
+export const EndpointEmbedLite = ({
+  endpoint,
+  method = "GET",
+  title,
+  description,
+  linkText,
+  displayMode = "popup",      // "popup" | "inline"
+  theme = "card-block",       // "card-block" | "card-simple"
+  websiteBaseUrl,             // optional; auto-detects if omitted
+  docSlug,                    // optional; if provided, link to /reference/{docSlug}
+  apiBaseUrl,                 // optional; if provided, show "API: METHOD {apiBaseUrl}{endpoint}"
+  labels = true
+}) => {
+  const baseUrl = useMemo(() => {
+    if (websiteBaseUrl) return websiteBaseUrl.replace(/\/$/, "");
+    if (typeof window !== "undefined") return `${window.location.protocol}//${window.location.host}`;
+    return "";
+  }, [websiteBaseUrl]);
+
+  const derivedSlug = useMemo(() => {
+    if (docSlug) return docSlug;
+    const s = String(endpoint || "").replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "");
+    return s || "endpoint";
+  }, [endpoint, docSlug]);
+
+  const readmeDocUrl = baseUrl ? `${baseUrl}/reference/${derivedSlug}` : "#";
+  const displayTitle = title || endpoint || "Endpoint";
+  const displayLinkText = linkText || displayTitle;
+
+  const [hover, setHover] = useState(false);
+
+  const cardStyle = {
+    position: "relative",
+    background: theme === "card-block" ? "var(--color-bg-subtle, #f6f8fa)" : "transparent",
+    color: "inherit",
+    padding: theme === "card-block" ? "14px 16px" : "0",
+    borderRadius: theme === "card-block" ? 8 : 0,
+    border: theme === "card-block" ? "1px solid var(--color-border-default, rgba(0,0,0,.1))" : "none",
+    boxShadow: theme === "card-block" ? "0 6px 16px rgba(0,0,0,.06)" : "none",
+    minWidth: 240,
+    maxWidth: "100%"
+  };
+
+  const MethodTag = ({ m }) => (
+    <span style={{
+      fontWeight: 700, textTransform: "uppercase", fontSize: ".8rem",
+      color: m === "GET" ? "#2563eb" : m === "POST" ? "#16a34a" : m === "PUT" ? "#ca8a04" : m === "DELETE" ? "#dc2626" : "inherit"
+    }}>{m}</span>
+  );
+
+  const Label = ({ children }) => labels ? <strong>{children}: </strong> : null;
+
+  const CardContent = (
+    <a href={readmeDocUrl} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
+      <div style={cardStyle}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end", paddingBottom: 6, borderBottom: "1px solid rgba(0,0,0,.06)" }}>
+          <MethodTag m={String(method).toUpperCase()} />
+        </div>
+        <div style={{ paddingTop: 8 }}>
+          <h3 style={{ margin: "6px 0 4px" }}>{displayTitle}</h3>
+          {endpoint && (
+            <div style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontSize: ".9rem", opacity: .8 }}>
+              {endpoint}
+            </div>
+          )}
+          {description && (
+            <p style={{ margin: "8px 0 0", fontSize: ".95rem", opacity: .9 }}>{description}</p>
+          )}
+          {apiBaseUrl && endpoint && (
+            <div style={{ marginTop: 8, fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontSize: ".9rem", opacity: .85 }}>
+              <Label>API</Label>{String(method).toUpperCase()} {apiBaseUrl}{endpoint}
+            </div>
+          )}
+        </div>
+      </div>
+    </a>
+  );
+
+  if (displayMode === "popup") {
+    return (
+      <span
+        style={{ display: "inline-block", position: "relative" }}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        <a href={readmeDocUrl} style={{
+          textDecoration: "none",
+          fontWeight: 700,
+          borderRadius: 4,
+          padding: "2px 6px",
+          background: "var(--color-bg-muted, #e8f0fe)",
+          color: "var(--color-fg-accent, #1a73e8)"
+        }}>
+          {displayLinkText}
+        </a>
+        {hover && (
+          <div style={{ position: "absolute", left: 0, top: "calc(100% + 6px)", zIndex: 1000 }}>
+            {CardContent}
+          </div>
+        )}
+      </span>
+    );
+  }
+
+  return CardContent;
+};
+
+<EndpointEmbedLite endpoint="/user/{username}" method="GET" title="Get User" description="Retrieve a user by username." />
+
+<EndpointEmbedLite endpoint="/pet" method="POST" title="Create Pet" displayMode="inline" theme="card-block" apiBaseUrl="https://api.example.com" />
+
+<EndpointEmbedLite endpoint="/posts/{id}" method="DELETE" title="Delete Post" theme="card-simple" />
