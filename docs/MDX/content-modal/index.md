@@ -30,6 +30,4 @@ metadata:
   }
 />
 
-TESTING
-
-{user.bearer}
+{user.MyVariable}
