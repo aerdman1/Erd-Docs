@@ -1,0 +1,263 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "myField API",
+    "version": "v1",
+    "description": "myField API. Operations require the 'myField:admin' scope.",
+    "termsOfService": "https://support.hcss.com.",
+    "contact": {
+      "name": "Heavy Construction Systems Specialists, Inc. (HCSS)",
+      "url": "https://support.hcss.com/",
+      "email": "support@hcss.com"
+    },
+    "license": {
+      "name": "EULA",
+      "url": "https://support.hcss.com."
+    }
+  },
+  "paths": {
+    "/api/v1/timelineEvents": {
+      "put": {
+        "tags": [
+          "Timeline"
+        ],
+        "summary": "Adds/Updates timeline events for multiple users.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimelineEventAdminWrite"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimelineEventAdminWrite"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/TimelineEventAdminWrite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "TimelineEventAdminWrite": {
+        "required": [
+          "employees",
+          "modifiedBy"
+        ],
+        "type": "object",
+        "properties": {
+          "modifiedBy": {
+            "type": "string",
+            "description": "The ID of the user adding or updating timeline events.",
+            "format": "uuid"
+          },
+          "employees": {
+            "maxItems": 100,
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimelineEventEmployeeWrite"
+            },
+            "description": "A list of employees and their timeline events."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A Hcss.OperatorApp.PublicApi.Models.TimelineEvents.TimelineEventAdminWrite represents a list for timeline\r\nevents submitted by an admin on behalf of another user."
+      },
+      "TimelineEventDateWrite": {
+        "required": [
+          "date",
+          "timelineEvents"
+        ],
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "The local date the timeline events started on.",
+            "format": "date",
+            "example": "2025-02-24"
+          },
+          "timelineEvents": {
+            "maxItems": 100,
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimelineEventWrite"
+            },
+            "description": "A list of timeline events."
+          }
+        },
+        "additionalProperties": false,
+        "description": "A Hcss.OperatorApp.PublicApi.Models.TimelineEvents.TimelineEventDateWrite represents a list of\r\ntimeline events for a specific date."
+      },
+      "TimelineEventEmployeeWrite": {
+        "required": [
+          "dates",
+          "employeeCode",
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string",
+            "description": "The ID of the user.",
+            "format": "uuid"
+          },
+          "employeeCode": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The user's employee code."
+          },
+          "dates": {
+            "maxItems": 10,
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimelineEventDateWrite"
+            },
+            "description": "A list of timeline events"
+          }
+        },
+        "additionalProperties": false,
+        "description": "A Hcss.OperatorApp.PublicApi.Models.TimelineEvents.TimelineEventEmployeeWrite Contains the user ID, employee code, and list of timeline events by\r\ndate."
+      },
+      "TimelineEventType": {
+        "enum": [
+          "clockIn",
+          "clockOut",
+          "takeBreak",
+          "resumeFromBreak"
+        ],
+        "type": "string",
+        "description": "Timeline events types."
+      },
+      "TimelineEventWrite": {
+        "required": [
+          "eventDateTime",
+          "eventType",
+          "localTime",
+          "recordedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "eventType": {
+            "$ref": "#/components/schemas/TimelineEventType"
+          },
+          "localTime": {
+            "type": "string",
+            "description": "The local time that this event occurred.",
+            "example": "21:01:42.2111443"
+          },
+          "eventDateTime": {
+            "type": "string",
+            "description": "The datetime for this event.",
+            "format": "date-time",
+            "example": "2025-02-24T21:01:42.2111443Z"
+          },
+          "recordedAt": {
+            "type": "string",
+            "description": "The instant that the timeline event was recorded.",
+            "format": "date-time",
+            "example": "2025-02-24T21:01:42.2111443Z"
+          },
+          "latitude": {
+            "type": "number",
+            "description": "The Latitude of the GPS location when the event was recorded.",
+            "format": "double",
+            "nullable": true
+          },
+          "longitude": {
+            "type": "number",
+            "description": "The Longitude of the GPS location when the event was recorded.",
+            "format": "double",
+            "nullable": true
+          },
+          "accuracyRadiusMeters": {
+            "type": "number",
+            "description": "This is the radius, in meters, of the circle we think the event occurred in.\r\nIf any part of this circle, centered on the passed Lat/Long, intersects\r\na geofence, the event is considered to have happened within that geofence.",
+            "format": "double",
+            "nullable": true
+          },
+          "foremanId": {
+            "type": "string",
+            "description": "The foreman id. Optional.",
+            "format": "uuid",
+            "nullable": true
+          },
+          "businessUnitId": {
+            "type": "string",
+            "description": "The business unit id. Optional.",
+            "format": "uuid",
+            "nullable": true
+          },
+          "jobId": {
+            "type": "string",
+            "description": "The job id. Optional.",
+            "format": "uuid",
+            "nullable": true
+          },
+          "costCodeId": {
+            "type": "string",
+            "description": "The cost code id. Optional.",
+            "format": "uuid",
+            "nullable": true
+          },
+          "equipmentId": {
+            "type": "string",
+            "description": "The equipment id. Optional.",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "A Hcss.OperatorApp.PublicApi.Models.TimelineEvents.TimelineEventWrite represents a timeline event\r\nsubmitted by the user."
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "oauth2",
+        "description": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://dev-api.hcssapps.com/identity/connect/token",
+            "scopes": {
+              "myField:admin": "myField:admin"
+            }
+          },
+          "authorizationCode": {
+            "tokenUrl": "https://dev-api.hcssapps.com/identity/connect/token",
+            "authorizationUrl": "https://dev-api.hcssapps.com/identity/connect/authorize",
+            "scopes": {
+              "myField:admin": "myField:admin"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": [
+        "myField:admin"
+      ]
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://dev-api.hcssapps.com/myField"
+    }
+  ]
+}
