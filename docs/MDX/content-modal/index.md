@@ -31,3 +31,5 @@ metadata:
 />
 
 TESTING
+
+{user.bearer}
