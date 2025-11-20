@@ -6,32 +6,11 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-iconify
+<br />
 
 ```mermaid
-flowchart LR
-  A[<span class="iconify" data-icon="mingcute:rocket-line"></span> Launch]
-  A --> B[<span class="iconify" data-icon="tabler:circle-check"></span> Done]
-
+flowchart LR 
+ A --- B[fa:fa-spinner B] 
+ B --> C[fa:fa-check C] 
+ B --> D[fa:fa-ban D]
 ```
-
-<HTMLBlock>{`
-<style>
-/* Keep icon inline and text-aligned */
-.iconify {
-  width: 1em;     /* important: size like a character */
-  height: 1em;
-  vertical-align: -0.125em;
-  line-height: 1;
-}
-
-/* Tighten label contents */
-svg .label foreignObject > div { 
-  display: inline-flex;
-  align-items: center;
-
-}
-svg .label p { margin: 0; display: inline-flex; align-items: center; gap: 0.25em; }
-
-</style>
-`}</HTMLBlock>
