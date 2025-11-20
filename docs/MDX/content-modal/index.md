@@ -37,3 +37,48 @@ metadata:
   ad minim veniam, quis nostrud exercitation ullamco. Excepteur sint
   occaecat cupidatat non proident!
 </Accordion>
+
+<br />
+
+```mermaid
+sequenceDiagram
+    title WEB PUSH PROVISIONING (APPLE PAY)
+
+    participant U as User
+    participant CW as "Client Website"
+    participant CB as "Client Backend"
+    participant A as Apple
+    participant S as Scheme
+    participant P as PayTech
+    participant DF as "Digitisation Flow"
+
+    U->>CW: Load page
+    U->>CW: Press 'Add to Apple Pay'
+
+    CW->>CW: Execute Apple JS
+    CW->>CW: Call jwsResolverCallback ()
+
+    CW->>CB: Retrieve Token  Object
+
+    Note over CB,A: - Generate\nSharingInstanceIdentifier\n- Create JWS\n- Encapsulate JWS to Token\nObject
+
+    CB->>A: Send Token Object to Apple Pay Web App
+    A->>A: Display Pop Up\nWindow
+
+    A-->>U: Sign In to Apple Account
+
+    CB->>A: getProvisioningTarget
+    A->>P: GET search -device -tokens
+    P-->>CB: getProvisioningTarget   (response)
+
+    CB->>A: Show list of eligible devices
+    A-->>U: Select device & agree to T&C's
+
+    CB->>P: getProvisioningCredential
+    P->>CB: POST provisioning  -data -request
+    P-->>CB: getProvisioningCredential   (response)
+
+    CB->>DF: Digitize Card (Green flow)
+    DF-->>CB: Digitisation Flow
+
+```
