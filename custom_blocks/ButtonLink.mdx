@@ -1,0 +1,32 @@
+---
+name: ButtonLink
+---
+---
+title: "DownloadOASButton"
+description: "A button for downloading an OpenAPI file."
+author: "@olehshh"
+version: "1.0.0"
+---
+
+export const DownloadOASButton = ({ url }) => {
+  const handleOpen = () => {
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
+    <button
+      onClick={handleOpen}
+      className="
+        flex items-center gap-3 px-6 py-3
+        bg-[#6BA539] hover:bg-[#5a8f30]
+        text-white font-semibold rounded-full
+        shadow-md hover:shadow-lg cursor-pointer
+        transform hover:scale-105 transition duration-300
+      "
+    >
+      <span>Hi Kirby!</span>
+    </button>
+  );
+};
+
+<DownloadOASButton url="https://demo-url.readme.io/openapi/openapi.json" />
