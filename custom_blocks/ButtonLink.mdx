@@ -1,14 +1,7 @@
 ---
 name: ButtonLink
 ---
----
-title: "DownloadOASButton"
-description: "A button for downloading an OpenAPI file."
-author: "@olehshh"
-version: "1.0.0"
----
-
-export const DownloadOASButton = ({ url }) => {
+export const ButtonLink = ({ url }) => {
   const handleOpen = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
@@ -24,9 +17,9 @@ export const DownloadOASButton = ({ url }) => {
         transform hover:scale-105 transition duration-300
       "
     >
-      <span>Hi Kirby!</span>
+      <span>My Link Here!</span>
     </button>
   );
 };
 
-<DownloadOASButton url="https://demo-url.readme.io/openapi/openapi.json" />
+<ButtonLink url="https://demo-url.readme.io/openapi/openapi.json" />
