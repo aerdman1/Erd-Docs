@@ -224,7 +224,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc et mattis diam. Pr
 <Accordion title="All props/default values">
   | **Prop**           | **Type**  | **Default**                 | **Description**                                                                            |
   | ------------------ | --------- | --------------------------- | ------------------------------------------------------------------------------------------ |
-  | `websiteBaseUrl`   | `string`  | `'https://yourdocsite.com'` | The ReadMe project base URL (used for linking to reference pages).                         |
+  | `pickles`   | `string`  | `'https://yourdocsite.com'` | The ReadMe project base URL (used for linking to reference pages).                         |
   | `apiTargetUrl`     | `string`  | *none*                      | Optional override for the real API server base URL (for displaying API URL).               |
   | `endpoint`         | `string`  | *required*                  | The API path you want to display (e.g. `/pet/{petId}`).                                    |
   | `method`           | `string`  | *optional*                  | The HTTP method (e.g. `GET`, `POST`). If omitted, auto-selects best match.                 |
