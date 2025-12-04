@@ -28,6 +28,6 @@ metadata:
   }
 />
 
-<br />
+<Anchor label="google" target="_blank" href="https://www.google.com">google</Anchor>
 
 ### <i class="fa-solid fa-gear" /> Settings Overview
