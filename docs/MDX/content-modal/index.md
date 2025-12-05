@@ -28,6 +28,12 @@ metadata:
   }
 />
 
+<br />
+
+<br />
+
+1. Go to the <Anchor label="URL" target="_blank" href="http://my.jfrog.com">URL</Anchor> to access the MyJFrog Portal.
+
 <Anchor label="google" target="_blank" href="https://www.google.com">google</Anchor>
 
 ### <i class="fa-solid fa-gear" /> Settings Overview
