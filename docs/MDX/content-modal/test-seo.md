@@ -6,23 +6,33 @@ icon: far fa-arrows-maximize
 metadata:
   robots: index
 ---
+<Callout icon="📘" theme="info">
+**Important**
 
-
-<Callout icon="⚠️" theme="warning">
-**Warning**
-
-This feature does not affect the synchronization between your JPDs. It is upon you to ensure data and all security configurations between JPDs are synced and up-to-date.
-
-Docker subdomains are not supported.
+Before using geolocation restrictions to block a country, verify that you do not have any active JPDs in that location.
 </Callout>
 
 
+To set geolocation restrictions:
 
+4. To select all countries, check the **Select All** checkbox above the list.
+5. When done, click **Update** to save your changes.
 
-#### [Manual Failover Routing Policy](/docs/manual-failover-setup-and-monitoring "Manual Failover Setup and Monitoring")
+   
+<Callout icon="📘" theme="info">
+   **Note**
 
-Use when you want to configure active-passive failover between two JPDs in different regions.
+   It will take a few minutes for your changes to apply.
+</Callout>
 
-#### [Geolocation Routing Policy](/docs/geolocation-setup-and-monitoring "Geolocation Setup and Monitoring")
+## DNS Routing in MyJFrog
 
-Use when you want to route traffic based on the location of your users (the location that DNS queries originate from). You may define 2-10 JPDs, in different regions, under one routing URL.
+A routing policy lets you define a single jfrog.io routing URL and to direct traffic over it to topology members based on DNS logic.
+
+<Callout icon="📘" theme="info">
+**Subscription Information**
+
+This feature is supported on JFrog Cloud platform, with an Enterprise+ license.
+
+Primary Admins, Admins, and technical users can create and manage the different DNS policies.
+</Callout>
