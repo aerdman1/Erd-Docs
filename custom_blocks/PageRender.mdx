@@ -1,0 +1,97 @@
+---
+name: PageRender
+---
+import React, { useState } from "react";
+
+export const FlattenedExportButton = ({
+  label = "Download flattened content",
+  filename = "flattened-doc.txt",
+  mode = "text", // "text" or "html"
+}) => {
+  const [error, setError] = useState(null);
+
+  const handleClick = () => {
+    if (typeof document === "undefined" || typeof window === "undefined") {
+      return;
+    }
+
+    setError(null);
+
+    // Main rendered markdown container on ReadMe pages
+    const root = document.querySelector(".rm-Markdown");
+    if (!root) {
+      setError("Could not find page content.");
+      return;
+    }
+
+    const docTitle = document.title || "";
+    const url = window.location ? window.location.href : "";
+
+    var content = "";
+    var mimeType = "text/plain;charset=utf-8";
+
+    if (mode === "html") {
+      var bodyHtml = root.innerHTML || "";
+      var header = "";
+      if (docTitle || url) {
+        header = "<!-- " + docTitle + (url ? " | " + url : "") + " -->\n\n";
+      }
+      content = header + bodyHtml;
+      mimeType = "text/html;charset=utf-8";
+    } else {
+      var bodyText = root.innerText || "";
+      var headerLines = [];
+      if (docTitle) headerLines.push(docTitle);
+      if (url) headerLines.push(url);
+      var headerText = headerLines.length ? headerLines.join("\n") + "\n\n" : "";
+      content = headerText + bodyText;
+    }
+
+    try {
+      var blob = new Blob([content], { type: mimeType });
+      var objectUrl = URL.createObjectURL(blob);
+
+      var a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(objectUrl);
+    } catch (e) {
+      console.error(e);
+      setError("Unable to generate download.");
+    }
+  };
+
+  return (
+    <div style={{ margin: "1rem 0" }}>
+      <button type="button" onClick={handleClick}>
+        {label}
+      </button>
+      {error && (
+        <div
+          style={{
+            marginTop: "0.25rem",
+            fontSize: "0.8rem",
+            color: "#b91c1c",
+          }}
+        >
+          {error}
+        </div>
+      )}
+    </div>
+  );
+};
+
+<FlattenedExportButton
+  label="Download flattened page as text"
+  filename="flattened-page.txt"
+/>
+
+<FlattenedExportButton
+  label="Download flattened page as HTML"
+  filename="flattened-page.html"
+  mode="html"
+/>
