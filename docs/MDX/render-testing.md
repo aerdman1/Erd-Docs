@@ -6,11 +6,7 @@ icon: far fa-arrows-maximize
 metadata:
   robots: index
 ---
-<br />
-
 <ReusableContent />
-
-<br />
 
 <FlattenedExportButton label="Download flattened page as text" filename="flattened-page.txt" />
 
