@@ -22,19 +22,20 @@ export const FlattenedExportButton = ({
     }
 
     const title = document.title || "";
-    const url = window.location.href || "";
 
     let content = "";
     let mimeType = "text/plain;charset=utf-8";
 
     if (mode === "html") {
       const bodyHtml = root.innerHTML || "";
-      const header = `<!-- ${title} | ${url} -->\n\n`;
+      // only include a title comment, no URL
+      const header = title ? `<!-- ${title} -->\n\n` : "";
       content = header + bodyHtml;
       mimeType = "text/html;charset=utf-8";
     } else {
       const bodyText = root.innerText || "";
-      const header = title ? `${title}\n${url}\n\n` : "";
+      // only include a title line, no URL
+      const header = title ? `${title}\n\n` : "";
       content = header + bodyText;
     }
 
@@ -46,11 +47,10 @@ export const FlattenedExportButton = ({
       a.href = objectUrl;
       a.download = filename;
       a.style.display = "none";
-      a.target = "_self"; // 👈 ensures same-tab behavior
+      a.target = "_self";
       document.body.appendChild(a);
       a.click();
 
-      // clean up
       setTimeout(() => {
         URL.revokeObjectURL(objectUrl);
         a.remove();
@@ -74,10 +74,4 @@ export const FlattenedExportButton = ({
 <FlattenedExportButton
   label="Download flattened page as text"
   filename="flattened-page.txt"
-/>
-
-<FlattenedExportButton
-  label="Download flattened page as HTML"
-  filename="flattened-page.html"
-  mode="html"
 />
