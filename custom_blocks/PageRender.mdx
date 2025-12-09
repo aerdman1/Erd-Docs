@@ -10,77 +10,63 @@ export const FlattenedExportButton = ({
 }) => {
   const [error, setError] = useState(null);
 
-  const handleClick = () => {
-    if (typeof document === "undefined" || typeof window === "undefined") {
-      return;
-    }
-
+  const handleClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setError(null);
 
-    // Main rendered markdown container on ReadMe pages
     const root = document.querySelector(".rm-Markdown");
     if (!root) {
       setError("Could not find page content.");
       return;
     }
 
-    const docTitle = document.title || "";
-    const url = window.location ? window.location.href : "";
+    const title = document.title || "";
+    const url = window.location.href || "";
 
-    var content = "";
-    var mimeType = "text/plain;charset=utf-8";
+    let content = "";
+    let mimeType = "text/plain;charset=utf-8";
 
     if (mode === "html") {
-      var bodyHtml = root.innerHTML || "";
-      var header = "";
-      if (docTitle || url) {
-        header = "<!-- " + docTitle + (url ? " | " + url : "") + " -->\n\n";
-      }
+      const bodyHtml = root.innerHTML || "";
+      const header = `<!-- ${title} | ${url} -->\n\n`;
       content = header + bodyHtml;
       mimeType = "text/html;charset=utf-8";
     } else {
-      var bodyText = root.innerText || "";
-      var headerLines = [];
-      if (docTitle) headerLines.push(docTitle);
-      if (url) headerLines.push(url);
-      var headerText = headerLines.length ? headerLines.join("\n") + "\n\n" : "";
-      content = headerText + bodyText;
+      const bodyText = root.innerText || "";
+      const header = title ? `${title}\n${url}\n\n` : "";
+      content = header + bodyText;
     }
 
     try {
-      var blob = new Blob([content], { type: mimeType });
-      var objectUrl = URL.createObjectURL(blob);
+      const blob = new Blob([content], { type: mimeType });
+      const objectUrl = URL.createObjectURL(blob);
 
-      var a = document.createElement("a");
+      const a = document.createElement("a");
       a.href = objectUrl;
       a.download = filename;
+      a.style.display = "none";
+      a.target = "_self"; // 👈 ensures same-tab behavior
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
 
-      URL.revokeObjectURL(objectUrl);
-    } catch (e) {
-      console.error(e);
+      // clean up
+      setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+        a.remove();
+      }, 100);
+    } catch (err) {
+      console.error(err);
       setError("Unable to generate download.");
     }
   };
 
   return (
-    <div style={{ margin: "1rem 0" }}>
+    <div className="FlattenedExportButton">
       <button type="button" onClick={handleClick}>
         {label}
       </button>
-      {error && (
-        <div
-          style={{
-            marginTop: "0.25rem",
-            fontSize: "0.8rem",
-            color: "#b91c1c",
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <div className="error">{error}</div>}
     </div>
   );
 };
