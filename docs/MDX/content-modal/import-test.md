@@ -43,7 +43,7 @@ Lightcast Career Pathways by Occupation use the following data sources:
    * Requirement Level 5: Advanced BA roles.
    * Requirement Level 6: Graduate and professional roles.
 
-O_NET occupations are similarly classified into five job zones based on the levels of education, experience, and training required to qualify for that occupation. Definitions are available on the O_NET website: [https://www.onetonline.org/help/online/zones](https://www.onetonline.org/help/online/zones).
+O*NET occupations are similarly classified into five job zones based on the levels of education, experience, and training required to qualify for that occupation. Definitions are available on the O*NET website: [https://www.onetonline.org/help/online/zones](https://www.onetonline.org/help/online/zones).
 
 3. _Salary by Occupation:_ Average annual advertised salary in the last 12 months for each occupation.
 4. _Specialized Training Requirements:_ Occupations that typically require a license or specialized training are identified in the Lightcast Occupation Taxonomy. The training requirements for these Lightcast Occupations are crosswalked to Specialized Occupations as well as SOC and O*NET Occupations.
