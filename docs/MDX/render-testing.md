@@ -8,5 +8,3 @@ metadata:
 ---
 <ReusableContent />
 
-<FlattenedExportButton label="Download flattened page as text" filename="flattened-page.txt" />
-
