@@ -1,0 +1,319 @@
+---
+name: BTMarketplace
+---
+import React, { useMemo, useState } from 'react';
+
+export const BtMarketplace = () => {
+  const masterRows = [
+    {
+      btProds: "AD Bridge",
+      extInts: "Apache",
+      TitleForInt: "AD Bridge",
+      TitleForProd: "Apache HTTP Server",
+      html: "https://docs.beyondtrust.com/adb/docs/apache"
+    },
+    {
+      btProds: "AD Bridge; Password Safe",
+      extInts: "",
+      TitleForInt: "",
+      TitleForProd: "AD Bridge and Password Safe",
+      html: "https://docs.beyondtrust.com/adb/docs/ps-integration"
+    },
+    {
+      btProds: "AD Bridge",
+      extInts: "Elasticsearch; Logstash",
+      TitleForInt: "AD Bridge",
+      TitleForProd: "Elasticsearch or Logstash",
+      html: "https://docs.beyondtrust.com/adb/docs/elasticsearch-logstash-reporting"
+    },
+    {
+      btProds: "AD Bridge",
+      extInts: "NFS",
+      TitleForInt: "AD Bridge",
+      TitleForProd: "NFS",
+      html: "https://docs.beyondtrust.com/adb/docs/nfs-integration"
+    },
+    {
+      btProds: "AD Bridge",
+      extInts: "Samba",
+      TitleForInt: "AD Bridge",
+      TitleForProd: "Samba",
+      html: "https://docs.beyondtrust.com/adb/docs/samba"
+    },
+    {
+      btProds: "AD Bridge",
+      extInts: "Smart cards",
+      TitleForInt: "AD Bridge",
+      TitleForProd: "Smart cards",
+      html: "https://docs.beyondtrust.com/adb/docs/smart-card"
+    },
+    {
+      btProds: "AD Bridge",
+      extInts: "SSH",
+      TitleForInt: "AD Bridge",
+      TitleForProd: "SSH",
+      html: "https://docs.beyondtrust.com/adb/docs/ssh"
+    },
+    {
+      btProds: "BeyondInsight for Unix and Linux",
+      extInts: "SailPoint",
+      TitleForInt: "BeyondInsight for Unix and Linux - Identity IQ",
+      TitleForProd: "SailPoint IdentityIQ",
+      html: "https://docs.beyondtrust.com/epm-ul/docs/sailpoint-identity-iq"
+    },
+    {
+      btProds: "BeyondInsight for Unix and Linux",
+      extInts: "SailPoint",
+      TitleForInt: "BeyondInsight for Unix and Linux - IdentityNow",
+      TitleForProd: "SailPoint IdentityNow",
+      html: "https://docs.beyondtrust.com/epm-ul/docs/identitynow"
+    },
+    {
+      btProds: "Endpoint Privilege Management for Linux Cloud",
+      extInts: "Elasticsearch",
+      TitleForInt: "Endpoint Privilege Management for Linux Cloud - Unified search",
+      TitleForProd: "Elasticsearch - Unified search",
+      html: "https://docs.beyondtrust.com/epm-l/docs/unified-search#add-a-new-elasticsearch-siem-connection"
+    }
+  ];
+
+  // --- helpers --------------------------------------------------
+
+  const splitField = (value) => {
+    if (!value) return [];
+    return value
+      .split(';')
+      .map((v) => v.trim())
+      .filter(Boolean);
+  };
+
+  const buildItems = (rows) => {
+    return rows.map((row, index) => {
+      const btProducts = splitField(row.btProds);
+      const partners = splitField(row.extInts);
+
+      const title =
+        row.TitleForInt ||
+        row.TitleForProd ||
+        [btProducts.join(', '), partners.join(', ')]
+          .filter(Boolean)
+          .join(' + ');
+
+      return {
+        id: index,
+        title,
+        btProducts,
+        partners,
+        url: row.html
+      };
+    });
+  };
+
+  const items = useMemo(() => buildItems(masterRows), []);
+
+  const allBtProducts = useMemo(() => {
+    const set = new Set();
+    items.forEach((item) => {
+      item.btProducts.forEach((p) => set.add(p));
+    });
+    return Array.from(set).sort();
+  }, [items]);
+
+  const allPartners = useMemo(() => {
+    const set = new Set();
+    items.forEach((item) => {
+      item.partners.forEach((p) => set.add(p));
+    });
+    return Array.from(set).sort();
+  }, [items]);
+
+  const [selectedBtProducts, setSelectedBtProducts] = useState([]);
+  const [selectedPartners, setSelectedPartners] = useState([]);
+  const [search, setSearch] = useState('');
+
+  const toggleFilter = (value, current, setFn) => {
+    if (current.includes(value)) {
+      setFn(current.filter((v) => v !== value));
+    } else {
+      setFn([...current, value]);
+    }
+  };
+
+  const matchesFilters = (item) => {
+    const searchLower = search.trim().toLowerCase();
+
+    if (searchLower) {
+      const haystack = [
+        item.title,
+        item.btProducts.join(' '),
+        item.partners.join(' ')
+      ]
+        .join(' ')
+        .toLowerCase();
+
+      if (!haystack.includes(searchLower)) return false;
+    }
+
+    if (selectedBtProducts.length) {
+      const hasProduct = item.btProducts.some((p) =>
+        selectedBtProducts.includes(p)
+      );
+      if (!hasProduct) return false;
+    }
+
+    if (selectedPartners.length) {
+      const hasPartner = item.partners.some((p) =>
+        selectedPartners.includes(p)
+      );
+      if (!hasPartner) return false;
+    }
+
+    return true;
+  };
+
+  const filteredItems = items.filter(matchesFilters);
+  const totalCount = items.length;
+  const visibleCount = filteredItems.length;
+
+  // --- render ---------------------------------------------------
+
+  return (
+    <div className="bg-black text-gray-200 p-6 rounded-lg font-sans w-full not-prose">
+      <div className="mb-8 border-b border-gray-800 pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-2 border-none m-0">
+            BeyondTrust Marketplace
+          </h1>
+          <p className="text-sm text-gray-400 m-0">
+            Showing {visibleCount} of {totalCount} integrations
+          </p>
+        </div>
+        <div className="w-full md:w-72">
+          <input
+            type="search"
+            placeholder="Search by product, partner, technology..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-md bg-gray-900 border border-gray-700 px-3 py-2 text-sm text-gray-100 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Sidebar Filters */}
+        <div className="w-full md:w-64 shrink-0 space-y-6">
+          <div>
+            <h4 className="text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">
+              BeyondTrust Product
+            </h4>
+            <div className="flex flex-col gap-2 max-h-64 overflow-auto pr-1">
+              {allBtProducts.map((prod) => (
+                <label
+                  key={prod}
+                  className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer hover:text-white"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedBtProducts.includes(prod)}
+                    onChange={() =>
+                      toggleFilter(prod, selectedBtProducts, setSelectedBtProducts)
+                    }
+                    className="rounded border-gray-600 bg-gray-800 text-pink-600 focus:ring-0"
+                  />
+                  <span className="truncate">{prod}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">
+              Partner / Technology
+            </h4>
+            <div className="flex flex-col gap-2 max-h-64 overflow-auto pr-1">
+              {allPartners.map((partner) => (
+                <label
+                  key={partner}
+                  className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer hover:text-white"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedPartners.includes(partner)}
+                    onChange={() =>
+                      toggleFilter(
+                        partner,
+                        selectedPartners,
+                        setSelectedPartners
+                      )
+                    }
+                    className="rounded border-gray-600 bg-gray-800 text-pink-600 focus:ring-0"
+                  />
+                  <span className="truncate">{partner}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Main Grid */}
+        <div className="flex-1 min-w-0">
+          {visibleCount === 0 ? (
+            <p className="text-sm text-gray-400">
+              No integrations match the current filters.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {filteredItems.map((item) => (
+                <a
+                  key={item.id}
+                  href={item.url}
+                  className="bg-gray-900 border border-gray-700 rounded-md flex flex-col h-full hover:border-gray-500 transition-colors cursor-pointer group"
+                >
+                  <div className="p-4 flex flex-col gap-3 flex-grow">
+                    <div className="flex gap-3">
+                      <div className="w-12 h-12 flex items-center justify-center font-bold text-[10px] rounded shrink-0 bg-purple-600 text-white uppercase">
+                        BT
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-white font-bold text-sm leading-tight group-hover:text-blue-400 m-0 break-words">
+                          {item.title}
+                        </h3>
+                        {item.btProducts.length > 0 && (
+                          <p className="text-[11px] text-gray-400 m-0 mt-1">
+                            {item.btProducts.join(' • ')}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {item.partners.length > 0 && (
+                      <p className="text-[11px] text-gray-400 leading-relaxed m-0">
+                        Integrates with: {item.partners.join(', ')}
+                      </p>
+                    )}
+
+                    <div className="mt-auto pt-2 flex justify-between items-center border-t border-gray-800">
+                      <div className="text-[10px] text-gray-500 uppercase font-semibold">
+                        View integration docs
+                      </div>
+                      <span className="text-[11px] text-blue-400">Open →</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-800 py-2 px-4 rounded-b-md border-t border-gray-700 flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full border border-green-500" />
+                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-wide">
+                      Integration
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+<BtMarketplace />
