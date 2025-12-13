@@ -6,15 +6,17 @@ icon: far fa-arrows-maximize
 metadata:
   robots: index
 ---
-
-
 # Career Pathways
 
 > Ready to use this data? See the Career Pathways [reference documentation](/apis/career-pathways) to get started.
 
 ## Description
 
-The Lightcast Career Pathways API includes calls to explore career advancement pathways for a selected occupation and also highlight the skills needed to advance from one job to the next. These data elements are powered by separate models – one that provides Career Pathways (i.e., next step and feeder occupations) and another that provides information on the skills gap between any pair of occupations.
+The Lightcast Career Pathways API includes calls to explore career advancement pathways for a selected occupation and also highlight the skills needed to advance from one job to the next. These data elements are powered by separate models – one that provides Career Pathways (i.e., next step and feeder occupations) and another that provides information on the skills gap between any pair of occupations.  
+
+[My broken link](/docs/blahblah)
+
+[My good link](/docs/import-test)
 
 ### Methodology:
 
