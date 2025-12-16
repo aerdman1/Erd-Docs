@@ -8,6 +8,10 @@ metadata:
 ---
 <HTMLBlock>{`
 <iframe src="https://readme.notion.site/ebd//b2ed46be1a0b4ff18d19f6635de49167" width="100%" height="900" frameborder="0" allowfullscreen />
+
+<style>nav#hub-sidebar {
+    display: none;
+}</style>
 `}</HTMLBlock>
 
 <br />
