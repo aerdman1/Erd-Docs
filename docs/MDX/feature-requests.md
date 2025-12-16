@@ -12,7 +12,7 @@ metadata:
 
 <HTMLBlock>{`
 <style>
-nav#hub-sidebar {
+.rm-Sidebar{
     display: none !important;
   }
 </style>
