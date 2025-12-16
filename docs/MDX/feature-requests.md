@@ -11,7 +11,7 @@ metadata:
 `}</HTMLBlock>
 
 <HTMLBlock>{`
-<iframe src="https://readme.notion.site/ebd//2cbc282774b580adacbedc3441c8e983" width="100%" height="600" frameborder="0" allowfullscreen />
+<iframe src="https://readme.notion.site/ebd//2cbc282774b580adacbedc3441c8e983" width="100%" height="800" frameborder="0" allowfullscreen />
 `}</HTMLBlock>
 
 <br />
