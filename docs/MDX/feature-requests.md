@@ -11,11 +11,7 @@ metadata:
 `}</HTMLBlock>
 
 <HTMLBlock>{`
-<style>
-.rm-Sidebar{
-    display: none !important;
-  }
-</style>
+<iframe src="https://readme.notion.site/ebd//2cbc282774b580adacbedc3441c8e983" width="100%" height="600" frameborder="0" allowfullscreen />
 `}</HTMLBlock>
 
 <br />
