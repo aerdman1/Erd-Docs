@@ -1,0 +1,34 @@
+openapi: 3.1.0
+info:
+  title: OAuth OR Order (Single Endpoint)
+  version: 1.0.0
+servers:
+  - url: https://example.com
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.example.com/oauth/authorize
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            safetyapi:read: Read access to Safety API
+            safetyapi:write: Write access to Safety API
+            safetyapi:admin: Admin access to Safety API
+paths:
+  /or-admin-first:
+    get:
+      operationId: orAdminFirst
+      summary: 'OR example (admin first): admin OR read'
+      description: |
+        This endpoint should allow either a token with `safetyapi:admin`
+        OR a token with `safetyapi:read`.
+      security:
+        - oauth2:
+            - safetyapi:admin
+        - oauth2:
+            - safetyapi:read
+      responses:
+        '200':
+          description: OK
