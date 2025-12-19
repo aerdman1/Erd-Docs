@@ -38,8 +38,6 @@ paths:
       security:
         - oauth2:
             - safetyapi:read
-            - safetyapi:write
-            - safetyapi:admin
         - oauth2:
             - safetyapi:admin
       responses:
