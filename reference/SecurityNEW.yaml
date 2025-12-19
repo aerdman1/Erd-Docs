@@ -1,0 +1,69 @@
+openapi: 3.1.0
+info:
+  title: OAuth Scope OR/AND + Order Test
+  version: 1.0.0
+servers:
+  - url: https://example.com
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://auth.example.com/oauth/authorize
+          tokenUrl: https://auth.example.com/oauth/token
+          scopes:
+            safetyapi:read: Read access to Safety API
+            safetyapi:write: Write access to Safety API
+            safetyapi:admin: Admin access to Safety API
+paths:
+  /and-example:
+    get:
+      operationId: andExample
+      summary: AND example (requires both read AND write)
+      security:
+        - oauth2:
+            - safetyapi:read
+            - safetyapi:write
+      responses:
+        '200':
+          description: OK
+  /or-example:
+    get:
+      operationId: orExample
+      summary: OR example (requires read OR admin)
+      description: |
+        This endpoint should allow either a token with `safetyapi:read`
+        OR a token with `safetyapi:admin`.
+      security:
+        - oauth2:
+            - safetyapi:read
+        - oauth2:
+            - safetyapi:admin
+      responses:
+        '200':
+          description: OK
+  /or-read-first:
+    get:
+      operationId: orReadFirst
+      summary: 'OR order test (read first): read OR admin'
+      security:
+        - oauth2:
+            - safetyapi:read
+        - oauth2:
+            - safetyapi:admin
+      responses:
+        '200':
+          description: OK
+  /or-admin-first:
+    get:
+      operationId: orAdminFirst
+      summary: 'OR order test (admin first): admin OR read'
+      security:
+        - oauth2:
+            - safetyapi:admin
+        - oauth2:
+            - safetyapi:read
+      responses:
+        '200':
+          description: OK
