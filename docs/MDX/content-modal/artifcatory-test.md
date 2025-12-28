@@ -1,12 +1,37 @@
 ---
-title: Artifcatory test
+title: Artifactory 7.117
 deprecated: false
 hidden: false
-icon: far fa-arrows-maximize
 metadata:
+  title: Artifactory 7.117
+  description: This section includes all the Artifactory 7.117 releases.
   robots: index
+  legacyUUIDs:
+  - UUID-428ab098-dee9-aa82-9edd-1129514c1abe
+  - UUID-2c5e3af9-f8d5-b1a9-11ac-aa520891b5df
+  - UUID-46bda823-7fb8-1685-b33c-a8fab76a58d1
+  - UUID-6d85b140-fa9f-e1f4-5760-8e107b338651
+  - UUID-f0031499-0103-90f4-344f-ffd4b4ee4d71
+  - UUID-27e339c5-feb2-aa3e-a51e-c40226392365
+  - UUID-fe038fa5-2072-f441-c498-60cde0138752
+  - UUID-ff1e27df-b003-637d-8b48-d5d25857147c
+  - UUID-e2af6bed-bcd4-98dc-b73a-aa92b2790bc1
+  - UUID-667bf82c-7878-5dfa-f303-7efc7f837afc
+  - UUID-88e28992-b0b6-6854-5e64-69baa076f575
+  - UUID-334fd7e9-905b-7c36-2827-52d76556f2bd
+  - UUID-8bd3200a-a505-c263-bd66-3743b0189f94
+  - UUID-681990bf-62a4-9feb-3de1-4e3379f636c1
+  - UUID-45d61944-bb29-c40f-276c-db91adf68a89
+  - UUID-03ba983f-057b-7124-3018-d3f1830a4afc
+  - UUID-8b970cf3-e8d4-b6fe-c660-44f8628ed3d7
+  - UUID-9408ee9d-5f02-0054-2a33-9b56fdf63fb3
+  - UUID-5ac99c97-be68-5daf-689a-9c8ef115a2b5
+  - UUID-96559322-4e20-69f7-d9a1-f270187cfb14
+  - UUID-081173b3-07c2-409e-dd47-9d2c09d86e5f
+  - UUID-5336865f-0877-f5f0-c823-736b50712af4
+  - UUID-73462172-3c5a-8484-1a40-06f83794ab8d
+  - UUID-cb0e599d-2e77-8187-5c96-4767742eca51
 ---
-
 This section includes all the Artifactory 7.117 releases.
 
 ## Artifactory 7.117.19 Self-Hosted (Self-Managed)
