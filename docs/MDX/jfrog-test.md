@@ -1,5 +1,10 @@
 ---
-title: jfrog test
+title: Get Started with Binary Management (DevOps)
+excerpt: >-
+  JFrog Artifactory is the single solution for housing and managing all your
+  software artifacts, AI/ML models, binaries, packages, files, containers,
+  components, and releases used in and generated across your organization’s
+  software supply chain.
 deprecated: false
 hidden: false
 icon: far fa-arrows-maximize
