@@ -6,99 +6,169 @@ icon: far fa-arrows-maximize
 metadata:
   robots: index
 ---
-# Welcome to The Henry Howler!
-
-A collection and collaboration of family history, current and future events.
-
 <HTMLBlock>{`
-<style>
-  /* --- Henry Howler Home Layout --- */
-  .hh-home{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px;align-items:start;margin-top:18px;}
-  .hh-main{min-width:0;}
-  .hh-aside{position:sticky;top:18px;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:16px;background:#fff;}
-  .hh-aside h3{margin:0 0 10px 0;font-size:16px;font-weight:700;}
-  .hh-aside .hh-sub{margin:0 0 14px 0;font-size:13px;opacity:.75;line-height:1.35;}
-
-  /* Hero image */
-  .hh-hero{border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.08);background:#f6f6f6;}
-  .hh-hero img{display:block;width:100%;height:360px;object-fit:cover;}
-  .hh-hero .hh-caption{padding:10px 12px;font-size:13px;opacity:.8;border-top:1px solid rgba(0,0,0,.06);}
-
-  /* How-to / navigation section */
-  .hh-howto{margin-top:18px;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:16px;background:#fff;}
-  .hh-howto h2{margin:0 0 10px 0;font-size:18px;font-weight:800;}
-  .hh-howto p{margin:0 0 12px 0;line-height:1.5;}
-  .hh-howto ul{margin:0;padding-left:18px;line-height:1.7;}
-  .hh-howto a{text-decoration:none;}
-  .hh-howto a:hover{text-decoration:underline;}
-
-  /* Recent posts list */
-  .hh-recent{display:flex;flex-direction:column;gap:10px;}
-  .hh-recent a{display:block;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:10px 12px;background:#fafafa;text-decoration:none;color:inherit;}
-  .hh-recent a:hover{background:#f2f2f2;}
-  .hh-recent .hh-title{font-weight:700;margin:0 0 2px 0;font-size:14px;}
-  .hh-recent .hh-meta{font-size:12px;opacity:.7;margin:0;}
-  .hh-recent .hh-note{font-size:12px;opacity:.75;margin:8px 0 0 0;}
-
-  /* Responsive */
-  @media (max-width: 980px){
-    .hh-home{grid-template-columns:1fr;gap:18px;}
-    .hh-aside{position:static;}
-    .hh-hero img{height:280px;}
-  }
-</style>
-
-<div class="hh-home">
-  <div class="hh-main">
-    <div class="hh-hero">
-      <!-- Replace this src with your own family image whenever ready -->
-      <img
-        src="https://placehold.co/1600x900/png?text=Family+Photo"
-        alt="Family photo"
-      />
-      <div class="hh-caption">Tip: swap this placeholder with your favorite family photo (any public image URL works).</div>
-    </div>
-
-    <section class="hh-howto">
-      <h2>How to navigate</h2>
-      <p>
-        Use the sections on the left to explore stories, photos, and family history by time period, branch, or theme.
-        If you’re not sure where to start, begin with “Through the Decades” for a quick timeline view.
-      </p>
-      <ul>
-        <li><a href="families-home">Through the Decades</a> — family articles organized by era</li>
-        <li><a href="ancestors-home">Ancestors</a> — family lines, notes, and background</li>
-        <li><a href="stories-and-memories-home">Odds &amp; Ends</a> — stories, memories, and one-offs</li>
-        <li><a href="media-home">Media</a> — images, videos, and other files</li>
-        <li><a href="other-home">Other</a> — misc. pages and experiments</li>
-      </ul>
-    </section>
-  </div>
-
-  <aside class="hh-aside">
-    <h3>Recent posts</h3>
-    <p class="hh-sub">A quick list of the latest additions. (For now, these are placeholders — replace with real links as you add articles.)</p>
-
-    <div class="hh-recent">
-      <a href="families-home">
-        <p class="hh-title">Through the Decades — start here</p>
-        <p class="hh-meta">Timeline overview</p>
-      </a>
-      <a href="ancestors-home">
-        <p class="hh-title">Ancestors — family branches</p>
-        <p class="hh-meta">Browse by line</p>
-      </a>
-      <a href="stories-and-memories-home">
-        <p class="hh-title">Odds &amp; Ends — stories &amp; memories</p>
-        <p class="hh-meta">Short reads</p>
-      </a>
-      <a href="media-home">
-        <p class="hh-title">Media — photos and videos</p>
-        <p class="hh-meta">Gallery</p>
-      </a>
-
-      <p class="hh-note"><strong>Note:</strong> Once you have true “recent articles,” we can swap this to a tighter list (titles + dates) and style it like a mini feed.</p>
-    </div>
-  </aside>
+<div id="hh-recent-posts">
+  <p class="hh-note"><strong>Recent posts</strong>: loading…</p>
 </div>
+
+<script>
+(function () {
+  var OWNER = "aerdman1";
+  var REPO = "henryhowler";
+
+  // Try these refs in order. If your sync uses a tag/branch like v1.0, this covers it.
+  var REFS = ["main", "master", "v1.0"];
+
+  // Where your “posts” live in the repo
+  var PATHS = ["docs"]; // add "custom_pages" if you want those too: ["docs","custom_pages"]
+
+  var MAX_ITEMS = 2;
+
+  function el() { return document.getElementById("hh-recent-posts"); }
+
+  function htmlEscape(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[c];
+    });
+  }
+
+  // Convert repo file path -> ReadMe doc slug/href
+  function fileToHref(filename) {
+    // docs/families-home.mdx -> families-home
+    // docs/ancestors/john-henry.mdx -> ancestors/john-henry
+    var slug = filename.replace(/^docs\//, "").replace(/\.(md|mdx)$/i, "");
+    return slug; // relative links work fine in ReadMe
+  }
+
+  // Friendly title fallback from filename
+  function fileToTitle(filename) {
+    var base = filename.split("/").pop().replace(/\.(md|mdx)$/i, "");
+    return base.replace(/[-_]+/g, " ").replace(/\b\w/g, function(m){ return m.toUpperCase(); });
+  }
+
+  // Optional: try to read the actual title from the file (frontmatter title: or first # heading)
+  function fetchTitleFromRaw(ref, filename) {
+    var raw = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + ref + "/" + filename;
+    return fetch(raw).then(function(r){ return r.ok ? r.text() : ""; }).then(function(txt){
+      if (!txt) return null;
+      var fm = txt.match(/^---[\\s\\S]*?\\btitle:\\s*["']?(.+?)["']?\\s*(?:\\r?\\n)[\\s\\S]*?---/m);
+      if (fm && fm[1]) return fm[1].trim();
+      var h1 = txt.match(/^\\s*#\\s+(.+)\\s*$/m);
+      if (h1 && h1[1]) return h1[1].trim();
+      return null;
+    }).catch(function(){ return null; });
+  }
+
+  // GitHub REST: list commits (supports per_page) :contentReference[oaicite:1]{index=1}
+  function listCommits(ref, path) {
+    var url = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/commits?sha=" + encodeURIComponent(ref) +
+              "&path=" + encodeURIComponent(path) + "&per_page=12";
+    return fetch(url).then(function(r){ return r.ok ? r.json() : Promise.reject(new Error("commits " + r.status)); });
+  }
+
+  // GitHub REST: get commit (includes files changed)
+  function getCommit(ref, sha) {
+    var url = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/commits/" + encodeURIComponent(sha);
+    return fetch(url).then(function(r){ return r.ok ? r.json() : Promise.reject(new Error("commit " + r.status)); });
+  }
+
+  function render(items){
+    var target = el();
+    if (!target) return;
+
+    if (!items.length) {
+      target.innerHTML = "<p class='hh-note'><strong>Recent posts</strong>: coming soon.</p>";
+      return;
+    }
+
+    var out = "";
+    out += "<h3 style='margin:0 0 10px 0;font-size:16px;font-weight:700;'>Recent posts</h3>";
+    out += "<div class='hh-recent'>";
+
+    items.forEach(function(it){
+      out += "<a href='" + htmlEscape(it.href) + "'>";
+      out += "<p class='hh-title'>" + htmlEscape(it.title) + "</p>";
+      out += "<p class='hh-meta'>Updated " + htmlEscape(it.updatedLabel) + "</p>";
+      out += "</a>";
+    });
+
+    out += "</div>";
+    target.innerHTML = out;
+  }
+
+  function tryRef(i){
+    if (i >= REFS.length) {
+      render([]);
+      return;
+    }
+    var ref = REFS[i];
+
+    // Pull a small window of commits for each path, then inspect commit files
+    Promise.all(PATHS.map(function(p){ return listCommits(ref, p); }))
+      .then(function(allCommitLists){
+        var shas = [];
+        allCommitLists.forEach(function(list){
+          (list || []).forEach(function(c){ if (c && c.sha) shas.push(c.sha); });
+        });
+
+        // De-dupe SHAs
+        var seenSha = {};
+        shas = shas.filter(function(s){ if (seenSha[s]) return false; seenSha[s]=true; return true; }).slice(0, 10);
+
+        return Promise.all(shas.map(function(sha){ return getCommit(ref, sha).catch(function(){ return null; }); }))
+          .then(function(commitDetails){
+            var fileMap = {}; // filename -> { updatedAt, title?, href }
+            commitDetails.forEach(function(cd){
+              if (!cd || !cd.files || !cd.commit) return;
+              var updatedAt = (cd.commit.committer && cd.commit.committer.date) || (cd.commit.author && cd.commit.author.date) || null;
+              if (!updatedAt) return;
+
+              cd.files.forEach(function(f){
+                if (!f || !f.filename) return;
+
+                // Only docs markdown
+                var name = f.filename;
+                var isDoc = name.indexOf("docs/") === 0; // keep tight to your use case
+                var isMd = /\.mdx?$/i.test(name);
+                if (!isDoc || !isMd) return;
+
+                var existing = fileMap[name];
+                if (!existing || existing.updatedAt < updatedAt) {
+                  fileMap[name] = {
+                    filename: name,
+                    updatedAt: updatedAt,
+                    href: fileToHref(name),
+                    title: null
+                  };
+                }
+              });
+            });
+
+            var files = Object.keys(fileMap).map(function(k){ return fileMap[k]; })
+              .sort(function(a,b){ return a.updatedAt < b.updatedAt ? 1 : -1; })
+              .slice(0, MAX_ITEMS);
+
+            // Try to fetch real titles; fall back to filename-based titles
+            return Promise.all(files.map(function(f){
+              return fetchTitleFromRaw(ref, f.filename).then(function(t){
+                var d = new Date(f.updatedAt);
+                f.title = t || fileToTitle(f.filename);
+                f.updatedLabel = isFinite(d.getTime()) ? d.toLocaleDateString() : "recently";
+                return f;
+              });
+            }));
+          })
+          .then(function(items){
+            render(items);
+          });
+      })
+      .catch(function(){
+        // If ref doesn't exist, try next ref
+        tryRef(i + 1);
+      });
+  }
+
+  tryRef(0);
+})();
+</script>
 `}</HTMLBlock>
