@@ -64,12 +64,32 @@ export const ChangelogRssFeed = props => {
     return d;
   }
 
-  function formatDate(d) {
-    if (!d) return "";
+  function coerceDate(v) {
+    // Accept Date or a date-like string; else null.
+    if (!v) return null;
     try {
-      return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+      if (v instanceof Date) return isNaN(v.getTime()) ? null : v;
+    } catch (e) {}
+    try {
+      var d = new Date(String(v));
+      return isNaN(d.getTime()) ? null : d;
+    } catch (e2) {
+      return null;
+    }
+  }
+
+  function toTime(v) {
+    var d = coerceDate(v);
+    return d ? d.getTime() : 0;
+  }
+
+  function formatDate(d) {
+    var dd = coerceDate(d);
+    if (!dd) return "";
+    try {
+      return dd.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
     } catch (e) {
-      return d.toDateString();
+      return dd.toDateString();
     }
   }
 
@@ -181,6 +201,22 @@ export const ChangelogRssFeed = props => {
     } catch (e) {}
   }
 
+  function sanitizeItems(arr) {
+    if (!Array.isArray(arr)) return [];
+    var out = arr.slice(0);
+    for (var i = 0; i < out.length; i++) {
+      if (!out[i]) continue;
+      out[i].pubDate = coerceDate(out[i].pubDate);
+      out[i].title = safeText(out[i].title);
+      out[i].link = safeText(out[i].link);
+      out[i].author = safeText(out[i].author);
+      out[i].descriptionText = safeText(out[i].descriptionText);
+      out[i].typeKey = safeText(out[i].typeKey);
+      out[i].typeLabel = safeText(out[i].typeLabel);
+    }
+    return out;
+  }
+
   function parseRss(xmlText) {
     var parser = new DOMParser();
     var doc = parser.parseFromString(xmlText, "text/xml");
@@ -226,6 +262,8 @@ export const ChangelogRssFeed = props => {
       });
     }
 
+    out = sanitizeItems(out);
+
     return { ok: true, items: out, sourceTitle: channelTitle };
   }
 
@@ -246,10 +284,13 @@ export const ChangelogRssFeed = props => {
     var ac = new AbortController();
     abortRef.current = ac;
 
-    var cacheKey = "rm_changelog_rss_cache__" + rssUrl;
+    // Bump cache key version to avoid older cached shapes (esp. Date -> string)
+    var cacheKey = "rm_changelog_rss_cache_v3__" + rssUrl;
+
     var cached = readCache(cacheKey);
-    if (cached && cached.items && cached.items.length) {
-      setItems(cached.items);
+    if (cached && cached.items && Array.isArray(cached.items)) {
+      var safeCached = sanitizeItems(cached.items);
+      setItems(safeCached);
       setLoading(false);
       return;
     }
@@ -262,8 +303,9 @@ export const ChangelogRssFeed = props => {
       .then(function (xmlText) {
         var parsed = parseRss(xmlText);
         if (!parsed.ok) throw new Error(parsed.error || "Failed to parse RSS.");
-        setItems(parsed.items || []);
-        writeCache(cacheKey, { items: parsed.items || [] });
+        var safeItems = sanitizeItems(parsed.items);
+        setItems(safeItems);
+        writeCache(cacheKey, { items: safeItems });
         setLoading(false);
       })
       .catch(function (err) {
@@ -320,10 +362,10 @@ export const ChangelogRssFeed = props => {
 
     var out = items.slice(0);
 
-    // Sort by pubDate (RSS has real timestamps)
+    // Sort by pubDate (RSS has real timestamps) — SAFE (handles Date OR string OR null)
     out.sort(function (x, y) {
-      var dx = x.pubDate ? x.pubDate.getTime() : 0;
-      var dy = y.pubDate ? y.pubDate.getTime() : 0;
+      var dx = toTime(x && x.pubDate);
+      var dy = toTime(y && y.pubDate);
       if (sort === "oldest") return dx - dy;
       return dy - dx;
     });
@@ -620,4 +662,4 @@ export const ChangelogRssFeed = props => {
   );
 };
 
-<ChangelogRssFeed rssUrl="/changelog.rss" maxItems={250} cacheMinutes={5} />
+<ChangelogRssFeed rssUrl="/changelog.rss" maxItems={250} cacheMinutes={0} />
