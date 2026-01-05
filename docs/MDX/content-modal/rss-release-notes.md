@@ -7,3 +7,13 @@ metadata:
   robots: index
 ---
 <ChangelogRssFeed rssUrl="/changelog.rss" maxItems={250} cacheMinutes={1} />
+
+<HTMLBlock>{`
+<style>
+section.content-toc.grid-25 {
+    display: none;
+}
+</style>
+`}</HTMLBlock>
+
+<br />
