@@ -47,10 +47,43 @@ export const ChangelogRssFeed = props => {
     return s;
   }
 
+  function tryQuerySelector(el, selector) {
+    if (!el) return null;
+    try {
+      return el.querySelector(selector);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function tryGetByTag(el, tagName) {
+    if (!el) return null;
+    try {
+      var nodes = el.getElementsByTagName(tagName);
+      if (nodes && nodes.length) return nodes[0];
+    } catch (e) {}
+    return null;
+  }
+
   function firstChildText(el, selectors) {
     if (!el) return "";
     for (var i = 0; i < selectors.length; i++) {
-      var node = el.querySelector(selectors[i]);
+      var sel = selectors[i];
+
+      // 1) Try querySelector (works for most simple tags + CSS paths)
+      var node = tryQuerySelector(el, sel);
+
+      // 2) If querySelector failed and selector looks like a simple tag, try getElementsByTagName
+      if (!node) {
+        // If they passed escaped namespace like "dc\\:creator", convert to "dc:creator"
+        var tag = sel.replace(/\\:/g, ":");
+
+        // Only attempt tag lookup if this is a simple tag name (no spaces/combinators)
+        if (!/[ >+~#[\].]/.test(tag)) {
+          node = tryGetByTag(el, tag);
+        }
+      }
+
       if (node && node.textContent) return String(node.textContent).trim();
     }
     return "";
@@ -76,10 +109,10 @@ export const ChangelogRssFeed = props => {
   function normalizeType(rawType) {
     var t = safeText(rawType).trim().toLowerCase();
 
-    // If the RSS doesn't include a category/type, treat as known issue.
+    // If the RSS doesn't include a type, treat as known issue.
     if (!t) return { key: "known issue", label: "Known Issue" };
 
-    // Your requested normalization
+    // Requested normalization
     if (t === "improved") return { key: "changed", label: "Changed" };
     if (t === "changed") return { key: "changed", label: "Changed" };
 
@@ -89,7 +122,7 @@ export const ChangelogRssFeed = props => {
     if (t === "deprecated") return { key: "deprecated", label: "Deprecated" };
     if (t === "removed") return { key: "removed", label: "Removed" };
 
-    // If ReadMe ever emits something unexpected, just display it nicely
+    // Unknown type: prettify it
     var label = t
       .split(" ")
       .map(function (w) { return w ? w[0].toUpperCase() + w.slice(1) : ""; })
@@ -98,24 +131,26 @@ export const ChangelogRssFeed = props => {
   }
 
   function pickTypeFromItem(itemEl) {
-    // RSS commonly uses <category> for classification.
-    // ReadMe’s feed may include one or more <category> tags.
-    // We’ll prefer the first category that matches our known keys.
-    var cats = itemEl ? itemEl.querySelectorAll("category") : null;
-    if (!cats || !cats.length) return normalizeType("");
+    // ReadMe RSS uses <type> (per your feed snippet)
+    var directType = firstChildText(itemEl, ["type"]);
+    if (directType) return normalizeType(directType);
 
-    var best = "";
-    for (var i = 0; i < cats.length; i++) {
-      var c = cats[i] && cats[i].textContent ? String(cats[i].textContent).trim() : "";
-      var k = normalizeType(c).key;
-      if (k === "added" || k === "fixed" || k === "changed" || k === "deprecated" || k === "removed" || k === "known issue") {
-        best = c;
-        break;
+    // Fallback: some RSS feeds use <category>
+    var cats = itemEl ? itemEl.getElementsByTagName("category") : null;
+    if (cats && cats.length) {
+      for (var i = 0; i < cats.length; i++) {
+        var c = cats[i] && cats[i].textContent ? String(cats[i].textContent).trim() : "";
+        var k = normalizeType(c).key;
+        if (k === "added" || k === "fixed" || k === "changed" || k === "deprecated" || k === "removed" || k === "known issue") {
+          return normalizeType(c);
+        }
       }
-      if (!best) best = c;
+      var c0 = cats[0] && cats[0].textContent ? String(cats[0].textContent).trim() : "";
+      return normalizeType(c0);
     }
 
-    return normalizeType(best);
+    // No type info => Known Issue
+    return normalizeType("");
   }
 
   function svgIcon(kind) {
@@ -190,7 +225,7 @@ export const ChangelogRssFeed = props => {
     }
 
     var channelTitle = firstChildText(doc, ["channel > title"]);
-    var itemEls = doc.querySelectorAll("item");
+    var itemEls = doc.getElementsByTagName("item");
     var out = [];
     var count = Math.min(itemEls.length, maxItems);
 
@@ -203,10 +238,10 @@ export const ChangelogRssFeed = props => {
       var pubDate = parsePubDate(pubDateRaw);
 
       // Author can be <dc:creator> or <author> in some feeds
-      var creator = firstChildText(it, ["dc\\:creator", "creator", "author"]);
+      var creator = firstChildText(it, ["dc\\:creator", "dc:creator", "creator", "author"]);
 
       // Description sometimes holds HTML; some RSS feeds include content:encoded
-      var desc = firstChildText(it, ["content\\:encoded", "encoded", "description"]);
+      var desc = firstChildText(it, ["content\\:encoded", "content:encoded", "encoded", "description"]);
       var descText = stripHtml(desc);
 
       var typeInfo = pickTypeFromItem(it);
@@ -479,12 +514,12 @@ export const ChangelogRssFeed = props => {
     );
   }
 
+  var styleText =
+    ".rmChangelogFeed select { -webkit-appearance: none; appearance: none; }";
+
   return (
     <div style={rootStyle}>
-      <style>{`
-        /* tiny improvement: make selects look consistent in Safari */
-        .rmChangelogFeed select { -webkit-appearance: none; appearance: none; }
-      `}</style>
+      <style>{styleText}</style>
 
       <div className="rmChangelogFeed">
         <div style={barStyle}>
