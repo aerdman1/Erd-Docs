@@ -6,6 +6,6 @@ icon: far fa-arrows-maximize
 metadata:
   robots: index
 ---
-<br />
+<ChangelogRssFeed rssUrl="/changelog.rss" maxItems={250} cacheMinutes={5} />
 
 <br />
