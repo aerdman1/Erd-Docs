@@ -1,0 +1,621 @@
+---
+name: RSS
+---
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+export const ChangelogRssFeed = props => {
+  // -----------------------------
+  // Props + defaults
+  // -----------------------------
+  var rssUrl = props && props.rssUrl ? String(props.rssUrl) : "/changelog.rss";
+  var maxItems = props && props.maxItems ? Number(props.maxItems) : 200;
+  var cacheMinutes = props && props.cacheMinutes ? Number(props.cacheMinutes) : 5;
+  var showSearch = props && typeof props.showSearch === "boolean" ? props.showSearch : true;
+  var showAuthorFilter = props && typeof props.showAuthorFilter === "boolean" ? props.showAuthorFilter : true;
+  var showSort = props && typeof props.showSort === "boolean" ? props.showSort : true;
+  var defaultType = props && props.defaultType ? String(props.defaultType) : "all";
+
+  // -----------------------------
+  // State
+  // -----------------------------
+  var [items, setItems] = useState([]);
+  var [loading, setLoading] = useState(true);
+  var [error, setError] = useState("");
+  var [typeFilter, setTypeFilter] = useState(defaultType);
+  var [search, setSearch] = useState("");
+  var [author, setAuthor] = useState("");
+  var [sort, setSort] = useState("newest"); // newest | oldest
+  var [expanded, setExpanded] = useState(false);
+
+  var abortRef = useRef(null);
+
+  // -----------------------------
+  // Helpers (scoped inside component)
+  // -----------------------------
+  function safeText(v) {
+    if (v === null || v === undefined) return "";
+    return String(v);
+  }
+
+  function stripHtml(html) {
+    // RSS description can be HTML; keep it safe-ish for display as text snippet.
+    var s = safeText(html);
+    s = s.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+    s = s.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "");
+    s = s.replace(/<\/?[^>]+>/g, " ");
+    s = s.replace(/\s+/g, " ").trim();
+    return s;
+  }
+
+  function firstChildText(el, selectors) {
+    if (!el) return "";
+    for (var i = 0; i < selectors.length; i++) {
+      var node = el.querySelector(selectors[i]);
+      if (node && node.textContent) return String(node.textContent).trim();
+    }
+    return "";
+  }
+
+  function parsePubDate(s) {
+    var v = safeText(s).trim();
+    if (!v) return null;
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return null;
+    return d;
+  }
+
+  function formatDate(d) {
+    if (!d) return "";
+    try {
+      return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch (e) {
+      return d.toDateString();
+    }
+  }
+
+  function normalizeType(rawType) {
+    var t = safeText(rawType).trim().toLowerCase();
+
+    // If the RSS doesn't include a category/type, treat as known issue.
+    if (!t) return { key: "known issue", label: "Known Issue" };
+
+    // Your requested normalization
+    if (t === "improved") return { key: "changed", label: "Changed" };
+    if (t === "changed") return { key: "changed", label: "Changed" };
+
+    // Keep existing types
+    if (t === "added") return { key: "added", label: "Added" };
+    if (t === "fixed") return { key: "fixed", label: "Fixed" };
+    if (t === "deprecated") return { key: "deprecated", label: "Deprecated" };
+    if (t === "removed") return { key: "removed", label: "Removed" };
+
+    // If ReadMe ever emits something unexpected, just display it nicely
+    var label = t
+      .split(" ")
+      .map(function (w) { return w ? w[0].toUpperCase() + w.slice(1) : ""; })
+      .join(" ");
+    return { key: t, label: label || "Unknown" };
+  }
+
+  function pickTypeFromItem(itemEl) {
+    // RSS commonly uses <category> for classification.
+    // ReadMe’s feed may include one or more <category> tags.
+    // We’ll prefer the first category that matches our known keys.
+    var cats = itemEl ? itemEl.querySelectorAll("category") : null;
+    if (!cats || !cats.length) return normalizeType("");
+
+    var best = "";
+    for (var i = 0; i < cats.length; i++) {
+      var c = cats[i] && cats[i].textContent ? String(cats[i].textContent).trim() : "";
+      var k = normalizeType(c).key;
+      if (k === "added" || k === "fixed" || k === "changed" || k === "deprecated" || k === "removed" || k === "known issue") {
+        best = c;
+        break;
+      }
+      if (!best) best = c;
+    }
+
+    return normalizeType(best);
+  }
+
+  function svgIcon(kind) {
+    // Inline SVGs (don’t rely on icon fonts).
+    if (kind === "added") {
+      return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 5a1 1 0 1 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5Z"/></svg>';
+    }
+    if (kind === "fixed") {
+      return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M9.2 16.6 4.9 12.3a1 1 0 1 1 1.4-1.4l2.9 2.9 8.5-8.5a1 1 0 1 1 1.4 1.4l-9.9 9.9a1 1 0 0 1-1.4 0Z"/></svg>';
+    }
+    if (kind === "changed") {
+      return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 12a8 8 0 0 1-13.66 5.66l-1.42 1.42A10 10 0 0 0 22 12h-2Zm-16 0a8 8 0 0 1 13.66-5.66l1.42-1.42A10 10 0 0 0 2 12h2Z"/><path fill="currentColor" d="M7 7h4V3l6 6-6 6v-4H7V7Z"/></svg>';
+    }
+    if (kind === "deprecated") {
+      return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 1 21h22L12 2Zm0 6a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1Zm0 11a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 19Z"/></svg>';
+    }
+    if (kind === "removed") {
+      return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.3 5.7a1 1 0 0 1 0 1.4L13.4 12l4.9 4.9a1 1 0 1 1-1.4 1.4L12 13.4l-4.9 4.9a1 1 0 1 1-1.4-1.4l4.9-4.9-4.9-4.9a1 1 0 1 1 1.4-1.4L12 10.6l4.9-4.9a1 1 0 0 1 1.4 0Z"/></svg>';
+    }
+    // known issue (default)
+    return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 .001 20.001A10 10 0 0 0 12 2Zm0 11a1 1 0 0 1-1-1V7a1 1 0 1 1 2 0v5a1 1 0 0 1-1 1Zm0 5a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 18Z"/></svg>';
+  }
+
+  function typeColor(kind) {
+    // Tweak these to match your portal theme if you want.
+    if (kind === "added") return "rgba(34,197,94,.18)";
+    if (kind === "fixed") return "rgba(59,130,246,.18)";
+    if (kind === "changed") return "rgba(107,91,255,.18)";
+    if (kind === "deprecated") return "rgba(245,158,11,.18)";
+    if (kind === "removed") return "rgba(239,68,68,.18)";
+    return "rgba(11,27,51,.12)"; // known issue
+  }
+
+  function typeBorder(kind) {
+    if (kind === "added") return "rgba(34,197,94,.35)";
+    if (kind === "fixed") return "rgba(59,130,246,.35)";
+    if (kind === "changed") return "rgba(107,91,255,.35)";
+    if (kind === "deprecated") return "rgba(245,158,11,.35)";
+    if (kind === "removed") return "rgba(239,68,68,.35)";
+    return "rgba(11,27,51,.25)";
+  }
+
+  function readCache(key) {
+    try {
+      var raw = window.localStorage.getItem(key);
+      if (!raw) return null;
+      var obj = JSON.parse(raw);
+      if (!obj || !obj.ts || !obj.data) return null;
+      var ageMs = Date.now() - obj.ts;
+      var maxMs = Math.max(0, cacheMinutes) * 60 * 1000;
+      if (maxMs && ageMs > maxMs) return null;
+      return obj.data;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeCache(key, data) {
+    try {
+      window.localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) {}
+  }
+
+  function parseRss(xmlText) {
+    var parser = new DOMParser();
+    var doc = parser.parseFromString(xmlText, "text/xml");
+
+    // If parse errors exist, many browsers create <parsererror>
+    var pe = doc.getElementsByTagName("parsererror");
+    if (pe && pe.length) {
+      return { ok: false, error: "RSS parse error (invalid XML)." };
+    }
+
+    var channelTitle = firstChildText(doc, ["channel > title"]);
+    var itemEls = doc.querySelectorAll("item");
+    var out = [];
+    var count = Math.min(itemEls.length, maxItems);
+
+    for (var i = 0; i < count; i++) {
+      var it = itemEls[i];
+
+      var title = firstChildText(it, ["title"]);
+      var link = firstChildText(it, ["link"]);
+      var pubDateRaw = firstChildText(it, ["pubDate", "date"]);
+      var pubDate = parsePubDate(pubDateRaw);
+
+      // Author can be <dc:creator> or <author> in some feeds
+      var creator = firstChildText(it, ["dc\\:creator", "creator", "author"]);
+
+      // Description sometimes holds HTML; some RSS feeds include content:encoded
+      var desc = firstChildText(it, ["content\\:encoded", "encoded", "description"]);
+      var descText = stripHtml(desc);
+
+      var typeInfo = pickTypeFromItem(it);
+
+      out.push({
+        title: title,
+        link: link,
+        pubDate: pubDate,
+        pubDateRaw: pubDateRaw,
+        author: creator,
+        descriptionText: descText,
+        typeKey: typeInfo.key,
+        typeLabel: typeInfo.label,
+        sourceTitle: channelTitle
+      });
+    }
+
+    return { ok: true, items: out, sourceTitle: channelTitle };
+  }
+
+  // -----------------------------
+  // Fetch RSS
+  // -----------------------------
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    setLoading(true);
+    setError("");
+
+    // Cancel prior request
+    try {
+      if (abortRef.current) abortRef.current.abort();
+    } catch (e) {}
+
+    var ac = new AbortController();
+    abortRef.current = ac;
+
+    var cacheKey = "rm_changelog_rss_cache__" + rssUrl;
+    var cached = readCache(cacheKey);
+    if (cached && cached.items && cached.items.length) {
+      setItems(cached.items);
+      setLoading(false);
+      return;
+    }
+
+    fetch(rssUrl, { method: "GET", signal: ac.signal, credentials: "omit" })
+      .then(function (res) {
+        if (!res || !res.ok) throw new Error("RSS request failed (" + (res ? res.status : "unknown") + ").");
+        return res.text();
+      })
+      .then(function (xmlText) {
+        var parsed = parseRss(xmlText);
+        if (!parsed.ok) throw new Error(parsed.error || "Failed to parse RSS.");
+        setItems(parsed.items || []);
+        writeCache(cacheKey, { items: parsed.items || [] });
+        setLoading(false);
+      })
+      .catch(function (err) {
+        if (err && err.name === "AbortError") return;
+        setError(err ? String(err.message || err) : "Unknown error.");
+        setLoading(false);
+      });
+
+    return function () {
+      try {
+        ac.abort();
+      } catch (e) {}
+    };
+  }, [rssUrl, maxItems, cacheMinutes]);
+
+  // -----------------------------
+  // Derived lists (types/authors)
+  // -----------------------------
+  var typeOptions = useMemo(() => {
+    // Always show the canonical set you care about
+    return [
+      { key: "all", label: "All types" },
+      { key: "known issue", label: "Known Issue" },
+      { key: "added", label: "Added" },
+      { key: "fixed", label: "Fixed" },
+      { key: "changed", label: "Changed" },
+      { key: "deprecated", label: "Deprecated" },
+      { key: "removed", label: "Removed" }
+    ];
+  }, []);
+
+  var authorOptions = useMemo(() => {
+    var seen = {};
+    var out = [];
+    for (var i = 0; i < items.length; i++) {
+      var a = safeText(items[i].author).trim();
+      if (!a) continue;
+      var k = a.toLowerCase();
+      if (seen[k]) continue;
+      seen[k] = true;
+      out.push(a);
+    }
+    out.sort(function (a1, a2) { return a1.localeCompare(a2); });
+    return out;
+  }, [items]);
+
+  // -----------------------------
+  // Filter + sort
+  // -----------------------------
+  var filtered = useMemo(() => {
+    var q = safeText(search).trim().toLowerCase();
+    var a = safeText(author).trim().toLowerCase();
+    var t = safeText(typeFilter).trim().toLowerCase();
+
+    var out = items.slice(0);
+
+    // Sort by pubDate (RSS has real timestamps)
+    out.sort(function (x, y) {
+      var dx = x.pubDate ? x.pubDate.getTime() : 0;
+      var dy = y.pubDate ? y.pubDate.getTime() : 0;
+      if (sort === "oldest") return dx - dy;
+      return dy - dx;
+    });
+
+    // Apply filters
+    var result = [];
+    for (var i = 0; i < out.length; i++) {
+      var it = out[i];
+
+      var okType = (t === "all") || (safeText(it.typeKey).toLowerCase() === t);
+      if (!okType) continue;
+
+      if (a) {
+        var aa = safeText(it.author).toLowerCase();
+        if (aa.indexOf(a) === -1) continue;
+      }
+
+      if (q) {
+        var hay = (safeText(it.title) + " " + safeText(it.descriptionText) + " " + safeText(it.typeLabel)).toLowerCase();
+        if (hay.indexOf(q) === -1) continue;
+      }
+
+      result.push(it);
+    }
+
+    return result;
+  }, [items, typeFilter, search, author, sort]);
+
+  // -----------------------------
+  // Render
+  // -----------------------------
+  var rootStyle = {
+    width: "100%",
+    maxWidth: 980
+  };
+
+  var barStyle = {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 10,
+    alignItems: "flex-end",
+    padding: "12px 12px",
+    borderRadius: 12,
+    border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
+    background: "var(--color-bg-muted, rgba(0,0,0,.03))",
+    marginBottom: 14
+  };
+
+  var groupStyle = { display: "flex", flexDirection: "column", gap: 6, minWidth: 180 };
+  var labelStyle = { fontSize: 12, fontWeight: 700, opacity: 0.75 };
+  var controlStyle = {
+    height: 34,
+    padding: "6px 10px",
+    borderRadius: 10,
+    border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
+    background: "var(--color-bg-page, #fff)",
+    color: "var(--color-text-default, #000)",
+    fontSize: 13,
+    outline: "none"
+  };
+
+  var metaStyle = { marginLeft: "auto", fontSize: 12, opacity: 0.7, paddingBottom: 6 };
+
+  var cardStyle = {
+    border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
+    background: "var(--color-bg-page, #fff)",
+    borderRadius: 14,
+    padding: "14px 14px",
+    boxShadow: "0 6px 18px rgba(0,0,0,.05)"
+  };
+
+  function Badge(props2) {
+    var kind = props2.kind;
+    var label = props2.label;
+
+    return (
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px 10px",
+          borderRadius: 999,
+          fontWeight: 800,
+          fontSize: 12,
+          letterSpacing: ".01em",
+          background: typeColor(kind),
+          border: "1px solid " + typeBorder(kind),
+          color: "var(--color-text-default, #000)"
+        }}
+      >
+        <span
+          aria-hidden="true"
+          style={{
+            width: 18,
+            height: 18,
+            borderRadius: 6,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(0,0,0,.12)"
+          }}
+          dangerouslySetInnerHTML={{ __html: svgIcon(kind) }}
+        />
+        {label}
+      </span>
+    );
+  }
+
+  function Row(props2) {
+    var it = props2.item;
+
+    var title = safeText(it.title) || "Untitled";
+    var href = safeText(it.link) || "#";
+    var when = formatDate(it.pubDate);
+    var who = safeText(it.author);
+    var typeKey = safeText(it.typeKey);
+    var typeLabel = safeText(it.typeLabel);
+
+    var snippet = safeText(it.descriptionText);
+    if (!expanded && snippet.length > 220) snippet = snippet.slice(0, 220) + "…";
+
+    return (
+      <div style={cardStyle}>
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap" }}>
+          <Badge kind={typeKey} label={typeLabel} />
+          <div style={{ fontSize: 12, opacity: 0.72, paddingTop: 2 }}>
+            {when ? when : null}
+            {when && who ? " • " : null}
+            {who ? who : null}
+          </div>
+        </div>
+
+        <div style={{ marginTop: 10 }}>
+          <a
+            href={href}
+            style={{
+              textDecoration: "none",
+              color: "var(--color-text-link, #1f78ff)",
+              fontWeight: 800,
+              fontSize: "1.05rem",
+              lineHeight: 1.3
+            }}
+          >
+            {title}
+          </a>
+        </div>
+
+        {snippet ? (
+          <div style={{ marginTop: 8, fontSize: ".96rem", opacity: 0.9, lineHeight: 1.5 }}>
+            {snippet}
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div style={rootStyle}>
+      <style>{`
+        /* tiny improvement: make selects look consistent in Safari */
+        .rmChangelogFeed select { -webkit-appearance: none; appearance: none; }
+      `}</style>
+
+      <div className="rmChangelogFeed">
+        <div style={barStyle}>
+          <div style={groupStyle}>
+            <div style={labelStyle}>Change type</div>
+            <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={controlStyle}>
+              {typeOptions.map(function (o) {
+                return (
+                  <option key={o.key} value={o.key}>
+                    {o.label}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          {showSort ? (
+            <div style={groupStyle}>
+              <div style={labelStyle}>Date</div>
+              <select value={sort} onChange={e => setSort(e.target.value)} style={controlStyle}>
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+            </div>
+          ) : null}
+
+          {showSearch ? (
+            <div style={groupStyle}>
+              <div style={labelStyle}>Search</div>
+              <input
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Title or content…"
+                style={controlStyle}
+              />
+            </div>
+          ) : null}
+
+          {showAuthorFilter ? (
+            <div style={groupStyle}>
+              <div style={labelStyle}>Author</div>
+              <select value={author} onChange={e => setAuthor(e.target.value)} style={controlStyle}>
+                <option value="">All authors</option>
+                {authorOptions.map(function (a) {
+                  return (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          ) : null}
+
+          <div style={metaStyle}>
+            {loading ? "Loading…" : null}
+            {!loading && error ? "Error: " + error : null}
+            {!loading && !error ? (filtered.length + " / " + items.length + " shown") : null}
+          </div>
+
+          <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
+            <button
+              type="button"
+              onClick={() => setExpanded(!expanded)}
+              style={{
+                height: 34,
+                padding: "0 12px",
+                borderRadius: 10,
+                border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
+                background: "var(--color-bg-page, #fff)",
+                cursor: "pointer",
+                fontWeight: 700
+              }}
+            >
+              {expanded ? "Collapse excerpts" : "Expand excerpts"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setTypeFilter("all");
+                setSearch("");
+                setAuthor("");
+                setSort("newest");
+              }}
+              style={{
+                height: 34,
+                padding: "0 12px",
+                borderRadius: 10,
+                border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
+                background: "var(--color-bg-page, #fff)",
+                cursor: "pointer",
+                fontWeight: 700
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div style={{ opacity: 0.75 }}>Loading RSS feed…</div>
+        ) : null}
+
+        {!loading && error ? (
+          <div style={{ padding: 12, borderRadius: 12, border: "1px solid rgba(239,68,68,.35)", background: "rgba(239,68,68,.08)" }}>
+            <div style={{ fontWeight: 800 }}>Couldn’t load RSS</div>
+            <div style={{ marginTop: 6, opacity: 0.85, lineHeight: 1.5 }}>
+              {error}
+              <div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>
+                If this URL is cross-origin, the browser may block it due to CORS. Using a same-origin path (like <code>/changelog.rss</code>) is the safest option.
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {!loading && !error && !filtered.length ? (
+          <div style={{ opacity: 0.75 }}>No posts match your filters.</div>
+        ) : null}
+
+        {!loading && !error && filtered.length ? (
+          <div style={{ display: "grid", gap: 12 }}>
+            {filtered.map(function (it, idx) {
+              var key = (it.link ? it.link : "item") + "_" + idx;
+              return <Row key={key} item={it} />;
+            })}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
+<ChangelogRssFeed rssUrl="/changelog.rss" maxItems={250} cacheMinutes={5} />
