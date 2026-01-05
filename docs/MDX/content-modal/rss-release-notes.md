@@ -9,3 +9,5 @@ metadata:
 <br />
 
 This is the content area
+
+<ChangelogRssFeed rssUrl="/changelog.rss" maxItems={250} cacheMinutes={5} />
