@@ -295,7 +295,7 @@ export const ChangelogRssFeed = props => {
       return;
     }
 
-    fetch(rssUrl, { method: "GET", signal: ac.signal, credentials: "omit" })
+    fetch(rssUrl, { method: "GET", signal: ac.signal })
       .then(function (res) {
         if (!res || !res.ok) throw new Error("RSS request failed (" + (res ? res.status : "unknown") + ").");
         return res.text();
