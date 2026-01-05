@@ -12,6 +12,14 @@ metadata:
 <style>
 section.content-toc.grid-25 {
     display: none;
+  }
+
+.rm-Guides .content-body {
+    -ms-flex-negative: 1;
+    flex-shrink: 1;
+    max-width: 100%;
+    padding-top: 30px;
+    width: 100%;
 }
 </style>
 `}</HTMLBlock>
