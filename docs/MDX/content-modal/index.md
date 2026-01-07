@@ -36,5 +36,6 @@ metadata:
 > 📘 Info
 >
 > **Bold inside callout**
-This line is missing `>` and is directly adjacent.
+> This line is missing `>` and is directly adjacent.
 
+ 
