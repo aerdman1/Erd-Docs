@@ -12,4 +12,4 @@ metadata:
 > 📘 Info
 >
 > **Bold inside callout**
-**Bold inside callout**
+**Bold inside callout** 
