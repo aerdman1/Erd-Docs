@@ -29,4 +29,12 @@ metadata:
 > 📘 Info
 >
 > **Bold inside callout**
-> This line is missing `>` and is directly adjacent.
+> This line is missing carr and is directly adjacent.
+
+<br />
+
+> 📘 Info
+>
+> **Bold inside callout**
+This line is missing `>` and is directly adjacent.
+
