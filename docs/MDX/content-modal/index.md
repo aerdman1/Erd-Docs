@@ -12,4 +12,4 @@ metadata:
 > 📘 Info
 >
 > **Bold inside callout**
-This line is missing `>` and is directly adjacent.
+**Bold inside callout**`>` and is directly adjacent.
