@@ -23,3 +23,10 @@ metadata:
 | test | test | test |
 
 <Anchor label="test" target="_blank" href="doc:overview">test</Anchor>
+
+<br />
+
+> 📘 Info
+>
+> **Bold inside callout**
+> This line is missing `>` and is directly adjacent.
