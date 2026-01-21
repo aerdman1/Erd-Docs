@@ -2,6 +2,7 @@
 title: Page Searching & Keywords
 deprecated: false
 hidden: false
+icon: far fa-file-lines
 metadata:
   keywords:
     - API
