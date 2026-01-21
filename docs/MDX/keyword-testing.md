@@ -2,6 +2,7 @@
 title: Keywords
 deprecated: false
 hidden: false
+icon: far fa-mp3-player
 metadata:
   robots: index
 ---
