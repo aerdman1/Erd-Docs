@@ -2,6 +2,7 @@
 title: Data Tables
 deprecated: false
 hidden: false
+icon: far fa-file-lines
 metadata:
   robots: index
 ---
