@@ -7,334 +7,726 @@ metadata:
   robots: index
 ---
 ---
-title: "Avails and Committed Title List specifications"
+title: "The Roku Channel live linear ingest specifications (OVP)"
 deprecated: false
 hidden: false
 robots: index
 ---
-# Avails and Committed Title List specifications
+# The Roku Channel live linear ingest specifications (OVP)
 
-## Avails and Committed Title Lists for The Roku Channel
+*Version 3.2*
 
-Roku requests an initial launch list of titles/episodes/shortForm videos in the current library that are available to Roku at the time of onboarding and a schedule when the content will be refreshed. For ongoing production, Roku requests that a Committed Title List be provided **60** days prior to licensing window start and the content be delivered in accordance with [The Roku Channel Ingest Specification](https://go.roku.com/ingest-ovp-specs) at least 30 days before licensing window start to allow ample time for selection, ingest, processing, and QC of the content before it goes live on The Roku Channel. 
+## Overview
 
-### Roku content policies
+This specification describes the ingest specifications and EPG requirements required for your channel's content catalog to be included in [The Roku Channel](https://www.roku.com/whats-on/the-roku-channel). A catalog is the set of movies, series, TV specials, short-form videos or linear stream your channel provides, along with the artwork that represents it in the UI. A catalog feed (JSON) or Gracenote channel ID (aka ProgSrvID) includes the metadata that describes each asset so Roku can index it, categorize it, and present it to users. **Note: Gracenote channel id support is currently limited to linear channels with live sports only.**
 
-#### Ad-supported content on The Roku Channel
+The Roku Channel feed format follows the JSON-Schema Draft 4. All the properties in the schema are case sensitive. Before submitting a feed, make sure it is a valid JSON file. You can do that by using an IDE or free online tools, such as [JSON Schema Validator](https://www.jsonschemavalidator.net/) or [JSON Schema Lint](https://jsonschemalint.com/#!/version/draft-07/markup/json).
 
-The Roku Channel is looking for ad-supported content that is appropriate for our users and advertisers – for example, The Roku Channel does not want ad-supported content that contains excessive nudity or extreme/graphic violence.  Please use your best judgement when sharing content. If an asset is questionable, please find an alternative to share. We reserve the right to remove or reject any content that we deem inappropriate.
+For guidelines about presenting your channel's EPG, see [EPG on The Roku Channel](/trc-docs/live-linear/epg-on-trc.md).
 
-#### Kids directed content policy
+### A note about deduplication of metadata
 
-“Kids-Directed Content” is content that either: (i) is directed to children as defined by the applicable law of the jurisdiction in which the content is shown (e.g., The Children's Online Privacy Protection Act); or (ii) was made for viewing primarily by children within the jurisdiction in which the content is shown.
+Roku augments metadata and artwork that appears in The Roku Channel on Roku devices, web browsers, mobile applications, and other off-platform players with data supplied from Gracenote’s database where available. The Gracenote data aids in a unified experience of a title across platforms as well as on the greater Roku ecosystem. Roku will attempt to match all content delivered by our Partners to a corresponding record in Gracenote’s database. *At this time all metadata and artwork that appears on The Roku Channel is sourced from Gracenote if that content is found in Gracenote’s database.*
 
-- You may NOT submit or distribute Kids-Directed content without Roku’s express written approval.
-- Roku must be made aware of the intent to submit or distribute Kids-Directed content via submission of the avails and Committed Title List document populating the columns outlined below:
-  - Kids-Directed column must be populated with the value "true"
-  - The Rating Source column must be populated with a valid Rating Source
-  - The Rating Value column must be populated with a valid parental [Rating](#ratings) from that Rating Source
-  - “UNRATED” and “Not Rated” are not acceptable ratings for kids directed content
+Our systems use a combination of methods to match a title its correct Gracenote record. Partners can aid in the matching to a Gracenote record by providing accurate metadata including:
 
-##### Optional age demographics tags
+- Exact title of a series, movie, TV special, or short form video
 
-Additional tags can be provided to help categorize kids-directed content around age demographics. Please use these tags to define different content directed age groups:
+- Release dates that are accurate to the year the title was originally released on any platform
 
-| Ages     | Tags        |
-| -------- | ----------- |
-| Ages 1-3 | ages_1-3    |
-| Ages 4-6 | ages_4-6    |
-| Ages 7-9 | ages_7-9    |
-| Ages 10+ | ages_10plus |
+- Accurate season and episode numbers according to the original release order
 
-### Avails
+- Accurate TMS (Gracenote) IDs or IMDB IDs by content type
 
-“Avails” is short for availability. It refers to the list of available content for licensing or distribution. The avails list is shared with Roku to aid in understanding what content is currently available for acquisition or distribution. Avails typically include information about the titles, such as the title name, genre, duration, rights availability (e.g., exclusive or non-exclusive rights), and any other relevant details about the content. Avails should be sent to the Content Partnerships team ([trcpartnersupport@roku.com](mailto:trcpartnersupport@roku.com)) for Selections review. Once the Content Partnerships team has reviewed the Avails, they will provide the Avails sheet back with Selections marked for review and any revisions. The agreed-upon list of Selected content becomes the Committed Title List
+  - Content classified as an episode with Gracenote must be delivered as an Episode to Roku
 
-### Committed Title List:
+  - Content classified as a movie with Gracenote must be delivered as a movie to Roku
 
-A “Committed title list” (CTL) is a comprehensive list of all the titles that have been committed and made available to Roku as agreed upon through the Selections process. Similar to avails, a CTL includes information about each title, such as the title name, genre, duration, and any other relevant details. CTLs are used for content management purposes and provide an overview of the committed content catalog from the content Partner. CTLs should be finalized for ingestion into Roku's Rights Management system at least 60 days prior to the start date of the titles in the list. The data provided in the CTL will control the availability of titles on The Roku Channel.
+  - Content classified as a TV Special with Gracenote can be delivered as a movie to Roku
 
-*The descriptive metadata (Title, Synopsis, Genre, etc.) provided in the avails and/or title list will be used for selection purposes only. Descriptive metadata must be included at the time the content is delivered in accordance with [The Roku Channel ingest specifications](https://go.roku.com/ingest-ovp-specs).*
+## Inclusion in The Roku Channel
 
-### Availability windows
+In order for your content to be surfaced in The Roku Channel, you must adhere to this specification. If you already have a channel powered by Direct Publisher and you want its content to appear in The Roku Channel, you must ensure your feed meets the requirements described in this specification. Likewise, if you've built a channel using our developer program, then you must provide Roku with a separate feed adhering to this specification. The new feed must contain only assets that are available for display in The Roku Channel.
 
-An availability window is the length of time during which a title is viewable by a user on The Roku Channel. Availability windows can include several different attributes in a number of combinations. Each unique combination of attributes bound by a start and end time is considered its own availability window. Each availability window should be represented in the avails or Committed Title List on its own row. The availability attributes currently supported by Roku are:
+** Note that participation in The Roku Channel is currently limited to select partners. Configuring your feed to meet this specification is a prerequisite to be reviewed for inclusion. To submit a feed for approval into The Roku Channel, contact your Roku representative.*
 
-- License Type
-- Territory
-- Language
+All Linear Partners must utilize one of the **Linear** **Certified Partners** for their stream and EPG distribution: **Amagi, Wurl, Frequency, OTTera,** **Xumo, Akta, or Zype**. Exceptions will only be considered if the partner can agree to abiding by all rules and requirements as outlined in the linear certification agreement which can be provided if such an exemption is necessary.
 
-#### Availability date and time
+### Error Reporting
 
-Roku has the ability for content to display on-device and for user playback at a specific starting time. By default, content will go into window at 12:00 am (midnight) and expire at 11:59:59 pm in the users’ time zone.
+Stream and EPG issue reports go directly to the LCPs. Stream issues and high priority EPG issues are reported as needed. Comprehensive EPG issue reports go out weekly to all LCPs. 
 
-If content is to go live at a time other than midnight or expire at a time other than 11:59:59 pm, the license window start or end values in the inbound metadata must include the desired times.
+## Roku OVP
 
-There are two types of specific time designations – relative and absolute.
+Roku now requires all live linear channels on TRC to run through their Online Video Platform (OVP). Below are the ingest specifications and input data template that needs to be filled out and provided to Roku Live Operations for all new live linear channels.
 
-- Relative Time – a Saturday night premiere of a movie goes into window at 9pm local time for all users. A user in the Eastern Time Zone watches at 9pm but a user in the Pacific Time Zone, at the exact same moment (6pm PT), cannot watch that content.
-- Absolute Time – a new episode of a series goes into window at 9pm Eastern and becomes immediately available across all time zones. A user in the Pacific Time Zone can watch the content at 6 pm local time.
+### Collection of Linear Channel Input Data
 
- While time settings are dictated by the content owner, Roku will need the metadata as follows:
+Please fill out the Excel template located here:
 
-- If the content has a relative start time, that time must be indicated in the ingest metadata and formatted as “yyyy-mm-ddThh:mm:ss” (2019-11-01T21:00:00)
-- If the content has an absolute start time, that time must be indicated in the ingest metadata. The time must be presented as UTC time and formatted as “yyyy-mm-ddThh:mm:ssZ” (2019-11-02T01:00:00Z).
-- In this example, 9 pm Eastern Time on November 1 is 1 am UTC (https://www.thetimezoneconverter.com)
-- If the metadata arrives without a time, Roku will assume a relative start time of 12:00:00 am and a relative end time of 11:59:59 pm
+https://roku.box.com/v/roku-linear-channel-input-data
 
-### Submitting Excel Avails/Committed Title Lists
+### **Supported Video and Audio Tech Specs**
 
-Avails must be submitted via email to [trcpartnersupport@roku.com](mailto:trcpartnersupport@roku.com) for selection review. Committed Title Lists must be finalized at least 60 days prior to the intended licensing window start date of the titles within the list. In certain cases we may be able to accept avails and Committed Title Lists via Aspera. Please reach out to your Roku representative for current delivery options.
-
-When submitting avails and Committed Title Lists via Excel workbook, all required fields must be populated. Roku has provided hints on row 2 of the Roku avails and Committed Title List template to highlight the required cells and any special formatting needed for each cell. Please refer to these hints when filling out the Roku avails and Committed Title List template. Other considerations when filling out the Roku Avails and Committed Title List Excel sheet include:
-
-- All data MUST begin on row 3. DO NOT DELETE THE HINTS ON ROW 2
-- Any formulas used must be converted to text prior to submission. Inclusion of a formula will result a rejection of the avails and Committed Title List sheet
-- Do not link to external data or Excel workbooks. All data must be self contained within the Excel workbook delivered to Roku
-- Do not add additional sheets to the workbook
-- Do not add additional columns to the workbook
-- Do not change any of the column header names
-- Do not supply a value of “N/A” or “n/a”. Required cells should contain valid data and optional cells may be left blank
-- Each row is considered a unique availability window for an episode/movie/shortForm video
-- Do not leave a blank row between entries in a worksheet. The system will terminate processing at the first empty row
-- Avails and Committed Title List sheets must be saved with .xlsx extension
-
-## Avails and Committed Title List sheet field definitions
-
-### Availability attribute fields
+The following outlines what we support. A preferred video set up is outlined in the referenced column.
 
 
-| **Field** | **Description** | **Type** | **Accepted Values** | **Required** |
-| --- | --- | --- | --- | --- |
-| Content Partner | Name of content owner/studio/network availing the content to The Roku Channel | string | Example:<br />Roku Originals | required |
-| Content Type | Describes the content type of the program as defined below:<br />- **episode**  - TV program that is structured in a series/season/episode hierarchy<br />- **movie**  - Full length, long form, stand-alone program that is not intended to be nested in a series/season/episode hierarchy and exceeds roughly 15 minutes run time including stand-alone TV Specials<br />- **shortForm**  - Short duration, stand-alone program that does not exceed roughly 15 minutes run time and is not intended to be nested in a series/season/episode hierarchy | enum | movie, episode, shortForm | required |
-| License Type | Available distribution rights for the content. Multiple rights may be submitted on the same row so long as all availability attributes are identical across the rights listed. The License Type provided in the Avails or Committed Title List must adhere to the distribution rights for the content as it pertains to the agreement signed with The Roku Channel.<br />- **AVOD**  – Ad-Supported Video on Demand. Video will play for free for all users and will contain advertisements<br />- **SVOD**  – Subscription Video on Demand. Video will play for users with an active subscription.  *Only to be used by Premium Subscriptions Partners on The Roku Channel*<br />- **FVOD**  – Free Video on Demand. Video will play for free for all users without monetization. FVOD windows must fall within an active SVOD window.  *Only to be used by Premium Subscriptions Partners on The Roku Channel*<br />- **Linear OTT**  - Over-the-top linear streaming rights for inclusion on Roku-built channels | enum | AVOD, SVOD, FVOD, Linear OTT | required |
-| Excluded Rights | Distribution exclusions for the content. Multiple exclusions may be submitted on the same row so long as all availability attributes are identical across the rights listed.<br />- **AVOD**  – Ad-Supported Video on Demand. Video will play for free for all users and will contain advertisements<br />- **SVOD**  – Subscription Video on Demand. Video will play for users with an active subscription.  *Only to be used by Premium Subscriptions Partners on The Roku Channel*<br />- **FVOD**  – Free Video on Demand. Video will play for free for all users without monetization. FVOD windows must fall within an active SVOD window.  *Only to be used by Premium Subscriptions Partners on The Roku Channel*<br />- **Linear OTT**  - Over-the-top linear streaming rights for inclusion on Roku-built channels | enum | AVOD, SVOD, FVOD, Linear OTT | optional |
-| Start Date | Start of availability in YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS format. If the content has no set Start Date, “open” is an acceptable value. Start Dates without time values will assume a relative start time of 12:00:00 am on the Start Date listed | date string | YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, or open | required |
-| End Date | End of availability in YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS format. If the content has no set End Date, “open” or “end of term” are acceptable values. End Dates without time values will assume relative end times of 11:59:59 pm on the End Date listed | date string | YYYY-MM-DD, YYYY-MM-DDTHH:MM:SS, open, or end of term | required |
-| Language | The language(s) that will be made available to users of The Roku Channel. Language values must conform to one of the enumerated [supported language codes](#language-codes) . Multiple language/localizationType combinations may be provided on the same row so long as all availability attributes are identical across the languages listed. When multiple languages are provided, the localization type related to that language must be included by appending a colon (":") and the localization type as defined below.<br />- **dub**  – indicates the language property refers to an audio track. Applicable to original voice audio<br />- **sub**  – indicates the language property refers to subtitle<br />- **subdub**  – includes both subtitles and dubbed audio<br />- **any**  – includes any combination of subtitles or dubbed audio (whatever is available) | enum | Examples:<br />en:dub, fr:sub, de:subdub, es-mx:any | required |
-| Localization Type | Applies to the Language column when only a single language code is provided. Indicates that the language property refers to either an audio track or a text track (subtitle). Localization Type would be “dub” for original voice audio. Valid values defined below:<br />- **dub**  – indicates the language property refers to an audio track. Applicable to original voice audio<br />- **sub**  – indicates the language property refers to subtitle<br />- **subdub**  – includes both subtitles and dubbed audio<br />- **any**  – includes any combination of subtitles or dubbed audio (whatever is available) | enum | sub, dub, subdub, any | required when providing a single language in the Language column |
-| Excluded Languages | The language(s) that must not be made available to users of The Roku Channel. Language values must conform to one of the enumerated [supported language codes](#language-codes) . Multiple language combinations may be provided on the same row so long as all availability attributes are identical across the languages listed. | enum | Example:<br />en, de | optional |
-| Territory | [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#search) country code for the country or territory in which the content may be made available. Multiple territories may be submitted on the same row so long as all availability attributes are identical across the territories listed. | enum | Example:<br />US, CA, GB, MX, LATAM, WW | required |
-| Excluded Territories | [ISO 3166-1 alpha-2](https://www.iso.org/obp/ui/#search) country code for the country or territory for which the content should NOT be made available. Multiple territories may be excluded. | enum | Example:<br />DE, FR | optional |
+| **Description** | **Specification** | **Preferred** |
+| --- | --- | --- |
+| Delivery Method | - AWS Media Connect Entitlement<br />- Zixi Push<br />- SRT<br />- Push IP and Port number will be provided to LCP/partner<br />- RTP w/FEC Push<br />- RTMP Push<br />- Push URL will be provided to LCP/partner<br />*Support AES Decryption* | AWS Media Connect Entitlement |
+| Container | TS over IP | TS over IP |
+| Video Codec | - MPEG-2<br /><br /><br />- H.264<br /><br /><br />- H.265 | H.264 |
+| Audio Codec | - AAC<br /><br /><br />- MPEG Audio<br /><br /><br />- Dolby Digital (AC3 2.0 + 5.1)<br /><br /><br />- PCM | AAC |
+| Video Resolution | - HD - 1920 x 1080<br />- SD 720 x 480 | HD - 1920 x 1080 |
+| Video Frame Rate | - 23.97<br />- 24<br />- 25<br />- 29.97<br />- 30<br />- 59.94<br />- 60 | any |
+| Audio Bitrate | - 128 Kbps (min)<br />- 320 Kbps (max) | within range |
+| Overall Bitrate | - HD - 12 Mbps (min)<br />- SD - 6 Mbps (min) | Above 12 Mbps |
+| Bitrate Mode | CBR | CBR |
+| Video Interlacing | Progressive Scan | Progressive Scan |
+| Audio Sampling Rate | 48 kHz | 48 kHz |
+| Audio Channels | Stereo | Stereo |
+| Closed Captions | CEA 608/708 (embedded) | CEA 608/708 (embedded) |
+| Aspect Ratio | - HD - 16:9<br />- SD - 4:3 | HD - 16:9 |
+| Ad Insertion Points (if applicable) | SCTE-35 Markers In Stream via any of the following:<br />- **Splice_Insertion**<br />- Start and Duration is required<br />- If scte35:SpliceInsert, outOfNetworkIndicator must be set to  **true**<br />- **Time Signal**<br />- Start and Duration is required<br />- If scte35:TimeSignal, then accompany by scte35:SegmentationDescriptor scte35:SegmentationUpid with segmentationTypeId set to  **one**  of the following cue-out numbers: 0x22 (start break) 0x30 (provider advertisement start) 0x32 (distributor advertisement start) 0x34 (provider placement opportunity start) 0x36 (distributor placement opportunity start) | Splice_Insertion |
+| Special ad support | Squeezebacks * (coming soon) * **Requires Roku approval** |  |
+| Ad policy | - Partners should not serve any ads in the channel other than the ones returned by the Roku SSAI, unless explicitly agreed in the contract.<br />- Partners should adhere to the below ad length requirements:<br />- General Audience 8 minutes of ads per hour Minimum 4 ads and maximum of 6 ads per pod Ad pod length of 2 minutes Duration between ad breaks of at least 10 minutes<br />- Kids 6 minutes of ads per hour Minimum 3 ads and maximum of 6 ads per pods Ad pod length of 90 seconds Duration between ad breaks of at least 10 minutes Bumper/lead-in identifying ad break before AND after ad pods occur (6 second maximum) Example: "We'll be right back after this break", "Now back to the show"<br />- Flexibility around the ad policy is provided during live events. Please discuss this with your Roku rep. \{#adqueuepoints\} - Avoid placing ad breaks that interrupt dialogue<br />- Avoid ad breaks that interrupt a major action/dramatic scene<br />- Ad breaks should be placed with frame accuracy in logical ad break points (ex. fades to black, scene transitions, etc)<br />** * Do not include pixels, third-party tags, or Software Development Kits of any kind without express prior written approval and certification by Roku.* |  |
+| Ad queue points quality | \$\{adqueuepoints\} |  |
 
 
-### Title metadata fields
+## Live Events
+
+The following additional details are required for Roku discrete live events (DLEs) and insertion into Roku owned and operated linear channels.
+
+- All live events must have both a primary and backup source
+  - **SRT or Zixi Push preferred;** HLS and RTMP are not supported
+- Live events intended for Roku O&Os must include program start/stop SCTE messages
+  - **Splice Insert messages are preferred**; Time Signal message type must include a splice command 
+
+### Metadata
+
+- Ensure all event metadata is delivered to your Roku rep for the event as early as possible
+  - **A Gracenote TMS ID for the event is preferred**
+  - Metadata fields can be found here based on event type: https://developer.roku.com/en-gb/trc-docs/live-linear/epg-on-trc.md#metadata-by-content-type
+
+### Recurring events
+
+- Roku has the ability to access third party APIs for recurring events. **Ask your Roku rep for details.**
+
+![roku400px - livespecs-1](https://image.roku.com/ZHZscHItMTc2/live-events-graph-1.png)
+
+# Direct Publisher Feed Schema
+
+These are the properties for the root object of your EPG feed. It contains basic information such as your company's name, when the feed was last updated, and other objects that will describe all your content in detail. The URL for your feed should have the form "https://*[yourfeeddomain.com](http://yourfeeddomain.com/)*".
+
+The format of the feed is a comma-separated list with each property enclosed in double quotes. You must assign each asset (object) its own reference ID, which is a string. **Note**: The ID for an asset must not exceed 50 characters.
+
+***Note:*** Partners should not make programming updates to content scheduled to air within **48 hours** of live broadcast.  
 
 
-| **Field** | **Description** | **Type** | **Accepted Values** | **Required** |
-| --- | --- | --- | --- | --- |
-| Series Title | Title of series for episodic TV content.  Include only the name of the series as it should appear on platform. Do not include non-title parentheticals such as indicator of original/remake, year of release, or video format. Examples: (Classic), (1987), or (Season #) | string | Example:<br />Die Hart | required for tv |
-| Series ID | Immutable, unique identifier for a TV series. IDs are to be generated and supplied by the Partner for content that is availed and delivered to Roku. The IDs in the avails and Committed Title List document should match the IDs provided in the metadata at the time of ingest into The Roku Channel.<br />- Must not be the same as the unique episode ID<br />- Must be included with all episodes of a series<br />- Must be consistent for all episodes of a series<br />- Must not exceed 50 characters<br />- Allowable characters:  alphanumeric characters, hyphens, and underscores only | string | Example:<br />diehartshow | required for tv<br />50 characters maximum |
-| Title | Title of the movie, episode, or shortForm video.  Include only the name of the content as it should appear on platform. Do not include non-title parentheticals such as indicator of original/remake, year of release, season, or video format. Examples: (Classic), (1987), (Season 1), or (HD) | string | Example:<br />Pilot | required |
-| Title ID | Immutable, unique identifier for a movie, episode, or shortForm video. IDs are to be generated and supplied by the Partner for content that is availed and delivered to Roku. The IDs in the avails and Committed Title List document should match the IDs provided in the metadata at the time of ingest into The Roku Channel. This will aid in tracking the content throughout Roku’s pipeline from avails and Committed Title List submission through publication on The Roku Channel.<br />- Must not exceed 50 characters<br />- Allowable characters:<br />alphanumeric characters, hyphens, and underscores only | string | Example:<br />dieharts1e1 | required<br />50 characters maximum |
-| Season Number | Season number for the episode. Must follow the original broadcast/distribution sequence of seasons and must be a number. Letters are not allowed | integer | #, ##, … | required for tv |
-| Episode Number | Episode number. Must follow the original broadcast/distribution sequence of episodes within a season and must be a number. Letters are not allowed.<br />Do not use production numbers (e.g. 201 for season 2 episode 1) | integer | #, ##, … | required for tv |
-| Country of Origin | Defines the primary country where the film was produced and where the main creators, crew, and producers are established. Value must conform to one of the supported country codes as defined in the [ISO 3166-1 alpha 2](https://www.iso.org/iso-3166-country-codes.html) list of 2-character country codes. Please include 1 country only | enum | Example:<br />US, CA, DE | required<br />1 country only |
-| Original Spoken Language | Language in which the content was produced. This is usually the primary language of the country of origin and the language that synchronizes exactly with the movements of the performers mouths as they speak. Must conform to one of the enumerated [supported language codes](#language-codes) . May include multiple languages separated by commas. | enum | Example:<br />en-us, fr-ca<br /> | required |
-| Run Time | Runtime of the content in whole minutes. Minimum runtime is 1 | integer | Example:<br />22 | required |
-| Format | Highest video resolution available for the content. All lower resolutions will be assumed* | enum | SD, HD, UHD | required |
-| DBO | Domestic Box Office Gross | string | $2,000,000 | optional |
-| Closed Captioning | Communicating if captions are included with the content per [FCC guidelines](https://www.fcc.gov/consumers/guides/captioning-internet-video-programming) . If captions are not included with the content, a Caption Exemption value must be provided | Boolean | true<br />false | required |
-| Caption Exemption | US avails only. FCC exemption for closed caption requirement. Allowable value and their definitions:<br />- The content has never aired on television in the United States.<br />- The content has only aired on television in the United States without captions.<br />- The content has not aired on television in the United States with captions since September 30, 2012.<br />- The content does not consist of full-length video programming.<br />- The content does not fall within a category of online programming that requires captions under FCC regulations (49 C.F.R. § 79.4(b)).<br />- The FCC and/or U.S. Congress has granted an exemption from captioning requirements for this content. | enum | 1, 2, 3, 4, 5, 6 | required if Caption Included is false |
-| Audio Description** (see note below) | Communicating if an audio description track is included with the content. [Audio description](https://www.fcc.gov/audio-description) (also referred to as video description) is audio-narrated descriptions of a television program's key visual elements. These descriptions are inserted into natural pauses in the program's dialogue. Audio description makes television programming more accessible to individuals who are blind or visually impaired. If Audio Description is required for content, and is not provided, an Audio Description Exemption must be included. | Boolean | true<br />false | optional |
-| Audio Description Exemption** (see note below) | Exemption reason for not providing audio description track where required. | string |  | optional |
-| Original Release Date | Original date content was first made available in any presentation. Must include year of release at a minimum | date string | YYYY-MM-DD or YYYY | required |
-| Genre | Genre classification of the content. May provide multiple genres separated by comma | enum | See [Genres](#genres) for allowed values | required |
-| Tags | Free form field to provide keywords, tags, categories, or keywords to be used to surface content on The Roku Channel UI. Please see our [Best Practices](https://developer.roku.com/trc-docs/video-on-demand/content-tags-and-metadata.md) page on how best to provide tags to The Roku Channel | string | exciting, timely, political | optional |
-| Rating Source | Rating system applied to the edit of title within territory of avail. Rating systems should be formatted and paired with Rating Value as per [Ratings](#ratings) | enum | See [Ratings](#ratings) for allowed values | optional |
-| Rating Value | Value representing the rating within the specified Rating Source. Ratings should be formatted and paired with Rating Source as per [Ratings](#ratings) | enum | See [Ratings](#ratings) for allowed values | optional |
-| Kids-Directed | Indicator that the content is intended for young audiences/family audiences. Must adhere to guidelines defined in [Kids Directed Content Policy](#kids-directed-content-policy) | Boolean | true, false | optional |
-| Recommended Age Group | When Kids Directed is True, a recommended age range for the content can be supplied. Only one Recommended Age Group allowed. Allowable values:<br />- **ages_1-3**  - For viewers 1 to 3 years of age<br />- **ages_4-6**  - For viewers 4 to 6 years of age<br />- **ages_7-9**  - For viewers 7 to 9 years of age<br />- **ages_10plus**  - For viewers ages 10 and up | enum | ages_1-3, ages_4-6, ages_7-9, ages_10plus | optional Used when Kids-Directed is true |
-| Main Cast | Top billed cast of content separated by comma in Firstname Lastname format | list | Example:<br />Kevin Hart, John Travolta | required |
-| Synopsis | A short synopsis of the content being availed for the purposes of content selection. Not to exceed 250 characters | string |  | required |
-| External ID Source | Source entity for external ID provided. Allowable values:<br />- **TMS**  – Gracenote ID<br />- **IMDb**  – IMDb ID<br />- **Wiki**  – Wikipedia ID *Roku does not support the playback of UHD/4K content at this time but can accept UHD/4K as a source to make available for playback in the future.* * *The Roku Channel prefers to make as much content accessible to as many users as possible. Audio Description, while not currently required for all content by the FCC at this time, may be in the future.*<br />May include IDs from multiple sources, separated by commas. ID originating from that source is indicated by appending a colon (":") and the ID | string | Example:<br />TMS, IMDb, Wiki<br />IDs from multiple sources examples:<br />TMS:E12345678, IMDb:tt12345678, Wiki:benson_s1_e1 | optional |
-| Series External ID | 3rd party identifier of the series | string | Example:<br />diehartshowExtId | optional |
-| External ID | 3rd party identifier of the content | string | Example:<br />dieharts1e1ExtId | optional |
-| Screener Link | URL link to stream or download a screener for the content. Any passwords required should also be included. Inclusion of a screener is helpful for content selection | string | Example:<br />https://urlLinkToScreener<br />password: 1234 | optional |
-| Exclusive | Indicator that the content is available exclusively on The Roku Channel | Boolean | true, false | optional |
-| Notes | Free form field for additional avail notes. For linear content, runs and telecast restrictions, or any other specifics not captured in the avails and Committed Title List document should be recorded here | string |  | optional |
-| Merchant of Record | Name of the entity to which financial transactions should be attributed if other than the Content Partner listed | string | Example:<br />Roku | optional |
-| Day Parting | For Linear content ONLY<br />Any dayparting rules for the content | string |  | optional |
-
-
-### Ratings
-
-A valid film or TV rating from the rating authority (Rating Source) of the Territory the title will be available in shall be provided for each movie, episode, or shortForm video. If the title has not been rated by that Territory’s official rating authority, a rating of NR (Not Rated) may be provided, however please note that Roku strongly prefers an actual rating on all content. Titles with a rating of NR (Not Rated) will be subject to manual verification which can delay the selection process and publishing to The Roku Channel. Discoverability on The Roku Channel may also be impacted for titles with the NR (Not Rated) rating and placement within the Kids & Family experience will be prohibited. In lieu of the NR (Not Rated) rating, the title should be self rated using the USA_PR rating system. Guidelines pertaining to the USA_PR ratings can be found [here](http://tvguidelines.org/)
-
-#### Rating values by rating system and country
-
-
-| **Ratings Authority and Territory** | **Country** | **ratingSystem** | **Rating Value** |  |  |
-| --- | --- | --- | --- | --- | --- |
-| British Board of Film Classification<br />United Kingdom | GB | BBFC | U<br />PG<br />12A | 12-A<br />12<br />15 | 18<br />NR [*](#unrated-vs-not-rated)<br />R18<br />R-1 |
-| Canadian Home Video Rating System<br />Canada | CA | CHVRS | G<br />PG<br />14A | 14-A<br />18A<br />18-A | NR<br />RE |
-| Motion Picture Associate of America<br />United States | US | MPAA | G<br />PG<br />PG13 | PG-13<br />R<br />NC-17 | NC17<br />NR |
-| Canadian Parental Rating<br />Canada | CA | CPR | 14+<br />18+<br />C | C8<br />C-8<br />G | NR<br />PG<br />E |
-| Dirección General de Radio, Televisión y Cinematografía<br />Mexico | MX | RTC | AA<br />A<br />B | B-15<br />B15<br />C | DD<br />D<br />NR |
-| USA Parental Rating (V-Chip)<br />United States | US | USA_PR | TV-Y<br />TVY<br />TV-Y7<br />TVY7 | TV-G<br />TVG<br />TV-PG<br />TVPG | TV-14<br />TV14<br />TV-MA<br />TVMA<br />NR |
-
-
-### Genres
-
-Below is the complete list of supported Genres for The Roku Channel
-
-
-| action<br />action sports<br />adventure<br />aerobics<br />agriculture<br />animals<br />animated<br />anime<br />anthology<br />archery<br />arm wrestling<br />art<br />arts/crafts<br />auction<br />auto<br />auto racing<br />aviation<br />awards<br />badminton<br />ballet<br />baseball<br />basketball<br />beach soccer<br />beach volleyball<br />biathlon<br />bicycle<br />bicycle racing<br />billiards<br />biography<br />blackjack<br />boat<br />boat racing<br />bobsled<br />bodybuilding<br />bowling<br />boxing<br />bullfighting<br />bus./financial<br />canoe<br />card games<br />cheerleading<br />children<br />children-music<br />children-special<br />children-talk<br />collectibles<br />comedy<br />comedy drama<br />community<br />computers<br />consumer<br />cooking<br />cricket | crime<br />crime drama<br />curling<br />dance<br />dark comedy<br />darts<br />debate<br />diving<br />docudrama<br />documentary<br />dog racing<br />dog show<br />dog sled<br />drag racing<br />drama<br />educational<br />entertainment<br />environment<br />equestrian<br />erotic<br />event<br />exercise<br />fantasy<br />faith<br />fashion<br />fencing<br />field hockey<br />figure skating<br />fishing<br />football<br />food<br />fundraiser<br />gaelic football<br />game show<br />gaming<br />gay/lesbian<br />golf<br />gymnastics<br />handball<br />health<br />historical drama<br />history<br />hockey<br />holiday<br />holiday music<br />holiday music special<br />holiday special<br />holiday-children<br />holiday-children special<br />home improvement<br />horror<br />horse | house/garden<br />how-to<br />hunting<br />hurling<br />hydroplane racing<br />indoor soccer<br />interview<br />intl soccer<br />kayaking<br />lacrosse<br />law<br />luge<br />martial arts<br />medical<br />military<br />miniseries<br />mixed martial arts<br />motorcycle<br />motorcycle racing<br />motorsports<br />mountain biking<br />music<br />music special<br />music talk<br />musical<br />musical comedy<br />mystery<br />nature<br />news<br />newsmagazine<br />olympics<br />opera<br />outdoors<br />parade<br />paranormal<br />parenting<br />performing arts<br />playoff<br />sports<br />poker<br />politics<br />polo<br />pool<br />pro wrestling<br />public affairs<br />racquet<br />reality<br />religious<br />ringuette<br />rodeo<br />roller derby<br />romance<br />romance comedy | rowing<br />rugby<br />running<br />sailing<br />science<br />science fiction<br />self improvement<br />shooting<br />shopping<br />sitcom<br />skateboarding<br />skating<br />skeleton<br />skiing<br />snooker<br />snowboarding<br />snowmobile<br />soap<br />soap special<br />soap talk<br />soccer<br />softball<br />special<br />speed skating<br />sports<br />sports talk<br />squash<br />standup<br />sumo wrestling<br />surfing<br />suspense<br />swimming<br />table tennis<br />talk<br />technology<br />tennis<br />theater<br />thriller<br />track/field<br />travel<br />triathlon<br />variety<br />volleyball<br />war<br />water polo<br />water skiing<br />watersports<br />weather<br />weightlifting<br />western<br />wrestling<br />yacht racing |
+| **Field/Root Property** | **Content Type** | **Required** | **Description** |
 | --- | --- | --- | --- |
+| providerName | string | Required | The name of the feed provider. For instance, “Acme Productions” as shown in the template below. |
+| lastUpdated | string | Required | The date that the feed was last modified in the [ISO 8601 ](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}T\{hh\}:\{mm\}:\{ss\}+\{TZ\}. For instance, "2015-11-11T22:21:37+00:00" as shown in the template below. |
+| language | string | Required | The language the channel uses for all its information and descriptions in an ISO 639 alpha-2 or alpha-3 language code string. For instance, “en-US” as shown in the template below. |
+| liveFeeds | [LiveFeed Object](#livefeed-content-type) | Required | A list of one or more live linear schedules.<br />**Generally, only one liveFeed schedule per channel delivery should be present in the JSON. For bulk channel deliveries, please consult your Roku rep.** |
+| movies | [Movie Object](#movie-content-type) | Required* | A list of one or more movies. |
+| series | [Series Object](#series-content-type) | Required* | A list of one or more series. Series are episodic in nature and would include TV shows and daily or weekly ongoing shows. |
+| shortFormVideos | [ShortFormVideo Object](#shortformvideo-content-type) | Required* | A list of one or more short-form videos. Short-form videos are usually less than 20 minutes long and are not TV shows or movies. |
+| tvSpecials | [TV Special Object](#tvspecial-content-type) | Required* | A list of one or more TV specials. TV specials are one-time TV programs that are not part of a series. |
 
 
-### Language codes
+> **At least one of these content types is required*
 
-The below list is the full set of language codes Roku currently supports for content ingest. This list is a simplified version of the [RFC 5646](https://datatracker.ietf.org/doc/html/rfc5646) specification.
+The Roku Channel Feed Root Object Template:
 
-| Language Code | Language                 | Language Code | Language                       |
-| ------------- | ------------------------ | ------------- | ------------------------------ |
-| af            | Afrikaans                | km            | Khmer                          |
-| sq            | Albanian                 | rw            | Kinyarwanda                    |
-| am            | Amharic                  | ko            | Korean                         |
-| ar            | Arabic                   | ko-kr         | Korean (Korea)                 |
-| ar-dz         | Arabic (Algeria)         | ku            | Kurdish                        |
-| ar-bh         | Arabic (Bahrain)         | ky            | Kyrgyz                         |
-| ar-eg         | Arabic (Egypt)           | lo            | Lao                            |
-| ar-iq         | Arabic (Iraq)            | la            | Latin                          |
-| ar-jo         | Arabic (Jordan)          | lv            | Latvian                        |
-| ar-kw         | Arabic (Kuwait)          | lt            | Lithuanian                     |
-| ar-lb         | Arabic (Lebanon)         | mk            | Macedonian                     |
-| ar-ly         | Arabic (Libya)           | mg            | Malagasy                       |
-| ar-ma         | Arabic (Morocco)         | ms            | Malay                          |
-| ar-om         | Arabic (Oman)            | ms-my         | Malay (Malaysia)               |
-| ar-qa         | Arabic (Qatar)           | ml            | Malayalam                      |
-| ar-sa         | Arabic (Saudi Arabia)    | mt            | Maltese                        |
-| ar-sy         | Arabic (Syria)           | mr            | Marathi                        |
-| ar-tn         | Arabic (Tunisia)         | mn            | Mongolian                      |
-| ar-ae         | Arabic (U.A.E.)          | nd            | Ndebele                        |
-| ar-ye         | Arabic (Yemen)           | ne            | Nepali                         |
-| hy            | Armenian                 | no            | Norwegian                      |
-| as            | Assamese                 | no-no         | Norwegian (Norway)             |
-| az            | Azerbaijani              | or            | Oriya                          |
-| eu            | Basque                   | om            | Oromo                          |
-| be            | Belarusian               | ps            | Pashto                         |
-| bn            | Bengali                  | fa            | Persian (Farsi)                |
-| bh            | Bihari                   | pl            | Polish                         |
-| bs            | Bosnian                  | pl-pl         | Polish (Poland)                |
-| bg            | Bulgarian                | pt            | Portuguese                     |
-| bg-bg         | Bulgarian (Bulgary)      | pt-br         | Portuguese (Brazil)            |
-| my            | Burmese                  | pt-pt         | Portuguese (Portugal)          |
-| ca            | Catalan                  | pa            | Punjabi                        |
-| zh            | Chinese                  | qu            | Quechua                        |
-| zh-hk         | Chinese (Hong Kong)      | rm            | Rhaeto-Romanic                 |
-| zh-cn         | Chinese (PRC)            | ro            | Romanian                       |
-| zh-sg         | Chinese (Singapore)      | ro-md         | Romanian (Republic of Moldova) |
-| zh-tw         | Chinese (Taiwan)         | ro-ro         | Romanian (Romania)             |
-| zh-hans       | Chinese (Simplified)     | rn            | Rundi                          |
-| zh-hant       | Chinese (Traditional)    | ru            | Russian                        |
-| hr            | Croatian                 | ru-md         | Russian (Republic of Moldova)  |
-| hr-hr         | Croatian (Croatia)       | ru-ru         | Russian (Russia)               |
-| cs            | Czech                    | se            | Sami                           |
-| cs-cz         | Czech (Czech Republic)   | sa            | Sanskrit                       |
-| da            | Danish                   | gd            | Scottish (Gaelic)              |
-| da-dk         | Danish (Denmark)         | sr            | Serbian                        |
-| dv            | Divehi                   | sn            | Shona                          |
-| nl            | Dutch                    | ii            | Sichuan Yi                     |
-| nl-be         | Dutch (Belgium)          | sd            | Sindhi                         |
-| nl-nl         | Dutch (Netherlands)      | si            | Sinhalese                      |
-| dz            | Dzongkha                 | sk            | Slovak                         |
-| en            | English                  | sl            | Slovenian                      |
-| en-au         | English (Australia)      | sl-si         | Slovenian (Slovenia)           |
-| en-bz         | English (Belize)         | so            | Somali                         |
-| en-ca         | English (Canada)         | st            | Sotho                          |
-| en-ie         | English (Ireland)        | es            | Spanish                        |
-| en-jm         | English (Jamaica)        | es-ar         | Spanish (Argentina)            |
-| en-nz         | English (New Zealand)    | es-bo         | Spanish (Bolivia)              |
-| en-za         | English (South Africa)   | es-cl         | Spanish (Chile)                |
-| en-tt         | English (Trinidad)       | es-co         | Spanish (Colombia)             |
-| en-gb         | English (United Kingdom) | es-cr         | Spanish (Costa Rica)           |
-| en-us         | English (United States)  | es-do         | Spanish (Dominican Republic)   |
-| et            | Estonian                 | es-ec         | Spanish (Ecuador)              |
-| fo            | Faeroese                 | es-sv         | Spanish (El Salvador)          |
-| fi            | Finnish                  | es-gt         | Spanish (Guatemala)            |
-| fr            | French                   | es-hn         | Spanish (Honduras)             |
-| fr-be         | French (Belgium)         | es-mx         | Spanish (Mexico)               |
-| fr-ca         | French (Canada)          | es-ni         | Spanish (Nicaragua)            |
-| fr-lu         | French (Luxembourg)      | es-pa         | Spanish (Panama)               |
-| fr-ch         | French (Switzerland)     | es-py         | Spanish (Paraguay)             |
-| fy            | Frisian                  | es-pe         | Spanish (Peru)                 |
-| ff            | Fulfulde (Fulah)         | es-pr         | Spanish (Puerto Rico)          |
-| gl            | Galician                 | es-es         | Spanish (Spain)                |
-| ka            | Georgian                 | es-uy         | Spanish (Uruguay)              |
-| de            | German                   | es-ve         | Spanish (Venezuela)            |
-| de-at         | German (Austria)         | sw            | Swahili                        |
-| de-de         | German (Germany)         | sv            | Swedish                        |
-| de-li         | German (Liechtenstein)   | sv-fi         | Swedish (Finland)              |
-| de-lu         | German (Luxembourg)      | sv-se         | Swedish (Sweden)               |
-| de-ch         | German (Switzerland)     | tl            | Tagalog                        |
-| el            | Greek                    | ty            | Tahitian                       |
-| el-gr         | Greek (Greece)           | tg            | Tajik                          |
-| gn            | Guarani                  | ta            | Tamil                          |
-| gu            | Gujarati                 | tt            | Tatar                          |
-| ht            | Haitian (Creole)         | te            | Telugu                         |
-| ha            | Hausa                    | th            | Thai                           |
-| he            | Hebrew                   | th-th         | Thai (Thailand)                |
-| hi            | Hindi                    | bo            | Tibetan                        |
-| hu            | Hungarian                | ti            | Tigrigna                       |
-| hu-hu         | Hungarian (Hungary)      | ts            | Tsonga                         |
-| is            | Icelandic                | tn            | Tswana                         |
-| ig            | Igbo                     | tr            | Turkish                        |
-| id            | Indonesian               | tr-tr         | Turkish (Turkey)               |
-| iu            | Inuktitut                | tk            | Turkmen                        |
-| ik            | Inupiaq                  | uk            | Ukrainian                      |
-| ga            | Irish                    | ur            | Urdu                           |
-| it            | Italian                  | uz            | Uzbek                          |
-| it-it         | Italian (Italy)          | ve            | Venda                          |
-| it-ch         | Italian (Switzerland)    | vi            | Vietnamese                     |
-| ja            | Japanese                 | vi-vn         | Vietnamese (Vietnam)           |
-| ja-jp         | Japanese (Japan)         | cy            | Welsh                          |
-| kn            | Kannada                  | xh            | Xhosa                          |
-| kr            | Kanuri                   | yi            | Yiddish                        |
-| ks            | Kashmiri                 | yo            | Yoruba                         |
-| kk            | Kazakh                   | zu            | Zulu                           |
+```json
+\{ "providerName": "Acme Productions", "lastUpdated": "2015-11-11T22:21:37+00:00", "language": "en-US", "categories": [ ... ], "playlists": [ ... ], "movies": [ ... ], "series": [ ... ], "shortFormVideos": [ ... ], "tvSpecials": [ ... ],"liveFeeds": [ ... ]
+ \}
+```
 
-##  Resources
+## Artwork for all content
 
-| Title                                               | Link                                                         |
-| --------------------------------------------------- | ------------------------------------------------------------ |
-| Roku Avails and Committed Title List Excel Template | [https://go.roku.com/trc-avail-template](https://go.roku.com/trc-avail-template) |
-| US MPAA Ratings                                     | [https://www.filmratings.com/](https://www.filmratings.com/) |
-| US TV Ratings                                       | [http://tvguidelines.org/](http://tvguidelines.org/)         |
-| UK BBFC Ratings                                     | [https://bbfc.co.uk/](https://bbfc.co.uk/)                   |
-| Canadian Film Ratings                               | [https://www.mpa-canada.org/film-ratings/](https://www.mpa-canada.org/film-ratings/) |
-| Canadian TV Ratings                                 | [https://www.cbsc.ca/tools/for-english-ca-and-third-language-broadcasters/](https://www.cbsc.ca/tools/for-english-ca-and-third-language-broadcasters/) |
-| FCC Closed Captioning Guide                         | [https://www.fcc.gov/consumers/guides/captioning-internet-video-programming](https://www.fcc.gov/consumers/guides/captioning-internet-video-programming) |
-| FCC Audio Description                               | [https://www.fcc.gov/audio-description](https://www.fcc.gov/audio-description) |
-| Sample Avails/Committed Title Lists                 | [https://go.roku.com/avail-ctl-samples](https://go.roku.com/avail-ctl-samples) |
+Each image must be delivered in the JPEG format (.jpg or .jpeg file extension). 
 
-## Change Log
+**Make sure your CDN is using the following ContentType headers**
 
-**v1.3 - 2024-04-22**
+- image/jpeg
+- image/jpg
 
-- Defined Avails and Committed Title List
-- Added Ad-supported content guideline
-- Renamed "Rights Available" to "License Type"
-- Added availability windows section
-- Added distribution lists for delivery of avail and Committed Title List sheets
-- Clarified: Country of Origin, Language, Season Number, Episode Number fields
-- Separated field definitions into sections
-- Replaced Window Type with FVOD Right
-- Defined License Types
-- Clarified when and where to provide Localization Type
-- Fixed Localization Type list of supported values
-- Updated ratings table to the format used in the Ingest Specification
-- Updated language codes table to align with the list used in the Ingest Specification
-- Removed UR as a valid rating
-- Added preference that not rated content be self rated using USA_PR system
-- Removed Reference ID
-- Added maximum character limit for Series and Title IDs
-- Added Excluded Rights
-- Added Excluded Languages
-- Updated max character count for Synopsis to 250
-- Added requirement to remove links to external data in Excel workbooks
-- Updated example data
-- Updated Tags to reference Best Practices page
-- Updated template with Instructions and more hints on Row 2
-- Added zip file contains sample documents
+
+| **Image Type** | **Description** | **Resolution** | **Aspect Ratio** | **Required/Optional** |
+| --- | --- | --- | --- | --- |
+| key art | Image with title treatment | 1920x1080 | 16:9 | Movie: Required<br />Series: Required |
+
+
+### Artwork content guidelines
+
+- Key art (graphic with the full title of the asset visible)
+
+- No sexually explicit or graphically violent artwork
+- Artwork should be post-theatrical and not include language such as “In Theaters Now” or “Coming Soon”
+- Artwork designed specifically for digital delivery is preferred
+- Artwork for international territories should be localized for each territory
+
+**For content on TRC, Roku will not accept branded artwork without prior approval for any individual video asset nor for season/series entities.
+
+Object Example:
+
+```json
+thumbnail: "http://thumbnail.jpg"
+```
+
+## Linear Channel Branding and Policies
+
+- Partners are permitted to have Logos, bugs and lower thirds in their channels
+
+#### Content Expectations
+
+- *Content Hours*: minimum of **150 hours of content**
+- *Content per Hour:* minimum of **50 minutes per hour** of content
+- *Daily Refresh:* **2 hours** minimum of refreshed content daily 
+- Content Recommendation
+  - *Content Loop:* minimum of **8 hours of content before loop**
+
+#### Content Policy
+
+- Content rated R and TV-MA is allowed only **between 9pm-5am Eastern Time**
+- Public policy and political issues must be presented with accuracy, honesty and fairness
+- Foreign Language Programming
+  - *On English-language channels, subtitles **must** be included.*
+  - *No foreign-language (subtitled) programming allowed on Kids & Family channels.*
+- **Every program must have a rating**. If a program has an MPAA rating, the partner must use the MPAA rating for the program. If the program does not have an MPAA rating, the partner must use a TV Ratings (USA_PR) rating. See [Advisory Ratings object](#advisoryratings-property)
+
+#### Slate Requirements
+
+- Must be animated & have audio
+- Must include the linear channel logo/branding
+- Must include a countdown timer for the duration of the ad break
+  - *Note: Countdown timer does not satisfy the animation requirement* 
+
+- Must include messaging to indicate a break is in progress and programming will resume shortly
+- No CTA
+- Cannot promote a channel outside of TRC
+
+#### LiveFeed Promotion Guidelines
+
+- Partners are not allowed to promote Partner content without explicit permission from TRC.
+- Calls to action (CTAs) or links to external platforms or sites (including QR codes) are not permissible and must be removed from the video prior to delivery to Roku.
+
+## Content types
+
+### LiveFeed Content Type
+
+Child object of root property liveFeeds. 
+
+This object represents a live linear stream. Please contact your Roku representative if you want to create a channel that streams live linear content.
+
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| id | string | Required | Your immutable string reference ID for the live linear stream. THIS CANNOT CHANGE. This should serve as a unique identifier for the live stream across different locales. **Note** : The ID for an asset must not exceed 50 characters. |
+| title | string | Required | The live stream's title. Roku uses this value for matching in Roku Search. Please don’t include extra information like year, version label, etc. |
+| content | [Content Object](#content-properties) | Required | Additional details about the livefeed, including the **program schedule** . |
+| thumbnail | string | Required | The URL of the primary thumbnail for the live stream. This is used within your channel and in search results.<br /><br />Landscape key art with the full title of the asset visible in a JPEG file. Image dimensions must be 1920x1080 (width x height, 16x9 aspect ratio)<br /><br />**Make sure your CDN is using the following ContentType headers**<br />- image/jpeg<br />- image/jpg Live Feed Object Example: \{ "id": "1509428502953", "title": "Sample Stream", "content": \{ ... \}, "language": \{ "en" \}, "thumbnail": " [https://example.org/cdn/thumbnails/1509428502952/1](https://example.org/cdn/thumbnails/1509428502952/2) ", "shortDescription": "A live description", "longDescription": "A longer description of a live stream","genres": [ "drama", "comedy", "horror" ],"tags": [ "kidsdirected" ] \} |
+| shortDescription | string | Required | A live stream description that does not exceed 200 characters. The text will be clipped if longer. No emojis. |
+| longDescription | string | Required | A longer live stream description that does not exceed 500 characters. The text will be clipped if longer. Must be different from shortDescription. No emojis. |
+| validityPeriodStart | string | Optional | The date when the content should become available in the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}T\{hh\}:\{mm\}:\{ss\}+\{TZ\}. E.g.: 2018-11-11T22:21:37+00:00 |
+| validityPeriodEnd | string | Optional | The date when the content is no longer available in the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}T\{hh\}:\{mm\}:\{ss\}+\{TZ\}. E.g.: 2018-11-11T22:21:37+00:00 (set to a perpetuity date if possible) |
+| advisoryRatings | [Advisory Ratings object](#advisoryratings-property) | Required* | An array of parental ratings for the content.<br />*See [Kids-Directed content](#kids-directed-content) for rating requirements |
+| genres | string | Required | Array of genre strings for the channel. Must be one or more of the values listed in [genres](#genres-property) . |
+| tags | string | Optional | One or more optional tags. Each tag is a string and is limited to 20 characters.*See [Kids-Directed content](#kids-directed-content) for tag requirements |
+
+
+### Movie content type
+
+Child object of root property `movies`.
+
+This object represents a movie.
+
+#### Movie ad policy
+
+- No adBreaks should be listed during the first 10 minutes of program start
+- No pre-roll adBreak should be listed - 00:00:00
+- adBreak cue points should be provided at naturally occurring scene breaks and/or fades to black
+- There should be no less than 10 minutes between each adBreak
+- No adBreaks within 10 minutes of end credits.
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| id | string | Required | Your immutable string reference ID for the movie. THIS CANNOT CHANGE. This should serve as a unique identifier for the movie across different locales.<br />**Note** : The ID for an asset must not exceed 50 characters and must be alphanumeric. |
+| title | string | Required | Movie title. Roku uses this value for matching in Roku Search. Please use plain text and do not include extra information like year, version label, etc. No Emojis. Mixed case. |
+| genres | string | Required | Array of genre strings for the movie. Must be one or more of the values listed in [genres](#genres-property) . |
+| thumbnail | string | Required | The URL of the primary thumbnail for the live stream. This is used within your channel and in search results.<br /><br />Landscape key art with the full title of the asset visible in a JPEG file. Image dimensions must be 1920x1080 (width x height, 16x9 aspect ratio)<br /><br />**Make sure your CDN is using the following ContentType headers**<br />- image/jpeg<br />- image/jpg Movie Object Example: \{ "id": "1509428502952", "title": "Sample Movie", "content": \{ ... \}, "genres": [ "drama", "comedy", "horror" ], "thumbnail": "https://example.org/cdn/thumbnails/1509428502952/1", "releaseDate": "2016-01-01", "shortDescription": "Incredible movie description", "longDescription": "Even more incredible and longer movie description", "tags": [ "amazing", "drama", "comedy", "horror" ] \} |
+| releaseDate | string | Required | The date the movie was initially released or first aired. Used to sort programs chronologically and grouping related content in Roku Search. Conforms to the [ISO 8601 ](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}. E.g.: 2015-11-11 |
+| shortDescription | string | Required | A movie description that does not exceed 110 characters. The text will be clipped if longer. No emojis. |
+| credits | [Credit Object](#credit-property) | Optional | One or more credits. The cast and crew of the movie. |
+| advisoryRatings | [Advisory Ratings Object](#advisoryratings-property) | Required* | An array of parental ratings for the content.<br />*See [Kids-Directed content](#kids-directed-content) for rating requirements |
+| externalIds | [External IDs Object](#externalids-property) | Optional | One or more third-party metadata provider IDs. |
+
+
+### Series content type
+
+Child object of root property `series`.
+
+This object represents a series, such as a season of a TV show or a mini-series.
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| id | string | Required | Your immutable string reference ID for the series. THIS CANNOT CHANGE. This should serve as a unique identifier for the movie across different locales.<br />**Note** : The ID for an asset must not exceed 50 characters and must be alphanumeric. |
+| title | string | Required | The title of the series. Roku uses this field for matching in Roku Search. No Emojis. Mixed case. |
+| seasons | [Season Object](#season-content-type) | Required* | One or more seasons of the series. Seasons should be used if episodes are grouped by seasons. |
+| episodes | [Episode Object](#episode-content-type) | Required* | One or more episodes of the series. Episodes should be used if they are not grouped by seasons (e.g., a mini-series). |
+| genres | string | Required | Array of genre strings for the series. Must be one or more of the values listed in [genres](#genres-property) . |
+| thumbnail | string | Required | The URL of the primary thumbnail for the live stream. This is used within your channel and in search results.<br /><br />Landscape key art with the full title of the asset visible in a JPEG file. Image dimensions must be 1920x1080 (width x height, 16x9 aspect ratio)<br /><br />**Make sure your CDN is using the following ContentType headers**<br />- image/jpeg<br />- image/jpg *Must have either * `seasons` * * or * * `episodes` * Series Object Example (seasons): \{ "id": "1509428502952", "title": "The Amazing Series with Seasons!", "seasons": [ ... ], "genres": [ "educational", "science fiction", "thriller", ], "thumbnail": "https://example.org/cdn/thumbnails/1509428502952/1", "shortDescription": "Wondrous series seasons." \} Series Object Example (mini-series): \{ "id": "1509428502952", "title": "The Amazing Series with Episodes Only!", "episodes": [ ... ], "genres": [ "fashion", "romance", "technology", ], "thumbnail": "https://example.org/cdn/thumbnails/1509428502952/1", "shortDescription": "Unbelievables series episodes." \} |
+| releaseDate | string | Required | The date the series first aired. Used to sort programs chronologically and grouping related content in Roku Search. Conforms to the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}. E.g.: 2015-11-11 |
+| shortDescription | string | Required | A description of the series that does not exceed 110 characters. The text will be clipped if longer. No emojis. |
+| advisoryRatings | [Advisory Ratings Object](#advisoryratings-property) | Required* | An array of parental ratings for the content.<br />*See [Kids-Directed content](#kids-directed-content) for rating requirements |
+| credits | [Credit Object](#credit-property) | Optional | One or more credits. The cast and crew of the series. |
+| externalIds | [External IDs Object](#externalids-property) | Optional | One or more third-party metadata provider IDs. |
+
+
+### Season content type
+
+Child object of property `series -> seasons`.
+
+This object represents a single season of a series.
+
+| **Field**    | **Type**                                | **Required** | **Description**                                 |
+| ------------ | --------------------------------------- | ------------ | ----------------------------------------------- |
+| seasonNumber | integer                                 | Required     | Sequential season number. e.g.: 3 or 2015.      |
+| episodes     | [Episode Object](#episode-content-type) | Required     | One or more episodes of this particular season. |
+
+Season Object Example:
+
+```json
+\{ "seasonNumber": 1, "episodes": [ ... ] \}
+```
+
+### Episode content type
+
+Child object of property:
+
+- `series -> episodes`
+- `series -> seasons -> episodes`
+
+This object represents a single episode in a series or a season.
+
+#### Episode ad policy
+
+Content length longer than 15 minutes:
+
+- No adBreaks should be listed during the first 4 mins of program start
+- No pre-roll adBreak should be listed - 00:00:00
+- adBreak cue points should be provided at naturally occurring scene breaks and/or fades to black
+- There should be no less than 6 mins between each adBreak
+- No adBreaks within the last 4 minutes of end credits
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| id | string | Required | Your immutable string reference ID for the episode. THIS CANNOT CHANGE. This should serve as a unique identifier for the movie across different locales.<br />**Note** : The ID for an asset must not exceed 50 characters and must be alphanumeric. |
+| title | string | Required | Episode title. Roku uses this value for matching in Roku Search. Please don’t include extra information like year, version label, etc. No Emojis. Mixed case. |
+| thumbnail | string | Required | The URL of the thumbnail for the episode. This is used within your channel as a backup to series artwork and in search results where applicable.<br /><br />Landscape untitled key art in a JPEG file. Recommended image dimensions: 1920x1080 (width x height, 16x9 aspect ratio)<br /><br />**Make sure your CDN is using the following ContentType headers**<br />- image/jpeg<br />- image/jpg Episode Object Example: \{ "id": "1509428502952", "title": "The Amazing First Episode Title", "content": \{ ... \}, "thumbnail": "https://example.org/cdn/thumbnails/1509428502952/1", "episodeNumber": 1, "shortDescription": "Marvelous episode description" \} |
+| releaseDate | string | Required | The date the episode first aired. Used to match program data to Gracenote counterpart. Conforms to the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}. E.g.: 2015-11-11 |
+| episodeNumber | integer | Required | Sequential episode number. e.g.: 3 |
+| shortDescription | string | Required | An episode description that does not exceed 110 characters. The text will be clipped if longer. No emojis. |
+| credits | [Credit Object](#credit-property) | Optional | One or more credits. The cast and crew of the episode. |
+| advisoryRatings | [Advisory Ratings Object](#advisoryratings-property) | Required* | An array of parental ratings for the content.<br />*See [Kids-Directed content](#kids-directed-content) for rating requirements |
+| externalIds | [External Property](#externalids-property) | Optional | One or more third-party metadata provider IDs. |
+
+
+### ShortFormVideo content type
+
+Child object of root property `shortFormVideos`.
+
+Short-form videos are generally less than 15 minutes long, and are not TV Shows or Movies. Must be included in a composite EPG block of 15 mins or greater.
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| id | string | Required | Your immutable string reference ID for the video. THIS CANNOT CHANGE. This should serve as a unique identifier for the movie across different locales.<br />**Note** : The ID for an asset must not exceed 50 characters and must be alphanumeric. |
+| title | string | Required | Video title. Roku uses this value for matching in Roku Search. Please don’t include extra information like year, version label, etc. No Emojis. Mixed case. |
+| thumbnail | string | Required | The URL of the primary thumbnail for the live stream. This is used within your channel and in search results.<br /><br />Landscape key art with the full title of the asset visible in a JPEG file. Image dimensions must be 1920x1080 (width x height, 16x9 aspect ratio)<br /><br />**Make sure your CDN is using the following ContentType headers**<br />- image/jpeg<br />- image/jpg Short-form Video Object Example: \{ "id": "1509428502952", "title": "The Amazing Short-form Video", "content": \{ ... \}, "thumbnail": "https://example.org/cdn/thumbnails/1509428502952/1", "shortDescription": "Astonishing short-form video", "releaseDate": "2016-01-01" \} |
+| shortDescription | string | Required | A description of the video that does not exceed 110 characters. The text will be clipped if longer. No emojis. |
+| releaseDate | string | Required | The date the video first became available. Used to sort programs chronologically and grouping related content in Roku Search.<br />Conforms to the [ISO 8601 ](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}. E.g.: 2015-11-11 |
+| genres | string | Optional | Array of genre strings for the video. Must be one or more of the values listed in [genres](#genres-property) . |
+| credits | [Credit Object](#credit-property) | Optional | One or more credits. The cast and crew of the video. |
+| advisoryRatings | [Advisory Ratings Object](#advisoryratings-property) | Required* | A parental rating for the content.<br />*See [Kids-Directed content ](#kids-directed-content) for rating requirements |
+
+
+### TvSpecial content type
+
+Child object of root property `tvSpecials`.
+
+#### TvSpecial ad policy
+
+Content length longer than 15 minutes:
+
+- No adBreaks should be listed during the first 4 mins of program start
+- No pre-roll adBreak should be listed - 00:00:00
+- adBreak cue points should be provided at naturally occurring scene breaks and/or fades to black
+- There should be no less than 6 mins between each adBreak
+- No adBreaks within the last 4 minutes of end credits
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| id | string | Required | Your immutable string reference ID for the TV Special. THIS CANNOT CHANGE. This should serve as a unique identifier for the movie across different locales.<br />**Note** : The ID for an asset must not exceed 50 characters and must be alphanumeric. |
+| title | string | Required | Episode title. Roku uses this value for matching in Roku Search. Please don’t include extra information like year, version label, etc. No Emojis. Mixed case. |
+| thumbnail | string | Required | The URL of the primary thumbnail for the live stream. This is used within your channel and in search results.<br /><br />Landscape key art with the full title of the asset visible in a JPEG file. Image dimensions must be 1920x1080 (width x height, 16x9 aspect ratio)<br /><br />**Make sure your CDN is using the following ContentType headers**<br />- image/jpeg<br />- image/jpg TV Special Object Example: \{ "id": "1509428502952", "title": "The Amazing First Episode Title", "content": \{ ... \}, "genres": [ "animals", "animated", "fantasy", ], "thumbnail": "https://example.org/cdn/thumbnails/1509428502952/1", "shortDescription": "Unusual episode description" \} |
+| genres | string | Required | Array of genre strings for the special. Must be one or more of the values listed in [genres](#genres-property) . |
+| releaseDate | string | Required | The date the TV Special first aired. Used to sort programs chronologically and grouping related content in Roku Search. Conforms to the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}. E.g.: 2015-11-11 |
+| shortDescription | string | Required | A description of the special that does not exceed 110 characters. The text will be clipped if longer. No emojis. |
+| credits | [Credit Object](#credit-property) | Optional | One or more credits. The cast and crew of the TV special. |
+| advisoryRatings | [Advisory Ratings Object](#advisoryratings-property) | Required* | A parental rating for the content.<br />*See [Kids-Directed content ](#kids-directed-content) for rating requirements |
+| externalIds | [External IDs Property](#externalids-property) | Optional | One or more third-party metadata provider IDs. |
+
+
+### **Schedule object**
+
+All linear feeds require a schedule as part of the livefeed content object.
+
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| id | string | Required | Your immutable string reference ID to the program's content ID from its respective content type section. THIS CANNOT CHANGE. This should serve as a unique identifier for the live stream across different locales. **Note** : The ID for an asset must not exceed 50 characters and must be alphanumeric. |
+| durationInSeconds | integer | Required | the duration in seconds that the program will run. |
+| isLive | boolean | Required | true OR false - Identifies a program as a true live event. |
+| date | string | Required | Scheduled date for program to play. All times are UTC. Format: \{YYYY\}-\{MM\}-\{DD\} |
+| times | string | Required | An array of start times in the particular day the program will start [ "HH:MM:SS" ] |
+| attributes | enum | Recommended | May denote a number of badges to appear in the EPG UI next to a program's title. Currently, only "CC" for Closed Captions is supported. |
+
+
+Schedule object example
+
+```json
+\{
+    "id": "programId",
+    "isLive": false,
+    "date": "2020-01-13",
+    "times": [
+        "21:30"
+    ],
+    "durationInSeconds": 2760,
+    "attributes": [
+        "CC"
+    ]
+\}
+```
+
+### EPG
+
+EPG Requirement
+
+8 days of full data (1 week forward and 24 Hours back) to populate the EPG
+
+15-minute minimum duration for content block
+
+For full details and guidance on constructing your EPG, please refer this this guide.
+
+https://developer.roku.com/en-ot/trc-docs/live-linear/epg-on-trc.md
+
+Notes:
+
+- Please include the liveFeed as the first item in a feed.
+- Only a title or a **TMS** ExternalID is required for programs referenced in a schedule. We will reject anything that's not a **valid** ExternalID.
+- When referencing an episode, the parent items must also be in included ([series](/docs/specs/direct-publisher-feed-specs/json-dp-spec.md#series) and [season](/docs/specs/direct-publisher-feed-specs/json-dp-spec.md#season) when applicable). These parent items must be **<u>fully populated with required fields</u>** as specified in the [Roku Direct Published feed specification](/docs/specs/direct-publisher-feed-specs/json-dp-spec.md) or the series item must contain a valid External **TMS** id.
+
+![roku400px - feedspecs-1](https://image.roku.com/ZHZscHItMTc2/feed-specs-1-v2.jpg)
+
+#### EPG logos
+
+**To be provided via .zip file to Roku**
+
+| Logo                                     | Required | Resolution                               | Notes                                    |
+| ---------------------------------------- | -------- | ---------------------------------------- | ---------------------------------------- |
+| Program Guide channel Identifier (light) | Required | 114x60 pixels                            | Needs to read well on a black background |
+| Program Guide channel Identifier (dark)  | Required | 114x60 pixels                            | Needs to read well on a white background |
+| Info HUD channel Identifier              | Required | 260x147 (**MUST** be hex color #efefef ) |                                          |
+
+For EPG Spine
+
+- 1 logo for white background, 1 for black background (can be the same image if reads well on both backgrounds).
+- Logos need to be transparent PNGs
+- 114 pixels wide x 60 pixels tall
+- Center aligned on the horizontal & vertical axis
+- 3 pixel top and bottom border
+
+For Info HUD
+
+- Logos need to be transparent PNGs
+- Logos need to be monochromatic hex #efefef 
+- 260 pixels wide x 147 pixels tall
+- 1x logo center aligned
+
+Feed Example:
+
+```json
+\{
+    "liveFeeds": [
+        \{
+            "id": "providerx-live",
+            "title": "Provider X Live",
+            "content": \{
+                "dateAdded": "2019-06-01",
+                "language": "en",
+                "schedule": [
+                    \{
+                        "id": "movie-id-1",
+                        "durationInSeconds": 7200,
+                        "isLive": false,
+                        "date": "2018-04-05",
+                        "times": [
+                            "10:00"                       
+                        ]                       
+                    \},
+                    \{
+                        "id": "episode-id-1",
+                        "durationInSeconds": 7200,
+                        "isLive": false,
+                        "date": "2018-04-05",
+                        "times": [                           
+                            "12:00",                           
+                            "16:00"
+                        ]                       
+                    \},
+                    \{
+                        "id": "shortformvideo-id-1",
+                        "durationInSeconds": 7200,
+                        "isLive": false,
+                        "date": "2018-04-05",
+                        "times": [                   
+                            "14:00"                           
+                        ]                       
+                    \},
+                    \{
+                        "id": "tvspecial-id-1",
+                        "durationInSeconds": 7200,
+                        "isLive": true,
+                        "date": "2018-04-05",
+                        "times": [
+                            "18:00"
+                        ]                       
+                    \},
+                    \{
+                        "id": "movie-id-2",
+                        "durationInSeconds": 3600,
+                        "isLive": false,
+                        "date": "2018-04-05",
+                        "times": [
+                            "20:00"
+                        ]                       
+                    \},
+                    \{
+                        "id": "movie-id-3",
+                        "durationInSeconds": 7200,
+                        "isLive": false,
+                        "date": "2018-04-05",
+                        "times": [
+                            "21:00"
+                        ]                       
+                    \}
+                ]
+            \},
+            "thumbnail": "https://<imageUrl>.jpg",
+            "shortDescription": "Live business and national news, with top executives interviews and coverage of the technologies transforming our lives and economy.",
+            "longDescription": "Live business and national news, with top executives interviews and coverage of the technologies transforming our lives and economy."           
+        \}
+    ],
+    "movies": [
+        \{
+        "id": "movie-id-1",
+        "title": "Between Worlds",
+        "externalIds": [
+            \{
+                "id": "MV015001100000",
+                "idType": "TMS"
+                \}
+            ]
+        \},
+        \{
+            "id": "movie-id-2",
+            "title": "Between Worlds 2",
+            "thumbnail": "https://<imageUrl>.jpg",
+            "shortDescription": "A truck driver whose life spirals out of control after the spirit of his deceased wife comes to life.",
+            "advisoryRatings": [
+                \{
+                "source": "MPAA",
+                "value": "R"
+                \},
+                \{
+                "source": "CPR",
+                "value": "14+"
+                \}
+                  ],
+            "genres":
+                [
+                "animals",
+                "animated",
+                "fantasy",
+                ]
+        \},        
+    ],
+    "series": [
+        \{
+            "id": "series-id-1",
+            "title": "series1",
+            "seasons": [
+                \{
+                     "seasonNumber": 6,
+                        "episodes": [
+                        \{
+                            "id": "episode-id-1",
+                            "title": "episode1",
+                            "episodeNumber": 59
+                        \}                       
+                    ]
+                \}
+            ]
+        \}
+    ],
+    "tvSpecials": [
+        \{
+            "id": "tvspecial-id-1",
+            "title": "tvspecial1"
+        \}
+    ],
+    "shortFormVideos": [
+        \{
+            "id": "shortformvideo-id-1",
+            "title": "shortformvideo1"
+        \}
+    ]
+\}
+```
+
+## Kids-directed content
+
+“**Kids-Directed Content**” means content that either: (i) is directed to children as defined by the applicable law of the jurisdiction in which the content is shown (e.g., The Children's Online Privacy Protection Act); or (ii) was made for viewing primarily by children within the jurisdiction in which the content is shown.
+
+You may NOT submit or distribute Kids-Directed Content unless you have Roku’s express written approval. 
+
+The following additional obligations apply to all Kids-Directed Content:
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| tags | string | Required | Include a "kidsdirected" tag into the tags string * *all lowercase*<br />- This is how you flag to Roku that the content is Kids-Directed Content<br />- Do not include this tag in non-Kids-Directed Content |
+| advisoryRatings | [Advisory Ratings Object](#advisoryratings-property) | Required | A parental rating for the content. (MPAA or TV Rating).<br />- 'Unrated' and "Not Rated" are not accepted ratings for Kids-Directed Content The following additional obligations apply to all live linear streams that include Kids-Directed Content: - You will only include Kids-Directed Content in a live linear stream if that live linear stream is (and will always be) comprised exclusively of Kids-Directed Content. Do not mingle Kids-Directed Content and non-Kids-Directed Content in a live linear feed.<br />- You will provide a single TV content rating in the  [Rating Object ](#rating-property) reflecting the most restrictive rating of all Kids-Directed Content that will be available on the live linear feed. **Additional kidsdirected guidelines** A `kidsdirected` tag should be inserted for any channel that is directed to children, based on a variety of factors, including the following: - Ratings which designate the content as designed to be appropriate for children<br />- Allowable ratings: Rating = TVPG, PG, TVY, TVY7, TVG, G<br />- TVY and TVY7 are reserved for kidsDirected channels only<br />- Content subject matter (e.g., teaching the alphabet)<br />- Visual content (e.g., unicorns)<br />- Use of animated characters (e.g., My Little Pony)<br />- Child-oriented activities and incentives<br />- Music or other audio content designed for children (e.g., nursery rhymes)<br />- Young age of models (e.g., toddlers)<br />- Presence of child celebrities or celebrities who appeal to children<br />- Language or other characteristics of the content that target children<br />- Whether advertising appearing with the content is directed to children<br />- Whether your intended audience for the content is children<br />- Whether you have competent and reliable empirical evidence that your audience composes primarily of children |
+
+
+## Content properties
+
+### Content property
+
+Child object of property:
+
+- `liveFeed`
+
+This object represents the details about the liveFeed
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| dateAdded | string | Required | The date the liveFeed was added to the library in the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}T\{hh\}:\{mm\}:\{ss\}+\{TZ\}. E.g.: 2015-11-11T22:21:37+00:00 This information is used to generate the “Recently Added” category. |
+| language | string | Required | The language in which the feed is intended (e.g., “en”, “en-US”, “es”, etc). ISO 639 alpha-2 or alpha-3 language code string. |
+| validityPeriodStart | string | Optional | The date when the content should become available in the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}T\{hh\}:\{mm\}:\{ss\}+\{TZ\}. E.g.: 2015-11-11T22:21:37+00:00 |
+| validityPeriodEnd | string | Optional | The date when the content is no longer available in the [ISO 8601](http://www.iso.org/iso/home/standards/iso8601.htm) format: \{YYYY\}-\{MM\}-\{DD\}T\{hh\}:\{mm\}:\{ss\}+\{TZ\}. E.g.: 2015-11-11T22:21:37+00:00 |
+| schedule | [Schedule Object](#schedule-object) | Required | A chronological listing of program start times and durations referencing objects in other content type sections (movies, series, shortFormVideos, tvSpecials) |
+
+
+Content Object Example:
+
+```json
+\{ "dateAdded": "2015-11-11T22:21:37+00:00", "language": "es", "schedule": [...], "validityPeriodStart": "2020-03-13", "validityPeriodEnd": "2100-03-12"\}
+```
+
+### Genres property
+
+The following genres are supported:
+
+
+| 1. | 2. | 3. | 4. | 5. | 6. |
+| --- | --- | --- | --- | --- | --- |
+| - action<br />- action sports<br />- adventure<br />- aerobics<br />- agriculture<br />- animals<br />- animated<br />- anime<br />- anthology<br />- archery<br />- arm wrestling<br />- art<br />- arts/crafts<br />- artistic gymnastics<br />- artistic swimming<br />- athletics<br />- auction<br />- auto<br />- auto racing<br />- aviation<br />- awards<br />- badminton<br />- ballet<br />- baseball<br />- basketball<br />- 3x3 basketball<br />- beach soccer<br />- beach volleyball<br />- biathlon<br />- bicycle<br />- bicycle racing<br />- billiards<br />- biography<br />- blackjack<br />- bmx racing<br />- boat<br />- boat racing<br />- bobsled | - bodybuilding<br />- bowling<br />- boxing<br />- bullfighting<br />- bus./financial<br />- canoe<br />- card games<br />- ceremony<br />- cheerleading<br />- children<br />- children-music<br />- children-special<br />- children-talk<br />- collectibles<br />- comedy<br />- comedy drama<br />- community<br />- computers<br />- canoe/kayak<br />- consumer<br />- cooking<br />- cricket<br />- crime<br />- crime drama<br />- curling<br />- cycling<br />- dance<br />- dark comedy<br />- darts<br />- debate<br />- diving<br />- docudrama<br />- documentary<br />- dog racing<br />- dog show<br />- dog sled<br />- drag racing<br />- drama | - educational<br />- entertainment<br />- environment<br />- equestrian<br />- erotic<br />- event<br />- exercise<br />- fantasy<br />- faith<br />- fashion<br />- fencing<br />- field hockey<br />- figure skating<br />- fishing<br />- football<br />- food<br />- fundraiser<br />- gaelic football<br />- game show<br />- gaming<br />- gay/lesbian<br />- golf<br />- gymnastics<br />- handball<br />- health<br />- historical drama<br />- history<br />- hockey<br />- holiday<br />- holiday music<br />- holiday music special<br />- holiday special<br />- holiday-children<br />- holiday-children special<br />- home improvement<br />- horror<br />- horse<br />- house/garden | - how-to<br />- hunting<br />- hurling<br />- hydroplane racing<br />- indoor soccer<br />- interview<br />- intl soccer<br />- judo<br />- karate<br />- kayaking<br />- lacrosse<br />- law<br />- live<br />- luge<br />- martial arts<br />- medical<br />- military<br />- miniseries<br />- mixed martial arts<br />- modern pentathlon<br />- motorcycle<br />- motorcycle racing<br />- motorsports<br />- mountain biking<br />- music<br />- music special<br />- music talk<br />- musical<br />- musical comedy<br />- mystery<br />- nature<br />- news<br />- newsmagazine<br />- olympics<br />- opera<br />- outdoors<br />- parade<br />- paranormal | - parenting<br />- performing arts<br />- playoff sports<br />- poker<br />- politics<br />- polo<br />- pool<br />- pro wrestling<br />- public affairs<br />- racquet<br />- reality<br />- religious<br />- ringuette<br />- road cycling<br />- rodeo<br />- roller derby<br />- romance<br />- romantic comedy<br />- rowing<br />- rugby<br />- running<br />- rhythmic gymnastics<br />- sailing<br />- science<br />- science fiction<br />- self improvement<br />- shooting<br />- shopping<br />- sitcom<br />- skateboarding<br />- skating<br />- skeleton<br />- skiing<br />- snooker<br />- snowboarding<br />- snowmobile<br />- soap<br />- soap special | - soap talk<br />- soccer<br />- softball<br />- special<br />- speed skating<br />- sport climbing<br />- sports<br />- sports talk<br />- squash<br />- standup<br />- sumo wrestling<br />- surfing<br />- suspense<br />- swimming<br />- table tennis<br />- taekwondo<br />- talk<br />- technology<br />- tennis<br />- theater<br />- thriller<br />- track/field<br />- track cycling<br />- travel<br />- trampoline<br />- triathlon<br />- variety<br />- volleyball<br />- war<br />- water polo<br />- water skiing<br />- watersports<br />- weather<br />- weightlifting<br />- western<br />- wrestling<br />- yacht racing |
+
+
+### ExternalIds property
+
+Child object of property:
+
+- `movie`
+- `series`
+- `series -> episodes -> episode`
+- `series -> seasons -> episodes -> episode`
+- `shortFormVideo`
+- `tvSpecial`
+
+This object represents a third-party metadata provider ID (such as TMS, Rovi, IMDB, EIDR) that can provide more information about a specific video content. This metadata optimizes the opportunity for your content to be discovered by Roku search and to provide more details to users.
+
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| id | string | Required | The third-party metadata provider ID for your video content. For example, in the case of IMDB you would use the last part of the URL of a movie such as "http://www.imdb.com/title/tt0371724". |
+| idType | enum | Required | Must be one of the following:<br />- TMS – A Tribune Metadata Service ID for the content. Roku recommends using TMS and will associate these IDs for you.<br />- ROVI - A Rovi ID for the content<br />- IMDB – An Internet Movie Database ID<br />- EIDR – An Entertainment Identifier Registry ID External IDs Object Example: \{ "id": "123456789", "idType": "TMS" \}, \{ "id": "tt0371724", "idType": "IMDB" \}, \{ "id": "10.5240/48A5-E3C5-6B11-D874-FD2B-V", "idType": "EIDR" \} |
+
+
+### AdvisoryRatings property
+
+Child object of property:
+
+- `movie`
+- `series -> episodes -> episode`
+- `shortFormVideo`
+- `tvSpecial`
+- `livefeed`
+
+This object represents the ratings across multiple territories for the video content. You can define the parental rating, as well as the source (USA Parental Rating, UK Content Provider, etc). See Parental Ratings and Rating Sources for acceptable values.
+
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| value | enum | Required | Must be a value listed in [Parental Ratings](#parental-ratings-property) .<br />Do not include any content targeted specifically to children. |
+| source | enum | Required | Must be one or more of the following:<br />- BBFC<br />- CHVRS<br />- CPR<br />- MPAA<br />- USA_PR<br />- RTC<br />- ACB<br />- CLASSIND UK content - rating is **required** . If there is no BBFC rating, please note a content rating of 'NR' Rating Object Example: "advisoryRatings": [        \{          "source": "MPAA",          "value": "PG13"        \},        \{          "source": "CPR",          "value": "14+"        \}      ], |
+
+
+### Accepted parental ratings
+
+The following parental ratings can be used to better help your viewers find age-appropriate content.
+
+Note: No content can be targeted specifically to children. No pornographic or porn industry-related content is allowed.
+
+
+| Source | USA_PR (USA Parental Rating) | MPAA (Motion Picture Association of America) | CHVRS (Canadian Home Video Rating System) | CPR (Canadian Parental Rating) |
+| --- | --- | --- | --- | --- |
+| Rating | - TV-Y<br />- TVY<br />- TV-Y7<br />- TVY7<br />- TV-G<br />- TVG<br />- TV-PG<br />- TVPG<br />- TV-14<br />- TV14<br />- TV-MA<br />- TVMA | - G<br />- PG<br />- PG13<br />- PG-13<br />- R<br />- NC-17<br />- NC17<br />- UR | - G<br />- PG<br />- 14A<br />- 14-A<br />- 18A<br />- 18-A<br />- R<br />- E | - 14+<br />- 18+<br />- C<br />- C8<br />- C-8<br />- G<br />- PG<br />- E |
+| **Source** | **RTC (General Directorate of Radio Television and Cinematography) - Mexico** | **BBFC (British Board of Film Classification)** | **ACB (Australian Classification Board)** | **CLASSIND (Classificação Indicativa) - Brazil** |
+| Rating | - AA<br />- A<br />- B<br />- B-15<br />- B15<br />- C<br />- D | - U<br />- PG<br />- 12A<br />- 12-A<br />- 12<br />- 15<br />- 18<br />- R18<br />- R-18 | - E<br />- G<br />- PG<br />- M<br />- MA 15+<br />- R 18+<br />- X 18+<br />- AV 15+<br />- C<br />- NC<br />- RC | - L<br />- 10<br />- 12<br />- 14<br />- 16<br />- 18<br />- AL<br />- A10<br />- A12<br />- A14<br />- A16<br />- A18 |
+
+
+### Rating source property
+
+These are the accepted values for the `ratingSource` property:
+
+- BBFC - British Board of Film Classification
+- CHVRS - Canadian Home Video Rating System
+- CPR - Canadian Parental Rating
+- MPAA - Motion Picture Association of America
+- USA_PR - USA Parental Rating
+- RTC - General Directorate of Radio Television and Cinematography - Mexico
+- ACB - Australian Classification Board
+- CLASSIND - Classificação Indicativa - Brazil
+
+### Credit property
+
+Child object of property:
+
+- `movie`
+- `series`
+- `series -> episodes -> episode`
+- `shortFormVideo`
+- `tvSpecial`
+
+This object represents a single person in the credits of a video content.
