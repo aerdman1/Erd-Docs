@@ -1,4 +1,5 @@
 - my-first-page-with-content
+- blank-page-should-show-no-content
 - content-modal
 - changelog-widget
 - rss-release-notes
@@ -24,4 +25,3 @@
 - '555'
 - testtest
 - test1299999
-- blank-page-should-show-no-content
