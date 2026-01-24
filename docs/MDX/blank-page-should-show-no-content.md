@@ -1,5 +1,5 @@
 ---
-title: Blank Page should show no content
+title: BLANK PAGE
 deprecated: false
 hidden: false
 icon: far fa-arrows-maximize
