@@ -1,0 +1,3 @@
+- post_create-payment-method
+- post_update-payment-method
+- post_find-payment-methods
