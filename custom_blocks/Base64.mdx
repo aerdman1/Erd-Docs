@@ -3,48 +3,74 @@ name: Base64
 ---
 import React, { useEffect, useMemo, useState } from 'react';
 
-export const RemoteJsonDoc = (props) => {
+export const RemoteJsonCodeBlock = props => {
+  // -------------------------
   // Props
+  // -------------------------
   const url = props.url || '';
-  const titleKey = props.titleKey || 'title';
-  const descriptionKey = props.descriptionKey || 'description';
-  const sectionsKey = props.sectionsKey || 'sections';
-  const showRaw = props.showRaw !== false; // default true
-  const rawLabel = props.rawLabel || 'View raw JSON';
-  const maxRawHeight = props.maxRawHeight || 520;
+  const jsonPath = props.jsonPath || 'front_image'; // key in the JSON
+  const language = props.language || 'python';
+  const filename = props.filename || 'sample_front_image.py';
+  const variableName = props.variableName || 'FRONT_IMAGE';
+  const quoteStyle = props.quoteStyle || 'double'; // "double" | "single" | "triple"
+  const maxHeight = props.maxHeight || 520;
 
   const [loading, setLoading] = useState(Boolean(url));
   const [error, setError] = useState('');
-  const [json, setJson] = useState(null);
-  const [rawOpen, setRawOpen] = useState(false);
+  const [data, setData] = useState(null);
+  const [copied, setCopied] = useState(false);
 
-  // Helpers (scoped inside component, per your MDX pattern)
-  const isObject = (v) => {
-    return Boolean(v) && typeof v === 'object' && !Array.isArray(v);
-  };
+  // -------------------------
+  // Helpers (scoped)
+  // -------------------------
+  const getByPath = (obj, path) => {
+    if (!obj || !path) return undefined;
+    const parts = String(path)
+      .split('.')
+      .map(p => p.trim())
+      .filter(Boolean);
 
-  const safeString = (v) => {
-    if (v === null || v === undefined) return '';
-    if (typeof v === 'string') return v;
-    if (typeof v === 'number' || typeof v === 'boolean') return String(v);
-    return '';
-  };
-
-  const pretty = useMemo(() => {
-    try {
-      if (!json) return '';
-      return JSON.stringify(json, null, 2);
-    } catch (e) {
-      return '';
+    let cur = obj;
+    for (const part of parts) {
+      if (cur && typeof cur === 'object' && part in cur) cur = cur[part];
+      else return undefined;
     }
-  }, [json]);
+    return cur;
+  };
 
+  const isString = v => typeof v === 'string';
+
+  const quoteValue = v => {
+    if (quoteStyle === 'triple') return `"""${v}"""`;
+    if (quoteStyle === 'single') return `'${v.replace(/'/g, "\\'")}'`;
+    // default double
+    return `"${v.replace(/"/g, '\\"')}"`;
+  };
+
+  const buildCode = v => {
+    // Python-y assignment (what you asked for originally)
+    return `${variableName} = ${quoteValue(v)}`;
+  };
+
+  const onCopy = async text => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch (e) {
+      // If clipboard isn't allowed, do nothing (user can still select/copy)
+    }
+  };
+
+  // -------------------------
+  // Fetch
+  // -------------------------
   useEffect(() => {
     let cancelled = false;
 
     async function run() {
       setError('');
-      setJson(null);
+      setData(null);
 
       if (!url) {
         setLoading(false);
@@ -57,11 +83,10 @@ export const RemoteJsonDoc = (props) => {
       try {
         const res = await fetch(url, { credentials: 'omit' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
-
-        const data = await res.json();
+        const json = await res.json();
 
         if (cancelled) return;
-        setJson(data);
+        setData(json);
       } catch (e) {
         if (cancelled) return;
         setError(e && e.message ? e.message : 'Failed to load JSON.');
@@ -73,127 +98,76 @@ export const RemoteJsonDoc = (props) => {
 
     run();
 
-    return function cleanup() {
+    return () => {
       cancelled = true;
     };
   }, [url]);
 
-  // “Doc” extraction
-  const docTitle = useMemo(() => {
-    if (!json || !isObject(json)) return '';
-    return safeString(json[titleKey]);
-  }, [json, titleKey]);
+  // -------------------------
+  // Derived output
+  // -------------------------
+  const extracted = useMemo(() => {
+    return getByPath(data, jsonPath);
+  }, [data, jsonPath]);
 
-  const docDescription = useMemo(() => {
-    if (!json || !isObject(json)) return '';
-    return safeString(json[descriptionKey]);
-  }, [json, descriptionKey]);
+  const codeText = useMemo(() => {
+    if (!isString(extracted)) return '';
+    return buildCode(extracted);
+  }, [extracted]);
 
-  const docSections = useMemo(() => {
-    if (!json || !isObject(json)) return [];
-    const s = json[sectionsKey];
-    if (!Array.isArray(s)) return [];
-    return s;
-  }, [json, sectionsKey]);
-
+  // -------------------------
   // Render
+  // -------------------------
   return (
     <div className="not-prose w-full rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="p-5 border-b border-slate-100">
-        <div className="text-sm font-semibold text-slate-900">
-          {docTitle || 'Loaded JSON'}
+      <div className="px-5 py-4 border-b border-slate-100 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="text-sm font-semibold text-slate-900">Remote code block</div>
+          <div className="text-xs text-slate-500 mt-1 break-all">{url}</div>
         </div>
-        <div className="text-xs text-slate-500 mt-1 break-all">
-          {url}
-        </div>
+
+        {codeText && (
+          <button
+            type="button"
+            onClick={() => onCopy(codeText)}
+            className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+        )}
       </div>
 
       <div className="p-5">
-        {loading && (
-          <div className="text-sm text-slate-600">Loading…</div>
-        )}
+        {loading && <div className="text-sm text-slate-600">Loading…</div>}
 
         {!loading && error && (
           <div className="rounded-xl border border-red-200 bg-red-50 p-4">
             <div className="text-sm font-semibold text-red-900">Could not load JSON</div>
             <div className="text-sm text-red-800 mt-1">{error}</div>
-            <div className="text-xs text-red-800 mt-3">
-              If this is a GitHub raw URL, make sure the file is public. If it’s private, you’ll need a proxy endpoint that returns JSON with CORS enabled.
+          </div>
+        )}
+
+        {!loading && !error && !codeText && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="text-sm font-semibold text-amber-900">No string found</div>
+            <div className="text-sm text-amber-900 mt-1">
+              Expected <span className="font-mono">{jsonPath}</span> to be a string in the loaded JSON.
             </div>
           </div>
         )}
 
-        {!loading && !error && json && (
-          <div className="space-y-5">
-            {(docTitle || docDescription) && (
-              <div>
-                {docTitle && (
-                  <div className="text-xl font-semibold text-slate-900">
-                    {docTitle}
-                  </div>
-                )}
-                {docDescription && (
-                  <div className="text-sm text-slate-700 mt-2">
-                    {docDescription}
-                  </div>
-                )}
-              </div>
-            )}
+        {!loading && !error && codeText && (
+          <div className="rounded-xl border border-slate-200 overflow-hidden">
+            <div className="px-4 py-2 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
+              {filename}
+            </div>
 
-            {docSections.length > 0 && (
-              <div className="space-y-4">
-                {docSections.map((sec, idx) => {
-                  const heading = isObject(sec) ? safeString(sec.heading) : '';
-                  const body = isObject(sec) ? safeString(sec.body) : '';
-                  const items = isObject(sec) && Array.isArray(sec.items) ? sec.items : [];
-
-                  return (
-                    <div key={String(idx)} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                      {heading && (
-                        <div className="text-sm font-semibold text-slate-900">
-                          {heading}
-                        </div>
-                      )}
-                      {body && (
-                        <div className="text-sm text-slate-700 mt-2">
-                          {body}
-                        </div>
-                      )}
-                      {items.length > 0 && (
-                        <ul className="mt-3 list-disc pl-5 text-sm text-slate-700">
-                          {items.map((it, j) => {
-                            const label = safeString(it);
-                            return <li key={String(j)}>{label}</li>;
-                          })}
-                        </ul>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {showRaw && (
-              <div className="rounded-xl border border-slate-200">
-                <button
-                  type="button"
-                  onClick={() => setRawOpen(!rawOpen)}
-                  className="w-full flex items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-slate-50"
-                >
-                  <span>{rawLabel}</span>
-                  <span className="text-slate-500">{rawOpen ? 'Hide' : 'Show'}</span>
-                </button>
-
-                {rawOpen && (
-                  <pre
-                    className="m-0 border-t border-slate-200 p-4 overflow-auto text-xs leading-relaxed"
-                    style={{ maxHeight: maxRawHeight, whiteSpace: 'pre' }}
-                  >
-                    <code>{pretty}</code>
-                  </pre>
-                )}
-              </div>
-            )}
+            <pre
+              className="m-0 p-4 overflow-auto text-xs leading-relaxed bg-white"
+              style={{ maxHeight, whiteSpace: 'pre' }}
+            >
+              <code className={'language-' + language}>{codeText}</code>
+            </pre>
           </div>
         )}
       </div>
@@ -202,4 +176,10 @@ export const RemoteJsonDoc = (props) => {
 };
 
 
-<RemoteJsonDoc url="https://example.com/path/to/file.json" showRaw={true} />
+<RemoteJsonCodeBlock
+  url="https://raw.githubusercontent.com/aerdman1/aerdman1.github.io/refs/heads/main/sample_front_image.json"
+  jsonPath="front_image"
+  language="python"
+  filename="sample_front_image.py"
+  variableName="FRONT_IMAGE"
+/>
