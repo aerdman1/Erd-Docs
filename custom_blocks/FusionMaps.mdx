@@ -1,0 +1,180 @@
+---
+name: FusionMaps
+---
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+
+export const RemoteFusionChartsMap = props => {
+  const configUrl = props.configUrl || '';
+  const height = props.height || 550;
+  const width = props.width || '100%';
+
+  const baseCdn = props.baseCdn || 'https://cdn.fusioncharts.com/fusioncharts/latest/';
+  const themeUrl = props.themeUrl || (baseCdn + 'themes/fusioncharts.theme.fusion.js');
+
+  // If you don’t pass a mapDefinitionUrl, we will infer it from config.type
+  const mapDefinitionUrl = props.mapDefinitionUrl || '';
+
+  const containerRef = useRef(null);
+  const chartRef = useRef(null);
+
+  const [loading, setLoading] = useState(Boolean(configUrl));
+  const [error, setError] = useState('');
+  const [config, setConfig] = useState(null);
+
+  const loadScriptOnce = (src) => {
+    if (!src) return Promise.reject(new Error('Missing script src'));
+    if (document.querySelector('script[data-rm-fc="' + src + '"]')) return Promise.resolve();
+
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.defer = true;
+      s.setAttribute('data-rm-fc', src);
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load script: ' + src));
+      document.head.appendChild(s);
+    });
+  };
+
+  const inferMapDefUrl = (cfgType) => {
+    const t = String(cfgType || '').trim();
+    if (!t) return '';
+    // Examples:
+    //  "maps/world" -> fusioncharts.world.js
+    //  "maps/california" -> maps/fusioncharts.california.js
+    //  "world" -> fusioncharts.world.js (fallback)
+    const parts = t.split('/');
+    const alias = parts.length === 2 ? parts[1] : parts[0];
+    if (!alias) return '';
+
+    // FusionCharts doc shows world at the root, and other maps under /maps/
+    if (alias === 'world' || alias === 'usa') return baseCdn + 'fusioncharts.' + alias + '.js';
+    return baseCdn + 'maps/fusioncharts.' + alias + '.js';
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      setError('');
+      setConfig(null);
+
+      if (!configUrl) {
+        setLoading(false);
+        setError('Missing configUrl prop.');
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch(configUrl, { credentials: 'omit' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const json = await res.json();
+        if (!cancelled) setConfig(json);
+      } catch (e) {
+        if (!cancelled) setError(e && e.message ? e.message : 'Failed to load JSON config.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    run();
+    return () => { cancelled = true; };
+  }, [configUrl]);
+
+  const scriptsToLoad = useMemo(() => {
+    const inferredMapUrl = mapDefinitionUrl || inferMapDefUrl(config && config.type);
+    return [
+      baseCdn + 'fusioncharts.js',
+      baseCdn + 'fusioncharts.maps.js',
+      inferredMapUrl,
+      themeUrl
+    ].filter(Boolean);
+  }, [config, mapDefinitionUrl, baseCdn, themeUrl]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function render() {
+      if (!config) return;
+      if (!containerRef.current) return;
+
+      // Cleanup any previous chart instance
+      try {
+        if (chartRef.current && typeof chartRef.current.dispose === 'function') chartRef.current.dispose();
+      } catch (e) {}
+      chartRef.current = null;
+
+      try {
+        for (const src of scriptsToLoad) {
+          await loadScriptOnce(src);
+        }
+        if (cancelled) return;
+
+        const FC = window.FusionCharts;
+        if (!FC) throw new Error('FusionCharts did not load (window.FusionCharts missing).');
+
+        const renderId = containerRef.current.id;
+        if (!renderId) throw new Error('Missing container id.');
+
+        const cfg = Object.assign({}, config, { renderAt: renderId });
+
+        // Respect props overrides if desired
+        if (width) cfg.width = width;
+        if (height) cfg.height = String(height);
+
+        chartRef.current = new FC(cfg);
+        chartRef.current.render();
+      } catch (e) {
+        if (!cancelled) setError(e && e.message ? e.message : 'Failed to render map.');
+      }
+    }
+
+    render();
+    return () => {
+      cancelled = true;
+      try {
+        if (chartRef.current && typeof chartRef.current.dispose === 'function') chartRef.current.dispose();
+      } catch (e) {}
+      chartRef.current = null;
+    };
+  }, [config, scriptsToLoad, width, height]);
+
+  const containerId = useMemo(() => {
+    const rand = Math.random().toString(16).slice(2);
+    return 'rm-fc-map-' + rand;
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: 12, fontFamily: 'system-ui, sans-serif', fontSize: 13, color: '#64748b' }}>
+        Loading map...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ borderRadius: 10, border: '1px solid #fecaca', background: '#fff5f5', padding: '10px 14px', fontFamily: 'system-ui, sans-serif' }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#b91c1c' }}>Map failed</div>
+        <div style={{ fontSize: 13, color: '#dc2626', marginTop: 4 }}>{error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12, overflow: 'hidden' }}>
+      <div
+        id={containerId}
+        ref={containerRef}
+        style={{ width: '100%', height: Number(height) || 550, background: '#fff' }}
+      />
+    </div>
+  );
+};
+
+<RemoteFusionChartsMap
+  configUrl="https://raw.githubusercontent.com/aerdman1/aerdman1.github.io/refs/heads/main/fusioncharts-map-world.json"
+  height={550}
+/> 
