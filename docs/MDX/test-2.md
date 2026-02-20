@@ -12,4 +12,4 @@ metadata:
 
 [Testing](project/pageslug)
 
-[another](docs:pageslug)
+[another](doc:pageslug)
