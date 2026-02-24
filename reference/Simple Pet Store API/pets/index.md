@@ -1,4 +1,0 @@
----
-title: Pets
-hidden: false
----
