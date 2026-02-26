@@ -1,0 +1,214 @@
+openapi: 3.1.0
+info:
+  title: Example-Heavy API (Short)
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+paths:
+  /widgets/{id}:
+    get:
+      summary: Get a widget
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            examples:
+              numeric:
+                value: '123'
+              uuid:
+                value: b0d9b1f4-7f6e-4d65-8a7e-2f97c86f0c2a
+      responses:
+        '200':
+          description: Widget found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+              examples:
+                basic:
+                  summary: Basic widget
+                  value:
+                    id: '123'
+                    name: Red Widget
+                    status: active
+                    tags:
+                      - sale
+                      - featured
+                detailed:
+                  summary: Widget with metadata
+                  value:
+                    id: b0d9b1f4-7f6e-4d65-8a7e-2f97c86f0c2a
+                    name: Blue Widget
+                    status: inactive
+                    tags: []
+                    metadata:
+                      source: import
+                      imported_at: '2026-02-20T14:30:00Z'
+        '404':
+          description: Widget not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                notFoundById:
+                  summary: Unknown widget id
+                  value:
+                    code: NOT_FOUND
+                    message: Widget '123' was not found.
+                notFoundByUuid:
+                  summary: Unknown widget uuid
+                  value:
+                    code: NOT_FOUND
+                    message: >-
+                      Widget 'b0d9b1f4-7f6e-4d65-8a7e-2f97c86f0c2a' was not
+                      found.
+  /widgets:
+    post:
+      summary: Create a widget
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWidgetRequest'
+            examples:
+              minimal:
+                summary: Minimum fields
+                value:
+                  name: Green Widget
+              withTags:
+                summary: With tags
+                value:
+                  name: Gold Widget
+                  tags:
+                    - limited
+                    - premium
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+              examples:
+                createdActive:
+                  summary: Created (default active)
+                  value:
+                    id: '987'
+                    name: Green Widget
+                    status: active
+                    tags: []
+                createdWithTags:
+                  summary: Created with tags
+                  value:
+                    id: '988'
+                    name: Gold Widget
+                    status: active
+                    tags:
+                      - limited
+                      - premium
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingName:
+                  summary: Name missing
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Field 'name' is required.
+                nameTooLong:
+                  summary: Name too long
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Field 'name' must be <= 50 chars.
+components:
+  schemas:
+    Widget:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - status
+        - tags
+      properties:
+        id:
+          type: string
+          description: Widget identifier
+          examples:
+            - '123'
+            - b0d9b1f4-7f6e-4d65-8a7e-2f97c86f0c2a
+        name:
+          type: string
+          maxLength: 50
+          examples:
+            - Red Widget
+            - Blue Widget
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+          examples:
+            - active
+            - inactive
+        tags:
+          type: array
+          items:
+            type: string
+          examples:
+            - - sale
+              - featured
+            - []
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          examples:
+            - source: import
+              imported_at: '2026-02-20T14:30:00Z'
+            - source: api
+    CreateWidgetRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 50
+          examples:
+            - Green Widget
+            - Gold Widget
+        tags:
+          type: array
+          items:
+            type: string
+          default: []
+          examples:
+            - - limited
+              - premium
+            - []
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          examples:
+            - NOT_FOUND
+            - VALIDATION_ERROR
+        message:
+          type: string
+          examples:
+            - Widget '123' was not found.
+            - Field 'name' is required.
