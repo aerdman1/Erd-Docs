@@ -177,7 +177,7 @@ Follow the steps below to use the **Reprice Held Booking** feature in a Prime Bo
 * Search for and open a deferred (On Hold) round-trip booking which contains published fares.
 * Click **Reprice Held Booking**.
 
-  <Image align="center" width="150px" src="https://files.readme.io/ca580106a65c2017957d0065f5479aa80d595cef2bc6b2b2e4c6d9583c4dd335-reprice_held_booking_04.png" />
+  <Image align="left" src="https://files.readme.io/ca580106a65c2017957d0065f5479aa80d595cef2bc6b2b2e4c6d9583c4dd335-reprice_held_booking_04.png" />
 * Click **Change** for the required segment on the **Your Previous Booking Details** page.
 
 <Image align="left" src="https://files.readme.io/a0455c1f5dc7fcfb817380636e48affa309f7fb22659d1c0621d98c2f62f073e-reprice_held_booking_05.png" />
