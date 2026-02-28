@@ -88,7 +88,7 @@ Before using the **Reprice Held Booking** feature, it must be enabled in three p
 * Click the **Edit** icon in the **Action** column to edit the supplier integration.
 * Check the **Reprice Held Booking** checkbox in the **Supplier Features** section, and click **Update**.
 
-  <Image align="center" border={true} width="200px" src="https://files.readme.io/75eab1ac1f592f7a1a738c541df80a99b5972101e1d2f26a3105cdc62b5002ae-reprice_held_booking_flag_3.png" className="border" />
+  <Image align="left" border={true} src="https://files.readme.io/75eab1ac1f592f7a1a738c541df80a99b5972101e1d2f26a3105cdc62b5002ae-reprice_held_booking_flag_3.png" className="border" />
 * The **Reprice Held Booking** feature is enabled for the selected supplier integration.
 
 ### 2. Enable the Reprice Held Booking Feature for a Point of Sale (POS)
@@ -99,7 +99,7 @@ Before using the **Reprice Held Booking** feature, it must be enabled in three p
 * Select the returned POS from the search results, and click the **Edit** icon in the **Action** column to edit the POS.
 * Check the **Reprice Held Booking** checkbox in the **Features and Permissions** section, and click **Update**.
 
-  <Image align="center" width="200px" src="https://files.readme.io/04d559192898694d9552080b00df9d19021c6d9b3ffedeee38340acd51aaf329-reprice_held_booking_flag_3.png" />
+  <Image align="left" src="https://files.readme.io/04d559192898694d9552080b00df9d19021c6d9b3ffedeee38340acd51aaf329-reprice_held_booking_flag_3.png" />
 * The **Reprice Held Booking** feature is enabled for the required POS.
 
 ### 3. Configure the RepricePCC for a Point of Sale (POS) in Manage Credentials
@@ -180,13 +180,13 @@ Follow the steps below to use the **Reprice Held Booking** feature in a Prime Bo
   <Image align="center" width="150px" src="https://files.readme.io/ca580106a65c2017957d0065f5479aa80d595cef2bc6b2b2e4c6d9583c4dd335-reprice_held_booking_04.png" />
 * Click **Change** for the required segment on the **Your Previous Booking Details** page.
 
-<Image align="center" src="https://files.readme.io/a0455c1f5dc7fcfb817380636e48affa309f7fb22659d1c0621d98c2f62f073e-reprice_held_booking_05.png" />
+<Image align="left" src="https://files.readme.io/a0455c1f5dc7fcfb817380636e48affa309f7fb22659d1c0621d98c2f62f073e-reprice_held_booking_05.png" />
 
 <Callout theme="default">
   **Note**: When a deferred (On Hold) round-trip booking is selected for reprice, and the **Change** button is clicked for one of the segments, then the second segment is automatically selected based on the original fare quote. You cannot reprice only one segment in a round-trip booking.
 </Callout>
 
-<Image align="center" src="https://files.readme.io/83421930b229b36296353b1c362e48a2b4e21e4a6d1cf25d3b6615d20ce8301c-reprice_held_booking_06.png" />
+<Image align="left" src="https://files.readme.io/83421930b229b36296353b1c362e48a2b4e21e4a6d1cf25d3b6615d20ce8301c-reprice_held_booking_06.png" />
 
 * The **Reprice Criteria** page displays.
 
