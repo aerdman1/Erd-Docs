@@ -14,4 +14,3 @@ metadata:
   When a deferred (On Hold) round-trip booking is selected for reprice, and the **Change** button is clicked for one of the segments, then the second segment is automatically selected based on the original fare quote. You cannot reprice only one segment in a round-trip booking.
 </Callout>
 
-* <br />
