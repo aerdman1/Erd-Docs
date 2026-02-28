@@ -192,7 +192,7 @@ Follow the steps below to use the **Reprice Held Booking** feature in a Prime Bo
 
 > **Note**: The **Flight Information**, such as the **Departure Airport**, **Arrival Airport**, **Date**, and **Cabin** of the booking, cannot be edited on the **Reprice Criteria** page.
 
-<Image align="center" src="https://files.readme.io/3759b13175fd9cc9cd3bc7290387d48517eb885c46a1bf052e635a3d1c576056-reprice_held_booking_07.png" />
+<Image align="left" src="https://files.readme.io/3759b13175fd9cc9cd3bc7290387d48517eb885c46a1bf052e635a3d1c576056-reprice_held_booking_07.png" />
 
 * Select the required **Fare Preference** and or **Type** options from the **Fare Preference** and **Type** drop-down lists. The following options are available:
 * **Fare Preference**:
