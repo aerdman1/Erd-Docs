@@ -27,7 +27,7 @@ section.content-toc.grid-25 {
 <br />
 
 <Cards>
-  <Card title="Full code quickstart" href="/content-modal" icon="fa-code">
+  <Card title="Full code quickstart" href="/docs/content-modal" icon="fa-code">
     Build a complete verification flow using the MiVIP APIs.
   </Card>
 
