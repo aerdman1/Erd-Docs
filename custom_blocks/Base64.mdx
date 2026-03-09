@@ -1,180 +1,269 @@
 ---
 name: Base64
 ---
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-export const RemoteJsonCodeBlock = props => {
-  // -------------------------
-  // Props
-  // -------------------------
-  const url = props.url || '';
-  const jsonPath = props.jsonPath || 'front_image'; // key in the JSON
-  const language = props.language || 'python';
-  const filename = props.filename || 'sample_front_image.py';
-  const variableName = props.variableName || 'FRONT_IMAGE';
-  const quoteStyle = props.quoteStyle || 'double'; // "double" | "single" | "triple"
-  const maxHeight = props.maxHeight || 520;
+export const RemoteJsonCodeBlock = (props) => {
+  const url = props.url || "";
+  const jsonPath = props.jsonPath || "front_image";
+  const language = props.language || "python";
+  const filename = props.filename || "sample.py";
+  const variableName = props.variableName || "VALUE";
+  const quoteStyle = props.quoteStyle || "double";
 
   const [loading, setLoading] = useState(Boolean(url));
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [data, setData] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [dark, setDark] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
 
-  // -------------------------
-  // Helpers (scoped)
-  // -------------------------
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e) => setDark(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  const t = dark
+    ? {
+        bg: "#1a1a1a",
+        border: "#3a3a3a",
+        labelBg: "#111111",
+        text: "#e5e7eb",
+        muted: "#6b7280",
+        varColor: "#a5b4fc",
+        strColor: "#6ee7b7",
+      }
+    : {
+        bg: "#ffffff",
+        border: "#e5e7eb",
+        labelBg: "#f9fafb",
+        text: "#111827",
+        muted: "#6b7280",
+        varColor: "#4f46e5",
+        strColor: "#065f46",
+      };
+
+  const H = 30; // height of each row
+
   const getByPath = (obj, path) => {
     if (!obj || !path) return undefined;
-    const parts = String(path)
-      .split('.')
-      .map(p => p.trim())
-      .filter(Boolean);
-
     let cur = obj;
-    for (const part of parts) {
-      if (cur && typeof cur === 'object' && part in cur) cur = cur[part];
+    for (const part of String(path).split(".").map((p) => p.trim()).filter(Boolean)) {
+      if (cur && typeof cur === "object" && part in cur) cur = cur[part];
       else return undefined;
     }
     return cur;
   };
 
-  const isString = v => typeof v === 'string';
+  const quoteOpen = quoteStyle === "triple" ? '"""' : quoteStyle === "single" ? "'" : '"';
 
-  const quoteValue = v => {
-    if (quoteStyle === 'triple') return `"""${v}"""`;
-    if (quoteStyle === 'single') return `'${v.replace(/'/g, "\\'")}'`;
-    // default double
+  const quoteValue = (v) => {
+    if (quoteStyle === "triple") return `"""${v}"""`;
+    if (quoteStyle === "single") return `'${v.replace(/'/g, "\\'")}'`;
     return `"${v.replace(/"/g, '\\"')}"`;
   };
 
-  const buildCode = v => {
-    // Python-y assignment (what you asked for originally)
-    return `${variableName} = ${quoteValue(v)}`;
-  };
-
-  const onCopy = async text => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1200);
-    } catch (e) {
-      // If clipboard isn't allowed, do nothing (user can still select/copy)
-    }
-  };
-
-  // -------------------------
-  // Fetch
-  // -------------------------
   useEffect(() => {
     let cancelled = false;
-
     async function run() {
-      setError('');
-      setData(null);
-
-      if (!url) {
-        setLoading(false);
-        setError('Missing url prop.');
-        return;
-      }
-
+      setError(""); setData(null);
+      if (!url) { setLoading(false); setError("Missing url prop."); return; }
       setLoading(true);
-
       try {
-        const res = await fetch(url, { credentials: 'omit' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const res = await fetch(url, { credentials: "omit" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
-
-        if (cancelled) return;
-        setData(json);
+        if (!cancelled) setData(json);
       } catch (e) {
-        if (cancelled) return;
-        setError(e && e.message ? e.message : 'Failed to load JSON.');
+        if (!cancelled) setError(e?.message || "Failed to load.");
       } finally {
-        if (cancelled) return;
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-
     run();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [url]);
 
-  // -------------------------
-  // Derived output
-  // -------------------------
-  const extracted = useMemo(() => {
-    return getByPath(data, jsonPath);
-  }, [data, jsonPath]);
+  const extracted = useMemo(() => getByPath(data, jsonPath), [data, jsonPath]);
 
   const codeText = useMemo(() => {
-    if (!isString(extracted)) return '';
-    return buildCode(extracted);
-  }, [extracted]);
+    if (typeof extracted !== "string") return "";
+    return `${variableName} = ${quoteValue(extracted)}`;
+  }, [extracted, variableName, quoteStyle]);
 
-  // -------------------------
-  // Render
-  // -------------------------
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(codeText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
+
+  // Outer wrapper — two rows stacked, each H px
+  const wrap = {
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: 6,
+    border: `1px solid ${t.border}`,
+    background: t.bg,
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+    fontSize: 12,
+    lineHeight: 1,
+    color: t.text,
+    overflow: "hidden",
+    boxSizing: "border-box",
+  };
+
+  // Shared row — exactly H px
+  const row = {
+    display: "flex",
+    alignItems: "center",
+    height: H,
+    minHeight: H,
+    maxHeight: H,
+    overflow: "hidden",
+    boxSizing: "border-box",
+  };
+
+  const CopyIcon = () => (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+
+  const CheckIcon = () => (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+
+  const SpinIcon = () => (
+    <>
+      <style>{`@keyframes _rcb_spin { to { transform: rotate(360deg); } }`}</style>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+        style={{ animation: "_rcb_spin 1s linear infinite", flexShrink: 0 }}>
+        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+      </svg>
+    </>
+  );
+
+  // Loading / error / empty states use single-row fallback
+  if (loading) return (
+    <div style={{ ...wrap, flexDirection: "row", height: H, minHeight: H, maxHeight: H, gap: 8, padding: "0 12px", color: t.muted }}>
+      <SpinIcon /> Loading {filename}…
+    </div>
+  );
+
+  if (error) return (
+    <div style={{ ...wrap, flexDirection: "row", height: H, minHeight: H, maxHeight: H, padding: "0 12px", gap: 6, color: t.muted }}>
+      <span>✕</span> {error}
+    </div>
+  );
+
+  if (!codeText) return (
+    <div style={{ ...wrap, flexDirection: "row", height: H, minHeight: H, maxHeight: H, padding: "0 12px", gap: 4, color: t.muted }}>
+      No string found at <code style={{ color: t.text, marginLeft: 4 }}>{jsonPath}</code>
+    </div>
+  );
+
   return (
-    <div className="not-prose w-full rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="px-5 py-4 border-b border-slate-100 flex items-start justify-between gap-4">
-        <div className="min-w-0">
-          <div className="text-sm font-semibold text-slate-900">Remote code block</div>
-          <div className="text-xs text-slate-500 mt-1 break-all">{url}</div>
+    <div style={wrap}>
+
+      {/* ── Row 1: language badge + filename ── */}
+      <div style={{ ...row, borderBottom: `1px solid ${t.border}` }}>
+
+        {/* Language badge */}
+        <div style={{
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          padding: "0 10px",
+          background: t.labelBg,
+          borderRight: `1px solid ${t.border}`,
+          color: t.muted,
+          fontSize: 11,
+          fontWeight: 600,
+          letterSpacing: "0.05em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+        }}>
+          {language}
         </div>
 
-        {codeText && (
-          <button
-            type="button"
-            onClick={() => onCopy(codeText)}
-            className="shrink-0 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            {copied ? 'Copied' : 'Copy'}
-          </button>
-        )}
+        {/* Filename */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          padding: "0 10px",
+          color: t.muted,
+          fontSize: 11,
+          fontWeight: 400,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}>
+          {filename}
+        </div>
+
       </div>
 
-      <div className="p-5">
-        {loading && <div className="text-sm text-slate-600">Loading…</div>}
+      {/* ── Row 2: code content + copy button ── */}
+      <div style={row}>
 
-        {!loading && error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-            <div className="text-sm font-semibold text-red-900">Could not load JSON</div>
-            <div className="text-sm text-red-800 mt-1">{error}</div>
-          </div>
-        )}
+        {/* Code: varName = "value" */}
+        <div style={{
+          flex: 1,
+          overflow: "hidden",
+          padding: "0 12px",
+          whiteSpace: "nowrap",
+          display: "flex",
+          alignItems: "center",
+        }}>
+          <span style={{ color: t.varColor, flexShrink: 0 }}>{variableName}</span>
+          <span style={{ color: t.muted, margin: "0 5px", flexShrink: 0 }}>=</span>
+          <span style={{ color: t.strColor, overflow: "hidden", textOverflow: "ellipsis" }}>
+            {quoteOpen}{extracted}{quoteOpen}
+          </span>
+        </div>
 
-        {!loading && !error && !codeText && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-            <div className="text-sm font-semibold text-amber-900">No string found</div>
-            <div className="text-sm text-amber-900 mt-1">
-              Expected <span className="font-mono">{jsonPath}</span> to be a string in the loaded JSON.
-            </div>
-          </div>
-        )}
+        {/* Copy button */}
+        <button
+          type="button"
+          onClick={onCopy}
+          style={{
+            flexShrink: 0,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            height: "100%",
+            padding: "0 10px",
+            border: "none",
+            borderLeft: `1px solid ${t.border}`,
+            background: "transparent",
+            color: copied ? t.text : t.muted,
+            cursor: "pointer",
+            fontSize: 11,
+            fontWeight: 600,
+            transition: "color 0.12s",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {copied ? <CheckIcon /> : <CopyIcon />}
+          {copied ? "Copied" : "Copy"}
+        </button>
 
-        {!loading && !error && codeText && (
-          <div className="rounded-xl border border-slate-200 overflow-hidden">
-            <div className="px-4 py-2 border-b border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
-              {filename}
-            </div>
-
-            <pre
-              className="m-0 p-4 overflow-auto text-xs leading-relaxed bg-white"
-              style={{ maxHeight, whiteSpace: 'pre' }}
-            >
-              <code className={'language-' + language}>{codeText}</code>
-            </pre>
-          </div>
-        )}
       </div>
     </div>
   );
 };
-
 
 <RemoteJsonCodeBlock
   url="https://raw.githubusercontent.com/aerdman1/aerdman1.github.io/refs/heads/main/sample_front_image.json"
