@@ -9,118 +9,125 @@ link:
 metadata:
   robots: index
 ---
-
-| Constraint | Limit |
-| --- | --- |
-| Maximum partition size | 500 GB |
-| Maximum throughput | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests |
-| Minimum TTL | 7 days |
-| Maximum TTL | No maximum |
-| Maximum amount of data | No maximum |
-| Minimum number of indexes of an index layer | 1 |
-| Maximum number of indexes of an index layer | 4 |
+| Constraint                                  | Limit                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Maximum partition size                      | 500 GB                                                                                                                                                                                                                                                                                                         |
+| Maximum throughput                          | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests |
+| Minimum TTL                                 | 7 days                                                                                                                                                                                                                                                                                                         |
+| Maximum TTL                                 | No maximum                                                                                                                                                                                                                                                                                                     |
+| Maximum amount of data                      | No maximum                                                                                                                                                                                                                                                                                                     |
+| Minimum number of indexes of an index layer | 1                                                                                                                                                                                                                                                                                                              |
+| Maximum number of indexes of an index layer | 4                                                                                                                                                                                                                                                                                                              |
 
 Cost considerations:
-- You are charged for the amount of metadata and data stored in the layer
-- You are charged based on the amount of data you read and write using the `blob` and `index` APIs
-- You are charged based on the [retention](creating-index-layer.md#retention) setting configured for the layer
+
+* You are charged for the amount of metadata and data stored in the layer
+* You are charged based on the amount of data you read and write using the `blob` and `index` APIs
+* You are charged based on the [retention](creating-index-layer.md#retention) setting configured for the layer
 
 ### Interactive map layer limits
 
-| Constraint | Limit |
-| --- | --- |
-| Maximum partition size | Not applicable |
-| Maximum throughput | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests |
-| Minimum TTL | Not applicable |
-| Maximum TTL | Not applicable |
-| Maximum amount of data | 128 TB |
-| Maximum payload size - uploads | 20 MB (uncompressed) |
-| Maximum payload size - downloads | 50 MB (uncompressed) |
-| Maximum requests | If you exceed 1,000 requests in a second, you are throttled and the remaining requests within that second fail for each app. |
-| Maximum duration of a single request | 30 seconds |
-| Maximum features in a response | 100,000 |
+| Constraint                                         | Limit                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Maximum partition size                             | Not applicable                                                                                                                                                                                                                                                                                                                          |
+| Maximum throughput                                 | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests                          |
+| Minimum TTL                                        | Not applicable                                                                                                                                                                                                                                                                                                                          |
+| Maximum TTL                                        | Not applicable                                                                                                                                                                                                                                                                                                                          |
+| Maximum amount of data                             | 128 TB                                                                                                                                                                                                                                                                                                                                  |
+| Maximum payload size - uploads                     | 20 MB (uncompressed)                                                                                                                                                                                                                                                                                                                    |
+| Maximum payload size - downloads                   | 50 MB (uncompressed)                                                                                                                                                                                                                                                                                                                    |
+| Maximum requests                                   | If you exceed 1,000 requests in a second, you are throttled and the remaining requests within that second fail for each app.                                                                                                                                                                                                            |
+| Maximum duration of a single request               | 30 seconds                                                                                                                                                                                                                                                                                                                              |
+| Maximum features in a response                     | 100,000                                                                                                                                                                                                                                                                                                                                 |
 | Maximum features in a layer to be fully searchable | There are no restrictions for property search in layers that contain less than 10,000 features. For layers that contain more than 10,000 features, property search is enabled only for properties marked as “searchable”. Searchable properties can be defined either automatically or manually using the layer configuration settings. |
 
 Cost considerations:
-- You are charged for the amount of metadata and data stored in the layer
-- You are charged based on the amount of data you read and write using the `interactive` API
-- Indexing of layers happens on the fly, so no additional IO is charged, but the indexes add to the data stored.
+
+* You are charged for the amount of metadata and data stored in the layer
+* You are charged based on the amount of data you read and write using the `interactive` API
+* Indexing of layers happens on the fly, so no additional IO is charged, but the indexes add to the data stored.
 
 ### Object store layer limits
 
-| Constraint | Limit |
-| --- | --- |
-| Maximum single object size | 500 GB |
-| Maximum throughput | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests |
-| Minimum TTL | Not applicable |
-| Maximum TTL | Not applicable |
-| Maximum amount of data in an object store layer | No limit |
+| Constraint                                      | Limit                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Maximum single object size                      | 500 GB                                                                                                                                                                                                                                                                                                         |
+| Maximum throughput                              | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests |
+| Minimum TTL                                     | Not applicable                                                                                                                                                                                                                                                                                                 |
+| Maximum TTL                                     | Not applicable                                                                                                                                                                                                                                                                                                 |
+| Maximum amount of data in an object store layer | No limit                                                                                                                                                                                                                                                                                                       |
 
 Cost considerations:
-- You are charged for the amount of metadata and data stored in the layer
-- You are charged based on the amount of data you read and write using the `blob` API
-- There are no layer configuration settings that affect cost
+
+* You are charged for the amount of metadata and data stored in the layer
+* You are charged based on the amount of data you read and write using the `blob` API
+* There are no layer configuration settings that affect cost
 
 ### Stream layer limits
 
-| Constraint | Limit |
-| --- | --- |
-| Maximum partition size | 1 MB <br /> <br /> |
-| Maximum throughput | Inbound: 32800 KBps <br /> <br /> Outbound: 65500 KBps, but catalogs in the HERE Marketplace have a maximum outbound throughput of 2000 KBps. <br /> <br /> The maximum throughput for a stream layer is configured as allocated capacity during layer creation. The service starts throttling inbound messages when the inbound rate exceeds the inbound throughput. The service starts throttling outbound messages when the total outbound rate to all consumers exceeds the outbound throughput. When throttling occurs, the service response is delayed, but no messages are dropped. |
-| Minimum TTL | 10 minutes |
-| Maximum TTL | 72 hours |
-| Maximum amount of data | The maximum amount of data that can be concurrently stored in a stream layer can be calculated as follows: <br /> <br /> `(inbound throughput) x (retention time)` |
-| Maximum consumer group size | The number of subscriptions in a consumer group in a stream layer can be calculated as follows: <br /> <br /> `max (input throughput, ceil (output throughput /2))` |
-| Maximum message size | The maximum message size for a stream layer is 1 MB, and we recommend that you keep messages to 1 MB or less. For messages larger than 1 MB, we recommend that you upload the data to the Blob API first and pass a message in stream by reference (data handle). |
+| Constraint                  | Limit                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Maximum partition size      | 1 MB <br /> <br />                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Maximum throughput          | Inbound: 32800 KBps <br /> <br /> Outbound: 65500 KBps, but catalogs in the HERE Marketplace have a maximum outbound throughput of 2000 KBps. <br /> <br /> The maximum throughput for a stream layer is configured as allocated capacity during layer creation. The service starts throttling inbound messages when the inbound rate exceeds the inbound throughput. The service starts throttling outbound messages when the total outbound rate to all consumers exceeds the outbound throughput. When throttling occurs, the service response is delayed, but no messages are dropped. |
+| Minimum TTL                 | 10 minutes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Maximum TTL                 | 72 hours                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Maximum amount of data      | The maximum amount of data that can be concurrently stored in a stream layer can be calculated as follows: <br /> <br /> `(inbound throughput) x (retention time)`                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Maximum consumer group size | The number of subscriptions in a consumer group in a stream layer can be calculated as follows: <br /> <br /> `max (input throughput, ceil (output throughput /2))`                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Maximum message size        | The maximum message size for a stream layer is 1 MB, and we recommend that you keep messages to 1 MB or less. For messages larger than 1 MB, we recommend that you upload the data to the Blob API first and pass a message in stream by reference (data handle).                                                                                                                                                                                                                                                                                                                          |
 
 Cost considerations:
-- Usage does not affect cost
-- You are charged based on the [maximum throughput](creating-stream-layer.md#maximum-throughput) configured for the layer
-- You are charged based on the [retention](creating-stream-layer.md#retention) setting configured for the layer
+
+* Usage does not affect cost
+* You are charged based on the [maximum throughput](creating-stream-layer.md#maximum-throughput) configured for the layer
+* You are charged based on the [retention](creating-stream-layer.md#retention) setting configured for the layer
 
 ### Versioned layer limits
 
-| Constraint | Limit |
-| --- | --- |
-| Maximum partition size | 500 GB |
-| Maximum throughput | We recommend that you don't exceed 24 MB/second when publishing metadata. More specific limits apply for single file uploads in the data publication process. For more information see [Publish to a versioned layer.](https://www.here.com/docs/bundle/data-api-developer-guide/page/rest/publishing-data-versioned.html) |
-| Maximum amount of data | No maximum |
+| Constraint             | Limit                                                                                                                                                                                                                                                                                                                      |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Maximum partition size | 500 GB                                                                                                                                                                                                                                                                                                                     |
+| Maximum throughput     | We recommend that you don't exceed 24 MB/second when publishing metadata. More specific limits apply for single file uploads in the data publication process. For more information see [Publish to a versioned layer.](https://www.here.com/docs/bundle/data-api-developer-guide/page/rest/publishing-data-versioned.html) |
+| Maximum amount of data | No maximum                                                                                                                                                                                                                                                                                                                 |
 
 Cost considerations:
-- HERE charges you for the amount of metadata and data stored in the layer
-- HERE charges you based on the amount of data you read and write using the `blob` and `metadata` APIs
-- There are no layer configuration settings that affect cost
-- Deleting catalog versions to manage storage costs gives you more granular data lifecycle management controls for your versioned layers. You can delete catalog versions manually or use the `config` service to delete catalog versions automatically by enabling the `automaticVersionDeletion` and setting the `numberOfVersionsToKeep` with a maximum value of 50,000. For more information, see [Delete catalog versions](delete-catalog-versions.md).
-- HERE recommends your data partitions have homogenous sizes and use as high of a zoom level as possible. For more information, see [Considerations when designing data models for versioned layers](data-api.md#considerations-when-designing-data-models-for-versioned-layers).
+
+* HERE charges you for the amount of metadata and data stored in the layer
+* HERE charges you based on the amount of data you read and write using the `blob` and `metadata` APIs
+* There are no layer configuration settings that affect cost
+* Deleting catalog versions to manage storage costs gives you more granular data lifecycle management controls for your versioned layers. You can delete catalog versions manually or use the `config` service to delete catalog versions automatically by enabling the `automaticVersionDeletion` and setting the `numberOfVersionsToKeep` with a maximum value of 50,000. For more information, see [Delete catalog versions](delete-catalog-versions.md).
+* HERE recommends your data partitions have homogenous sizes and use as high of a zoom level as possible. For more information, see [Considerations when designing data models for versioned layers](data-api.md#considerations-when-designing-data-models-for-versioned-layers).
 
 ### Volatile layer limits
 
-| Constraint | Limit |
-| --- | --- |
-| Maximum partition size | 2 MB |
-| Maximum throughput | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests |
-| Minimum TTL | 1 minute |
-| Maximum TTL | 7 days |
-| Maximum amount of data | 21 GB |
+| Constraint             | Limit                                                                                                                                                                                                                                                                                                          |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Maximum partition size | 2 MB                                                                                                                                                                                                                                                                                                           |
+| Maximum throughput     | No established limit, but your throughput will be affected by these factors: <br /> • Load on the HERE platform globally <br /> • Load on your HERE platform org <br /> • Type of operation (for example, read, write, or delete) <br /> • Size of the request or batch <br /> • Number of concurrent requests |
+| Minimum TTL            | 1 minute                                                                                                                                                                                                                                                                                                       |
+| Maximum TTL            | 7 days                                                                                                                                                                                                                                                                                                         |
+| Maximum amount of data | 21 GB                                                                                                                                                                                                                                                                                                          |
 
 Cost considerations:
-- You are charged based on the amount of data you read and write using the `blob` API
-- You are charged based on the [storage capacity](creating-volatile-layer.md#storage-capacity) configured for the layer. The price increases as the storage capacity increases.
-- You are charged based on the [data redundancy](creating-volatile-layer.md#data-redundancy) configured for the layer. For `multi-instance` mode, your cost triples because two additional copies of your data are created, for a total of 3 copies, to provide durability.
+
+* You are charged based on the amount of data you read and write using the `blob` API
+* You are charged based on the [storage capacity](creating-volatile-layer.md#storage-capacity) configured for the layer. The price increases as the storage capacity increases.
+* You are charged based on the [data redundancy](creating-volatile-layer.md#data-redundancy) configured for the layer. For `multi-instance` mode, your cost triples because two additional copies of your data are created, for a total of 3 copies, to provide durability.
 
 ## Data API quotas
 
-| API | Quota |
-| --- | --- |
-| `stream` | Each `appId` has a quota for total stream layer throughput. Quotas are byte-rate thresholds. A single `appId` can span multiple producer and consumer instances, and the quota will apply for all of them as a single entity. For example, if the `appId` ”test-client” has a produce quota of 10200 KBps, this is shared across all instances with that same `appId`. The default quota per Kafka topic partition is: <br /> <br /> • Input throughput ("producer\_byte\_rate"): 10200 KBps <br /> • Output throughput rate ("consumer\_byte\_rate"): 2000 KBps |
-| `index` | The `index` API uses a resource-based throttling mechanism. When requests cause CPU and memory resources to exceed certain threshold, further requests are throttled while the system allocates more resources using autoscaling. |
-| `publish` | The `publish` API has a quota of 5000 requests per minute, per `appId`. |
+| API       | Quota                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `stream`  | Each `appId` has a quota for total stream layer throughput. Quotas are byte-rate thresholds. A single `appId` can span multiple producer and consumer instances, and the quota will apply for all of them as a single entity. For example, if the `appId` ”test-client” has a produce quota of 10200 KBps, this is shared across all instances with that same `appId`. The default quota per Kafka topic partition is: <br /> <br /> • Input throughput ("producer_byte_rate"): 10200 KBps <br /> • Output throughput rate ("consumer_byte_rate"): 2000 KBps |
+| `index`   | The `index` API uses a resource-based throttling mechanism. When requests cause CPU and memory resources to exceed certain threshold, further requests are throttled while the system allocates more resources using autoscaling.                                                                                                                                                                                                                                                                                                                            |
+| `publish` | The `publish` API has a quota of 5000 requests per minute, per `appId`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Artifact Service API quotas
 
-| API | Quota |
-| --- | --- |
-| `schema and artifact listing` | Each `appId` has a quota for requests that return lists. A single `appId` can send no more than 5 requests in 5 seconds |
-| `download artifact with API key` | Each `appId` has a quota for requests that use an API key. A single `appId` can send no more than 500 requests in 5 seconds |
-| `check access to an artifact` | Each `appId` has a quota for requests that return artifact. A single `appId` can send no more than 150 requests in 5 seconds |
+| API                                    | Quota                                                                                                                                              |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schema and artifact listing`          | Each `appId` has a quota for requests that return lists. A single `appId` can send no more than 5 requests in 5 seconds                            |
+| `download artifact with API key`       | Each `appId` has a quota for requests that use an API key. A single `appId` can send no more than 500 requests in 5 seconds                        |
+| `check access to an artifact`          | Each `appId` has a quota for requests that return artifact. A single `appId` can send no more than 150 requests in 5 seconds                       |
 | `other schema and artifact operations` | Each `appId` has a quota for requests that are not covered by previous paragraphs. A single `appId` can send no more than 50 requests in 5 seconds |
+
+_サービスレスポンス時間_は、HLSがリクエストの最後のバイトを受信した時点から、対応するレスポンスの最初のバイトがHLSから送信される時点までの期間です。サービスレスポンス時間はミリ秒単位で測定されます。必要な情報を提供するために、HEREの本番稼働サービスログが使用されます。サービスレスポンス時間の98パーセンタイルは、協定世界時 (UTC) の午前0時から24時間の連続する期間内に送信されたすべての有効な呼び出しの98パーセンタイルとして計算されます。
