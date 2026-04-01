@@ -6,9 +6,6 @@ icon: far fa-calendar-circle-exclamation
 metadata:
   robots: index
 ---
-<br />
-
-
 
 <Callout icon="📘" theme="info">
   Note
