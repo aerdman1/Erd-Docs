@@ -1,4 +1,0 @@
----
-title: /widgets
-hidden: false
----
