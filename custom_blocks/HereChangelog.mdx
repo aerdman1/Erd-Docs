@@ -37,7 +37,7 @@ export const ChangelogTable = props => {
   var [loading, setLoading] = useState(true);
   var [error, setError] = useState("");
   var [versionF, setVersionF] = useState("all");
-  var [productF, setProductF] = useState("all");
+  var [domainF, setDomainF] = useState("all");
   var [changeF, setChangeF] = useState("all");
   var [search, setSearch] = useState("");
   var [sortCol, setSortCol] = useState("pubDate");
@@ -88,8 +88,8 @@ export const ChangelogTable = props => {
 
   function stripMetaTokens(text) {
     var s = safeText(text); if (!s) return "";
-    s = s.replace(/\{\%\s*(product|version|change)\s*[:=][^%}]+\%\}/gi, "");
-    s = s.replace(/\[(product|version|change)\s*[:=][^\]]+\]/gi, "");
+    s = s.replace(/\{\%\s*(domain|version|change)\s*[:=][^%}]+\%\}/gi, "");
+    s = s.replace(/\[(domain|version|change)\s*[:=][^\]]+\]/gi, "");
     s = s.replace(/[ \t]{2,}/g, " ");
     return s.trim();
   }
@@ -259,10 +259,10 @@ export const ChangelogTable = props => {
       var desc = firstChildText(it, "content\\:encoded") || firstChildText(it, "encoded") || firstChildText(it, "description");
       var descText = stripHtml(desc);
       var version = extractToken(descText, "version") || extractToken(title, "version");
-      var product = extractToken(descText, "product") || extractToken(title, "product");
+      var domain = extractToken(descText, "domain") || extractToken(title, "domain");
       var change = normalizeType(extractToken(descText, "change") || extractToken(descText, "type") || firstChildText(it, "type"));
       var body = stripMetaTokens(descText);
-      out.push({ title: title, link: link, pubDate: pubDate, version: version, product: product, change: change, body: body, contentHtml: "", __hydrated: false });
+      out.push({ title: title, link: link, pubDate: pubDate, version: version, domain: domain, change: change, body: body, contentHtml: "", __hydrated: false });
     }
     return out;
   }
@@ -349,9 +349,9 @@ export const ChangelogTable = props => {
     out.sort(); return out;
   }, [items]);
 
-  var products = useMemo(function () {
+  var domains = useMemo(function () {
     var seen = {}; var out = [];
-    for (var i = 0; i < items.length; i++) { var v = safeText(items[i].product).trim(); if (v && !seen[v]) { seen[v] = true; out.push(v); } }
+    for (var i = 0; i < items.length; i++) { var v = safeText(items[i].domain).trim(); if (v && !seen[v]) { seen[v] = true; out.push(v); } }
     out.sort(); return out;
   }, [items]);
 
@@ -366,11 +366,11 @@ export const ChangelogTable = props => {
     for (var i = 0; i < items.length; i++) {
       var it = items[i]; if (!it) continue;
       if (versionF !== "all" && safeText(it.version) !== versionF) continue;
-      if (productF !== "all" && safeText(it.product) !== productF) continue;
+      if (domainF !== "all" && safeText(it.domain) !== domainF) continue;
       if (changeF !== "all" && safeText(it.change) !== changeF) continue;
       if (search) {
         var q = safeText(search).trim().toLowerCase();
-        var hay = (safeText(it.title) + " " + safeText(it.version) + " " + safeText(it.product) + " " + safeText(it.change) + " " + safeText(it.body) + " " + stripHtml(safeText(it.contentHtml))).toLowerCase();
+        var hay = (safeText(it.title) + " " + safeText(it.version) + " " + safeText(it.domain) + " " + safeText(it.change) + " " + safeText(it.body) + " " + stripHtml(safeText(it.contentHtml))).toLowerCase();
         if (hay.indexOf(q) === -1) continue;
       }
       result.push(it);
@@ -384,7 +384,7 @@ export const ChangelogTable = props => {
       return 0;
     });
     return result;
-  }, [items, versionF, productF, changeF, search, sortCol, sortDir]);
+  }, [items, versionF, domainF, changeF, search, sortCol, sortDir]);
 
   function toggleSort(col) {
     if (sortCol === col) { setSortDir(sortDir === "asc" ? "desc" : "asc"); }
@@ -401,19 +401,16 @@ export const ChangelogTable = props => {
     var fullHtml = safeText(it.contentHtml).trim();
     var fallback = safeText(it.body).trim();
 
-    // Not yet hydrated — show RSS body text or a loading indicator
+    var link = it.link ? <a href={safeText(it.link)} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 6, fontSize: 12, color: "#2563eb", fontWeight: 600, textDecoration: "none" }}>View full log →</a> : null;
+
     if (!it.__hydrated) {
-      if (fallback) return <span style={{ color: "#374151", fontSize: 13, lineHeight: 1.55 }}>{fallback}</span>;
-      return <span style={{ color: "#94a3b8", fontSize: 12 }}>Loading…</span>;
+      return <div>{fallback ? <span style={{ color: "#374151", fontSize: 13, lineHeight: 1.55 }}>{fallback}</span> : <span style={{ color: "#94a3b8", fontSize: 12 }}>Loading…</span>}{link}</div>;
     }
 
-    // Hydrated but empty
     if (!fullHtml) {
-      if (fallback) return <span style={{ color: "#374151", fontSize: 13, lineHeight: 1.55 }}>{fallback}</span>;
-      return <span style={{ color: "#94a3b8", fontSize: 12 }}>—</span>;
+      return <div>{fallback ? <span style={{ color: "#374151", fontSize: 13, lineHeight: 1.55 }}>{fallback}</span> : <span style={{ color: "#94a3b8", fontSize: 12 }}>—</span>}{link}</div>;
     }
 
-    // Check if content exceeds excerptMaxChars
     var fullText = stripHtml(fullHtml);
     var isTruncated = fullText.length > excerptMaxChars;
     var excerptText = isTruncated ? truncateText(fullText, excerptMaxChars) : fullText;
@@ -421,7 +418,7 @@ export const ChangelogTable = props => {
     return (
       <div>
         <div style={{ color: "#374151", fontSize: 13, lineHeight: 1.6 }}>{excerptText}</div>
-        {isTruncated && it.link ? <a href={safeText(it.link)} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 6, fontSize: 12, color: "#2563eb", fontWeight: 600, textDecoration: "none" }}>View full log →</a> : null}
+        {link}
       </div>
     );
   }
@@ -430,10 +427,10 @@ export const ChangelogTable = props => {
     <div style={{ width: "100%", fontFamily: "system-ui, sans-serif" }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16, alignItems: "center" }}>
         {showVersionCol && showVersionFilter ? <select value={versionF} onChange={function (e) { setVersionF(e.target.value); }} style={selectStyle}><option value="all">{versionLabel + " ⏷"}</option>{versions.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
-        {showDomainCol && showDomainFilter ? <select value={productF} onChange={function (e) { setProductF(e.target.value); }} style={selectStyle}><option value="all">{domainLabel + " ⏷"}</option>{products.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
+        {showDomainCol && showDomainFilter ? <select value={domainF} onChange={function (e) { setDomainF(e.target.value); }} style={selectStyle}><option value="all">{domainLabel + " ⏷"}</option>{domains.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
         {showChangeCol && showChangeFilter ? <select value={changeF} onChange={function (e) { setChangeF(e.target.value); }} style={selectStyle}><option value="all">{changeLabel + " ⏷"}</option>{changes.map(function (v) { return <option key={v} value={v}>{titleCase(v)}</option>; })}</select> : null}
         {showSearch ? <input value={search} onChange={function (e) { setSearch(e.target.value); }} placeholder="Search…" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 13, fontFamily: "inherit", color: "#374151", outline: "none", minWidth: 160, background: "#f8fafc", boxShadow: "0 1px 2px rgba(0,0,0,.04)" }} /> : null}
-        {(versionF !== "all" || productF !== "all" || changeF !== "all" || search) ? <button type="button" onClick={function () { setVersionF("all"); setProductF("all"); setChangeF("all"); setSearch(""); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,.04)" }}>Clear</button> : null}
+        {(versionF !== "all" || domainF !== "all" || changeF !== "all" || search) ? <button type="button" onClick={function () { setVersionF("all"); setDomainF("all"); setChangeF("all"); setSearch(""); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid #e2e8f0", background: "#fff", fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,.04)" }}>Clear</button> : null}
         <span style={{ marginLeft: "auto", fontSize: 12, color: "#94a3b8" }}>{loading ? "Loading…" : error ? "Error" : rows.length + " / " + items.length + " entries"}</span>
       </div>
 
@@ -444,7 +441,7 @@ export const ChangelogTable = props => {
           <thead>
             <tr>
               {showVersionCol ? <th style={thStyle} onClick={function () { toggleSort("version"); }}>{versionLabel}{sortCol === "version" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
-              {showDomainCol ? <th style={thStyle} onClick={function () { toggleSort("product"); }}>{domainLabel}{sortCol === "product" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
+              {showDomainCol ? <th style={thStyle} onClick={function () { toggleSort("domain"); }}>{domainLabel}{sortCol === "product" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
               {showChangeCol ? <th style={thStyle} onClick={function () { toggleSort("change"); }}>{changeLabel}{sortCol === "change" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
               {showDescriptionCol ? <th style={thStyle} onClick={function () { toggleSort("body"); }}>{descriptionLabel}{sortCol === "body" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
               {showDateCol ? <th style={thStyle} onClick={function () { toggleSort("pubDate"); }}>{dateLabel}{sortCol === "pubDate" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
@@ -457,7 +454,7 @@ export const ChangelogTable = props => {
               return (
                 <tr key={safeText(it.link) || String(idx)} style={{ background: idx % 2 === 0 ? "#fff" : "#fafbfc" }}>
                   {showVersionCol ? <td style={tdStyle}>{it.version ? <span style={{ display: "inline-block", padding: "2px 10px", borderRadius: 999, background: "#f1f5f9", border: "1px solid #e2e8f0", color: "#475569", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", letterSpacing: ".02em" }}>{it.version}</span> : <span style={{ color: "#cbd5e1" }}>—</span>}</td> : null}
-                  {showDomainCol ? <td style={tdStyle}><span style={{ color: "#475569", fontWeight: 500 }}>{it.product || <span style={{ color: "#cbd5e1" }}>—</span>}</span></td> : null}
+                  {showDomainCol ? <td style={tdStyle}><span style={{ color: "#475569", fontWeight: 500 }}>{it.domain || <span style={{ color: "#cbd5e1" }}>—</span>}</span></td> : null}
                   {showChangeCol ? <td style={tdStyle}>{it.change ? <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 4, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", background: badgeBg(it.change), color: "#fff", textTransform: "uppercase", whiteSpace: "nowrap" }}>{it.change}</span> : <span style={{ color: "#cbd5e1" }}>{"—"}</span>}</td> : null}
                   {showDescriptionCol ? <td style={{ padding: "12px 14px", verticalAlign: "top", borderBottom: "1px solid #f1f5f9" }}><DescriptionCell item={it} /></td> : null}
                   {showDateCol ? <td style={tdStyle}><span style={{ color: "#94a3b8", fontSize: 11, fontWeight: 500, whiteSpace: "nowrap", letterSpacing: ".02em" }}>{formatDate(it.pubDate)}</span></td> : null}
@@ -497,4 +494,4 @@ export const ChangelogMount = props => {
   changeLabel="Change"
   descriptionLabel="Description"
   dateLabel="Date"
-/>
+/> 
