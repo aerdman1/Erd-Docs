@@ -217,37 +217,37 @@ export const ChangelogTable = props => {
   return (
     <div style={{ width: "100%", fontFamily: "system-ui, sans-serif" }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16, alignItems: "center" }}>
-        {showVersionCol && showVersionFilter ? <select value={versionF} onChange={function (e) { setVersionF(e.target.value); }} style={selectStyle}><option value="all">{versionLabel + " \u25bd"}</option>{versions.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
-        {showDomainCol && showDomainFilter ? <select value={productF} onChange={function (e) { setProductF(e.target.value); }} style={selectStyle}><option value="all">{domainLabel + " \u25bd"}</option>{products.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
-        {showChangeCol && showChangeFilter ? <select value={changeF} onChange={function (e) { setChangeF(e.target.value); }} style={selectStyle}><option value="all">{changeLabel + " \u25bd"}</option>{changes.map(function (v) { return <option key={v} value={v}>{titleCase(v)}</option>; })}</select> : null}
-        {showSearch ? <input value={search} onChange={function (e) { setSearch(e.target.value); }} placeholder="Search\u2026" style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #d1d5db", fontSize: 13, fontFamily: "inherit", color: "#111827", outline: "none", minWidth: 160 }} /> : null}
+        {showVersionCol && showVersionFilter ? <select value={versionF} onChange={function (e) { setVersionF(e.target.value); }} style={selectStyle}><option value="all">{versionLabel + " ▽"}</option>{versions.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
+        {showDomainCol && showDomainFilter ? <select value={productF} onChange={function (e) { setProductF(e.target.value); }} style={selectStyle}><option value="all">{domainLabel + " ▽"}</option>{products.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
+        {showChangeCol && showChangeFilter ? <select value={changeF} onChange={function (e) { setChangeF(e.target.value); }} style={selectStyle}><option value="all">{changeLabel + " ▽"}</option>{changes.map(function (v) { return <option key={v} value={v}>{titleCase(v)}</option>; })}</select> : null}
+        {showSearch ? <input value={search} onChange={function (e) { setSearch(e.target.value); }} placeholder="Search…" style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #d1d5db", fontSize: 13, fontFamily: "inherit", color: "#111827", outline: "none", minWidth: 160 }} /> : null}
         {(versionF !== "all" || productF !== "all" || changeF !== "all" || search) ? <button type="button" onClick={function () { setVersionF("all"); setProductF("all"); setChangeF("all"); setSearch(""); }} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #d1d5db", background: "#fff", fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button> : null}
-        <span style={{ marginLeft: "auto", fontSize: 12, color: "#94a3b8" }}>{loading ? "Loading\u2026" : error ? "Error" : rows.length + " / " + items.length + " entries"}</span>
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "#94a3b8" }}>{loading ? "Loading…" : error ? "Error" : rows.length + " / " + items.length + " entries"}</span>
       </div>
 
-      {error ? <div style={{ padding: "12px 16px", borderRadius: 8, background: "#fef2f2", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, marginBottom: 12 }}>{"Couldn\u2019t load RSS: " + error}</div> : null}
+      {error ? <div style={{ padding: "12px 16px", borderRadius: 8, background: "#fef2f2", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, marginBottom: 12 }}>{"Couldn't load RSS: " + error}</div> : null}
 
       <div style={{ width: "100%", overflowX: "auto", borderRadius: 10, border: "1px solid #e2e8f0" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr>
-              {showVersionCol ? <th style={thStyle} onClick={function () { toggleSort("version"); }}>{versionLabel}{sortCol === "version" ? (sortDir === "asc" ? " \u25b2" : " \u25bc") : " \u25bd"}</th> : null}
-              {showDomainCol ? <th style={thStyle} onClick={function () { toggleSort("product"); }}>{domainLabel}{sortCol === "product" ? (sortDir === "asc" ? " \u25b2" : " \u25bc") : " \u25bd"}</th> : null}
-              {showChangeCol ? <th style={thStyle} onClick={function () { toggleSort("change"); }}>{changeLabel}{sortCol === "change" ? (sortDir === "asc" ? " \u25b2" : " \u25bc") : " \u25bd"}</th> : null}
-              {showDescriptionCol ? <th style={thStyle} onClick={function () { toggleSort("body"); }}>{descriptionLabel}{sortCol === "body" ? (sortDir === "asc" ? " \u25b2" : " \u25bc") : " \u25bd"}</th> : null}
-              {showDateCol ? <th style={thStyle} onClick={function () { toggleSort("pubDate"); }}>{dateLabel}{sortCol === "pubDate" ? (sortDir === "asc" ? " \u25b2" : " \u25bc") : " \u25bd"}</th> : null}
+              {showVersionCol ? <th style={thStyle} onClick={function () { toggleSort("version"); }}>{versionLabel}{sortCol === "version" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
+              {showDomainCol ? <th style={thStyle} onClick={function () { toggleSort("product"); }}>{domainLabel}{sortCol === "product" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
+              {showChangeCol ? <th style={thStyle} onClick={function () { toggleSort("change"); }}>{changeLabel}{sortCol === "change" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
+              {showDescriptionCol ? <th style={thStyle} onClick={function () { toggleSort("body"); }}>{descriptionLabel}{sortCol === "body" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
+              {showDateCol ? <th style={thStyle} onClick={function () { toggleSort("pubDate"); }}>{dateLabel}{sortCol === "pubDate" ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}</th> : null}
             </tr>
           </thead>
           <tbody>
-            {loading ? <tr><td colSpan={colCount} style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>{"Loading\u2026"}</td></tr> : null}
+            {loading ? <tr><td colSpan={colCount} style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>{"Loading…"}</td></tr> : null}
             {!loading && !error && rows.length === 0 ? <tr><td colSpan={colCount} style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>No entries match your filters.</td></tr> : null}
             {rows.map(function (it, idx) {
               return (
                 <tr key={safeText(it.link) || String(idx)} style={{ background: idx % 2 === 0 ? "#fff" : "#f8fafc" }}>
-                  {showVersionCol ? <td style={tdStyle}><span style={{ color: "#334155", fontWeight: 500, whiteSpace: "nowrap" }}>{it.version || "\u2014"}</span></td> : null}
-                  {showDomainCol ? <td style={tdStyle}><span style={{ color: "#334155" }}>{it.product || "\u2014"}</span></td> : null}
-                  {showChangeCol ? <td style={tdStyle}>{it.change ? <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 4, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", background: badgeBg(it.change), color: "#fff", textTransform: "uppercase", whiteSpace: "nowrap" }}>{it.change}</span> : <span style={{ color: "#cbd5e1" }}>{"\u2014"}</span>}</td> : null}
-                  {showDescriptionCol ? <td style={{ padding: "10px 14px", verticalAlign: "top", borderBottom: "1px solid #e2e8f0", color: "#374151", lineHeight: 1.55, maxWidth: 520 }}>{it.body ? it.body : (it.link ? <a href={safeText(it.link)} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", fontWeight: 600 }}>{safeText(it.title)}</a> : "\u2014")}</td> : null}
+                  {showVersionCol ? <td style={tdStyle}><span style={{ color: "#334155", fontWeight: 500, whiteSpace: "nowrap" }}>{it.version || "—"}</span></td> : null}
+                  {showDomainCol ? <td style={tdStyle}><span style={{ color: "#334155" }}>{it.product || "—"}</span></td> : null}
+                  {showChangeCol ? <td style={tdStyle}>{it.change ? <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 4, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", background: badgeBg(it.change), color: "#fff", textTransform: "uppercase", whiteSpace: "nowrap" }}>{it.change}</span> : <span style={{ color: "#cbd5e1" }}>{"—"}</span>}</td> : null}
+                  {showDescriptionCol ? <td style={{ padding: "10px 14px", verticalAlign: "top", borderBottom: "1px solid #e2e8f0", color: "#374151", lineHeight: 1.55, maxWidth: 520 }}>{it.body ? it.body : (it.link ? <a href={safeText(it.link)} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", fontWeight: 600 }}>{safeText(it.title)}</a> : "—")}</td> : null}
                   {showDateCol ? <td style={tdStyle}><span style={{ color: "#94a3b8", fontSize: 12, whiteSpace: "nowrap" }}>{formatDate(it.pubDate)}</span></td> : null}
                 </tr>
               );
@@ -266,7 +266,7 @@ export const ChangelogMount = props => {
 <ChangelogMount
   rssUrl="https://erdtest123.readme.io/changelog.rss"
   maxItems={200}
-  cacheMinutes={15}
+  cacheMinutes={0}
   fetchTimeoutMs={5000}
   showVersionCol={true}
   showDomainCol={true}
