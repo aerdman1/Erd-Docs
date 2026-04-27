@@ -1,7 +1,7 @@
 ---
 title: RSS Release Notes
 deprecated: false
-hidden: false
+hidden: true
 icon: far fa-arrows-maximize
 metadata:
   robots: index
