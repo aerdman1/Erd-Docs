@@ -142,7 +142,7 @@ export const ChangelogTable = props => {
     }
 
     var timer = window.setTimeout(function () { try { ac.abort(); } catch (e) {} }, fetchTimeoutMs);
-    fetch(rssUrl, { signal: ac.signal, cache: "default", credentials: "omit" })
+    fetch(rssUrl + (rssUrl.indexOf("?") === -1 ? "?" : "&") + "_t=" + Date.now(), { signal: ac.signal, cache: "no-store", credentials: "omit" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
       .then(function (xml) {
         window.clearTimeout(timer);
@@ -282,4 +282,4 @@ export const ChangelogMount = props => {
   changeLabel="Change"
   descriptionLabel="Description"
   dateLabel="Date"
-/> 
+/>
