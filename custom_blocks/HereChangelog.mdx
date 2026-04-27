@@ -8,6 +8,10 @@ export const ChangelogTable = props => {
   var maxItems = props && props.maxItems ? Number(props.maxItems) : 200;
   var cacheMinutes = props && props.cacheMinutes ? Number(props.cacheMinutes) : 0;
   var fetchTimeoutMs = props && props.fetchTimeoutMs ? Number(props.fetchTimeoutMs) : 5000;
+  var hydrateContent = props && typeof props.hydrateContent === "boolean" ? props.hydrateContent : true;
+  var hydrateMax = props && props.hydrateMax ? Number(props.hydrateMax) : 50;
+  var hydrateConcurrency = props && props.hydrateConcurrency ? Number(props.hydrateConcurrency) : 4;
+  var excerptMaxChars = props && props.excerptMaxChars ? Number(props.excerptMaxChars) : 400;
 
   // Column visibility
   var showVersionCol = props && typeof props.showVersionCol === "boolean" ? props.showVersionCol : true;
@@ -40,11 +44,11 @@ export const ChangelogTable = props => {
   var [sortDir, setSortDir] = useState("desc");
 
   var abortRef = useRef(null);
+  var hydrateAbortRef = useRef(null);
 
   function safeText(v) { if (v === null || v === undefined) return ""; return String(v); }
   function safeJsonParse(s) { try { return JSON.parse(s); } catch (e) { return null; } }
 
-  // Auto-detect RSS URL from ReadMe page meta tags
   function readMeta(name) { try { var el = document.querySelector("meta[name='" + String(name) + "']"); return el ? safeText(el.getAttribute("content")).trim() : ""; } catch (e) { return ""; } }
   function readSsrProp(name) { try { var el = document.getElementById("ssr-props"); if (!el || !el.textContent) return ""; var data = safeJsonParse(el.textContent); return data && data[name] ? safeText(data[name]).trim() : ""; } catch (e) { return ""; } }
   function detectProjectBasePath() { var bp = readMeta("readme-basepath-childProject"); if (bp) return "/" + bp.replace(/^\/+|\/+$/g, ""); var sb = readSsrProp("baseUrl"); if (sb && sb !== "/") return "/" + sb.replace(/^\/+|\/+$/g, ""); return ""; }
@@ -72,6 +76,8 @@ export const ChangelogTable = props => {
     s = s.replace(/<[^>]+>/g, " "); s = s.replace(/[ \t]{2,}/g, " ");
     return s.trim();
   }
+
+  function truncateText(s, n) { var t = safeText(s); if (t.length <= n) return t; return t.slice(0, n).trim() + "…"; }
 
   function extractToken(text, name) {
     var s = safeText(text); if (!s) return "";
@@ -111,6 +117,135 @@ export const ChangelogTable = props => {
     if (!el) return ""; var n = el.querySelector(sel); return n ? safeText(n.textContent).trim() : "";
   }
 
+  function canonicalizeLink(link) {
+    var s = safeText(link).trim(); if (!s) return "";
+    try { var u = new URL(s, window.location.origin); u.search = ""; u.hash = ""; return u.toString(); } catch (e) { return s.split("?")[0].split("#")[0]; }
+  }
+
+  function looksLikeReactShell(htmlText) {
+    var s = safeText(htmlText); if (!s) return false;
+    if (s.indexOf("useReactApp") !== -1 && s.indexOf("userLoggedIn") !== -1) return true;
+    if (s.indexOf("__NEXT_DATA__") !== -1 && s.indexOf("rm-Markdown") === -1 && s.indexOf("ChangelogPage_list-post") === -1) return true;
+    return false;
+  }
+
+  function sanitizeHtmlAllowTables(html) {
+    var allowed = { a: true, p: true, br: true, strong: true, em: true, b: true, i: true, code: true, pre: true, ul: true, ol: true, li: true, blockquote: true, h1: true, h2: true, h3: true, h4: true, h5: true, h6: true, hr: true, div: true, span: true, table: true, thead: true, tbody: true, tfoot: true, tr: true, th: true, td: true };
+    var doc = new DOMParser().parseFromString("<div>" + safeText(html) + "</div>", "text/html");
+    var root = doc.body && doc.body.firstChild ? doc.body.firstChild : null; if (!root) return "";
+    function cleanEl(el) {
+      if (!el || el.nodeType !== 1) return;
+      var tag = (el.tagName || "").toLowerCase();
+      if (tag === "script" || tag === "style" || tag === "iframe" || tag === "object" || tag === "embed") { el.parentNode && el.parentNode.removeChild(el); return; }
+      if (!allowed[tag]) { var parent = el.parentNode; if (!parent) return; while (el.firstChild) parent.insertBefore(el.firstChild, el); parent.removeChild(el); return; }
+      var attrs = el.attributes ? Array.prototype.slice.call(el.attributes) : [];
+      for (var i = 0; i < attrs.length; i++) {
+        var nm = attrs[i].name;
+        if (/^on/i.test(nm) || nm === "style") { el.removeAttribute(nm); continue; }
+        if ((tag === "td" || tag === "th") && (nm === "colspan" || nm === "rowspan")) continue;
+        if (nm === "class") continue;
+        if (tag === "a") { if (nm === "href" || nm === "target" || nm === "rel") continue; el.removeAttribute(nm); continue; }
+        el.removeAttribute(nm);
+      }
+      if (tag === "a") {
+        var href = safeText(el.getAttribute("href")).trim(); if (/^javascript:/i.test(href)) el.removeAttribute("href");
+        var tgt = safeText(el.getAttribute("target")).trim();
+        if (tgt === "_blank") { var rel = safeText(el.getAttribute("rel")).trim(); if (!rel || rel.indexOf("noopener") === -1) el.setAttribute("rel", "noopener noreferrer"); }
+      }
+      var kids = el.childNodes ? Array.prototype.slice.call(el.childNodes) : [];
+      for (var k = 0; k < kids.length; k++) { if (kids[k] && kids[k].nodeType === 1) cleanEl(kids[k]); }
+    }
+    cleanEl(root);
+    var out = safeText(root.innerHTML).trim(); if (out.length > 70000) out = out.slice(0, 70000);
+    return out;
+  }
+
+  function bestHtmlFromNextData(doc) {
+    try {
+      var nd = doc.getElementById("__NEXT_DATA__"); if (!nd || !nd.textContent) return "";
+      var data = safeJsonParse(nd.textContent); if (!data) return "";
+      var best = { score: 0, html: "" };
+      function scoreString(s) {
+        var x = safeText(s); if (!x || x.indexOf("<") === -1) return 0;
+        var score = 0;
+        if (x.indexOf("<p") !== -1) score += 6; if (x.indexOf("<h1") !== -1 || x.indexOf("<h2") !== -1 || x.indexOf("<h3") !== -1) score += 6;
+        if (x.indexOf("<ul") !== -1 || x.indexOf("<ol") !== -1) score += 4; if (x.indexOf("<table") !== -1) score += 6; if (x.indexOf("rm-Markdown") !== -1) score += 8;
+        var len = x.length; if (len > 200 && len < 120000) score += Math.min(20, Math.floor(len / 2000));
+        return score;
+      }
+      function walk(v, depth) {
+        if (depth > 12 || v === null || v === undefined) return;
+        if (typeof v === "string") { var sc = scoreString(v); if (sc > best.score) { best.score = sc; best.html = v; } return; }
+        if (typeof v !== "object") return;
+        var keys = Array.isArray(v) ? v.map(function (_, i) { return i; }) : Object.keys(v);
+        for (var k = 0; k < keys.length; k++) walk(v[keys[k]], depth + 1);
+      }
+      walk(data, 0);
+      return (best && best.html && best.score >= 6) ? safeText(best.html) : "";
+    } catch (e) { return ""; }
+  }
+
+  function extractExcerptFromHtml(htmlText) {
+    var doc = new DOMParser().parseFromString(safeText(htmlText), "text/html");
+    var md = doc.querySelector('.rm-Markdown[data-testid="RDMD"]') || doc.querySelector(".rm-Markdown");
+    if (md) {
+      var styleEls = md.querySelectorAll ? md.querySelectorAll("style") : [];
+      for (var i = 0; i < styleEls.length; i++) { try { styleEls[i].parentNode && styleEls[i].parentNode.removeChild(styleEls[i]); } catch (e) {} }
+      return sanitizeHtmlAllowTables(stripMetaTokens(md.innerHTML));
+    }
+    var ndHtml = bestHtmlFromNextData(doc); if (ndHtml) return sanitizeHtmlAllowTables(stripMetaTokens(ndHtml));
+    var post = doc.querySelector(".ChangelogPage_list-post") || doc.querySelector(".rm-Changelog-post") || doc.querySelector("[data-testid='changelog-post']") || doc.querySelector("article") || doc.querySelector("main");
+    if (post) return sanitizeHtmlAllowTables(stripMetaTokens(post.innerHTML));
+    return "";
+  }
+
+  function readLocal(key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } }
+  function writeLocal(key, value) { try { window.localStorage.setItem(key, value); } catch (e) {} }
+
+  function fetchOnce(url, signal) {
+    return fetch(url, { method: "GET", signal: signal, credentials: "omit", cache: "default", redirect: "follow" })
+      .then(function (r) { if (!r || !r.ok) throw new Error("HTTP " + (r ? r.status : "?")); return r.text(); });
+  }
+
+  function fetchWithTimeout(url, signal, ms) {
+    var local = new AbortController(); var timer = null;
+    function onAbort() { try { local.abort(); } catch (e) {} }
+    try { if (signal && signal.addEventListener) signal.addEventListener("abort", onAbort, { once: true }); } catch (e) {}
+    timer = window.setTimeout(function () { try { local.abort(); } catch (e) {} }, ms);
+    return fetchOnce(url, local.signal)
+      .then(function (txt) { window.clearTimeout(timer); return txt; })
+      .catch(function (err) { window.clearTimeout(timer); throw err; });
+  }
+
+  function fetchAndExtractExcerpt(link, signal) {
+    var url = canonicalizeLink(link); if (!url) return Promise.resolve("");
+    var ck = "rmCLExcerpt_v1__" + url;
+    var cached = safeJsonParse(readLocal(ck));
+    if (cached && cached.html && cached.ts) return Promise.resolve(String(cached.html));
+    return fetchWithTimeout(url, signal, fetchTimeoutMs)
+      .then(function (htmlText) {
+        if (looksLikeReactShell(htmlText)) return fetchOnce(url, signal).catch(function () { return htmlText; });
+        return htmlText;
+      })
+      .then(function (htmlText2) {
+        var html = extractExcerptFromHtml(htmlText2);
+        if (html) writeLocal(ck, JSON.stringify({ ts: Date.now(), html: html }));
+        return html;
+      })
+      .catch(function () { return ""; });
+  }
+
+  function runWithLimit(tasks, limit) {
+    var idx = 0; var results = new Array(tasks.length);
+    function worker() {
+      if (idx >= tasks.length) return Promise.resolve(); var my = idx++;
+      return Promise.resolve().then(tasks[my]).then(function (r) { results[my] = r; }).catch(function () { results[my] = ""; }).then(worker);
+    }
+    var pool = []; var n = Math.max(1, Math.min(limit || 1, tasks.length));
+    for (var i = 0; i < n; i++) pool.push(worker());
+    return Promise.all(pool).then(function () { return results; });
+  }
+
   function parseRss(xmlText) {
     var parser = new DOMParser(); var doc = parser.parseFromString(xmlText, "text/xml");
     var pe = doc.getElementsByTagName("parsererror"); if (pe && pe.length) return [];
@@ -127,25 +262,22 @@ export const ChangelogTable = props => {
       var product = extractToken(descText, "product") || extractToken(title, "product");
       var change = normalizeType(extractToken(descText, "change") || extractToken(descText, "type") || firstChildText(it, "type"));
       var body = stripMetaTokens(descText);
-      out.push({ title: title, link: link, pubDate: pubDate, version: version, product: product, change: change, body: body });
+      out.push({ title: title, link: link, pubDate: pubDate, version: version, product: product, change: change, body: body, contentHtml: "", __hydrated: false });
     }
     return out;
   }
 
-  function readLocal(key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } }
-  function writeLocal(key, value) { try { window.localStorage.setItem(key, value); } catch (e) {} }
-
-  // Build a cache-busted RSS URL — rounded to the nearest minute so it stays
-  // stable within a single page session but always fetches fresh on a new load
   function bustUrl(url) {
     var sep = url.indexOf("?") === -1 ? "?" : "&";
     return url + sep + "_cb=" + Math.floor(Date.now() / 60000);
   }
 
+  // ── Fetch RSS ──
   useEffect(function () {
     if (typeof window === "undefined") return;
     setLoading(true); setError("");
     try { if (abortRef.current) abortRef.current.abort(); } catch (e) {}
+    try { if (hydrateAbortRef.current) hydrateAbortRef.current.abort(); } catch (e) {}
     var ac = new AbortController(); abortRef.current = ac;
 
     var ck = "rmCLTable_v1__" + rssUrl;
@@ -174,6 +306,43 @@ export const ChangelogTable = props => {
     return function () { try { ac.abort(); } catch (e) {} };
   }, [rssUrl, maxItems, cacheMinutes, fetchTimeoutMs]);
 
+  // ── Hydrate content from permalinks ──
+  useEffect(function () {
+    if (typeof window === "undefined") return;
+    if (!hydrateContent) return;
+    if (loading || error) return;
+    if (!items || !items.length) return;
+
+    var toHydrate = [];
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (!it || !it.link || it.__hydrated) continue;
+      toHydrate.push({ idx: i, link: it.link });
+      if (toHydrate.length >= hydrateMax) break;
+    }
+    if (!toHydrate.length) return;
+
+    try { if (hydrateAbortRef.current) hydrateAbortRef.current.abort(); } catch (e) {}
+    var ac = new AbortController(); hydrateAbortRef.current = ac;
+
+    runWithLimit(
+      toHydrate.map(function (x) { return function () { return fetchAndExtractExcerpt(x.link, ac.signal); }; }),
+      hydrateConcurrency
+    ).then(function (results) {
+      setItems(function (prev) {
+        var next = prev.slice(0);
+        for (var j = 0; j < toHydrate.length; j++) {
+          var target = toHydrate[j]; if (!target) continue;
+          var cur = next[target.idx]; if (!cur) continue;
+          next[target.idx] = Object.assign({}, cur, { contentHtml: safeText(results[j]), __hydrated: true });
+        }
+        return next;
+      });
+    });
+
+    return function () { try { ac.abort(); } catch (e) {} };
+  }, [loading, error, items, hydrateContent, hydrateMax, hydrateConcurrency, fetchTimeoutMs]);
+
   var versions = useMemo(function () {
     var seen = {}; var out = [];
     for (var i = 0; i < items.length; i++) { var v = safeText(items[i].version).trim(); if (v && !seen[v]) { seen[v] = true; out.push(v); } }
@@ -201,7 +370,7 @@ export const ChangelogTable = props => {
       if (changeF !== "all" && safeText(it.change) !== changeF) continue;
       if (search) {
         var q = safeText(search).trim().toLowerCase();
-        var hay = (safeText(it.title) + " " + safeText(it.version) + " " + safeText(it.product) + " " + safeText(it.change) + " " + safeText(it.body)).toLowerCase();
+        var hay = (safeText(it.title) + " " + safeText(it.version) + " " + safeText(it.product) + " " + safeText(it.change) + " " + safeText(it.body) + " " + stripHtml(safeText(it.contentHtml))).toLowerCase();
         if (hay.indexOf(q) === -1) continue;
       }
       result.push(it);
@@ -223,10 +392,39 @@ export const ChangelogTable = props => {
   }
 
   var colCount = (showVersionCol ? 1 : 0) + (showDomainCol ? 1 : 0) + (showChangeCol ? 1 : 0) + (showDescriptionCol ? 1 : 0) + (showDateCol ? 1 : 0);
-
   var selectStyle = { padding: "6px 28px 6px 10px", borderRadius: 6, border: "1px solid #d1d5db", background: "#fff", fontSize: 13, color: "#111827", appearance: "none", WebkitAppearance: "none", cursor: "pointer", fontFamily: "inherit" };
   var thStyle = { padding: "10px 14px", textAlign: "left", fontWeight: 700, fontSize: 13, color: "#1e293b", background: "#f1f5f9", borderBottom: "2px solid #e2e8f0", cursor: "pointer", userSelect: "none", whiteSpace: "nowrap" };
   var tdStyle = { padding: "10px 14px", verticalAlign: "top", borderBottom: "1px solid #e2e8f0" };
+
+  function DescriptionCell(p) {
+    var it = p.item;
+    var fullHtml = safeText(it.contentHtml).trim();
+    var fallback = safeText(it.body).trim();
+
+    // Not yet hydrated — show RSS body text or a loading indicator
+    if (!it.__hydrated) {
+      if (fallback) return <span style={{ color: "#374151", fontSize: 13, lineHeight: 1.55 }}>{fallback}</span>;
+      return <span style={{ color: "#94a3b8", fontSize: 12 }}>Loading…</span>;
+    }
+
+    // Hydrated but empty
+    if (!fullHtml) {
+      if (fallback) return <span style={{ color: "#374151", fontSize: 13, lineHeight: 1.55 }}>{fallback}</span>;
+      return <span style={{ color: "#94a3b8", fontSize: 12 }}>—</span>;
+    }
+
+    // Check if content exceeds excerptMaxChars
+    var fullText = stripHtml(fullHtml);
+    var isTruncated = fullText.length > excerptMaxChars;
+    var excerptText = isTruncated ? truncateText(fullText, excerptMaxChars) : fullText;
+
+    return (
+      <div>
+        <div style={{ color: "#374151", fontSize: 13, lineHeight: 1.6 }}>{excerptText}</div>
+        {isTruncated && it.link ? <a href={safeText(it.link)} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", marginTop: 6, fontSize: 12, color: "#2563eb", fontWeight: 600, textDecoration: "none" }}>View full log →</a> : null}
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: "100%", fontFamily: "system-ui, sans-serif" }}>
@@ -261,7 +459,7 @@ export const ChangelogTable = props => {
                   {showVersionCol ? <td style={tdStyle}><span style={{ color: "#334155", fontWeight: 500, whiteSpace: "nowrap" }}>{it.version || "—"}</span></td> : null}
                   {showDomainCol ? <td style={tdStyle}><span style={{ color: "#334155" }}>{it.product || "—"}</span></td> : null}
                   {showChangeCol ? <td style={tdStyle}>{it.change ? <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 4, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", background: badgeBg(it.change), color: "#fff", textTransform: "uppercase", whiteSpace: "nowrap" }}>{it.change}</span> : <span style={{ color: "#cbd5e1" }}>{"—"}</span>}</td> : null}
-                  {showDescriptionCol ? <td style={{ padding: "10px 14px", verticalAlign: "top", borderBottom: "1px solid #e2e8f0", color: "#374151", lineHeight: 1.55, maxWidth: 520 }}>{it.body ? it.body : (it.link ? <a href={safeText(it.link)} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", fontWeight: 600 }}>{safeText(it.title)}</a> : "—")}</td> : null}
+                  {showDescriptionCol ? <td style={{ padding: "10px 14px", verticalAlign: "top", borderBottom: "1px solid #e2e8f0" }}><DescriptionCell item={it} /></td> : null}
                   {showDateCol ? <td style={tdStyle}><span style={{ color: "#94a3b8", fontSize: 12, whiteSpace: "nowrap" }}>{formatDate(it.pubDate)}</span></td> : null}
                 </tr>
               );
@@ -281,6 +479,10 @@ export const ChangelogMount = props => {
   maxItems={200}
   cacheMinutes={0}
   fetchTimeoutMs={5000}
+  hydrateContent={true}
+  hydrateMax={50}
+  hydrateConcurrency={4}
+  excerptMaxChars={400}
   showVersionCol={true}
   showDomainCol={true}
   showChangeCol={true}
@@ -295,4 +497,4 @@ export const ChangelogMount = props => {
   changeLabel="Change"
   descriptionLabel="Description"
   dateLabel="Date"
-/>
+/> 
