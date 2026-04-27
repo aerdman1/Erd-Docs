@@ -3,191 +3,26 @@ name: HereChangelog
 ---
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-export const ChangelogGlobal = props => {
-  // -----------------------------
-  // Props + defaults
-  // -----------------------------
-  var rssUrl = props && props.rssUrl ? String(props.rssUrl) : detectDefaultRssUrl();
+export const ChangelogTable = props => {
+  var rssUrl = props && props.rssUrl ? String(props.rssUrl) : "/changelog.rss";
   var maxItems = props && props.maxItems ? Number(props.maxItems) : 200;
-  var cacheMinutes = props && props.cacheMinutes ? Number(props.cacheMinutes) : 5;
-  var preconnectRss = props && typeof props.preconnectRss === "boolean" ? props.preconnectRss : true;
-
-  // PERF FIX #1: timeout tightened from 12000 → 5000ms
+  var cacheMinutes = props && props.cacheMinutes ? Number(props.cacheMinutes) : 15;
   var fetchTimeoutMs = props && props.fetchTimeoutMs ? Number(props.fetchTimeoutMs) : 5000;
 
-  var showSearch = props && typeof props.showSearch === "boolean" ? props.showSearch : true;
-  var showSort = props && typeof props.showSort === "boolean" ? props.showSort : true;
-  var showAuthorFilter = props && typeof props.showAuthorFilter === "boolean" ? props.showAuthorFilter : true;
-  var showTypeFilter = props && typeof props.showTypeFilter === "boolean" ? props.showTypeFilter : true;
-  var showDescriptions = props && typeof props.showDescriptions === "boolean" ? props.showDescriptions : false;
-  var showTitles = props && typeof props.showTitles === "boolean" ? props.showTitles : true;
-  var showPreview = props && typeof props.showPreview === "boolean" ? props.showPreview : false;
-  var previewMaxChars = props && props.previewMaxChars ? Number(props.previewMaxChars) : 280;
-  var showSeeMore = props && typeof props.showSeeMore === "boolean" ? props.showSeeMore : true;
-  var showProductFilter = props && typeof props.showProductFilter === "boolean" ? props.showProductFilter : false;
-  var showVersionFilter = props && typeof props.showVersionFilter === "boolean" ? props.showVersionFilter : false;
-  var showVersionOnCards = props && typeof props.showVersionOnCards === "boolean" ? props.showVersionOnCards : false;
-  var defaultProduct = props && props.defaultProduct ? String(props.defaultProduct) : "all";
-  var defaultVersion = props && props.defaultVersion ? String(props.defaultVersion) : "all";
-  var lockedProduct = props && typeof props.lockedProduct === "string" ? String(props.lockedProduct) : "";
-  var lockedVersion = props && typeof props.lockedVersion === "string" ? String(props.lockedVersion) : "";
-  var cardsPerRow = props && props.cardsPerRow ? Number(props.cardsPerRow) : 2;
-  var defaultType = props && props.defaultType ? String(props.defaultType) : "all";
-  var treatMissingTypeAs = props && typeof props.treatMissingTypeAs === "string" ? String(props.treatMissingTypeAs) : "none";
-  var hydrateFromPermalink = props && typeof props.hydrateFromPermalink === "boolean" ? props.hydrateFromPermalink : true;
-
-  // PERF FIX #2: hydrateMax/hydrateConcurrency have sane defaults (usage was 9999/9999)
-  var hydrateMax = props && props.hydrateMax ? Number(props.hydrateMax) : 20;
-  var hydrateConcurrency = props && props.hydrateConcurrency ? Number(props.hydrateConcurrency) : 4;
-
-  var minExcerptChars = props && props.minExcerptChars ? Number(props.minExcerptChars) : 120;
-  var excerptMaxChars = props && props.excerptMaxChars ? Number(props.excerptMaxChars) : 900;
-  var enableModal = props && typeof props.enableModal === "boolean" ? props.enableModal : true;
-  var modalContentSelector = props && typeof props.modalContentSelector === "string" ? String(props.modalContentSelector) : ".ChangelogPage_list-post";
-  var modalMaxWidth = props && props.modalMaxWidth ? Number(props.modalMaxWidth) : 980;
-  var showToc = props && typeof props.showToc === "boolean" ? props.showToc : true;
-  var tocTitle = props && typeof props.tocTitle === "string" ? String(props.tocTitle) : "All changelogs";
-  var tocMaxHeightVh = props && props.tocMaxHeightVh ? Number(props.tocMaxHeightVh) : 72;
-  var initialRenderCount = props && props.initialRenderCount ? Number(props.initialRenderCount) : 10;
-  var renderBatchSize = props && props.renderBatchSize ? Number(props.renderBatchSize) : 10;
-
-  // PERF FIX #3: renderIdleTimeoutMs reduced from 650 → 100ms
-  var renderIdleTimeoutMs = props && props.renderIdleTimeoutMs ? Number(props.renderIdleTimeoutMs) : 100;
-
-  var autoLoadMore = props && typeof props.autoLoadMore === "boolean" ? props.autoLoadMore : true;
-  var rewriteVersionedChangelogLinks = props && typeof props.rewriteVersionedChangelogLinks === "boolean" ? props.rewriteVersionedChangelogLinks : true;
-  var stripQueryParamsForPostFetch = props && typeof props.stripQueryParamsForPostFetch === "boolean" ? props.stripQueryParamsForPostFetch : true;
-  var fallbackToIframeInModal = props && typeof props.fallbackToIframeInModal === "boolean" ? props.fallbackToIframeInModal : true;
-  var preferApiNextForModal = props && typeof props.preferApiNextForModal === "boolean" ? props.preferApiNextForModal : true;
-
-  // PERF FIX #4: modalCacheMinutes defaults to 15 (was 0 = never cache modals, refetched every open)
-  var modalCacheMinutes = props && props.modalCacheMinutes != null ? Number(props.modalCacheMinutes) : 15;
-
-  var preferRenderedHtmlForModal = props && typeof props.preferRenderedHtmlForModal === "boolean" ? props.preferRenderedHtmlForModal : true;
-  var apiProjectSlug = props && typeof props.apiProjectSlug === "string" ? String(props.apiProjectSlug) : "";
-  var apiNextChangelogPath = props && typeof props.apiNextChangelogPath === "string" ? String(props.apiNextChangelogPath) : "/api-next/v2/changelogs/";
-
-  // -----------------------------
-  // State
-  // -----------------------------
   var [items, setItems] = useState([]);
   var [loading, setLoading] = useState(true);
-  var [refreshing, setRefreshing] = useState(false);
   var [error, setError] = useState("");
-  var [typeFilter, setTypeFilter] = useState(defaultType);
-  var [productFilter, setProductFilter] = useState(lockedProduct ? lockedProduct : defaultProduct);
-  var [versionFilter, setVersionFilter] = useState(lockedVersion ? lockedVersion : defaultVersion);
+  var [versionF, setVersionF] = useState("all");
+  var [productF, setProductF] = useState("all");
+  var [changeF, setChangeF] = useState("all");
   var [search, setSearch] = useState("");
-  var [author, setAuthor] = useState("");
-  var [sort, setSort] = useState("newest");
-  var [renderCount, setRenderCount] = useState(initialRenderCount);
-  var [modalOpen, setModalOpen] = useState(false);
-  var [modalLoading, setModalLoading] = useState(false);
-  var [modalError, setModalError] = useState("");
-  var [modalHtml, setModalHtml] = useState("");
-  var [modalTitle, setModalTitle] = useState("");
-  var [modalHref, setModalHref] = useState("");
-  var [modalMode, setModalMode] = useState("html");
+  var [sortCol, setSortCol] = useState("pubDate");
+  var [sortDir, setSortDir] = useState("desc");
 
   var abortRef = useRef(null);
-  var hydrateAbortRef = useRef(null);
-  var modalAbortRef = useRef(null);
-  var modalFrameRef = useRef(null);
 
-  useEffect(() => { if (lockedProduct) setProductFilter(lockedProduct); }, [lockedProduct]);
-  useEffect(() => { if (lockedVersion) setVersionFilter(lockedVersion); }, [lockedVersion]);
-
-  // PERF: stable style objects built once
-  var stylesRef = useRef(null);
-  if (!stylesRef.current) {
-    stylesRef.current = {
-      barStyle: { display: "flex", flexWrap: "wrap", gap: 10, alignItems: "flex-end", padding: "12px 12px", borderRadius: 12, border: "1px solid var(--color-border-default, rgba(0,0,0,.12))", background: "var(--color-bg-muted, rgba(0,0,0,.03))", marginBottom: 14 },
-      groupStyle: { display: "flex", flexDirection: "column", gap: 6, minWidth: 180 },
-      labelStyle: { fontSize: 12, fontWeight: 700, opacity: 0.75 },
-      controlStyle: { height: 34, padding: "6px 10px", borderRadius: 10, border: "1px solid var(--color-border-default, rgba(0,0,0,.12))", background: "var(--color-bg-page, #fff)", color: "var(--color-text-default, #000)", fontSize: 13, outline: "none" },
-      metaStyle: { marginLeft: "auto", fontSize: 12, opacity: 0.7, paddingBottom: 6 },
-      cardStyle: { border: "1px solid var(--color-border-default, rgba(0,0,0,.12))", background: "var(--color-bg-page, #fff)", borderRadius: 14, padding: "14px 14px", boxShadow: "0 6px 18px rgba(0,0,0,.05)" }
-    };
-  }
-
-  var styleTextRef = useRef("");
-  if (!styleTextRef.current) {
-    styleTextRef.current =
-      ".rmChangelogFeed select{ -webkit-appearance:none; appearance:none; }\n" +
-      ".rmChangelogFeed__layout{ display:block; }\n" +
-      ".rmChangelogFeed__list{ display:grid; grid-template-columns:repeat(var(--rmChangelogFeedColumns, 2), minmax(0, 1fr)); gap:12px; }\n" +
-      "@media (max-width:980px){ .rmChangelogFeed__list{ grid-template-columns:1fr; } }\n" +
-      ".rmChangelogFeed__excerpt p{ margin:0.5rem 0; }\n" +
-      ".rmChangelogFeed__excerpt ul,.rmChangelogFeed__excerpt ol{ margin:0.5rem 0 0.5rem 1.1rem; padding:0; }\n" +
-      ".rmChangelogFeed__excerpt li{ margin:0.2rem 0; }\n" +
-      ".rmChangelogFeed__excerpt h1,.rmChangelogFeed__excerpt h2,.rmChangelogFeed__excerpt h3,.rmChangelogFeed__excerpt h4{ margin:0.8rem 0 0.35rem; line-height:1.25; font-weight:900; font-size:1.02rem; }\n" +
-      ".rmChangelogFeed__excerpt a{ color:var(--color-text-link, #1f78ff); text-decoration:underline; text-underline-offset:2px; }\n" +
-      ".rmChangelogFeed__tableWrap{ width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0.6rem 0; border:1px solid var(--color-border-default, rgba(0,0,0,.12)); border-radius:10px; background:var(--color-bg-page, #fff); }\n" +
-      ".rmChangelogFeed__tableWrap table{ width:100%; border-collapse:collapse; min-width:520px; }\n" +
-      ".rmChangelogFeed__tableWrap th,.rmChangelogFeed__tableWrap td{ padding:10px 12px; vertical-align:top; border-bottom:1px solid var(--color-border-default, rgba(0,0,0,.10)); font-size:0.92rem; line-height:1.35; }\n" +
-      ".rmChangelogFeed__tableWrap th{ font-weight:900; background:var(--color-bg-muted, rgba(0,0,0,.03)); }\n" +
-      ".rmChangelogFeed__tableWrap tr:last-child td{ border-bottom:none; }\n" +
-      ".rmChangelogFeed__modalOverlay{ position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:2147483000; display:flex; align-items:center; justify-content:center; padding:18px; }\n" +
-      ".rmChangelogFeed__modal{ width:100%; max-width: var(--rmChangelogFeedModalMaxWidth, 980px); max-height:90vh; background:var(--color-bg-page, #fff); border:1px solid var(--color-border-default, rgba(0,0,0,.18)); border-radius:16px; box-shadow:0 22px 60px rgba(0,0,0,.25); overflow:hidden; display:flex; flex-direction:column; }\n" +
-      ".rmChangelogFeed__modalHeader{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; border-bottom:1px solid var(--color-border-default, rgba(0,0,0,.12)); background:var(--color-bg-muted, rgba(0,0,0,.03)); }\n" +
-      ".rmChangelogFeed__modalTitle{ font-weight:900; font-size:16px; line-height:1.2; margin:0; }\n" +
-      ".rmChangelogFeed__modalActions{ display:flex; gap:10px; align-items:center; }\n" +
-      ".rmChangelogFeed__modalBtn{ height:32px; padding:0 10px; border-radius:10px; border:1px solid var(--color-border-default, rgba(0,0,0,.18)); background:var(--color-bg-page, #fff); cursor:pointer; font-weight:900; }\n" +
-      ".rmChangelogFeed__modalBody{ padding:16px; overflow:auto; }\n" +
-      ".rmChangelogFeed__modalBody a{ color:var(--color-text-link, #1f78ff); text-decoration:underline; text-underline-offset:2px; }\n";
-  }
-
-  // -----------------------------
-  // Helpers (identical to original)
-  // -----------------------------
   function safeText(v) { if (v === null || v === undefined) return ""; return String(v); }
   function safeJsonParse(s) { try { return JSON.parse(s); } catch (e) { return null; } }
-
-  function absolutizeUrlMaybe(u) {
-    var s = safeText(u).trim(); if (!s) return "";
-    try { return new URL(s, window.location.origin).href; } catch (e) { return s; }
-  }
-
-  function normalizeChangelogLinkMaybe(link) {
-    var s = safeText(link).trim(); if (!s) return "";
-    s = absolutizeUrlMaybe(s);
-    if (!rewriteVersionedChangelogLinks) return s;
-    var re = /\/v\d+(?:\.\d+)*\/changelog(\/|$)/i;
-    try { var u = new URL(s, window.location.origin); u.pathname = safeText(u.pathname).replace(re, "/changelog$1"); return u.toString(); }
-    catch (e2) { return s.replace(re, "/changelog$1"); }
-  }
-
-  function canonicalizeForFetch(link) {
-    var href = normalizeChangelogLinkMaybe(link); if (!href) return "";
-    try {
-      var u = new URL(href, window.location.origin);
-      if (stripQueryParamsForPostFetch) { u.search = ""; u.hash = ""; }
-      return u.toString();
-    } catch (e) {
-      if (!stripQueryParamsForPostFetch) return href;
-      return href.split("#")[0].split("?")[0];
-    }
-  }
-
-  function stripHtml(html) {
-    var s = safeText(html);
-    s = s.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
-    s = s.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "");
-    s = s.replace(/<br\s*\/?>/gi, "\n"); s = s.replace(/<\/p\s*>/gi, "\n\n");
-    s = s.replace(/<\/div\s*>/gi, "\n"); s = s.replace(/<\/li\s*>/gi, "\n");
-    s = s.replace(/<\/h[1-6]\s*>/gi, "\n\n"); s = s.replace(/<hr\s*\/?>/gi, "\n\n");
-    s = s.replace(/<\/?[^>]+>/g, " "); s = s.replace(/[ \t]+\n/g, "\n");
-    s = s.replace(/\n{3,}/g, "\n\n"); s = s.replace(/[ \t]{2,}/g, " ");
-    return s.trim();
-  }
-
-  function firstChildText(el, selectors) {
-    if (!el) return "";
-    for (var i = 0; i < selectors.length; i++) { var node = el.querySelector(selectors[i]); if (node && node.textContent) return String(node.textContent).trim(); }
-    return "";
-  }
-
-  function parsePubDate(s) { var v = safeText(s).trim(); if (!v) return null; var d = new Date(v); if (isNaN(d.getTime())) return null; return d; }
 
   function coerceDate(v) {
     if (!v) return null;
@@ -203,910 +38,235 @@ export const ChangelogGlobal = props => {
     catch (e) { return dd.toDateString(); }
   }
 
-  function titleCase(s) {
-    var t = safeText(s).trim(); if (!t) return "";
-    return t.split(/[\s_-]+/).filter(Boolean).map(function (w) { return w ? w.charAt(0).toUpperCase() + w.slice(1) : ""; }).join(" ");
+  function stripHtml(html) {
+    var s = safeText(html);
+    s = s.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+    s = s.replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "");
+    s = s.replace(/<br\s*\/?>/gi, " "); s = s.replace(/<\/p\s*>/gi, " ");
+    s = s.replace(/<[^>]+>/g, " "); s = s.replace(/[ \t]{2,}/g, " ");
+    return s.trim();
   }
 
-  function normalizeTypeRaw(rawType) {
-    var t = safeText(rawType).trim().toLowerCase(); if (!t) return { key: "", label: "" };
-    if (t === "improved") t = "changed";
-    if (t === "knownissue" || t === "known_issue" || t === "known-issue") t = "known issue";
-    return { key: t, label: titleCase(t) };
-  }
-
-  function normalizeMetaRaw(raw) { var t = safeText(raw).trim(); if (!t) return { key: "", label: "" }; return { key: t.toLowerCase(), label: t }; }
-
-  function getCategoriesFromItem(itemEl) {
-    var out = []; var cats = itemEl ? itemEl.querySelectorAll("category") : null;
-    if (!cats || !cats.length) return out;
-    for (var i = 0; i < cats.length; i++) { var v = cats[i] && cats[i].textContent ? String(cats[i].textContent).trim() : ""; if (v) out.push(v); }
-    return out;
-  }
-
-  function normalizeTypeKeyOnly(rawType) {
-    var t = safeText(rawType).trim().toLowerCase(); if (!t) return "";
-    if (t === "improved") t = "changed";
-    if (t === "knownissue" || t === "known_issue" || t === "known-issue") t = "known issue";
-    return t;
-  }
-
-  function isKnownTypeKey(rawType) {
-    var t = normalizeTypeKeyOnly(rawType); if (!t) return false;
-    return t === "added" || t === "fixed" || t === "changed" || t === "deprecated" || t === "removed" || t === "known issue";
-  }
-
-  function pickPrefixedValue(values, prefixes) {
-    if (!values || !values.length) return "";
-    for (var i = 0; i < values.length; i++) {
-      var raw = safeText(values[i]).trim(); if (!raw) continue;
-      var lower = raw.toLowerCase();
-      for (var p = 0; p < prefixes.length; p++) { var pre = prefixes[p]; if (lower.indexOf(pre) === 0) return raw.slice(pre.length).trim(); }
-    }
-    return "";
-  }
-
-  function extractTokenValue(textValue, name) {
-    var s = safeText(textValue); if (!s) return "";
+  function extractToken(text, name) {
+    var s = safeText(text); if (!s) return "";
     try { var re1 = new RegExp("\\{\\%\\s*" + name + "\\s*[:=]\\s*([^%}]+?)\\s*\\%\\}", "i"); var m1 = s.match(re1); if (m1 && m1[1]) return String(m1[1]).trim(); } catch (e) {}
     try { var re2 = new RegExp("\\[" + name + "\\s*[:=]\\s*([^\\]]+?)\\]", "i"); var m2 = s.match(re2); if (m2 && m2[1]) return String(m2[1]).trim(); } catch (e2) {}
     return "";
   }
 
-  function stripMetaTokens(textValue) {
-    var s = safeText(textValue); if (!s) return "";
+  function stripMetaTokens(text) {
+    var s = safeText(text); if (!s) return "";
     s = s.replace(/\{\%\s*(product|version|change)\s*[:=][^%}]+\%\}/gi, "");
     s = s.replace(/\[(product|version|change)\s*[:=][^\]]+\]/gi, "");
-    s = s.replace(/[ \t]+\n/g, "\n"); s = s.replace(/\n{3,}/g, "\n\n");
+    s = s.replace(/[ \t]{2,}/g, " ");
     return s.trim();
   }
 
-  function pickProductFromParts(categories, title, descText) {
-    var fromCat = pickPrefixedValue(categories || [], ["product:", "prod:", "p:"]); if (fromCat) return normalizeMetaRaw(fromCat);
-    var fromTitle = extractTokenValue(title, "product"); if (fromTitle) return normalizeMetaRaw(fromTitle);
-    var fromDesc = extractTokenValue(descText, "product"); if (fromDesc) return normalizeMetaRaw(fromDesc);
-    return { key: "", label: "" };
+  function normalizeType(raw) {
+    var t = safeText(raw).trim().toLowerCase(); if (!t) return "";
+    if (t === "improved") t = "changed";
+    if (t === "knownissue" || t === "known_issue" || t === "known-issue") t = "known issue";
+    return t;
   }
 
-  function pickVersionFromParts(categories, title, descText) {
-    var fromCat = pickPrefixedValue(categories || [], ["version:", "ver:", "v:"]); if (fromCat) return normalizeMetaRaw(fromCat);
-    var fromTitle = extractTokenValue(title, "version"); if (fromTitle) return normalizeMetaRaw(fromTitle);
-    var fromDesc = extractTokenValue(descText, "version"); if (fromDesc) return normalizeMetaRaw(fromDesc);
-    return { key: "", label: "" };
+  function titleCase(s) {
+    var t = safeText(s).trim(); if (!t) return "";
+    return t.split(/[\s_-]+/).filter(Boolean).map(function (w) { return w ? w.charAt(0).toUpperCase() + w.slice(1) : ""; }).join(" ");
   }
 
-  function pickTypeFromItem(itemEl, categories) {
-    var directType = firstChildText(itemEl, ["type"]); if (directType) return normalizeTypeRaw(directType);
-    var cats = categories && categories.length ? categories : getCategoriesFromItem(itemEl);
-    if (cats && cats.length) {
-      for (var i = 0; i < cats.length; i++) { var c = safeText(cats[i]).trim(); if (!c) continue; if (isKnownTypeKey(c)) return normalizeTypeRaw(c); }
-      var c0 = safeText(cats[0]).trim(); if (c0) return normalizeTypeRaw(c0);
-    }
-    var descText = firstChildText(itemEl, ["content\\:encoded", "encoded", "description"]);
-    var fromDesc = extractTokenValue(descText, "change"); if (fromDesc) return normalizeTypeRaw(fromDesc);
-    if (treatMissingTypeAs && treatMissingTypeAs !== "none") return { key: safeText(treatMissingTypeAs).trim().toLowerCase(), label: titleCase(treatMissingTypeAs) };
-    return { key: "known issue", label: "Known Issue" };
+  function badgeBg(key) {
+    if (key === "added") return "#16a34a"; if (key === "fixed") return "#1d6fb8";
+    if (key === "changed") return "#9b1c4a"; if (key === "deprecated") return "#b45309";
+    if (key === "removed") return "#b91c1c"; if (key === "known issue") return "#64748b";
+    return "#334155";
   }
 
-  function svgIcon(kind) {
-    if (!kind) return "";
-    if (kind === "added") return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M11 5a1 1 0 1 1 2 0v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5Z"/></svg>';
-    if (kind === "fixed") return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M9.2 16.6 4.9 12.3a1 1 0 1 1 1.4-1.4l2.9 2.9 8.5-8.5a1 1 0 1 1 1.4 1.4l-9.9 9.9a1 1 0 0 1-1.4 0Z"/></svg>';
-    if (kind === "changed" || kind === "improved") return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 12a8 8 0 0 1-13.66 5.66l-1.42 1.42A10 10 0 0 0 22 12h-2Zm-16 0a8 8 0 0 1 13.66-5.66l1.42-1.42A10 10 0 0 0 2 12h2Z"/><path fill="currentColor" d="M7 7h4V3l6 6-6 6v-4H7V7Z"/></svg>';
-    if (kind === "deprecated") return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 1 21h22L12 2Zm0 6a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1Zm0 11a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 19Z"/></svg>';
-    if (kind === "removed") return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M18.3 5.7a1 1 0 0 1 0 1.4L13.4 12l4.9 4.9a1 1 0 1 1-1.4 1.4L12 13.4l-4.9 4.9a1 1 0 1 1-1.4-1.4l4.9-4.9-4.9-4.9a1 1 0 1 1 1.4-1.4L12 10.6l4.9-4.9a1 1 0 0 1 1.4 0Z"/></svg>';
-    if (kind === "known issue") return '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 6a1 1 0 0 1 1 1v5a1 1 0 1 1-2 0V9a1 1 0 0 1 1-1Zm0 11a1.25 1.25 0 1 1 0-2.5A1.25 1.25 0 0 1 12 19Z"/></svg>';
-    return "";
+  function firstChildText(el, sel) {
+    if (!el) return ""; var n = el.querySelector(sel); return n ? safeText(n.textContent).trim() : "";
   }
 
-  function typeColor(kind) {
-    if (kind === "added") return "rgba(34,197,94,.18)"; if (kind === "fixed") return "rgba(59,130,246,.18)";
-    if (kind === "changed" || kind === "improved") return "rgba(107,91,255,.18)"; if (kind === "deprecated") return "rgba(245,158,11,.18)";
-    if (kind === "removed") return "rgba(239,68,68,.18)"; if (kind === "known issue") return "rgba(148,163,184,.18)";
-    return "rgba(11,27,51,.10)";
-  }
-
-  function typeBorder(kind) {
-    if (kind === "added") return "rgba(34,197,94,.35)"; if (kind === "fixed") return "rgba(59,130,246,.35)";
-    if (kind === "changed" || kind === "improved") return "rgba(107,91,255,.35)"; if (kind === "deprecated") return "rgba(245,158,11,.35)";
-    if (kind === "removed") return "rgba(239,68,68,.35)"; if (kind === "known issue") return "rgba(148,163,184,.35)";
-    return "rgba(11,27,51,.20)";
-  }
-
-  function cacheEnabled() { return Number(cacheMinutes) > 0; }
-
-  function readCacheRaw(key) {
-    try { var raw = window.localStorage.getItem(key); if (!raw) return null; var obj = JSON.parse(raw); if (!obj || !obj.ts || !obj.data) return null; return obj; }
-    catch (e) { return null; }
-  }
-
-  function writeCache(key, data) { try { window.localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data })); } catch (e) {} }
-
-  function sanitizeItems(arr) {
-    if (!Array.isArray(arr)) return [];
-    var out = arr.slice(0);
-    for (var i = 0; i < out.length; i++) {
-      if (!out[i]) continue;
-      out[i].pubDate = coerceDate(out[i].pubDate); out[i].title = safeText(out[i].title); out[i].link = safeText(out[i].link);
-      out[i].author = safeText(out[i].author); out[i].descriptionText = safeText(out[i].descriptionText); out[i].descriptionHtml = safeText(out[i].descriptionHtml);
-      out[i].typeKey = safeText(out[i].typeKey); out[i].typeLabel = safeText(out[i].typeLabel); out[i].productKey = safeText(out[i].productKey);
-      out[i].productLabel = safeText(out[i].productLabel); out[i].versionKey = safeText(out[i].versionKey); out[i].versionLabel = safeText(out[i].versionLabel);
-      out[i].__hydrated = Boolean(out[i].__hydrated); out[i].__id = safeText(out[i].__id);
+  function parseRss(xmlText) {
+    var parser = new DOMParser(); var doc = parser.parseFromString(xmlText, "text/xml");
+    var pe = doc.getElementsByTagName("parsererror"); if (pe && pe.length) return [];
+    var itemEls = doc.querySelectorAll("item"); var out = [];
+    var count = Math.min(itemEls.length, maxItems);
+    for (var i = 0; i < count; i++) {
+      var it = itemEls[i];
+      var title = firstChildText(it, "title");
+      var link = firstChildText(it, "link");
+      var pubDate = coerceDate(firstChildText(it, "pubDate") || firstChildText(it, "date"));
+      var desc = firstChildText(it, "content\\:encoded") || firstChildText(it, "encoded") || firstChildText(it, "description");
+      var descText = stripHtml(desc);
+      var version = extractToken(descText, "version") || extractToken(title, "version");
+      var product = extractToken(descText, "product") || extractToken(title, "product");
+      var change = normalizeType(extractToken(descText, "change") || extractToken(descText, "type") || firstChildText(it, "type"));
+      var body = stripMetaTokens(descText);
+      out.push({ title: title, link: link, pubDate: pubDate, version: version, product: product, change: change, body: body });
     }
     return out;
-  }
-
-  function stableIdFromLink(link) {
-    var s = safeText(link).trim(); if (!s) return "";
-    try { var u = new URL(s, window.location.origin); s = (u.pathname || "") + (u.hash || ""); } catch (e) {}
-    s = s.replace(/^\/+/, "").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
-    if (!s) s = "item";
-    return "rmChangelogItem__" + s;
-  }
-
-  function sanitizeHtmlAllowTables(html) {
-    var allowed = { a: true, p: true, br: true, strong: true, em: true, b: true, i: true, code: true, pre: true, ul: true, ol: true, li: true, blockquote: true, h1: true, h2: true, h3: true, h4: true, h5: true, h6: true, hr: true, div: true, span: true, table: true, thead: true, tbody: true, tfoot: true, tr: true, th: true, td: true };
-    var doc = new DOMParser().parseFromString("<div>" + safeText(html) + "</div>", "text/html");
-    var root = doc.body && doc.body.firstChild ? doc.body.firstChild : null; if (!root) return "";
-
-    function cleanEl(el) {
-      if (!el || el.nodeType !== 1) return;
-      var tag = (el.tagName || "").toLowerCase();
-      if (tag === "script" || tag === "style" || tag === "iframe" || tag === "object" || tag === "embed") { el.parentNode && el.parentNode.removeChild(el); return; }
-      if (!allowed[tag]) { var parent = el.parentNode; if (!parent) return; while (el.firstChild) parent.insertBefore(el.firstChild, el); parent.removeChild(el); return; }
-      var attrs = el.attributes ? Array.prototype.slice.call(el.attributes) : [];
-      for (var i = 0; i < attrs.length; i++) {
-        var name = attrs[i].name;
-        if (/^on/i.test(name) || name === "style") { el.removeAttribute(name); continue; }
-        if ((tag === "td" || tag === "th") && (name === "colspan" || name === "rowspan")) continue;
-        if (name === "class") continue;
-        if (tag === "a") { if (name === "href" || name === "target" || name === "rel") continue; el.removeAttribute(name); continue; }
-        el.removeAttribute(name);
-      }
-      if (tag === "a") {
-        var href = safeText(el.getAttribute("href")).trim(); if (/^javascript:/i.test(href)) el.removeAttribute("href");
-        var tgt = safeText(el.getAttribute("target")).trim();
-        if (tgt === "_blank") { var rel = safeText(el.getAttribute("rel")).trim(); if (!rel || rel.indexOf("noopener") === -1) el.setAttribute("rel", "noopener noreferrer"); }
-      }
-      if (tag === "table") {
-        var p = el.parentNode;
-        if (p && (!p.className || String(p.className).indexOf("rmChangelogFeed__tableWrap") === -1)) {
-          var wrap = doc.createElement("div"); wrap.setAttribute("class", "rmChangelogFeed__tableWrap"); p.insertBefore(wrap, el); wrap.appendChild(el);
-        }
-      }
-      var kids = el.childNodes ? Array.prototype.slice.call(el.childNodes) : [];
-      for (var k = 0; k < kids.length; k++) { if (kids[k] && kids[k].nodeType === 1) cleanEl(kids[k]); }
-    }
-
-    cleanEl(root);
-    var out = safeText(root.innerHTML).trim(); if (out.length > 70000) out = out.slice(0, 70000);
-    return out;
-  }
-
-  function truncateText(s, n) { var t = safeText(s); if (t.length <= n) return t; return t.slice(0, n).trim() + "…"; }
-
-  function needsHydration(descText) {
-    var t = safeText(descText).trim(); if (!t) return true;
-    if (t.length < minExcerptChars) return true;
-    if (t.length <= 40 && !/[.!?]/.test(t)) return true;
-    return false;
   }
 
   function readLocal(key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } }
   function writeLocal(key, value) { try { window.localStorage.setItem(key, value); } catch (e) {} }
 
-  function ensureHeadLink(rel, href, crossOrigin) {
-    try {
-      if (!href) return; var h = safeText(href).trim(); if (!h) return;
-      var existing = document.querySelector('link[rel="' + rel + '"][href="' + h + '"]'); if (existing) return;
-      var link = document.createElement("link"); link.setAttribute("rel", rel); link.setAttribute("href", h);
-      if (crossOrigin) link.setAttribute("crossorigin", "anonymous");
-      (document.head || document.documentElement).appendChild(link);
-    } catch (e) {}
-  }
-
-  function preconnectToRssUrl(url) {
-    try {
-      var u = new URL(String(url), window.location.origin); var origin = u.origin;
-      ensureHeadLink("dns-prefetch", origin, false);
-      ensureHeadLink("preconnect", origin, origin !== window.location.origin);
-    } catch (e) {}
-  }
-
-  useEffect(() => { if (typeof window === "undefined") return; if (!preconnectRss) return; preconnectToRssUrl(rssUrl); }, [rssUrl, preconnectRss]);
-
-  // -----------------------------
-  // PERF FIX #5: fetch uses cache:"default" (respects browser cache) instead of "no-store"
-  // PERF FIX #6: only retry with credentials if first attempt throws, not on every request
-  // -----------------------------
-  function fetchTextOnce(url, cred, signal, acceptHeader) {
-    return fetch(url, {
-      method: "GET", signal: signal, credentials: cred,
-      cache: "default", // was "no-store" — that forces a full round-trip every time
-      redirect: "follow",
-      headers: { Accept: acceptHeader || "*/*" }
-    }).then(function (res) {
-      if (!res || !res.ok) throw new Error("Request failed (" + (res ? res.status : "unknown") + ").");
-      return res.text();
-    });
-  }
-
-  function fetchTextAuto(url, signal, acceptHeader) {
-    return fetchTextOnce(url, "omit", signal, acceptHeader).catch(function (err) {
-      if (err && err.name === "AbortError") throw err;
-      return fetchTextOnce(url, "include", signal, acceptHeader);
-    });
-  }
-
-  function fetchTextAutoWithTimeout(url, signal, acceptHeader, timeoutMs) {
-    var ms = Math.max(1, Number(timeoutMs) || 5000);
-    var timer = null; var local = new AbortController();
-    function onAbort() { try { local.abort(); } catch (e) {} }
-    try { if (signal && typeof signal.addEventListener === "function") signal.addEventListener("abort", onAbort, { once: true }); } catch (e2) {}
-    timer = window.setTimeout(function () { try { local.abort(); } catch (e3) {} }, ms);
-
-    return fetchTextAuto(url, local.signal, acceptHeader)
-      .then(function (txt) {
-        if (timer) window.clearTimeout(timer);
-        try { if (signal && typeof signal.removeEventListener === "function") signal.removeEventListener("abort", onAbort); } catch (e4) {}
-        return txt;
-      })
-      .catch(function (err) {
-        if (timer) window.clearTimeout(timer);
-        try { if (signal && typeof signal.removeEventListener === "function") signal.removeEventListener("abort", onAbort); } catch (e5) {}
-        if (err && err.name === "AbortError") throw new Error("RSS request timed out after " + ms + "ms.");
-        throw err;
-      });
-  }
-
-  function looksLikeReactShell(htmlText) {
-    var s = safeText(htmlText); if (!s) return false;
-    if (s.indexOf("useReactApp") !== -1 && s.indexOf("userLoggedIn") !== -1) return true;
-    if (s.indexOf("__NEXT_DATA__") !== -1 && s.indexOf("rm-Markdown") === -1 && s.indexOf("ChangelogPage_list-post") === -1) return true;
-    return false;
-  }
-
-  function looksLikeHtmlDocument(text) {
-    var s = safeText(text).trim().toLowerCase(); if (!s) return false;
-    return s.indexOf("<!doctype html") === 0 || s.indexOf("<html") === 0 || s.indexOf("<head") === 0 || s.indexOf("<body") === 0;
-  }
-
-  function readMeta(name) { try { var el = document.querySelector('meta[name="' + String(name) + '"]'); return el ? safeText(el.getAttribute("content")).trim() : ""; } catch (e) { return ""; } }
-
-  function readSsrProp(name) {
-    try {
-      var el = document.getElementById("ssr-props"); if (!el || !el.textContent) return "";
-      var data = safeJsonParse(el.textContent); var v = data && data[name] ? data[name] : "";
-      return safeText(v).trim();
-    } catch (e) { return ""; }
-  }
-
-  function detectProjectBasePath() {
-    var bp = readMeta("readme-basepath-childProject"); if (bp) return "/" + bp.replace(/^\/+|\/+$/g, "");
-    var ssrBase = readSsrProp("baseUrl"); if (ssrBase && ssrBase !== "/") return "/" + ssrBase.replace(/^\/+|\/+$/g, "");
-    return "";
-  }
-
-  function detectDefaultRssUrl() {
-    var bp = detectProjectBasePath();
-    return (bp ? bp : "") + "/changelog.rss";
-  }
-
-  function detectProjectSlug() {
-    var bp = detectProjectBasePath(); if (bp) return bp.replace(/^\/+|\/+$/g, "");
-    var m = readMeta("readme-subdomain"); if (m) return m;
-    var m2 = readMeta("readme-project"); if (m2) return m2;
-    return "";
-  }
-
-  function extractChangelogIdFromLink(link) {
-    var href = safeText(link).trim(); if (!href) return "";
-    try {
-      var u = new URL(href, window.location.origin); var p = safeText(u.pathname);
-      var m = p.match(/\/changelog\/([^\/?#]+)(?:\/|$)/i); if (m && m[1]) return String(m[1]).trim();
-      var parts = p.split("/").filter(Boolean); return parts.length ? String(parts[parts.length - 1]).trim() : "";
-    } catch (e) {
-      var s = href.split("#")[0].split("?")[0]; var mm = s.match(/\/changelog\/([^\/?#]+)(?:\/|$)/i); if (mm && mm[1]) return String(mm[1]).trim();
-      var segs = s.split("/").filter(Boolean); return segs.length ? String(segs[segs.length - 1]).trim() : "";
-    }
-  }
-
-  function joinPath(a, b) {
-    var x = safeText(a); var y = safeText(b); if (!x) return y; if (!y) return x;
-    if (x.charAt(x.length - 1) === "/" && y.charAt(0) === "/") return x + y.slice(1);
-    if (x.charAt(x.length - 1) !== "/" && y.charAt(0) !== "/") return x + "/" + y;
-    return x + y;
-  }
-
-  function buildApiNextUrlFromChangelogLink(link) {
-    var id = extractChangelogIdFromLink(link); if (!id) return "";
-    var slug = safeText(apiProjectSlug).trim(); if (!slug) slug = detectProjectSlug(); if (!slug) return "";
-    var base = window.location.origin; var path = safeText(apiNextChangelogPath) || "/api-next/v2/changelogs/";
-    if (path.charAt(path.length - 1) !== "/") path = path + "/";
-    return joinPath(joinPath(base, "/" + slug), path + encodeURIComponent(id));
-  }
-
-  function escapeHtml(s) {
-    var x = safeText(s); if (!x) return "";
-    return x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-  }
-
-  function looksLikeHtmlFragment(s) { var x = safeText(s); if (!x) return false; return /<(table|thead|tbody|tfoot|tr|th|td|p|br|div|span|ul|ol|li|h[1-6]|blockquote|pre|code|hr)\b/i.test(x); }
-
-  function inlineMarkdownToHtml(line) {
-    var t = escapeHtml(line);
-    t = t.replace(/\[([^\]]+)\]\(([^\)]+)\)/g, function (_m, txt, url) { return '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + txt + "</a>"; });
-    t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>"); t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
-    return t;
-  }
-
-  function markdownToHtmlSimple(md) {
-    var src = safeText(md).replace(/\r\n/g, "\n"); var lines = src.split("\n");
-    var htmlParts = [], paraLines = [], listType = "", listItems = [], inCode = false, codeLines = [];
-    function flushPara() { if (!paraLines.length) return; htmlParts.push("<p>" + inlineMarkdownToHtml(paraLines.join("\n")).replace(/\n/g, "<br/>") + "</p>"); paraLines = []; }
-    function flushList() { if (!listType || !listItems.length) { listType = ""; listItems = []; return; } htmlParts.push("<" + listType + ">" + listItems.map(function (li) { return "<li>" + inlineMarkdownToHtml(li) + "</li>"; }).join("") + "</" + listType + ">"); listType = ""; listItems = []; }
-    function flushCode() { if (!codeLines.length) return; htmlParts.push("<pre><code>" + escapeHtml(codeLines.join("\n")) + "</code></pre>"); codeLines = []; }
-    for (var i = 0; i < lines.length; i++) {
-      var line = String(lines[i] || "");
-      if (/^```/.test(line.trim())) { if (inCode) { inCode = false; flushCode(); } else { flushPara(); flushList(); inCode = true; codeLines = []; } continue; }
-      if (inCode) { codeLines.push(line); continue; }
-      var hm = line.match(/^(#{1,6})\s+(.+)$/);
-      if (hm) { flushPara(); flushList(); htmlParts.push("<h" + hm[1].length + ">" + inlineMarkdownToHtml(hm[2].trim()) + "</h" + hm[1].length + ">"); continue; }
-      var ulm = line.match(/^\s*[-\*\+]\s+(.+)$/); var olm = line.match(/^\s*(\d+)\.\s+(.+)$/);
-      if (ulm && ulm[1]) { flushPara(); if (listType && listType !== "ul") flushList(); listType = "ul"; listItems.push(ulm[1].trim()); continue; }
-      if (olm && olm[2]) { flushPara(); if (listType && listType !== "ol") flushList(); listType = "ol"; listItems.push(olm[2].trim()); continue; }
-      if (!line.trim()) { flushPara(); flushList(); continue; }
-      flushList(); paraLines.push(line);
-    }
-    flushPara(); flushList(); if (inCode) flushCode();
-    return htmlParts.join("");
-  }
-
-  function renderBodyTextToHtml(bodyText) {
-    var raw = stripMetaTokens(safeText(bodyText)); if (!raw) return "";
-    if (looksLikeHtmlFragment(raw)) return sanitizeHtmlAllowTables(raw);
-    return sanitizeHtmlAllowTables(markdownToHtmlSimple(raw));
-  }
-
-  function fetchApiNextChangelog(link, signal) {
-    var apiUrl = buildApiNextUrlFromChangelogLink(link); if (!apiUrl) return Promise.reject(new Error("Couldn't build api-next URL."));
-    return fetchTextAutoWithTimeout(apiUrl, signal, "application/json", fetchTimeoutMs)
-      .then(function (txt) {
-        var json = safeJsonParse(txt); if (!json) throw new Error("api-next did not return valid JSON.");
-        var body = safeText(json && json.data && json.data.content && json.data.content.body);
-        if (!body) throw new Error("api-next JSON was valid but data.content.body was empty.");
-        return { title: safeText(json && json.data && json.data.title).trim(), html: renderBodyTextToHtml(body), apiUrl: apiUrl };
-      });
-  }
-
-  function stripMetaTokensFromHtml(html) {
-    var s = safeText(html); if (!s) return "";
-    s = s.replace(/\{\%\s*(product|version)\s*[:=][^%}]+\%\}/gi, ""); s = s.replace(/\[(product|version)\s*[:=][^\]]+\]/gi, "");
-    return s;
-  }
-
-  function pickPostContainer(doc) {
-    if (!doc) return null;
-    return doc.querySelector(modalContentSelector) || doc.querySelector(".ChangelogPage_list-post") || doc.querySelector(".rm-Changelog-post") || doc.querySelector("[data-testid='changelog-post']") || doc.querySelector("article") || doc.querySelector("main");
-  }
-
-  function bestHtmlFromNextData(doc) {
-    try {
-      var nd = doc.getElementById("__NEXT_DATA__"); if (!nd || !nd.textContent) return "";
-      var data = safeJsonParse(nd.textContent); if (!data) return "";
-      var best = { score: 0, html: "" };
-      function scoreString(s) {
-        var x = safeText(s); if (!x || x.indexOf("<") === -1) return 0;
-        var score = 0;
-        if (x.indexOf("<p") !== -1) score += 6; if (x.indexOf("<h1") !== -1 || x.indexOf("<h2") !== -1 || x.indexOf("<h3") !== -1) score += 6;
-        if (x.indexOf("<ul") !== -1 || x.indexOf("<ol") !== -1) score += 4; if (x.indexOf("<table") !== -1) score += 6; if (x.indexOf("rm-Markdown") !== -1) score += 8;
-        var len = x.length; if (len > 200 && len < 120000) score += Math.min(20, Math.floor(len / 2000));
-        return score;
-      }
-      function walk(v, depth) {
-        if (depth > 12 || v === null || v === undefined) return;
-        if (typeof v === "string") { var sc = scoreString(v); if (sc > best.score) { best.score = sc; best.html = v; } return; }
-        if (typeof v !== "object") return;
-        var keys = Array.isArray(v) ? v.map(function (_, i) { return i; }) : Object.keys(v);
-        for (var k = 0; k < keys.length; k++) walk(v[keys[k]], depth + 1);
-      }
-      walk(data, 0);
-      return (best && best.html && best.score >= 6) ? safeText(best.html) : "";
-    } catch (e) { return ""; }
-  }
-
-  function extractModalHtmlFromChangelogPage(htmlText) {
-    var doc = new DOMParser().parseFromString(safeText(htmlText), "text/html");
-    var md = doc.querySelector('.rm-Markdown[data-testid="RDMD"]') || doc.querySelector(".rm-Markdown");
-    if (md) {
-      var styleEls = md.querySelectorAll ? md.querySelectorAll("style") : [];
-      for (var i = 0; i < styleEls.length; i++) { try { styleEls[i].parentNode && styleEls[i].parentNode.removeChild(styleEls[i]); } catch (e) {} }
-      return sanitizeHtmlAllowTables(stripMetaTokensFromHtml(md.innerHTML));
-    }
-    var ndHtml = bestHtmlFromNextData(doc); if (ndHtml) return sanitizeHtmlAllowTables(stripMetaTokensFromHtml(ndHtml));
-    var post = pickPostContainer(doc); if (post) return sanitizeHtmlAllowTables(stripMetaTokensFromHtml(post.innerHTML));
-    return "";
-  }
-
-  // PERF FIX #7: removed cache-bust timestamp — modal HTML now served from browser cache on repeat opens
-  function fetchRenderedChangelogModal(link, signal) {
-    var fetchUrl = canonicalizeForFetch(link); if (!fetchUrl) return Promise.resolve({ html: "", title: "" });
-    return fetchTextAutoWithTimeout(fetchUrl, signal, "*/*", fetchTimeoutMs)
-      .then(function (htmlText) { return { html: extractModalHtmlFromChangelogPage(htmlText), title: "" }; })
-      .catch(function () { return { html: "", title: "" }; });
-  }
-
-  function isModalCacheValid(cached) {
-    if (!cached || !cached.ts || !cached.html) return false;
-    var mins = Number(modalCacheMinutes) || 0; if (mins <= 0) return false;
-    return Date.now() - Number(cached.ts || 0) < mins * 60 * 1000;
-  }
-
-  function extractExcerptFromChangelogHtml(htmlText) {
-    var doc = new DOMParser().parseFromString(htmlText, "text/html");
-    var post = pickPostContainer(doc);
-    var md = post ? post.querySelector(".rm-Markdown") : null;
-    if (!md) md = doc.querySelector(".rm-Changelog-post .rm-Markdown") || doc.querySelector(".rm-Markdown");
-    if (!md) {
-      var ndHtml = bestHtmlFromNextData(doc);
-      if (ndHtml) { var html2 = sanitizeHtmlAllowTables(ndHtml); return { html: html2, text: truncateText(stripMetaTokens(stripHtml(html2)), excerptMaxChars) }; }
-      return { html: "", text: "" };
-    }
-    var clone = md.cloneNode(true);
-    var styleEls = clone.querySelectorAll("style");
-    for (var i = 0; i < styleEls.length; i++) { try { styleEls[i].parentNode && styleEls[i].parentNode.removeChild(styleEls[i]); } catch (e) {} }
-    var html = sanitizeHtmlAllowTables(clone.innerHTML);
-    return { html: html, text: truncateText(stripMetaTokens(stripHtml(html)), excerptMaxChars) };
-  }
-
-  function excerptCacheKey(link) { return "rm_changelog_post_excerpt_html_v8__" + safeText(link); }
-
-  function fetchAndExtractExcerpt(link, signal) {
-    var fetchUrl = canonicalizeForFetch(link); if (!fetchUrl) return Promise.resolve({ html: "", text: "" });
-    var ck = excerptCacheKey(fetchUrl); var cachedRaw = readLocal(ck);
-    if (cachedRaw) { var cached = safeJsonParse(cachedRaw); if (cached && cached.html && cached.ts) return Promise.resolve({ html: String(cached.html), text: stripHtml(String(cached.html)) }); }
-    return fetchTextAutoWithTimeout(fetchUrl, signal, "*/*", fetchTimeoutMs)
-      .then(function (htmlText) { if (looksLikeReactShell(htmlText)) return fetchTextOnce(fetchUrl, "omit", signal).catch(function () { return htmlText; }); return htmlText; })
-      .then(function (htmlText2) { var ex = extractExcerptFromChangelogHtml(htmlText2); if (ex && ex.html) writeLocal(ck, JSON.stringify({ ts: Date.now(), html: ex.html })); return ex; })
-      .catch(function () { return { html: "", text: "" }; });
-  }
-
-  function runWithLimit(tasks, limit) {
-    var idx = 0; var results = new Array(tasks.length);
-    function worker() {
-      if (idx >= tasks.length) return Promise.resolve(); var my = idx++;
-      return Promise.resolve().then(tasks[my]).then(function (r) { results[my] = r; }).catch(function () { results[my] = null; }).then(worker);
-    }
-    var pool = []; var n = Math.max(1, Math.min(limit || 1, tasks.length));
-    for (var i = 0; i < n; i++) pool.push(worker());
-    return Promise.all(pool).then(function () { return results; });
-  }
-
-  function parseRss(xmlText) {
-    if (looksLikeHtmlDocument(xmlText)) return { ok: false, error: "RSS URL returned HTML instead of XML. This usually means the URL is wrong, requires auth, or is blocked by CORS/proxy behavior." };
-    var parser = new DOMParser(); var doc = parser.parseFromString(xmlText, "text/xml");
-    var pe = doc.getElementsByTagName("parsererror"); if (pe && pe.length) return { ok: false, error: "RSS parse error (invalid XML)." };
-    var channelTitle = firstChildText(doc, ["channel > title"]); var itemEls = doc.querySelectorAll("item");
-    var out = []; var count = Math.min(itemEls.length, maxItems);
-    for (var i = 0; i < count; i++) {
-      var it = itemEls[i];
-      var title = firstChildText(it, ["title"]); var link = normalizeChangelogLinkMaybe(firstChildText(it, ["link"]));
-      var pubDate = parsePubDate(firstChildText(it, ["pubDate", "date"]));
-      var creator = firstChildText(it, ["dc\\:creator", "creator", "author"]);
-      var desc = firstChildText(it, ["content\\:encoded", "encoded", "description"]);
-      var descTextRaw = stripHtml(desc); var descText = stripMetaTokens(descTextRaw);
-      var categories = getCategoriesFromItem(it);
-      var typeInfo = pickTypeFromItem(it, categories); var productInfo = pickProductFromParts(categories, title, descTextRaw); var versionInfo = pickVersionFromParts(categories, title, descTextRaw);
-      out.push({ title: title, link: link, pubDate: pubDate, pubDateRaw: firstChildText(it, ["pubDate", "date"]), author: creator, descriptionText: descText, descriptionHtml: "", typeKey: typeInfo.key, typeLabel: typeInfo.label, productKey: productInfo.key, productLabel: productInfo.label, versionKey: versionInfo.key, versionLabel: versionInfo.label, sourceTitle: channelTitle, __hydrated: false, __id: stableIdFromLink(link) });
-    }
-    return { ok: true, items: sanitizeItems(out), sourceTitle: channelTitle };
-  }
-
-  // -----------------------------
-  // Fetch RSS — cache-first + stale-while-revalidate
-  // -----------------------------
-  useEffect(() => {
+  useEffect(function () {
     if (typeof window === "undefined") return;
-    setError("");
+    setLoading(true); setError("");
     try { if (abortRef.current) abortRef.current.abort(); } catch (e) {}
-    try { if (hydrateAbortRef.current) hydrateAbortRef.current.abort(); } catch (e2) {}
     var ac = new AbortController(); abortRef.current = ac;
-    var cacheKey = "rm_changelog_rss_cache_raw_v9__" + rssUrl;
-    var didPaintCache = false; var shouldFetch = true;
 
-    if (cacheEnabled()) {
-      var cachedObj = readCacheRaw(cacheKey);
-      if (cachedObj && cachedObj.data && Array.isArray(cachedObj.data.items)) {
-        var safeCached = sanitizeItems(cachedObj.data.items);
-        setItems(safeCached); setLoading(false); didPaintCache = true;
-        var ageMs = Date.now() - Number(cachedObj.ts || 0); var maxMs = Math.max(0, Number(cacheMinutes) || 0) * 60 * 1000;
-        if (maxMs > 0 && ageMs >= maxMs) { shouldFetch = true; setRefreshing(true); } else { shouldFetch = false; setRefreshing(false); }
-      }
+    var ck = "rmCLTable_v1__" + rssUrl;
+    var cached = safeJsonParse(readLocal(ck));
+    if (cached && cached.items && Array.isArray(cached.items) && (Date.now() - Number(cached.ts || 0)) < Number(cacheMinutes) * 60000) {
+      setItems(cached.items); setLoading(false); return function () {};
     }
 
-    if (!didPaintCache) { setLoading(true); setRefreshing(false); }
-    if (!shouldFetch) { return function () { try { ac.abort(); } catch (e3) {} }; }
-
-    fetchTextAutoWithTimeout(rssUrl, ac.signal, "application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.5", fetchTimeoutMs)
-      .then(function (xmlText) {
-        var parsed = parseRss(xmlText); if (!parsed.ok) throw new Error(parsed.error || "Failed to parse RSS.");
-        var safeItems = sanitizeItems(parsed.items);
-        setItems(safeItems); if (cacheEnabled()) writeCache(cacheKey, { items: safeItems });
-        setLoading(false); setRefreshing(false);
+    var timer = window.setTimeout(function () { try { ac.abort(); } catch (e) {} }, fetchTimeoutMs);
+    fetch(rssUrl, { signal: ac.signal, cache: "default", credentials: "omit" })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+      .then(function (xml) {
+        window.clearTimeout(timer);
+        var parsed = parseRss(xml);
+        setItems(parsed); setLoading(false);
+        writeLocal(ck, JSON.stringify({ ts: Date.now(), items: parsed }));
       })
       .catch(function (err) {
+        window.clearTimeout(timer);
         if (err && err.name === "AbortError") return;
-        var msg = err ? String(err.message || err) : "Unknown error.";
-        if (msg.toLowerCase().indexOf("failed to fetch") !== -1) msg = "Failed to fetch RSS (often CORS or network). If this is cross-origin, you'll need a proxy or CORS headers.";
-        setError(msg); setLoading(false); setRefreshing(false);
+        setError(safeText(err && err.message ? err.message : err)); setLoading(false);
       });
 
-    return function () { try { ac.abort(); } catch (e4) {} };
-  }, [rssUrl, maxItems, cacheMinutes, rewriteVersionedChangelogLinks, fetchTimeoutMs]);
+    return function () { try { ac.abort(); } catch (e) {} };
+  }, [rssUrl, maxItems, cacheMinutes, fetchTimeoutMs]);
 
-  useEffect(() => { setRenderCount(initialRenderCount); }, [rssUrl, maxItems, initialRenderCount]);
-
-  // -----------------------------
-  // PERF FIX #8: Hydration skipped entirely when showDescriptions=false
-  // This was the biggest culprit: with showDescriptions=false + hydrateMax=9999 + hydrateConcurrency=9999,
-  // the original code fired thousands of parallel fetch requests on mount for no visible benefit
-  // -----------------------------
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!hydrateFromPermalink) return;
-    if (!showDescriptions) return; // ← KEY FIX: descriptions hidden = no point hydrating
-    if (loading || error) return;
-    if (!items || !items.length) return;
-
-    var toHydrate = [];
-    for (var i = 0; i < items.length; i++) {
-      var it = items[i]; if (!it || !it.link || it.__hydrated) continue;
-      if (needsHydration(it.descriptionText)) toHydrate.push({ idx: i, link: it.link });
-      if (toHydrate.length >= hydrateMax) break;
-    }
-    if (!toHydrate.length) return;
-
-    try { if (hydrateAbortRef.current) hydrateAbortRef.current.abort(); } catch (e0) {}
-    var ac = new AbortController(); hydrateAbortRef.current = ac;
-
-    runWithLimit(toHydrate.map(function (x) { return function () { return fetchAndExtractExcerpt(x.link, ac.signal); }; }), hydrateConcurrency)
-      .then(function (excerpts) {
-        setItems(function (prev) {
-          var next = prev.slice(0);
-          for (var j = 0; j < toHydrate.length; j++) {
-            var ex = excerpts[j]; var target = toHydrate[j]; if (!target) continue;
-            var cur = next[target.idx]; if (!cur) continue;
-            var updated = Object.assign({}, cur, { __hydrated: true });
-            if (ex && ex.html && needsHydration(cur.descriptionText)) { updated.descriptionHtml = safeText(ex.html); updated.descriptionText = stripHtml(ex.html); }
-            next[target.idx] = updated;
-          }
-          return next;
-        });
-      });
-
-    return function () { try { ac.abort(); } catch (e1) {} };
-  }, [hydrateFromPermalink, hydrateMax, hydrateConcurrency, minExcerptChars, excerptMaxChars, modalContentSelector, loading, error, items, showDescriptions, fetchTimeoutMs]);
-
-  // -----------------------------
-  // Modal
-  // -----------------------------
-  function modalCacheKey(link) { return "rm_changelog_post_modal_html_v10__" + safeText(link); }
-
-  function openModalForItem(it) {
-    if (!enableModal) return;
-    var rawHref = safeText(it && it.link); if (!rawHref) return;
-    var hrefForOpen = normalizeChangelogLinkMaybe(rawHref); var hrefForFetch = canonicalizeForFetch(hrefForOpen);
-
-    setModalOpen(true); setModalLoading(true); setModalError(""); setModalHtml(""); setModalMode("html");
-    setModalTitle(safeText(it && it.title) || "Changelog post"); setModalHref(hrefForOpen);
-
-    try { if (modalAbortRef.current) modalAbortRef.current.abort(); } catch (e0) {}
-    var ac = new AbortController(); modalAbortRef.current = ac;
-    var ck = modalCacheKey(hrefForFetch || hrefForOpen);
-
-    // PERF FIX #9: modal cache is now checked properly (was always skipped when modalCacheMinutes=0 and then actively deleted)
-    if (Number(modalCacheMinutes) > 0) {
-      var cachedRaw = readLocal(ck); if (cachedRaw) {
-        var cached = safeJsonParse(cachedRaw);
-        if (cached && isModalCacheValid(cached)) { setModalHtml(String(cached.html)); if (cached.title) setModalTitle(String(cached.title)); setModalLoading(false); return; }
-      }
-    }
-
-    function writeModalCacheMaybe(title, html) { if (!(Number(modalCacheMinutes) > 0)) return; try { writeLocal(ck, JSON.stringify({ ts: Date.now(), html: html, title: title || "" })); } catch (e2) {} }
-    function doneHtml(title, html) { if (ac.signal && ac.signal.aborted) return; if (html) { setModalHtml(html); if (title) setModalTitle(title); setModalLoading(false); return true; } return false; }
-
-    var first = Promise.resolve({ html: "", title: "" });
-    if (preferRenderedHtmlForModal) first = fetchRenderedChangelogModal(hrefForOpen, ac.signal);
-
-    first
-      .then(function (res1) { if (res1 && res1.html) { writeModalCacheMaybe(res1.title, res1.html); return doneHtml(res1.title, res1.html); } return false; })
-      .then(function (ok) {
-        if (ok) return;
-        if (preferApiNextForModal) return fetchApiNextChangelog(hrefForOpen, ac.signal).then(function (res2) { if (res2 && res2.html) { writeModalCacheMaybe(res2.title, res2.html); return doneHtml(res2.title, res2.html); } return false; }).catch(function () { return false; });
-        return false;
-      })
-      .then(function (ok2) {
-        if (ok2) return;
-        if (fallbackToIframeInModal) { setModalMode("iframe"); setModalLoading(false); return; }
-        setModalError("Couldn't load the post content."); setModalLoading(false);
-      })
-      .catch(function (err) {
-        if (err && err.name === "AbortError") return;
-        if (fallbackToIframeInModal) { setModalMode("iframe"); setModalLoading(false); return; }
-        setModalError(err ? String(err.message || err) : "Unknown error."); setModalLoading(false);
-      });
-  }
-
-  function closeModal() {
-    setModalOpen(false); setModalLoading(false); setModalError(""); setModalHtml(""); setModalHref(""); setModalMode("html");
-    try { if (modalAbortRef.current) modalAbortRef.current.abort(); } catch (e) {}
-  }
-
-  useEffect(() => {
-    if (typeof window === "undefined") return; if (!modalOpen) return;
-    function onKey(e) { if (e && e.key === "Escape") closeModal(); }
-    try { document.addEventListener("keydown", onKey); } catch (e2) {}
-    var prevOverflow = ""; try { prevOverflow = document.body.style.overflow; document.body.style.overflow = "hidden"; } catch (e3) {}
-    return function () { try { document.removeEventListener("keydown", onKey); } catch (e4) {} try { document.body.style.overflow = prevOverflow; } catch (e5) {} };
-  }, [modalOpen]);
-
-  function onModalFrameLoad() {
-    if (!modalFrameRef.current) return;
-    try {
-      var w = modalFrameRef.current.contentWindow; var d = w && w.document ? w.document : null; if (!d) return;
-      var st = d.createElement("style"); st.type = "text/css";
-      st.appendChild(d.createTextNode(["header, nav, aside, .content-toc, section.content-toc, .hub-sidebar, .rm-TopNav, .rm-Sidebar { display:none !important; }", ".rm-Guides .content-body, main, article { max-width: 980px !important; margin: 0 auto !important; padding: 18px !important; }", "body { background: #fff !important; }"].join("\n")));
-      (d.head || d.documentElement).appendChild(st);
-    } catch (e) {}
-  }
-
-  // -----------------------------
-  // Derived lists
-  // -----------------------------
-  var typeOptions = useMemo(() => {
-    var seen = {}; var out = [{ key: "all", label: "All types" }];
-    for (var i = 0; i < items.length; i++) { var k = safeText(items[i].typeKey).trim().toLowerCase(); var l = safeText(items[i].typeLabel).trim(); if (!k || !l || seen[k]) continue; seen[k] = true; out.push({ key: k, label: l }); }
-    out.sort(function (a, b) { if (a.key === "all") return -1; if (b.key === "all") return 1; return String(a.label).localeCompare(String(b.label)); });
-    return out;
-  }, [items]);
-
-  var productOptions = useMemo(() => {
-    var seen = {}; var out = [{ key: "all", label: "All products" }];
-    for (var i = 0; i < items.length; i++) { var k = safeText(items[i].productKey).trim().toLowerCase(); var l = safeText(items[i].productLabel).trim(); if (!k || !l || seen[k]) continue; seen[k] = true; out.push({ key: k, label: l }); }
-    out.sort(function (a, b) { if (a.key === "all") return -1; if (b.key === "all") return 1; return String(a.label).localeCompare(String(b.label)); });
-    return out;
-  }, [items]);
-
-  var versionOptions = useMemo(() => {
-    var seen = {}; var out = [{ key: "all", label: "All versions" }];
-    for (var i = 0; i < items.length; i++) { var k = safeText(items[i].versionKey).trim().toLowerCase(); var l = safeText(items[i].versionLabel).trim(); if (!k || !l || seen[k]) continue; seen[k] = true; out.push({ key: k, label: l }); }
-    out.sort(function (a, b) { if (a.key === "all") return -1; if (b.key === "all") return 1; return String(a.label).localeCompare(String(b.label)); });
-    return out;
-  }, [items]);
-
-  var authorOptions = useMemo(() => {
+  var versions = useMemo(function () {
     var seen = {}; var out = [];
-    for (var i = 0; i < items.length; i++) { var a = safeText(items[i].author).trim(); if (!a) continue; var k = a.toLowerCase(); if (seen[k]) continue; seen[k] = true; out.push(a); }
-    out.sort(function (a1, a2) { return a1.localeCompare(a2); }); return out;
+    for (var i = 0; i < items.length; i++) { var v = safeText(items[i].version).trim(); if (v && !seen[v]) { seen[v] = true; out.push(v); } }
+    out.sort(); return out;
   }, [items]);
 
-  var filtered = useMemo(() => {
-    var q = safeText(search).trim().toLowerCase(); var a = safeText(author).trim().toLowerCase(); var t = safeText(typeFilter).trim().toLowerCase();
-    var applyProduct = Boolean(lockedProduct) || showProductFilter; var applyVersion = Boolean(lockedVersion) || showVersionFilter;
-    var p = safeText(lockedProduct ? lockedProduct : productFilter).trim().toLowerCase(); var v = safeText(lockedVersion ? lockedVersion : versionFilter).trim().toLowerCase();
+  var products = useMemo(function () {
+    var seen = {}; var out = [];
+    for (var i = 0; i < items.length; i++) { var v = safeText(items[i].product).trim(); if (v && !seen[v]) { seen[v] = true; out.push(v); } }
+    out.sort(); return out;
+  }, [items]);
+
+  var changes = useMemo(function () {
+    var seen = {}; var out = [];
+    for (var i = 0; i < items.length; i++) { var v = safeText(items[i].change).trim(); if (v && !seen[v]) { seen[v] = true; out.push(v); } }
+    out.sort(); return out;
+  }, [items]);
+
+  var rows = useMemo(function () {
     var result = [];
     for (var i = 0; i < items.length; i++) {
       var it = items[i]; if (!it) continue;
-      if (showTypeFilter && t !== "all") { if (safeText(it.typeKey).toLowerCase() !== t) continue; }
-      if (applyProduct && p !== "all") { if (safeText(it.productKey).toLowerCase() !== p) continue; }
-      if (applyVersion && v !== "all") { if (safeText(it.versionKey).toLowerCase() !== v) continue; }
-      if (showAuthorFilter && a) { if (safeText(it.author).toLowerCase().indexOf(a) === -1) continue; }
-      if (q) { var hay = (safeText(it.title) + " " + safeText(it.descriptionText) + " " + safeText(it.typeLabel) + " " + safeText(it.productLabel) + " " + safeText(it.versionLabel)).toLowerCase(); if (hay.indexOf(q) === -1) continue; }
+      if (versionF !== "all" && safeText(it.version) !== versionF) continue;
+      if (productF !== "all" && safeText(it.product) !== productF) continue;
+      if (changeF !== "all" && safeText(it.change) !== changeF) continue;
+      if (search) {
+        var q = safeText(search).trim().toLowerCase();
+        var hay = (safeText(it.title) + " " + safeText(it.version) + " " + safeText(it.product) + " " + safeText(it.change) + " " + safeText(it.body)).toLowerCase();
+        if (hay.indexOf(q) === -1) continue;
+      }
       result.push(it);
     }
-    result.sort(function (x, y) { var dx = toTime(x && x.pubDate); var dy = toTime(y && y.pubDate); return sort === "oldest" ? dx - dy : dy - dx; });
+    result.sort(function (a, b) {
+      var va, vb;
+      if (sortCol === "pubDate") { va = toTime(a.pubDate); vb = toTime(b.pubDate); }
+      else { va = safeText(a[sortCol]).toLowerCase(); vb = safeText(b[sortCol]).toLowerCase(); }
+      if (va < vb) return sortDir === "asc" ? -1 : 1;
+      if (va > vb) return sortDir === "asc" ? 1 : -1;
+      return 0;
+    });
     return result;
-  }, [items, typeFilter, productFilter, versionFilter, lockedProduct, lockedVersion, search, author, sort, showTypeFilter, showProductFilter, showVersionFilter, showAuthorFilter]);
+  }, [items, versionF, productF, changeF, search, sortCol, sortDir]);
 
-  useEffect(() => { setRenderCount(initialRenderCount); }, [typeFilter, productFilter, versionFilter, search, author, sort, initialRenderCount]);
-
-  var visibleFiltered = useMemo(() => { return filtered.slice(0, Math.max(0, Math.min(renderCount, filtered.length))); }, [filtered, renderCount]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return; if (loading || error) return; if (!filtered || !filtered.length) return; if (!autoLoadMore) return;
-    var target = filtered.length; if (renderCount >= target) return;
-    var idleId = null; var timerId = null; var cancelled = false;
-    function step() { if (cancelled) return; setRenderCount(function (prev) { var next = prev + Math.max(1, renderBatchSize); return next > target ? target : next; }); }
-    if (typeof window.requestIdleCallback === "function") { idleId = window.requestIdleCallback(step, { timeout: Math.max(1, renderIdleTimeoutMs) }); } else { timerId = window.setTimeout(step, 0); }
-    return function () {
-      cancelled = true;
-      if (idleId && typeof window.cancelIdleCallback === "function") { try { window.cancelIdleCallback(idleId); } catch (e) {} }
-      if (timerId) { try { window.clearTimeout(timerId); } catch (e2) {} }
-    };
-  }, [loading, error, filtered.length, renderCount, renderBatchSize, renderIdleTimeoutMs, autoLoadMore]);
-
-  // -----------------------------
-  // Render
-  // -----------------------------
-  var rootStyle = { width: "100%" };
-  rootStyle["--rmChangelogFeedModalMaxWidth"] = String(modalMaxWidth) + "px";
-  rootStyle["--rmChangelogFeedColumns"] = String(Math.max(1, Math.floor(cardsPerRow || 2)));
-  var barStyle = stylesRef.current.barStyle; var groupStyle = stylesRef.current.groupStyle; var labelStyle = stylesRef.current.labelStyle;
-  var controlStyle = stylesRef.current.controlStyle; var metaStyle = stylesRef.current.metaStyle; var cardStyle = stylesRef.current.cardStyle;
-
-  function Badge(props2) {
-    var kind = safeText(props2.kind).trim().toLowerCase(); var label = safeText(props2.label).trim();
-    if (!kind || !label) return null;
-    var icon = svgIcon(kind);
-    return (
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 999, fontWeight: 800, fontSize: 12, letterSpacing: ".01em", background: typeColor(kind), border: "1px solid " + typeBorder(kind), color: "var(--color-text-default, #000)" }}>
-        {icon ? <span aria-hidden="true" style={{ width: 18, height: 18, borderRadius: 6, display: "inline-flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.12)" }} dangerouslySetInnerHTML={{ __html: icon }} /> : null}
-        {label}
-      </span>
-    );
+  function toggleSort(col) {
+    if (sortCol === col) { setSortDir(sortDir === "asc" ? "desc" : "asc"); }
+    else { setSortCol(col); setSortDir("asc"); }
   }
 
-  function Row(props2) {
-    var it = props2.item;
-    var title = safeText(it.title) || "Untitled"; var href = safeText(it.link) || "#"; var when = formatDate(it.pubDate); var who = safeText(it.author);
-    var typeKey = safeText(it.typeKey); var typeLabel = safeText(it.typeLabel);
-    var versionLabelRaw = safeText(it.versionLabel).trim();
-    var versionDisplay = versionLabelRaw && versionLabelRaw.toLowerCase().indexOf("v") !== 0 ? "v" + versionLabelRaw : versionLabelRaw;
-    var htmlExcerpt = safeText(it.descriptionHtml).trim(); var rawDesc = safeText(it.descriptionText).trim();
-    var previewText = truncateText(rawDesc, Math.max(40, Number(previewMaxChars) || 280));
-    var textExcerpt = truncateText(rawDesc, excerptMaxChars);
-    var anchorId = safeText(it.__id) || stableIdFromLink(href);
-    function open() { openModalForItem(it); }
-    function SeeMore() {
-      if (!showSeeMore) return null;
-      if (enableModal) return <button type="button" onClick={open} style={{ padding: 0, marginLeft: 8, border: 0, background: "transparent", cursor: "pointer", color: "var(--color-text-link, #1f78ff)", fontWeight: 900 }} aria-label="See more">See more…</button>;
-      if (href && href !== "#") return <a href={href} style={{ marginLeft: 8, fontWeight: 900, color: "var(--color-text-link, #1f78ff)" }}>See more…</a>;
-      return null;
-    }
-    return (
-      <div id={anchorId} style={cardStyle}>
-        <div style={{ display: "flex", gap: 10, alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap" }}>
-          {showTypeFilter ? <Badge kind={typeKey} label={typeLabel} /> : null}
-          <div style={{ fontSize: 12, opacity: 0.72, paddingTop: 2 }}>
-            {when ? when : null}{showVersionOnCards && when && versionDisplay ? " • " : null}{showVersionOnCards && versionDisplay ? versionDisplay : null}
-            {showAuthorFilter && (when || (showVersionOnCards && versionDisplay)) && who ? " • " : null}{showAuthorFilter && who ? who : null}
-          </div>
-        </div>
-        <div style={{ marginTop: 10 }}>
-          {showTitles ? <button type="button" onClick={open} style={{ padding: 0, margin: 0, border: 0, background: "transparent", textAlign: "left", cursor: enableModal ? "pointer" : "default", color: "var(--color-text-link, #1f78ff)", fontWeight: 900, fontSize: "1.15rem", lineHeight: 1.25 }} aria-label={"Open " + title}>{title}</button> : null}
-          {!showTitles ? <div style={{ fontSize: ".98rem", opacity: 0.95, lineHeight: 1.55 }}>{previewText ? previewText : null}{previewText ? <SeeMore /> : null}{!previewText ? <SeeMore /> : null}</div> : null}
-        </div>
-        {showTitles && showPreview && previewText ? <div style={{ marginTop: 8, fontSize: ".98rem", opacity: 0.9, lineHeight: 1.55, whiteSpace: "pre-line" }}>{previewText}<SeeMore /></div> : null}
-        {showTitles && showDescriptions ? (htmlExcerpt ? <div className="rmChangelogFeed__excerpt" style={{ marginTop: 10, fontSize: ".98rem", opacity: 0.95, lineHeight: 1.55 }} dangerouslySetInnerHTML={{ __html: htmlExcerpt }} /> : textExcerpt ? <div style={{ marginTop: 10, fontSize: ".98rem", opacity: 0.9, lineHeight: 1.55, whiteSpace: "pre-line" }}>{textExcerpt}<SeeMore /></div> : null) : null}
-      </div>
-    );
-  }
+  var selectStyle = { padding: "6px 28px 6px 10px", borderRadius: 6, border: "1px solid #d1d5db", background: "#fff", fontSize: 13, color: "#111827", appearance: "none", WebkitAppearance: "none", cursor: "pointer", fontFamily: "inherit" };
+  var thStyle = { padding: "10px 14px", textAlign: "left", fontWeight: 700, fontSize: 13, color: "#1e293b", background: "#f1f5f9", borderBottom: "2px solid #e2e8f0", cursor: "pointer", userSelect: "none", whiteSpace: "nowrap" };
+  var tdStyle = { padding: "10px 14px", verticalAlign: "top", borderBottom: "1px solid #e2e8f0" };
+
+  var cols = [
+    { key: "version", label: "Version" },
+    { key: "product", label: "Domain" },
+    { key: "change", label: "Change" },
+    { key: "body", label: "Description" },
+    { key: "pubDate", label: "Date" }
+  ];
 
   return (
-    <div style={rootStyle}>
-      <style>{styleTextRef.current}</style>
-      <div className="rmChangelogFeed">
-        <div style={barStyle}>
-          {showTypeFilter ? <div style={groupStyle}><div style={labelStyle}>Change type</div><select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={controlStyle}>{typeOptions.map(function (o) { return <option key={o.key} value={o.key}>{o.label}</option>; })}</select></div> : null}
-          {showProductFilter && !lockedProduct ? <div style={groupStyle}><div style={labelStyle}>Product</div><select value={productFilter} onChange={e => setProductFilter(e.target.value)} style={controlStyle}>{productOptions.map(function (o) { return <option key={o.key} value={o.key}>{o.label}</option>; })}</select></div> : null}
-          {showVersionFilter && !lockedVersion ? <div style={groupStyle}><div style={labelStyle}>Version</div><select value={versionFilter} onChange={e => setVersionFilter(e.target.value)} style={controlStyle}>{versionOptions.map(function (o) { return <option key={o.key} value={o.key}>{o.label}</option>; })}</select></div> : null}
-          {showSort ? <div style={groupStyle}><div style={labelStyle}>Date</div><select value={sort} onChange={e => setSort(e.target.value)} style={controlStyle}><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></div> : null}
-          {showSearch ? <div style={groupStyle}><div style={labelStyle}>Search</div><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Title or content…" style={controlStyle} /></div> : null}
-          {showAuthorFilter ? <div style={groupStyle}><div style={labelStyle}>Author</div><select value={author} onChange={e => setAuthor(e.target.value)} style={controlStyle}><option value="">All authors</option>{authorOptions.map(function (a) { return <option key={a} value={a}>{a}</option>; })}</select></div> : null}
-          <div style={metaStyle}>
-            {loading ? "Loading…" : null}{!loading && refreshing ? "Refreshing…" : null}{!loading && error ? "Error: " + error : null}
-            {!loading && !error ? visibleFiltered.length + " / " + items.length + " shown" + (visibleFiltered.length < filtered.length ? " • loading more…" : "") : null}
-          </div>
-        </div>
-
-        {loading ? <div style={{ opacity: 0.75 }}>Loading RSS feed…</div> : null}
-        {!loading && error ? <div style={{ padding: 12, borderRadius: 12, border: "1px solid rgba(239,68,68,.35)", background: "rgba(239,68,68,.08)" }}><div style={{ fontWeight: 800 }}>Couldn't load RSS</div><div style={{ marginTop: 6, opacity: 0.85, lineHeight: 1.5 }}>{error}<div style={{ marginTop: 8, fontSize: 12, opacity: 0.75 }}>If this URL is cross-origin, the browser may block it due to CORS. Using a same-origin path (like <code>/changelog.rss</code>) is the safest option.</div></div></div> : null}
-        {!loading && !error && !filtered.length ? <div style={{ opacity: 0.75 }}>No posts match your filters.</div> : null}
-        {!loading && !error && filtered.length ? (
-          <div className="rmChangelogFeed__layout">
-            <div className="rmChangelogFeed__list">
-              {visibleFiltered.map(function (it, idx) { return <Row key={(it.link ? it.link : "item") + "_" + idx} item={it} />; })}
-              {visibleFiltered.length < filtered.length ? (
-                <div style={{ opacity: 0.7, fontSize: 12, padding: "6px 2px" }}>
-                  {autoLoadMore ? "Loading more posts… (" + visibleFiltered.length + "/" + filtered.length + ")" : "Showing " + visibleFiltered.length + " of " + filtered.length}
-                  <button type="button" onClick={function () { if (autoLoadMore) { setRenderCount(filtered.length); return; } setRenderCount(function (prev) { var next = prev + Math.max(1, renderBatchSize); return next > filtered.length ? filtered.length : next; }); }} style={{ marginLeft: 10, border: "1px solid var(--color-border-default, rgba(0,0,0,.12))", background: "var(--color-bg-page, #fff)", borderRadius: 10, padding: "6px 10px", cursor: "pointer", fontWeight: 800, fontSize: 12 }}>{autoLoadMore ? "Load all now" : "Load more"}</button>
-                  {!autoLoadMore ? <button type="button" onClick={function () { setRenderCount(filtered.length); }} style={{ marginLeft: 10, border: "1px solid var(--color-border-default, rgba(0,0,0,.12))", background: "var(--color-bg-page, #fff)", borderRadius: 10, padding: "6px 10px", cursor: "pointer", fontWeight: 800, fontSize: 12 }}>Load all</button> : null}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
+    <div style={{ width: "100%", fontFamily: "system-ui, sans-serif" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16, alignItems: "center" }}>
+        <select value={versionF} onChange={function (e) { setVersionF(e.target.value); }} style={selectStyle}>
+          <option value="all">Version ▽</option>
+          {versions.map(function (v) { return <option key={v} value={v}>{v}</option>; })}
+        </select>
+        <select value={productF} onChange={function (e) { setProductF(e.target.value); }} style={selectStyle}>
+          <option value="all">Domain ▽</option>
+          {products.map(function (v) { return <option key={v} value={v}>{v}</option>; })}
+        </select>
+        <select value={changeF} onChange={function (e) { setChangeF(e.target.value); }} style={selectStyle}>
+          <option value="all">Change ▽</option>
+          {changes.map(function (v) { return <option key={v} value={v}>{titleCase(v)}</option>; })}
+        </select>
+        <input value={search} onChange={function (e) { setSearch(e.target.value); }} placeholder="Search…" style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #d1d5db", fontSize: 13, fontFamily: "inherit", color: "#111827", outline: "none", minWidth: 160 }} />
+        {(versionF !== "all" || productF !== "all" || changeF !== "all" || search) ? <button type="button" onClick={function () { setVersionF("all"); setProductF("all"); setChangeF("all"); setSearch(""); }} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #d1d5db", background: "#fff", fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button> : null}
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "#94a3b8" }}>{loading ? "Loading\u2026" : error ? "Error" : rows.length + " / " + items.length + " entries"}</span>
       </div>
 
-      {modalOpen ? (
-        <div className="rmChangelogFeed__modalOverlay" role="dialog" aria-modal="true" aria-label="Changelog post" onMouseDown={function (e) { if (e && e.target && e.target.className && String(e.target.className).indexOf("rmChangelogFeed__modalOverlay") !== -1) closeModal(); }}>
-          <div className="rmChangelogFeed__modal" onMouseDown={function (e) { e && e.stopPropagation && e.stopPropagation(); }}>
-            <div className="rmChangelogFeed__modalHeader">
-              <div className="rmChangelogFeed__modalTitle">{modalTitle || "Changelog post"}</div>
-              <div className="rmChangelogFeed__modalActions">
-                {modalHref ? <a href={modalHref} style={{ fontSize: 13, fontWeight: 900, color: "var(--color-text-link, #1f78ff)" }} target="_blank" rel="noopener noreferrer">Open in new tab</a> : null}
-                <button type="button" className="rmChangelogFeed__modalBtn" onClick={closeModal}>Close</button>
-              </div>
-            </div>
-            <div className="rmChangelogFeed__modalBody">
-              {modalLoading ? <div style={{ opacity: 0.75 }}>Loading full post…</div> : null}
-              {!modalLoading && modalError ? <div style={{ padding: 12, borderRadius: 12, border: "1px solid rgba(239,68,68,.35)", background: "rgba(239,68,68,.08)" }}><div style={{ fontWeight: 800 }}>Couldn't load the post</div><div style={{ marginTop: 6, opacity: 0.85, lineHeight: 1.5 }}>{modalError}</div></div> : null}
-              {!modalLoading && !modalError && modalMode === "html" && modalHtml ? <div className="rmChangelogFeed__excerpt" dangerouslySetInnerHTML={{ __html: modalHtml }} /> : null}
-              {!modalLoading && !modalError && modalMode === "iframe" && modalHref ? <iframe ref={modalFrameRef} src={canonicalizeForFetch(modalHref) || modalHref} title={modalTitle || "Changelog post"} onLoad={onModalFrameLoad} style={{ width: "100%", height: "78vh", border: "1px solid rgba(0,0,0,.12)", borderRadius: 12 }} /> : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {error ? <div style={{ padding: "12px 16px", borderRadius: 8, background: "#fef2f2", border: "1px solid #fca5a5", color: "#991b1b", fontSize: 13, marginBottom: 12 }}>{"Couldn\u2019t load RSS: " + error}</div> : null}
+
+      <div style={{ width: "100%", overflowX: "auto", borderRadius: 10, border: "1px solid #e2e8f0" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+          <thead>
+            <tr>
+              {cols.map(function (col) {
+                return (
+                  <th key={col.key} style={thStyle} onClick={function () { toggleSort(col.key); }}>
+                    {col.label}
+                    {sortCol === col.key ? (sortDir === "asc" ? " ▲" : " ▼") : " ▽"}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>{"Loading\u2026"}</td></tr> : null}
+            {!loading && !error && rows.length === 0 ? <tr><td colSpan={5} style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>No entries match your filters.</td></tr> : null}
+            {rows.map(function (it, idx) {
+              return (
+                <tr key={safeText(it.link) || String(idx)} style={{ background: idx % 2 === 0 ? "#fff" : "#f8fafc" }}>
+                  <td style={tdStyle}><span style={{ color: "#334155", fontWeight: 500, whiteSpace: "nowrap" }}>{it.version || "\u2014"}</span></td>
+                  <td style={tdStyle}><span style={{ color: "#334155" }}>{it.product || "\u2014"}</span></td>
+                  <td style={tdStyle}>
+                    {it.change ? <span style={{ display: "inline-block", padding: "3px 10px", borderRadius: 4, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", background: badgeBg(it.change), color: "#fff", textTransform: "uppercase", whiteSpace: "nowrap" }}>{it.change}</span> : <span style={{ color: "#cbd5e1" }}>{"\u2014"}</span>}
+                  </td>
+                  <td style={{ padding: "10px 14px", verticalAlign: "top", borderBottom: "1px solid #e2e8f0", color: "#374151", lineHeight: 1.55, maxWidth: 520 }}>
+                    {it.body ? it.body : (it.link ? <a href={safeText(it.link)} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", fontWeight: 600 }}>{safeText(it.title)}</a> : "\u2014")}
+                  </td>
+                  <td style={tdStyle}><span style={{ color: "#94a3b8", fontSize: 12, whiteSpace: "nowrap" }}>{formatDate(it.pubDate)}</span></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
 export const ChangelogMount = props => {
-  return <ChangelogGlobal {...props} />;
+  return <ChangelogTable {...props} />;
 };
 
 <ChangelogMount
-  maxItems={50}
+  rssUrl="https://erdtest123.readme.io/changelog.rss"
+  maxItems={200}
   cacheMinutes={15}
-  preconnectRss={true}
   fetchTimeoutMs={5000}
-  hydrateFromPermalink={true}
-  hydrateMax={20}
-  hydrateConcurrency={4}
-  minExcerptChars={120}
-  excerptMaxChars={900}
-  enableModal={true}
-  modalContentSelector=".ChangelogPage_list-post"
-  modalMaxWidth={980}
-  showTypeFilter={true}
-  showAuthorFilter={false}
-  showSort={true}
-  showSearch={true}
-  showToc={false}
-  showTitles={false}
-  cardsPerRow={1}
-  showPreview={true}
-  previewMaxChars={280}
-  showSeeMore={true}
-  showProductFilter={true}
-  showVersionFilter={true}
-  showVersionOnCards={true}
-  tocTitle="All changelogs"
-  tocMaxHeightVh={72}
-  initialRenderCount={5}
-  autoLoadMore={false}
-  renderBatchSize={10}
-  renderIdleTimeoutMs={100}
-  showDescriptions={false}
-  rewriteVersionedChangelogLinks={true}
-  stripQueryParamsForPostFetch={true}
-  fallbackToIframeInModal={true}
-  preferApiNextForModal={true}
-  preferRenderedHtmlForModal={true}
-  modalCacheMinutes={15}
-  apiProjectSlug=""
-  apiNextChangelogPath="/api-next/v2/changelogs/"
-/>
-
-<HTMLBlock>{`
-<style>
-section.content-toc.grid-25 { display: none; }
-
-.rm-Guides .content-body{
-  -ms-flex-negative: 1;
-  flex-shrink: 1;
-  max-width: 100%;
-  padding-top: 30px;
-  width: 100%;
-}
-
-.rmChangelogFeed__modalTitle {
-  font-weight: 900;
-  font-size: 16px;
-  line-height: 1.2;
-  max-width: 600px;
-  margin: 0;
-  display: block;
-}
-</style>
-`}</HTMLBlock>
+/> 
