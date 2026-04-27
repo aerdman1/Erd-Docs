@@ -9,7 +9,7 @@ metadata:
 <ChangelogMount
   rssUrl="https://erdtest123.readme.io/changelog.rss"
   maxItems={200}
-  cacheMinutes={15}
+  cacheMinutes={0}
   fetchTimeoutMs={5000}
   showVersionCol={true}
   showDomainCol={true}
@@ -26,3 +26,7 @@ metadata:
   descriptionLabel="Description"
   dateLabel="Date"
 />
+
+<br />
+
+<br />
