@@ -429,9 +429,9 @@ export const ChangelogTable = props => {
   return (
     <div style={{ width: "100%", fontFamily: "system-ui, sans-serif" }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16, alignItems: "center" }}>
-        {showVersionCol && showVersionFilter ? <select value={versionF} onChange={function (e) { setVersionF(e.target.value); }} style={selectStyle}><option value="all">{versionLabel + " ▽"}</option>{versions.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
-        {showDomainCol && showDomainFilter ? <select value={productF} onChange={function (e) { setProductF(e.target.value); }} style={selectStyle}><option value="all">{domainLabel + " ▽"}</option>{products.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
-        {showChangeCol && showChangeFilter ? <select value={changeF} onChange={function (e) { setChangeF(e.target.value); }} style={selectStyle}><option value="all">{changeLabel + " ▽"}</option>{changes.map(function (v) { return <option key={v} value={v}>{titleCase(v)}</option>; })}</select> : null}
+        {showVersionCol && showVersionFilter ? <select value={versionF} onChange={function (e) { setVersionF(e.target.value); }} style={selectStyle}><option value="all">{versionLabel + " ⏷"}</option>{versions.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
+        {showDomainCol && showDomainFilter ? <select value={productF} onChange={function (e) { setProductF(e.target.value); }} style={selectStyle}><option value="all">{domainLabel + " ⏷"}</option>{products.map(function (v) { return <option key={v} value={v}>{v}</option>; })}</select> : null}
+        {showChangeCol && showChangeFilter ? <select value={changeF} onChange={function (e) { setChangeF(e.target.value); }} style={selectStyle}><option value="all">{changeLabel + " ⏷"}</option>{changes.map(function (v) { return <option key={v} value={v}>{titleCase(v)}</option>; })}</select> : null}
         {showSearch ? <input value={search} onChange={function (e) { setSearch(e.target.value); }} placeholder="Search…" style={{ padding: "6px 10px", borderRadius: 6, border: "1px solid #d1d5db", fontSize: 13, fontFamily: "inherit", color: "#111827", outline: "none", minWidth: 160 }} /> : null}
         {(versionF !== "all" || productF !== "all" || changeF !== "all" || search) ? <button type="button" onClick={function () { setVersionF("all"); setProductF("all"); setChangeF("all"); setSearch(""); }} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #d1d5db", background: "#fff", fontSize: 13, cursor: "pointer", color: "#6b7280", fontFamily: "inherit" }}>Clear</button> : null}
         <span style={{ marginLeft: "auto", fontSize: 12, color: "#94a3b8" }}>{loading ? "Loading…" : error ? "Error" : rows.length + " / " + items.length + " entries"}</span>
@@ -497,4 +497,4 @@ export const ChangelogMount = props => {
   changeLabel="Change"
   descriptionLabel="Description"
   dateLabel="Date"
-/> 
+/>
