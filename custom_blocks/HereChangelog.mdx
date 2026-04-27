@@ -4,9 +4,9 @@ name: HereChangelog
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 export const ChangelogTable = props => {
-  var rssUrl = props && props.rssUrl ? String(props.rssUrl) : "/changelog.rss";
+  var rssUrl = props && props.rssUrl ? String(props.rssUrl) : detectDefaultRssUrl();
   var maxItems = props && props.maxItems ? Number(props.maxItems) : 200;
-  var cacheMinutes = props && props.cacheMinutes ? Number(props.cacheMinutes) : 15;
+  var cacheMinutes = props && props.cacheMinutes ? Number(props.cacheMinutes) : 0;
   var fetchTimeoutMs = props && props.fetchTimeoutMs ? Number(props.fetchTimeoutMs) : 5000;
 
   // Column visibility
@@ -16,7 +16,7 @@ export const ChangelogTable = props => {
   var showDescriptionCol = props && typeof props.showDescriptionCol === "boolean" ? props.showDescriptionCol : true;
   var showDateCol = props && typeof props.showDateCol === "boolean" ? props.showDateCol : true;
 
-  // Filter bar visibility (each filter only shows if its column is also shown)
+  // Filter bar visibility
   var showVersionFilter = props && typeof props.showVersionFilter === "boolean" ? props.showVersionFilter : true;
   var showDomainFilter = props && typeof props.showDomainFilter === "boolean" ? props.showDomainFilter : true;
   var showChangeFilter = props && typeof props.showChangeFilter === "boolean" ? props.showChangeFilter : true;
@@ -43,6 +43,12 @@ export const ChangelogTable = props => {
 
   function safeText(v) { if (v === null || v === undefined) return ""; return String(v); }
   function safeJsonParse(s) { try { return JSON.parse(s); } catch (e) { return null; } }
+
+  // Auto-detect RSS URL from ReadMe page meta tags
+  function readMeta(name) { try { var el = document.querySelector("meta[name='" + String(name) + "']"); return el ? safeText(el.getAttribute("content")).trim() : ""; } catch (e) { return ""; } }
+  function readSsrProp(name) { try { var el = document.getElementById("ssr-props"); if (!el || !el.textContent) return ""; var data = safeJsonParse(el.textContent); return data && data[name] ? safeText(data[name]).trim() : ""; } catch (e) { return ""; } }
+  function detectProjectBasePath() { var bp = readMeta("readme-basepath-childProject"); if (bp) return "/" + bp.replace(/^\/+|\/+$/g, ""); var sb = readSsrProp("baseUrl"); if (sb && sb !== "/") return "/" + sb.replace(/^\/+|\/+$/g, ""); return ""; }
+  function detectDefaultRssUrl() { var bp = detectProjectBasePath(); return (bp ? bp : "") + "/changelog.rss"; }
 
   function coerceDate(v) {
     if (!v) return null;
@@ -129,6 +135,13 @@ export const ChangelogTable = props => {
   function readLocal(key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } }
   function writeLocal(key, value) { try { window.localStorage.setItem(key, value); } catch (e) {} }
 
+  // Build a cache-busted RSS URL — rounded to the nearest minute so it stays
+  // stable within a single page session but always fetches fresh on a new load
+  function bustUrl(url) {
+    var sep = url.indexOf("?") === -1 ? "?" : "&";
+    return url + sep + "_cb=" + Math.floor(Date.now() / 60000);
+  }
+
   useEffect(function () {
     if (typeof window === "undefined") return;
     setLoading(true); setError("");
@@ -136,19 +149,21 @@ export const ChangelogTable = props => {
     var ac = new AbortController(); abortRef.current = ac;
 
     var ck = "rmCLTable_v1__" + rssUrl;
-    var cached = safeJsonParse(readLocal(ck));
-    if (cached && cached.items && Array.isArray(cached.items) && (Date.now() - Number(cached.ts || 0)) < Number(cacheMinutes) * 60000) {
-      setItems(cached.items); setLoading(false); return function () {};
+    if (Number(cacheMinutes) > 0) {
+      var cached = safeJsonParse(readLocal(ck));
+      if (cached && cached.items && Array.isArray(cached.items) && (Date.now() - Number(cached.ts || 0)) < Number(cacheMinutes) * 60000) {
+        setItems(cached.items); setLoading(false); return function () {};
+      }
     }
 
     var timer = window.setTimeout(function () { try { ac.abort(); } catch (e) {} }, fetchTimeoutMs);
-    fetch(rssUrl + (rssUrl.indexOf("?") === -1 ? "?" : "&") + "_t=" + Date.now(), { signal: ac.signal, cache: "no-store", credentials: "omit" })
+    fetch(bustUrl(rssUrl), { signal: ac.signal, cache: "no-store", credentials: "omit" })
       .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
       .then(function (xml) {
         window.clearTimeout(timer);
         var parsed = parseRss(xml);
         setItems(parsed); setLoading(false);
-        writeLocal(ck, JSON.stringify({ ts: Date.now(), items: parsed }));
+        if (Number(cacheMinutes) > 0) { writeLocal(ck, JSON.stringify({ ts: Date.now(), items: parsed })); }
       })
       .catch(function (err) {
         window.clearTimeout(timer);
@@ -207,7 +222,6 @@ export const ChangelogTable = props => {
     else { setSortCol(col); setSortDir("asc"); }
   }
 
-  // Dynamic column count for colSpan
   var colCount = (showVersionCol ? 1 : 0) + (showDomainCol ? 1 : 0) + (showChangeCol ? 1 : 0) + (showDescriptionCol ? 1 : 0) + (showDateCol ? 1 : 0);
 
   var selectStyle = { padding: "6px 28px 6px 10px", borderRadius: 6, border: "1px solid #d1d5db", background: "#fff", fontSize: 13, color: "#111827", appearance: "none", WebkitAppearance: "none", cursor: "pointer", fontFamily: "inherit" };
@@ -264,7 +278,6 @@ export const ChangelogMount = props => {
 };
 
 <ChangelogMount
-  rssUrl="https://erdtest123.readme.io/changelog.rss"
   maxItems={200}
   cacheMinutes={0}
   fetchTimeoutMs={5000}
