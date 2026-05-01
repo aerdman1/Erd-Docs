@@ -1,0 +1,4 @@
+---
+title: /{level}
+hidden: false
+---
