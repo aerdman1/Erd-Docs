@@ -12,6 +12,7 @@ export const ChangelogTable = props => {
   var hydrateMax = props && props.hydrateMax ? Number(props.hydrateMax) : 50;
   var hydrateConcurrency = props && props.hydrateConcurrency ? Number(props.hydrateConcurrency) : 4;
   var excerptMaxChars = props && props.excerptMaxChars ? Number(props.excerptMaxChars) : 400;
+  var pageSize = props && props.pageSize !== undefined ? Number(props.pageSize) : 25;
 
   // Layout toggle
   var defaultLayout = props && props.defaultLayout === "cards" ? "cards" : "table";
@@ -47,6 +48,7 @@ export const ChangelogTable = props => {
   var [sortCol, setSortCol] = useState("pubDate");
   var [sortDir, setSortDir] = useState("desc");
   var [layout, setLayout] = useState(defaultLayout);
+  var [page, setPage] = useState(0);
 
   var abortRef = useRef(null);
   var hydrateAbortRef = useRef(null);
@@ -330,12 +332,22 @@ export const ChangelogTable = props => {
     if (loading || error) return;
     if (!items || !items.length) return;
 
+    var _epSize = pageSize > 0 ? pageSize : (rows.length || 1);
+    var _sPage = Math.min(page, Math.max(0, Math.ceil(rows.length / _epSize) - 1));
+    var _visLinks = {};
+    for (var pi = _sPage * _epSize; pi < Math.min((_sPage + 1) * _epSize, rows.length); pi++) {
+      if (rows[pi] && rows[pi].link) _visLinks[rows[pi].link] = true;
+    }
     var toHydrate = [];
     for (var i = 0; i < items.length; i++) {
       var it = items[i];
-      if (!it || !it.link || it.__hydrated) continue;
+      if (!it || !it.link || it.__hydrated || !_visLinks[it.link]) continue;
       toHydrate.push({ idx: i, link: it.link });
-      if (toHydrate.length >= hydrateMax) break;
+    }
+    for (var i = 0; i < items.length && toHydrate.length < hydrateMax; i++) {
+      var it = items[i];
+      if (!it || !it.link || it.__hydrated || _visLinks[it.link]) continue;
+      toHydrate.push({ idx: i, link: it.link });
     }
     if (!toHydrate.length) return;
 
@@ -358,7 +370,7 @@ export const ChangelogTable = props => {
     });
 
     return function () { try { ac.abort(); } catch (e) {} };
-  }, [loading, error, items, hydrateContent, hydrateMax, hydrateConcurrency, fetchTimeoutMs]);
+  }, [loading, error, items, hydrateContent, hydrateMax, hydrateConcurrency, fetchTimeoutMs, page]);
 
   var versions = useMemo(function () {
     var seen = {}; var out = [];
@@ -404,6 +416,13 @@ export const ChangelogTable = props => {
     return result;
   }, [items, versionF, domainF, changeF, search, sortCol, sortDir]);
 
+  useEffect(function () { setPage(0); }, [versionF, domainF, changeF, search, sortCol, sortDir]);
+
+  var effectivePageSize = pageSize > 0 ? pageSize : (rows.length || 1);
+  var pageCount = Math.ceil(rows.length / effectivePageSize);
+  var safePage = Math.min(page, Math.max(0, pageCount - 1));
+  var visibleRows = rows.slice(safePage * effectivePageSize, (safePage + 1) * effectivePageSize);
+
   function toggleSort(col) {
     if (sortCol === col) { setSortDir(sortDir === "asc" ? "desc" : "asc"); }
     else { setSortCol(col); setSortDir("asc"); }
@@ -448,7 +467,7 @@ export const ChangelogTable = props => {
     if (!loading && !error && rows.length === 0) return <div style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>No entries match your filters.</div>;
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {rows.map(function (it, idx) {
+        {visibleRows.map(function (it, idx) {
           var accent = it.change ? badgeBg(it.change) : "#e2e8f0";
           return (
             <div key={safeText(it.link) || String(idx)} style={{ borderRadius: 10, border: "1px solid #e2e8f0", background: "#fff", boxShadow: "0 1px 4px rgba(0,0,0,.06)", overflow: "hidden", display: "flex" }}>
@@ -510,7 +529,7 @@ export const ChangelogTable = props => {
           <tbody>
             {loading ? <tr><td colSpan={colCount} style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>{"Loading…"}</td></tr> : null}
             {!loading && !error && rows.length === 0 ? <tr><td colSpan={colCount} style={{ padding: 24, textAlign: "center", color: "#94a3b8", fontSize: 13 }}>No entries match your filters.</td></tr> : null}
-            {rows.map(function (it, idx) {
+            {visibleRows.map(function (it, idx) {
               return (
                 <tr key={safeText(it.link) || String(idx)} style={{ background: idx % 2 === 0 ? "#fff" : "#fafbfc" }}>
                   {showVersionCol ? <td style={tdStyle}>{it.version ? <span style={{ display: "inline-block", padding: "2px 10px", borderRadius: 999, background: "#f1f5f9", border: "1px solid #e2e8f0", color: "#475569", fontSize: 12, fontWeight: 600, whiteSpace: "nowrap", letterSpacing: ".02em" }}>{it.version}</span> : <span style={{ color: "#cbd5e1" }}>—</span>}</td> : null}
@@ -524,6 +543,14 @@ export const ChangelogTable = props => {
           </tbody>
         </table>
       </div>}
+
+      {pageCount > 1 ? (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 16 }}>
+          <button type="button" disabled={safePage === 0} onClick={function () { setPage(safePage - 1); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid #e2e8f0", background: safePage === 0 ? "#f8fafc" : "#fff", fontSize: 13, cursor: safePage === 0 ? "default" : "pointer", color: safePage === 0 ? "#cbd5e1" : "#374151", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,.04)" }}>← Prev</button>
+          <span style={{ fontSize: 12, color: "#64748b", minWidth: 80, textAlign: "center" }}>Page {safePage + 1} of {pageCount}</span>
+          <button type="button" disabled={safePage >= pageCount - 1} onClick={function () { setPage(safePage + 1); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid #e2e8f0", background: safePage >= pageCount - 1 ? "#f8fafc" : "#fff", fontSize: 13, cursor: safePage >= pageCount - 1 ? "default" : "pointer", color: safePage >= pageCount - 1 ? "#cbd5e1" : "#374151", fontFamily: "inherit", boxShadow: "0 1px 2px rgba(0,0,0,.04)" }}>Next →</button>
+        </div>
+      ) : null}
     </div>
   );
 };
@@ -540,6 +567,7 @@ export const ChangelogMount = props => {
   hydrateMax={50}
   hydrateConcurrency={4}
   excerptMaxChars={400}
+  pageSize={25}
   showVersionCol={true}
   showDomainCol={true}
   showChangeCol={true}
