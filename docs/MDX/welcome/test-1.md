@@ -8,7 +8,7 @@ metadata:
 ---
 <HTMLBlock>{`
 <iframe
-  src="https://documentation.qa.cpxchange.com/cpx-qa-docs/docs/2026-release-notes?isFramePreview=true"
+  src="https://documentation.qa.cpxchange.com/cpx-qa-docs/docs/2026-release-notes"
   sandbox="allow-downloads allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
 ></iframe>
 `}</HTMLBlock>
