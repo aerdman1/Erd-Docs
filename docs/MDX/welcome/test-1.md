@@ -7,7 +7,10 @@ metadata:
   robots: index
 ---
 <HTMLBlock>{`
-<iframe src="https://documentation.qa.cpxchange.com/cpx-qa-docs/docs/2026-release-notes?isFramePreview" sandbox="allow-downloads allow-same-origin allow-scripts allow-forms allow-popups allow-modals" ></iframe>
+<iframe
+  src="https://documentation.qa.cpxchange.com/cpx-qa-docs/docs/2026-release-notes?isFramePreview=true"
+  sandbox="allow-downloads allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+></iframe>
 `}</HTMLBlock>
 
 <br />
