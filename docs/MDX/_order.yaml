@@ -1,3 +1,4 @@
+- customer-quotes
 - welcome
 - here-changelog-test
 - rss-release-notes
@@ -15,7 +16,6 @@
 - keyword-testing
 - data-tables
 - dashboard-mdx
-- customer-quotes
 - page-modal-simple
 - display-geojson-data
 - feature-requests
