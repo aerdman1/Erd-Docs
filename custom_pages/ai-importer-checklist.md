@@ -107,6 +107,17 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       align-items: start;
       margin: 0 0 5px;
       font-size: 12px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .check:hover .box {
+      border-color: #374151;
+    }
+
+    .check.done > span:last-child {
+      color: var(--muted);
+      text-decoration: line-through;
     }
 
     .box {
@@ -115,6 +126,26 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       border: 1.5px solid #6b7280;
       border-radius: 2px;
       margin-top: 1px;
+      flex-shrink: 0;
+      position: relative;
+      transition: background 0.1s, border-color 0.1s;
+    }
+
+    .check.done .box {
+      background: #1f2933;
+      border-color: #1f2933;
+    }
+
+    .check.done .box::after {
+      content: '';
+      position: absolute;
+      left: 1px;
+      top: -1px;
+      width: 7px;
+      height: 4px;
+      border-left: 1.5px solid #fff;
+      border-bottom: 1.5px solid #fff;
+      transform: rotate(-45deg);
     }
 
     .grading {
@@ -335,6 +366,14 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       </div>
     </section>
   </main>
+
+  <script>
+    document.querySelectorAll('.check').forEach(function(item) {
+      item.addEventListener('click', function() {
+        this.classList.toggle('done');
+      });
+    });
+  </script>
 </body>
 </html>
 `}</HTMLBlock>
