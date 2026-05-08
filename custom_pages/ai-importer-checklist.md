@@ -16,7 +16,9 @@ hidden: false
     margin: 0 auto;
     max-width: 100%;
     }
-
+.Header-bottom_withOwlbot3wuKp8NLXCqs {
+    display:none !important;
+}
     :root {
       --text: #1f2933;
       --muted: #5f6b7a;
