@@ -6,16 +6,16 @@ icon: far fa-mp3-player
 metadata:
   robots: index
 ---
-<CustomerQuotes title="Customer Quotes!">
-  <CustomerQuote author="Alice">
-    ReadMe.io made our documentation sparkle with creativity!
+<CustomerQuotes title="Funny Movie Quotes!">
+  <CustomerQuote author="Ron Burgundy">
+    I’m kind of a big deal.
   </CustomerQuote>
 
-  <CustomerQuote author="Bob">
-    The support and experience are as bold as our ideas!
+  <CustomerQuote author="The Dude">
+    Yeah, well, you know, that’s just, like, your opinion, man.
   </CustomerQuote>
 
-  <CustomerQuote author="Charlie">
-    Every time I click, I get a fresh dose of inspiration!
+  <CustomerQuote author="Forrest Gump">
+    Life is like a box of chocolates.
   </CustomerQuote>
 </CustomerQuotes>
