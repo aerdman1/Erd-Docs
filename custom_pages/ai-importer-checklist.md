@@ -16,7 +16,7 @@ hidden: false
     margin: 0 auto;
     max-width: 100%;
     }
-header {
+.rm-Header_compact Header {
     display:none !important;
 }
     :root {
