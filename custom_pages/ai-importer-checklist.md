@@ -16,7 +16,7 @@ hidden: false
     margin: 0 auto;
     max-width: 100%;
     }
-.header.SuperHubCustomPage-content-header,.rm-Header,.Header-bottom_withOwlbot3wuKp8NLXCqs {
+header {
     display:none !important;
 }
     :root {
