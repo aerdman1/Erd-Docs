@@ -16,6 +16,13 @@ hidden: false
     margin: 0 auto;
     max-width: 100%;
     }
+
+.SuperHubCustomPage-content2y25YXtWEbiK {
+    margin: 0 auto;
+    max-width: 100%;
+    padding: 10px;
+    }
+
 header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Header3zzata9F_ZPQ.rm-Header_compact.Header_collapsible3n0YXfOvb_Al.rm-Header {
     display:none !important;
 }
