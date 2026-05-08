@@ -16,7 +16,7 @@ hidden: false
     margin: 0 auto;
     max-width: 100%;
     }
-.Header-bottom_withOwlbot3wuKp8NLXCqs {
+.rm-Header,.Header-bottom_withOwlbot3wuKp8NLXCqs {
     display:none !important;
 }
     :root {
