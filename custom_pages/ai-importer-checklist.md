@@ -11,6 +11,12 @@ hidden: false
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI Import QA - Full Quality Checklist</title>
   <style>
+
+.SuperHubCustomPage-content2y25YXtWEbiK {
+    margin: 0 auto;
+    max-width: 100%;
+    }
+
     :root {
       --text: #1f2933;
       --muted: #5f6b7a;
