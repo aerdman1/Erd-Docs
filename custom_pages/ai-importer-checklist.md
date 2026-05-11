@@ -9,51 +9,56 @@ hidden: false
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Import QA - Full Quality Checklist</title>
+  <title>AI Import QA</title>
   <style>
-.SuperHubCustomPage-content2y25YXtWEbiK { margin: 0 auto; max-width: 100%; padding: 10px; }
+/* ReadMe overrides */
+.SuperHubCustomPage-content2y25YXtWEbiK { margin: 0 auto; max-width: 100%; padding: 0; }
 header.SuperHubCustomPage-content-header,
 .rm-Header_compact Header,
 header.Header3zzata9F_ZPQ.rm-Header_compact.Header_collapsible3n0YXfOvb_Al.rm-Header { display: none !important; }
 
 :root {
   --text: #1f2933;
-  --muted: #5f6b7a;
-  --border: #d9dee7;
-  --section: #f5f7fa;
-  --critical: #fff3f0;
-  --critical-border: #f1b8aa;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --sidebar-bg: #f8fafc;
+  --sidebar-w: 210px;
+  --topbar-h: 52px;
+  --red: #dc2626;
+  --green: #16a34a;
+  --orange: #d97706;
 }
-* { box-sizing: border-box; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  margin: 0;
-  padding: 16px 20px 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
   color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
   background: #fff;
-  line-height: 1.25;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
-.page { max-width: 1100px; margin: 0 auto; }
-
-/* ── Header ── */
-.qa-header {
+/* ── Top bar ── */
+.qa-topbar {
+  height: var(--topbar-h);
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
-  border-bottom: 2px solid var(--border);
-  padding-bottom: 10px;
-  margin-bottom: 12px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-.qa-title {
-  font-size: 16px;
+.qa-logo {
+  font-size: 14px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   white-space: nowrap;
-  margin: 0;
+  flex-shrink: 0;
 }
 
 .qa-fields {
@@ -61,312 +66,471 @@ body {
   gap: 6px;
   flex: 1;
   min-width: 0;
-  flex-wrap: wrap;
 }
 
 .qa-fields input {
   flex: 1;
-  min-width: 110px;
-  padding: 5px 8px;
+  min-width: 80px;
+  padding: 5px 9px;
   font-size: 12px;
   border: 1.5px solid var(--border);
   border-radius: 6px;
   color: var(--text);
   font-family: inherit;
   outline: none;
-  transition: border-color 0.15s;
+  background: #f8fafc;
+  transition: border-color 0.15s, background 0.15s;
 }
-.qa-fields input:focus { border-color: #6b7280; }
+.qa-fields input:focus { border-color: #94a3b8; background: #fff; }
 
-.qa-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
+.qa-actions { display: flex; gap: 6px; flex-shrink: 0; }
 
 .btn {
-  padding: 5px 12px;
+  padding: 5px 13px;
   font-size: 12px;
   font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
   border: 1.5px solid;
+  transition: all 0.15s;
+  line-height: 1.4;
 }
+.btn-primary  { background: #1e293b; border-color: #1e293b; color: #fff; }
+.btn-primary:hover  { background: #334155; border-color: #334155; }
+.btn-ghost   { background: #fff; border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.btn-danger  { background: #fff; border-color: #fca5a5; color: var(--red); }
+.btn-danger:hover { background: #fef2f2; }
 
-.btn-primary {
-  background: #1f2933;
-  border-color: #1f2933;
-  color: #fff;
-}
-.btn-primary:hover { background: #374151; border-color: #374151; }
-
-.btn-secondary {
-  background: #fff;
-  border-color: var(--border);
-  color: var(--text);
-}
-.btn-secondary:hover { border-color: #9ca3af; background: #f9fafb; }
-
-/* ── Grid ── */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  align-items: start;
-}
-
-.section {
-  border: 1px solid var(--border);
-  border-radius: 8px;
+/* ── Body layout ── */
+.qa-body {
+  display: flex;
+  height: calc(100vh - var(--topbar-h) - 70px); /* 70px ≈ ReadMe chrome */
   overflow: hidden;
-  background: #fff;
 }
 
-.section h2 {
-  margin: 0;
-  padding: 6px 10px;
-  font-size: 12px;
+/* ── Sidebar ── */
+.qa-sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.nav-group-label {
+  font-size: 10px;
   font-weight: 700;
-  background: var(--section);
-  border-bottom: 1px solid var(--border);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.07em;
   color: var(--muted);
+  padding: 10px 14px 4px;
 }
 
-.section.critical { border-color: var(--critical-border); }
-.section.critical h2 {
-  background: var(--critical);
-  border-bottom-color: var(--critical-border);
-  color: #92400e;
-}
-
-.checklist { padding: 6px 10px 8px; }
-
-.check {
-  display: grid;
-  grid-template-columns: 16px 1fr;
-  gap: 5px;
-  align-items: start;
-  margin: 0 0 4px;
-  font-size: 11.5px;
+.qa-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
   cursor: pointer;
+  border-radius: 0;
+  transition: background 0.1s;
+  position: relative;
   user-select: none;
 }
+.qa-nav-item:hover { background: #f1f5f9; }
+.qa-nav-item.active {
+  background: #fff;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #1e293b;
+}
+
+.nav-icon { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
+.nav-label { flex: 1; font-size: 12px; }
+
+.nav-badge {
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+.badge-red   { background: #fee2e2; color: var(--red); }
+.badge-green { background: #dcfce7; color: var(--green); }
+.badge-none  { display: none; }
+
+/* ── Grade box in sidebar ── */
+.qa-grade-box {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: 14px;
+}
+.grade-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.grade-value {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.grade-pass    { color: var(--green); }
+.grade-partial { color: var(--orange); }
+.grade-fail    { color: var(--red); }
+.grade-desc {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 3px;
+  line-height: 1.35;
+}
+
+/* ── Content area ── */
+.qa-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.qa-section { display: none; }
+.qa-section.active { display: block; }
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.section-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+.check-list { display: flex; flex-direction: column; gap: 2px; }
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+.check:hover { background: #f8fafc; }
 
 .check input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
-  width: 11px;
-  height: 11px;
-  border: 1.5px solid #9ca3af;
-  border-radius: 2px;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  border: 1.5px solid #94a3b8;
+  border-radius: 3px;
   margin-top: 1px;
-  flex-shrink: 0;
   position: relative;
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
+  transition: all 0.1s;
+  background: #fff;
 }
-.check input[type="checkbox"]:hover { border-color: #374151; }
-.check input[type="checkbox"]:checked { background: #1f2933; border-color: #1f2933; }
+.check input[type="checkbox"]:checked {
+  background: #1e293b;
+  border-color: #1e293b;
+}
 .check input[type="checkbox"]:checked::after {
   content: '';
   position: absolute;
-  left: 1px;
-  top: -1px;
-  width: 6px;
-  height: 3px;
-  border-left: 1.5px solid #fff;
-  border-bottom: 1.5px solid #fff;
+  left: 2px;
+  top: 0px;
+  width: 7px;
+  height: 4px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
   transform: rotate(-45deg);
 }
 
-/* Non-critical: red strikethrough when unchecked */
-.section:not(.critical) .check:has(input:not(:checked)) > span {
-  color: #dc2626;
+.check-label { font-size: 13px; line-height: 1.4; }
+
+/* Non-critical: strikethrough + red when UNCHECKED */
+.qa-section:not(#section-critical) .check:has(input:not(:checked)) .check-label {
+  color: var(--red);
   text-decoration: line-through;
+  opacity: 0.8;
 }
 
-/* Critical: red bold when checked */
-.section.critical .check:has(input:checked) > span {
-  color: #dc2626;
-  font-weight: 700;
+/* Critical: bold red when CHECKED */
+#section-critical .check:has(input:checked) { background: #fef2f2; }
+#section-critical .check:has(input:checked) .check-label {
+  color: var(--red);
+  font-weight: 600;
+}
+#section-critical .check input[type="checkbox"]:checked {
+  background: var(--red);
+  border-color: var(--red);
 }
 
-/* ── Grading ── */
-.grading {
-  margin-top: 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
+/* ── Modal ── */
+.qa-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
 }
-.grading h2 {
-  margin: 0;
-  padding: 6px 10px;
+.qa-modal.open { display: flex; }
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+}
+.modal-box {
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px 28px 24px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal-icon { font-size: 28px; margin-bottom: 10px; }
+.modal-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.modal-box p { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+.modal-box p strong { color: var(--text); }
+.modal-btns { display: flex; flex-direction: column; gap: 8px; }
+.modal-btns .btn { width: 100%; justify-content: center; display: flex; padding: 8px 16px; font-size: 13px; }
+.modal-cancel-link {
+  display: block;
+  text-align: center;
+  margin-top: 12px;
   font-size: 12px;
-  font-weight: 700;
-  background: var(--section);
-  border-bottom: 1px solid var(--border);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
   color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
 }
-.grade-row {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: 8px;
-  padding: 5px 10px;
-  border-bottom: 1px solid var(--border);
-  font-size: 11.5px;
-}
-.grade-row:last-child { border-bottom: 0; }
-.grade { font-weight: 700; }
-
-@media print {
-  body { padding: 0.3in; }
-  .qa-actions { display: none; }
-  .qa-fields input { border: none; padding: 0; font-size: 10px; color: var(--muted); }
-  .grid { gap: 6px; }
-  .check { font-size: 9.5px; }
-}
+.modal-cancel-link:hover { color: var(--text); }
   </style>
 </head>
 <body>
-<main class="page">
 
-  <header class="qa-header">
-    <h1 class="qa-title">AI Import QA</h1>
-    <div class="qa-fields">
-      <input id="field-project" type="text"  placeholder="Project / customer" autocomplete="off">
-      <input id="field-owner"   type="text"  placeholder="QA Owner"           autocomplete="off">
-      <input id="field-url"     type="url"   placeholder="https://docs.example.com" autocomplete="off">
+<!-- Top bar -->
+<div class="qa-topbar">
+  <span class="qa-logo">AI Import QA</span>
+  <div class="qa-fields">
+    <input id="field-project" type="text" placeholder="Project / customer" autocomplete="off">
+    <input id="field-owner"   type="text" placeholder="QA Owner" autocomplete="off">
+    <input id="field-url"     type="url"  placeholder="https://docs.example.com" autocomplete="off">
+  </div>
+  <div class="qa-actions">
+    <button id="new-qa-btn"  class="btn btn-ghost">+ New QA</button>
+    <button id="export-btn"  class="btn btn-primary">Export &amp; Copy Link</button>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="qa-body">
+
+  <!-- Sidebar -->
+  <nav class="qa-sidebar">
+    <div class="nav-group-label">Sections</div>
+
+    <div class="qa-nav-item active" data-target="critical">
+      <span class="nav-icon">⚠️</span>
+      <span class="nav-label">Critical Failures</span>
+      <span class="nav-badge badge-none" id="badge-critical"></span>
     </div>
-    <div class="qa-actions">
-      <button id="new-qa-btn"  class="btn btn-secondary">+ New QA</button>
-      <button id="export-btn"  class="btn btn-primary">Export &amp; Copy Link</button>
+    <div class="qa-nav-item" data-target="completeness">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Completeness</span>
+      <span class="nav-badge badge-none" id="badge-completeness"></span>
     </div>
-  </header>
+    <div class="qa-nav-item" data-target="accuracy">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-label">Accuracy</span>
+      <span class="nav-badge badge-none" id="badge-accuracy"></span>
+    </div>
+    <div class="qa-nav-item" data-target="rendering">
+      <span class="nav-icon">🖼️</span>
+      <span class="nav-label">Rendering Fidelity</span>
+      <span class="nav-badge badge-none" id="badge-rendering"></span>
+    </div>
+    <div class="qa-nav-item" data-target="ia">
+      <span class="nav-icon">🗂️</span>
+      <span class="nav-label">Info Architecture</span>
+      <span class="nav-badge badge-none" id="badge-ia"></span>
+    </div>
+    <div class="qa-nav-item" data-target="code">
+      <span class="nav-icon">💻</span>
+      <span class="nav-label">Code Samples</span>
+      <span class="nav-badge badge-none" id="badge-code"></span>
+    </div>
+    <div class="qa-nav-item" data-target="performance">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-label">Performance</span>
+      <span class="nav-badge badge-none" id="badge-performance"></span>
+    </div>
 
-  <section class="grid">
+    <!-- Auto grade -->
+    <div class="qa-grade-box">
+      <div class="grade-label">Auto Grade</div>
+      <div class="grade-value grade-pass" id="auto-grade">PASS</div>
+      <div class="grade-desc" id="grade-desc">No issues flagged</div>
+    </div>
+  </nav>
 
-    <div class="section critical">
-      <h2>⚠️ Critical Failures — check any that apply</h2>
-      <div class="checklist">
-        <label class="check"><input type="checkbox"><span>Entire major sections missing</span></label>
-        <label class="check"><input type="checkbox"><span>Large numbers of skipped pages</span></label>
-        <label class="check"><input type="checkbox"><span>Missing API references</span></label>
-        <label class="check"><input type="checkbox"><span>Broad image/rendering failures</span></label>
-        <label class="check"><input type="checkbox"><span>Empty generated pages</span></label>
-        <label class="check"><input type="checkbox"><span>Fake AI-generated content</span></label>
-        <label class="check"><input type="checkbox"><span>Incorrect endpoint details</span></label>
-        <label class="check"><input type="checkbox"><span>Broken internal routing</span></label>
-        <label class="check"><input type="checkbox"><span>Broken markdown rendering</span></label>
-        <label class="check"><input type="checkbox"><span>Destroyed callouts</span></label>
-        <label class="check"><input type="checkbox"><span>Code/table corruption</span></label>
-        <label class="check"><input type="checkbox"><span>Unusable navigation</span></label>
-        <label class="check"><input type="checkbox"><span>Massive duplication</span></label>
-        <label class="check"><input type="checkbox"><span>Invalid JSON/examples</span></label>
-        <label class="check"><input type="checkbox"><span>Fake endpoints/parameters</span></label>
-        <label class="check"><input type="checkbox"><span>Unusable code samples</span></label>
-        <label class="check"><input type="checkbox"><span>Frequent rendering failures/crashes</span></label>
+  <!-- Content -->
+  <main class="qa-content">
+
+    <div class="qa-section active" id="section-critical">
+      <div class="section-title">⚠️ Critical Failure Conditions</div>
+      <div class="section-subtitle">Check anything that applies. Any checked item triggers a FAIL grade.</div>
+      <div class="check-list">
+        <label class="check"><input type="checkbox"><span class="check-label">Entire major sections missing</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Large numbers of skipped pages</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Missing API references</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Broad image/rendering failures</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Empty generated pages</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Fake AI-generated content</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Incorrect endpoint details</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Broken internal routing</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Broken markdown rendering</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Destroyed callouts</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Code/table corruption</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Unusable navigation</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Massive duplication</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Invalid JSON/examples</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Fake endpoints/parameters</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Unusable code samples</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Frequent rendering failures/crashes</span></label>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Completeness — uncheck anything failing</h2>
-      <div class="checklist">
-        <label class="check"><input type="checkbox" checked><span>Major sections/pages imported</span></label>
-        <label class="check"><input type="checkbox" checked><span>Subsections/pages not skipped</span></label>
-        <label class="check"><input type="checkbox" checked><span>API refs imported correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span>No major navigation holes</span></label>
-        <label class="check"><input type="checkbox" checked><span>No empty categories/folders</span></label>
-        <label class="check"><input type="checkbox" checked><span>No obvious missing child pages</span></label>
-        <label class="check"><input type="checkbox" checked><span>Images/SVGs imported correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span>Code examples imported</span></label>
-        <label class="check"><input type="checkbox" checked><span>Tables imported/readable</span></label>
-        <label class="check"><input type="checkbox" checked><span>PDFs/download links preserved or flagged</span></label>
-        <label class="check"><input type="checkbox" checked><span>Page count roughly matches source</span></label>
-        <label class="check"><input type="checkbox" checked><span>Major nav groups match source</span></label>
+    <div class="qa-section" id="section-completeness">
+      <div class="section-title">📋 Completeness</div>
+      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="check-list">
+        <label class="check"><input type="checkbox" checked><span class="check-label">Major sections/pages imported</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Subsections/pages not skipped</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">API refs imported correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No major navigation holes</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No empty categories/folders</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No obvious missing child pages</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Images/SVGs imported correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Code examples imported</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Tables imported/readable</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">PDFs/download links preserved or flagged</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Page count roughly matches source</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Major nav groups match source</span></label>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Accuracy — uncheck anything failing</h2>
-      <div class="checklist">
-        <label class="check"><input type="checkbox" checked><span>Technical meaning preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span>No truncated content</span></label>
-        <label class="check"><input type="checkbox" checked><span>No hallucinated/generated filler</span></label>
-        <label class="check"><input type="checkbox" checked><span>No merged unrelated content</span></label>
-        <label class="check"><input type="checkbox" checked><span>No duplicated content blocks</span></label>
-        <label class="check"><input type="checkbox" checked><span>HTTP methods correct</span></label>
-        <label class="check"><input type="checkbox" checked><span>API paths correct</span></label>
-        <label class="check"><input type="checkbox" checked><span>Parameters/types correct</span></label>
-        <label class="check"><input type="checkbox" checked><span>Response codes correct</span></label>
-        <label class="check"><input type="checkbox" checked><span>Request/response examples preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span>Internal links rewritten correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span>External links preserved correctly</span></label>
+    <div class="qa-section" id="section-accuracy">
+      <div class="section-title">🎯 Accuracy</div>
+      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="check-list">
+        <label class="check"><input type="checkbox" checked><span class="check-label">Technical meaning preserved</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No truncated content</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No hallucinated/generated filler</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No merged unrelated content</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No duplicated content blocks</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">HTTP methods correct</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">API paths correct</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Parameters/types correct</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Response codes correct</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Request/response examples preserved</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Internal links rewritten correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">External links preserved correctly</span></label>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Rendering Fidelity — uncheck anything failing</h2>
-      <div class="checklist">
-        <label class="check"><input type="checkbox" checked><span>Heading hierarchy logical</span></label>
-        <label class="check"><input type="checkbox" checked><span>TOC generates correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span>Pages readable/scannable</span></label>
-        <label class="check"><input type="checkbox" checked><span>Callouts/admonitions preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span>Syntax highlighting works</span></label>
-        <label class="check"><input type="checkbox" checked><span>Code blocks readable</span></label>
-        <label class="check"><input type="checkbox" checked><span>Tables aligned/readable</span></label>
-        <label class="check"><input type="checkbox" checked><span>Nested lists preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span>Images render correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span>Relative asset paths resolved</span></label>
+    <div class="qa-section" id="section-rendering">
+      <div class="section-title">🖼️ Rendering Fidelity</div>
+      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="check-list">
+        <label class="check"><input type="checkbox" checked><span class="check-label">Heading hierarchy logical</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">TOC generates correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Pages readable/scannable</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Callouts/admonitions preserved</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Syntax highlighting works</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Code blocks readable</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Tables aligned/readable</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Nested lists preserved</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Images render correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Relative asset paths resolved</span></label>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Information Architecture — uncheck anything failing</h2>
-      <div class="checklist">
-        <label class="check"><input type="checkbox" checked><span>Navigation grouping logical</span></label>
-        <label class="check"><input type="checkbox" checked><span>Parent/child relationships make sense</span></label>
-        <label class="check"><input type="checkbox" checked><span>Ordering predictable</span></label>
-        <label class="check"><input type="checkbox" checked><span>Landing pages placed correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span>Slugs/page names clean</span></label>
-        <label class="check"><input type="checkbox" checked><span>No orphan pages</span></label>
-        <label class="check"><input type="checkbox" checked><span>No duplicate sections/pages</span></label>
-        <label class="check"><input type="checkbox" checked><span>Versions separated correctly</span></label>
+    <div class="qa-section" id="section-ia">
+      <div class="section-title">🗂️ Information Architecture</div>
+      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="check-list">
+        <label class="check"><input type="checkbox" checked><span class="check-label">Navigation grouping logical</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Parent/child relationships make sense</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Ordering predictable</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Landing pages placed correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Slugs/page names clean</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No orphan pages</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No duplicate sections/pages</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Versions separated correctly</span></label>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Code Sample Quality — uncheck anything failing</h2>
-      <div class="checklist">
-        <label class="check"><input type="checkbox" checked><span>Code samples syntactically valid</span></label>
-        <label class="check"><input type="checkbox" checked><span>Correct language labels</span></label>
-        <label class="check"><input type="checkbox" checked><span>Request bodies plausible</span></label>
-        <label class="check"><input type="checkbox" checked><span>Auth examples reasonable</span></label>
-        <label class="check"><input type="checkbox" checked><span>JSON/code readable/formatted</span></label>
+    <div class="qa-section" id="section-code">
+      <div class="section-title">💻 Code Sample Quality</div>
+      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="check-list">
+        <label class="check"><input type="checkbox" checked><span class="check-label">Code samples syntactically valid</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Correct language labels</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Request bodies plausible</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Auth examples reasonable</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">JSON/code readable/formatted</span></label>
       </div>
     </div>
 
-    <div class="section">
-      <h2>Performance &amp; Stability — uncheck anything failing</h2>
-      <div class="checklist">
-        <label class="check"><input type="checkbox" checked><span>Pages progressively appeared during import</span></label>
-        <label class="check"><input type="checkbox" checked><span>Sidebar responsive</span></label>
-        <label class="check"><input type="checkbox" checked><span>Pages load normally</span></label>
-        <label class="check"><input type="checkbox" checked><span>No major lag/freezing</span></label>
-        <label class="check"><input type="checkbox" checked><span>Navigation usable during import</span></label>
+    <div class="qa-section" id="section-performance">
+      <div class="section-title">⚡ Performance &amp; Stability</div>
+      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="check-list">
+        <label class="check"><input type="checkbox" checked><span class="check-label">Pages progressively appeared during import</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Sidebar responsive</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Pages load normally</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">No major lag/freezing</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Navigation usable during import</span></label>
       </div>
     </div>
 
+  </main>
+</div>
 
+<!-- New QA confirmation modal -->
+<div class="qa-modal" id="qa-modal">
+  <div class="modal-overlay" id="modal-overlay"></div>
+  <div class="modal-box">
+    <div class="modal-icon">💾</div>
+    <h3>Starting a new QA?</h3>
+    <p>Make sure you've saved your work first — export your shareable link so you can come back to this one later.</p>
+    <div class="modal-btns">
+      <button id="modal-export-btn" class="btn btn-ghost">Export &amp; Copy Link First</button>
+      <button id="modal-open-btn"   class="btn btn-primary">Open New Tab Anyway</button>
+    </div>
+    <span class="modal-cancel-link" id="modal-cancel-btn">Cancel</span>
+  </div>
+</div>
 
-  </section>
-</main>
 </body>
 </html>
 `}</HTMLBlock>
