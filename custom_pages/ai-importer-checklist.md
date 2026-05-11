@@ -215,9 +215,16 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       transform: rotate(-45deg);
     }
 
-    .check:has(input:checked) > span {
-      color: var(--muted);
+    /* Non-critical: strike through when UNCHECKED (flagged as failing) */
+    .section:not(.critical) .check:has(input:not(:checked)) > span {
+      color: #dc2626;
       text-decoration: line-through;
+    }
+
+    /* Critical: highlight when CHECKED (flagged as a critical failure) */
+    .section.critical .check:has(input:checked) > span {
+      color: #dc2626;
+      font-weight: 600;
     }
 
     .grading {
@@ -253,72 +260,19 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
     }
 
     @media print {
-      body {
-        padding: 0.35in;
-      }
-
-      .page {
-        max-width: none;
-      }
-
-      h1 {
-        font-size: 20px;
-      }
-
-      .intro {
-        font-size: 11px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-
-      .section {
-        border-radius: 6px;
-      }
-
-      .section h2,
-      .grading h2 {
-        font-size: 12px;
-        padding: 6px 8px;
-      }
-
-      .checklist {
-        padding: 6px 8px;
-      }
-
-      .check {
-        font-size: 10px;
-        margin-bottom: 3px;
-        grid-template-columns: 15px 1fr;
-      }
-
-      .box {
-        width: 10px;
-        height: 10px;
-      }
-
-      .grading {
-        margin-top: 8px;
-        border-radius: 6px;
-      }
-
-      .grade-row {
-        font-size: 10px;
-        padding: 5px 8px;
-      }
-
-      #export-btn {
-        display: none;
-      }
-
-      .header-fields input {
-        border: none;
-        padding: 0;
-        font-size: 11px;
-        color: var(--muted);
-      }
+      body { padding: 0.35in; }
+      .page { max-width: none; }
+      h1 { font-size: 20px; }
+      .intro { font-size: 11px; }
+      .grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .section { border-radius: 6px; }
+      .section h2, .grading h2 { font-size: 12px; padding: 6px 8px; }
+      .checklist { padding: 6px 8px; }
+      .check { font-size: 10px; margin-bottom: 3px; grid-template-columns: 15px 1fr; }
+      .grading { margin-top: 8px; border-radius: 6px; }
+      .grade-row { font-size: 10px; padding: 5px 8px; }
+      #export-btn { display: none; }
+      .header-fields input { border: none; padding: 0; font-size: 11px; color: var(--muted); }
     }
   </style>
 </head>
@@ -327,7 +281,7 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
     <header>
       <div class="header-left">
         <h1>AI Import QA - Full Quality Checklist</h1>
-        <p class="intro">Use after initial validation passes. Notify Erdman immediately if any critical issue is discovered.</p>
+        <p class="intro">Uncheck anything that is failing. Check any critical failure conditions that apply. Notify Erdman immediately if any critical issue is discovered.</p>
         <div class="header-fields">
           <input id="field-project" type="text" placeholder="Project / customer name" autocomplete="off">
           <input id="field-url" type="url" placeholder="https://docs.example.com" autocomplete="off">
@@ -337,96 +291,10 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
     </header>
 
     <section class="grid">
-      <div class="section">
-        <h2>Completeness</h2>
-        <div class="checklist">
-          <label class="check"><input type="checkbox"><span>Major sections/pages imported</span></label>
-          <label class="check"><input type="checkbox"><span>Subsections/pages not skipped</span></label>
-          <label class="check"><input type="checkbox"><span>API refs imported correctly</span></label>
-          <label class="check"><input type="checkbox"><span>No major navigation holes</span></label>
-          <label class="check"><input type="checkbox"><span>No empty categories/folders</span></label>
-          <label class="check"><input type="checkbox"><span>No obvious missing child pages</span></label>
-          <label class="check"><input type="checkbox"><span>Images/SVGs imported correctly</span></label>
-          <label class="check"><input type="checkbox"><span>Code examples imported</span></label>
-          <label class="check"><input type="checkbox"><span>Tables imported/readable</span></label>
-          <label class="check"><input type="checkbox"><span>PDFs/download links preserved or flagged</span></label>
-          <label class="check"><input type="checkbox"><span>Page count roughly matches source</span></label>
-          <label class="check"><input type="checkbox"><span>Major nav groups match source</span></label>
-        </div>
-      </div>
 
-      <div class="section">
-        <h2>Accuracy</h2>
-        <div class="checklist">
-          <label class="check"><input type="checkbox"><span>Technical meaning preserved</span></label>
-          <label class="check"><input type="checkbox"><span>No truncated content</span></label>
-          <label class="check"><input type="checkbox"><span>No hallucinated/generated filler</span></label>
-          <label class="check"><input type="checkbox"><span>No merged unrelated content</span></label>
-          <label class="check"><input type="checkbox"><span>No duplicated content blocks</span></label>
-          <label class="check"><input type="checkbox"><span>HTTP methods correct</span></label>
-          <label class="check"><input type="checkbox"><span>API paths correct</span></label>
-          <label class="check"><input type="checkbox"><span>Parameters/types correct</span></label>
-          <label class="check"><input type="checkbox"><span>Response codes correct</span></label>
-          <label class="check"><input type="checkbox"><span>Request/response examples preserved</span></label>
-          <label class="check"><input type="checkbox"><span>Internal links rewritten correctly</span></label>
-          <label class="check"><input type="checkbox"><span>External links preserved correctly</span></label>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Rendering Fidelity</h2>
-        <div class="checklist">
-          <label class="check"><input type="checkbox"><span>Heading hierarchy logical</span></label>
-          <label class="check"><input type="checkbox"><span>TOC generates correctly</span></label>
-          <label class="check"><input type="checkbox"><span>Pages readable/scannable</span></label>
-          <label class="check"><input type="checkbox"><span>Callouts/admonitions preserved</span></label>
-          <label class="check"><input type="checkbox"><span>Syntax highlighting works</span></label>
-          <label class="check"><input type="checkbox"><span>Code blocks readable</span></label>
-          <label class="check"><input type="checkbox"><span>Tables aligned/readable</span></label>
-          <label class="check"><input type="checkbox"><span>Nested lists preserved</span></label>
-          <label class="check"><input type="checkbox"><span>Images render correctly</span></label>
-          <label class="check"><input type="checkbox"><span>Relative asset paths resolved</span></label>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Information Architecture</h2>
-        <div class="checklist">
-          <label class="check"><input type="checkbox"><span>Navigation grouping logical</span></label>
-          <label class="check"><input type="checkbox"><span>Parent/child relationships make sense</span></label>
-          <label class="check"><input type="checkbox"><span>Ordering predictable</span></label>
-          <label class="check"><input type="checkbox"><span>Landing pages placed correctly</span></label>
-          <label class="check"><input type="checkbox"><span>Slugs/page names clean</span></label>
-          <label class="check"><input type="checkbox"><span>No orphan pages</span></label>
-          <label class="check"><input type="checkbox"><span>No duplicate sections/pages</span></label>
-          <label class="check"><input type="checkbox"><span>Versions separated correctly</span></label>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Code Sample Quality</h2>
-        <div class="checklist">
-          <label class="check"><input type="checkbox"><span>Code samples syntactically valid</span></label>
-          <label class="check"><input type="checkbox"><span>Correct language labels</span></label>
-          <label class="check"><input type="checkbox"><span>Request bodies plausible</span></label>
-          <label class="check"><input type="checkbox"><span>Auth examples reasonable</span></label>
-          <label class="check"><input type="checkbox"><span>JSON/code readable/formatted</span></label>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Performance &amp; Stability</h2>
-        <div class="checklist">
-          <label class="check"><input type="checkbox"><span>Pages progressively appeared during import</span></label>
-          <label class="check"><input type="checkbox"><span>Sidebar responsive</span></label>
-          <label class="check"><input type="checkbox"><span>Pages load normally</span></label>
-          <label class="check"><input type="checkbox"><span>No major lag/freezing</span></label>
-          <label class="check"><input type="checkbox"><span>Navigation usable during import</span></label>
-        </div>
-      </div>
-
+      <!-- CRITICAL FIRST — unchecked by default, check to flag a failure -->
       <div class="section critical">
-        <h2>Critical Failure Conditions</h2>
+        <h2>⚠️ Critical Failure Conditions — check any that apply</h2>
         <div class="checklist">
           <label class="check"><input type="checkbox"><span>Entire major sections missing</span></label>
           <label class="check"><input type="checkbox"><span>Large numbers of skipped pages</span></label>
@@ -448,16 +316,104 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
         </div>
       </div>
 
+      <!-- COMPLETENESS — checked by default, uncheck to flag -->
+      <div class="section">
+        <h2>Completeness — uncheck anything failing</h2>
+        <div class="checklist">
+          <label class="check"><input type="checkbox" checked><span>Major sections/pages imported</span></label>
+          <label class="check"><input type="checkbox" checked><span>Subsections/pages not skipped</span></label>
+          <label class="check"><input type="checkbox" checked><span>API refs imported correctly</span></label>
+          <label class="check"><input type="checkbox" checked><span>No major navigation holes</span></label>
+          <label class="check"><input type="checkbox" checked><span>No empty categories/folders</span></label>
+          <label class="check"><input type="checkbox" checked><span>No obvious missing child pages</span></label>
+          <label class="check"><input type="checkbox" checked><span>Images/SVGs imported correctly</span></label>
+          <label class="check"><input type="checkbox" checked><span>Code examples imported</span></label>
+          <label class="check"><input type="checkbox" checked><span>Tables imported/readable</span></label>
+          <label class="check"><input type="checkbox" checked><span>PDFs/download links preserved or flagged</span></label>
+          <label class="check"><input type="checkbox" checked><span>Page count roughly matches source</span></label>
+          <label class="check"><input type="checkbox" checked><span>Major nav groups match source</span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Accuracy — uncheck anything failing</h2>
+        <div class="checklist">
+          <label class="check"><input type="checkbox" checked><span>Technical meaning preserved</span></label>
+          <label class="check"><input type="checkbox" checked><span>No truncated content</span></label>
+          <label class="check"><input type="checkbox" checked><span>No hallucinated/generated filler</span></label>
+          <label class="check"><input type="checkbox" checked><span>No merged unrelated content</span></label>
+          <label class="check"><input type="checkbox" checked><span>No duplicated content blocks</span></label>
+          <label class="check"><input type="checkbox" checked><span>HTTP methods correct</span></label>
+          <label class="check"><input type="checkbox" checked><span>API paths correct</span></label>
+          <label class="check"><input type="checkbox" checked><span>Parameters/types correct</span></label>
+          <label class="check"><input type="checkbox" checked><span>Response codes correct</span></label>
+          <label class="check"><input type="checkbox" checked><span>Request/response examples preserved</span></label>
+          <label class="check"><input type="checkbox" checked><span>Internal links rewritten correctly</span></label>
+          <label class="check"><input type="checkbox" checked><span>External links preserved correctly</span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Rendering Fidelity — uncheck anything failing</h2>
+        <div class="checklist">
+          <label class="check"><input type="checkbox" checked><span>Heading hierarchy logical</span></label>
+          <label class="check"><input type="checkbox" checked><span>TOC generates correctly</span></label>
+          <label class="check"><input type="checkbox" checked><span>Pages readable/scannable</span></label>
+          <label class="check"><input type="checkbox" checked><span>Callouts/admonitions preserved</span></label>
+          <label class="check"><input type="checkbox" checked><span>Syntax highlighting works</span></label>
+          <label class="check"><input type="checkbox" checked><span>Code blocks readable</span></label>
+          <label class="check"><input type="checkbox" checked><span>Tables aligned/readable</span></label>
+          <label class="check"><input type="checkbox" checked><span>Nested lists preserved</span></label>
+          <label class="check"><input type="checkbox" checked><span>Images render correctly</span></label>
+          <label class="check"><input type="checkbox" checked><span>Relative asset paths resolved</span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Information Architecture — uncheck anything failing</h2>
+        <div class="checklist">
+          <label class="check"><input type="checkbox" checked><span>Navigation grouping logical</span></label>
+          <label class="check"><input type="checkbox" checked><span>Parent/child relationships make sense</span></label>
+          <label class="check"><input type="checkbox" checked><span>Ordering predictable</span></label>
+          <label class="check"><input type="checkbox" checked><span>Landing pages placed correctly</span></label>
+          <label class="check"><input type="checkbox" checked><span>Slugs/page names clean</span></label>
+          <label class="check"><input type="checkbox" checked><span>No orphan pages</span></label>
+          <label class="check"><input type="checkbox" checked><span>No duplicate sections/pages</span></label>
+          <label class="check"><input type="checkbox" checked><span>Versions separated correctly</span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Code Sample Quality — uncheck anything failing</h2>
+        <div class="checklist">
+          <label class="check"><input type="checkbox" checked><span>Code samples syntactically valid</span></label>
+          <label class="check"><input type="checkbox" checked><span>Correct language labels</span></label>
+          <label class="check"><input type="checkbox" checked><span>Request bodies plausible</span></label>
+          <label class="check"><input type="checkbox" checked><span>Auth examples reasonable</span></label>
+          <label class="check"><input type="checkbox" checked><span>JSON/code readable/formatted</span></label>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Performance &amp; Stability — uncheck anything failing</h2>
+        <div class="checklist">
+          <label class="check"><input type="checkbox" checked><span>Pages progressively appeared during import</span></label>
+          <label class="check"><input type="checkbox" checked><span>Sidebar responsive</span></label>
+          <label class="check"><input type="checkbox" checked><span>Pages load normally</span></label>
+          <label class="check"><input type="checkbox" checked><span>No major lag/freezing</span></label>
+          <label class="check"><input type="checkbox" checked><span>Navigation usable during import</span></label>
+        </div>
+      </div>
+
       <div class="grading">
         <h2>Final Grading</h2>
         <div class="grade-row"><span class="grade">PASS</span><span>Launch-quality with only minor cleanup needed</span></div>
         <div class="grade-row"><span class="grade">PARTIAL</span><span>Usable but requires noticeable cleanup before customer-ready</span></div>
         <div class="grade-row"><span class="grade">FAIL</span><span>Major issues make the import unreliable or unusable</span></div>
       </div>
+
     </section>
   </main>
-
-
 </body>
 </html>
 `}</HTMLBlock>
