@@ -104,7 +104,13 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
     #field-project {
       flex: 1;
       min-width: 160px;
-      max-width: 260px;
+      max-width: 220px;
+    }
+
+    #field-owner {
+      flex: 1;
+      min-width: 130px;
+      max-width: 180px;
     }
 
     #field-url {
@@ -284,6 +290,7 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
         <p class="intro">Uncheck anything that is failing. Check any critical failure conditions that apply. Notify Erdman immediately if any critical issue is discovered.</p>
         <div class="header-fields">
           <input id="field-project" type="text" placeholder="Project / customer name" autocomplete="off">
+          <input id="field-owner" type="text" placeholder="QA Owner" autocomplete="off">
           <input id="field-url" type="url" placeholder="https://docs.example.com" autocomplete="off">
         </div>
       </div>
@@ -403,6 +410,13 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
           <label class="check"><input type="checkbox" checked><span>No major lag/freezing</span></label>
           <label class="check"><input type="checkbox" checked><span>Navigation usable during import</span></label>
         </div>
+      </div>
+
+      <div class="grading">
+        <h2>Final Grading</h2>
+        <div class="grade-row"><span class="grade">PASS</span><span>Launch-quality with only minor cleanup needed</span></div>
+        <div class="grade-row"><span class="grade">PARTIAL</span><span>Usable but requires noticeable cleanup before customer-ready</span></div>
+        <div class="grade-row"><span class="grade">FAIL</span><span>Major issues make the import unreliable or unusable</span></div>
       </div>
 
     </section>
