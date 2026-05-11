@@ -405,13 +405,6 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
         </div>
       </div>
 
-      <div class="grading">
-        <h2>Final Grading</h2>
-        <div class="grade-row"><span class="grade">PASS</span><span>Launch-quality with only minor cleanup needed</span></div>
-        <div class="grade-row"><span class="grade">PARTIAL</span><span>Usable but requires noticeable cleanup before customer-ready</span></div>
-        <div class="grade-row"><span class="grade">FAIL</span><span>Major issues make the import unreliable or unusable</span></div>
-      </div>
-
     </section>
   </main>
 </body>
