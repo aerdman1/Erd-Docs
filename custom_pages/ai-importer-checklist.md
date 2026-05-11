@@ -63,6 +63,11 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       gap: 12px;
     }
 
+    .header-left {
+      flex: 1;
+      min-width: 0;
+    }
+
     h1 {
       margin: 0 0 6px;
       font-size: 24px;
@@ -70,9 +75,41 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
     }
 
     .intro {
-      margin: 0;
+      margin: 0 0 8px;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    .header-fields {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .header-fields input {
+      padding: 5px 8px;
+      font-size: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+
+    .header-fields input:focus {
+      border-color: #6b7280;
+    }
+
+    #field-project {
+      flex: 1;
+      min-width: 160px;
+      max-width: 260px;
+    }
+
+    #field-url {
+      flex: 2;
+      min-width: 200px;
     }
 
     #export-btn {
@@ -88,6 +125,7 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       cursor: pointer;
       white-space: nowrap;
       transition: background 0.15s, color 0.15s;
+      font-family: inherit;
     }
 
     #export-btn:hover {
@@ -274,15 +312,26 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       #export-btn {
         display: none;
       }
+
+      .header-fields input {
+        border: none;
+        padding: 0;
+        font-size: 11px;
+        color: var(--muted);
+      }
     }
   </style>
 </head>
 <body>
   <main class="page">
     <header>
-      <div>
+      <div class="header-left">
         <h1>AI Import QA - Full Quality Checklist</h1>
         <p class="intro">Use after initial validation passes. Notify Erdman immediately if any critical issue is discovered.</p>
+        <div class="header-fields">
+          <input id="field-project" type="text" placeholder="Project / customer name" autocomplete="off">
+          <input id="field-url" type="url" placeholder="https://docs.example.com" autocomplete="off">
+        </div>
       </div>
       <button id="export-btn">Export &amp; Copy Link</button>
     </header>
@@ -366,7 +415,7 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       </div>
 
       <div class="section">
-        <h2>Performance & Stability</h2>
+        <h2>Performance &amp; Stability</h2>
         <div class="checklist">
           <label class="check"><input type="checkbox"><span>Pages progressively appeared during import</span></label>
           <label class="check"><input type="checkbox"><span>Sidebar responsive</span></label>
@@ -407,7 +456,6 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       </div>
     </section>
   </main>
-
 
 
 </body>
