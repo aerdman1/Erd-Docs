@@ -57,6 +57,10 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       border-bottom: 2px solid var(--border);
       margin-bottom: 16px;
       padding-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     h1 {
@@ -69,6 +73,26 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       margin: 0;
       color: var(--muted);
       font-size: 13px;
+    }
+
+    #export-btn {
+      flex-shrink: 0;
+      margin-top: 4px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1.5px solid #1f2933;
+      border-radius: 6px;
+      background: #1f2933;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    #export-btn:hover {
+      background: #374151;
+      border-color: #374151;
     }
 
     .grid {
@@ -246,14 +270,21 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
         font-size: 10px;
         padding: 5px 8px;
       }
+
+      #export-btn {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
   <main class="page">
     <header>
-      <h1>AI Import QA - Full Quality Checklist</h1>
-      <p class="intro">Use after initial validation passes. Notify Erdman immediately if any critical issue is discovered.</p>
+      <div>
+        <h1>AI Import QA - Full Quality Checklist</h1>
+        <p class="intro">Use after initial validation passes. Notify Erdman immediately if any critical issue is discovered.</p>
+      </div>
+      <button id="export-btn">Export &amp; Copy Link</button>
     </header>
 
     <section class="grid">
@@ -376,6 +407,7 @@ header.SuperHubCustomPage-content-header,.rm-Header_compact Header, header.Heade
       </div>
     </section>
   </main>
+
 
 
 </body>
