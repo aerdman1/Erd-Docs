@@ -3,30 +3,28 @@ name: QuickTryAPI
 ---
 import React, { useEffect, useMemo, useState } from "react";
 
-export const LiveEndpointDirectoryFromSpec = props => {
+export const LiveEndpointFromSpecBlock = props => {
   const specUrl = props.specUrl || "";
   const apiBaseUrlOverride = props.apiBaseUrl || "";
+  const endpointPath = props.path || props.endpointPath || "/posts/{id}";
+  const endpointMethod = String(props.method || "GET").toUpperCase();
   const defaultAuthMode = props.authMode || "none";
   const defaultApiKeyLocation = props.apiKeyLocation || "header";
   const defaultApiKeyHeaderName = props.apiKeyHeaderName || "x-api-key";
   const defaultApiKeyQueryName = props.apiKeyQueryName || "api_key";
   const defaultHeadersJson = props.defaultHeadersJson || "{}";
-  const defaultOpenFirstEndpoint = props.openFirstEndpoint !== false;
-  const showHeadersEditor = props.showHeadersEditor !== false;
-  const allowAuthModeToggle = props.allowAuthModeToggle !== false;
+  const showAdvancedDefault = props.showAdvanced === true;
 
   const [spec, setSpec] = useState(null);
-  const [endpoints, setEndpoints] = useState([]);
-  const [selectedKey, setSelectedKey] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [endpoint, setEndpoint] = useState(null);
   const [loadingSpec, setLoadingSpec] = useState(false);
-  const [specError, setSpecError] = useState("");
+  const [error, setError] = useState("");
 
+  const [apiBaseUrlInput, setApiBaseUrlInput] = useState(apiBaseUrlOverride);
   const [pathValues, setPathValues] = useState({});
   const [queryValues, setQueryValues] = useState({});
   const [headerValues, setHeaderValues] = useState({});
   const [requestBody, setRequestBody] = useState("");
-  const [apiBaseUrlInput, setApiBaseUrlInput] = useState(apiBaseUrlOverride);
   const [headersText, setHeadersText] = useState(defaultHeadersJson);
 
   const [authMode, setAuthMode] = useState(defaultAuthMode);
@@ -38,18 +36,21 @@ export const LiveEndpointDirectoryFromSpec = props => {
   const [basicUsername, setBasicUsername] = useState("");
   const [basicPassword, setBasicPassword] = useState("");
 
-  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(showAdvancedDefault);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
 
-  const httpMethods = {
-    get: true,
-    post: true,
-    put: true,
-    patch: true,
-    delete: true,
-    options: true,
-    head: true
+  const safeString = value => {
+    if (value === null || value === undefined) return "";
+    return String(value);
+  };
+
+  const prettyJson = value => {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch (e) {
+      return "";
+    }
   };
 
   const getFallbackSpec = () => {
@@ -57,96 +58,14 @@ export const LiveEndpointDirectoryFromSpec = props => {
       openapi: "3.0.3",
       info: {
         title: "JSONPlaceholder Sandbox API",
-        version: "1.0.0",
-        description: "Sandbox spec for testing a ReadMe MDX live endpoint tester."
+        version: "1.0.0"
       },
       servers: [
         {
-          url: "https://jsonplaceholder.typicode.com",
-          description: "JSONPlaceholder public sandbox API"
-        }
-      ],
-      tags: [
-        {
-          name: "Posts",
-          description: "Fake post resources"
-        },
-        {
-          name: "Users",
-          description: "Fake user resources"
-        },
-        {
-          name: "Comments",
-          description: "Fake comment resources"
+          url: "https://jsonplaceholder.typicode.com"
         }
       ],
       paths: {
-        "/posts": {
-          get: {
-            tags: ["Posts"],
-            summary: "List posts",
-            description: "Returns a list of fake posts.",
-            parameters: [
-              {
-                name: "userId",
-                in: "query",
-                required: false,
-                description: "Optional user ID filter.",
-                schema: {
-                  type: "integer",
-                  example: 1
-                }
-              }
-            ],
-            responses: {
-              "200": {
-                description: "A list of posts.",
-                content: {
-                  "application/json": {
-                    schema: {
-                      type: "array",
-                      items: {
-                        "$ref": "#/components/schemas/Post"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          post: {
-            tags: ["Posts"],
-            summary: "Create a post",
-            description: "Creates a fake post. The response is simulated and not persisted.",
-            requestBody: {
-              required: true,
-              content: {
-                "application/json": {
-                  schema: {
-                    "$ref": "#/components/schemas/NewPost"
-                  },
-                  example: {
-                    title: "Hello from ReadMe MDX",
-                    body: "This is a sandbox request body.",
-                    userId: 1
-                  }
-                }
-              }
-            },
-            responses: {
-              "201": {
-                description: "Fake created post response.",
-                content: {
-                  "application/json": {
-                    schema: {
-                      "$ref": "#/components/schemas/Post"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
         "/posts/{id}": {
           get: {
             tags: ["Posts"],
@@ -176,23 +95,13 @@ export const LiveEndpointDirectoryFromSpec = props => {
                 }
               }
             }
-          },
-          put: {
+          }
+        },
+        "/posts": {
+          post: {
             tags: ["Posts"],
-            summary: "Replace a post",
-            description: "Replaces a fake post. The response is simulated and not persisted.",
-            parameters: [
-              {
-                name: "id",
-                in: "path",
-                required: true,
-                description: "Post ID.",
-                schema: {
-                  type: "integer",
-                  example: 1
-                }
-              }
-            ],
+            summary: "Create a post",
+            description: "Creates a fake post. The response is simulated and not persisted.",
             requestBody: {
               required: true,
               content: {
@@ -201,114 +110,20 @@ export const LiveEndpointDirectoryFromSpec = props => {
                     "$ref": "#/components/schemas/NewPost"
                   },
                   example: {
-                    title: "Updated from ReadMe MDX",
-                    body: "Updated sandbox request body.",
+                    title: "Hello from ReadMe MDX",
+                    body: "This is a sandbox request body.",
                     userId: 1
                   }
                 }
               }
             },
             responses: {
-              "200": {
-                description: "Fake updated post response.",
+              "201": {
+                description: "Fake created post response.",
                 content: {
                   "application/json": {
                     schema: {
                       "$ref": "#/components/schemas/Post"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          delete: {
-            tags: ["Posts"],
-            summary: "Delete a post",
-            description: "Deletes a fake post. The response is simulated and not persisted.",
-            parameters: [
-              {
-                name: "id",
-                in: "path",
-                required: true,
-                description: "Post ID.",
-                schema: {
-                  type: "integer",
-                  example: 1
-                }
-              }
-            ],
-            responses: {
-              "200": {
-                description: "Fake deleted post response.",
-                content: {
-                  "application/json": {
-                    schema: {
-                      type: "object"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "/users/{id}": {
-          get: {
-            tags: ["Users"],
-            summary: "Get a user",
-            description: "Returns one fake user by ID.",
-            parameters: [
-              {
-                name: "id",
-                in: "path",
-                required: true,
-                description: "User ID.",
-                schema: {
-                  type: "integer",
-                  example: 1
-                }
-              }
-            ],
-            responses: {
-              "200": {
-                description: "A single user.",
-                content: {
-                  "application/json": {
-                    schema: {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "/comments": {
-          get: {
-            tags: ["Comments"],
-            summary: "List comments",
-            description: "Returns fake comments, optionally filtered by post ID.",
-            parameters: [
-              {
-                name: "postId",
-                in: "query",
-                required: false,
-                description: "Optional post ID filter.",
-                schema: {
-                  type: "integer",
-                  example: 1
-                }
-              }
-            ],
-            responses: {
-              "200": {
-                description: "A list of comments.",
-                content: {
-                  "application/json": {
-                    schema: {
-                      type: "array",
-                      items: {
-                        "$ref": "#/components/schemas/Comment"
-                      }
                     }
                   }
                 }
@@ -356,69 +171,10 @@ export const LiveEndpointDirectoryFromSpec = props => {
                 example: 1
               }
             }
-          },
-          User: {
-            type: "object",
-            properties: {
-              id: {
-                type: "integer",
-                example: 1
-              },
-              name: {
-                type: "string",
-                example: "Leanne Graham"
-              },
-              username: {
-                type: "string",
-                example: "Bret"
-              },
-              email: {
-                type: "string",
-                example: "Sincere@april.biz"
-              }
-            }
-          },
-          Comment: {
-            type: "object",
-            properties: {
-              postId: {
-                type: "integer",
-                example: 1
-              },
-              id: {
-                type: "integer",
-                example: 1
-              },
-              name: {
-                type: "string",
-                example: "id labore ex et quam laborum"
-              },
-              email: {
-                type: "string",
-                example: "Eliseo@gardner.biz"
-              },
-              body: {
-                type: "string",
-                example: "laudantium enim quasi est quidem magnam voluptate ipsam eos"
-              }
-            }
           }
         }
       }
     };
-  };
-
-  const safeString = value => {
-    if (value === null || value === undefined) return "";
-    return String(value);
-  };
-
-  const prettyJson = value => {
-    try {
-      return JSON.stringify(value, null, 2);
-    } catch (e) {
-      return "";
-    }
   };
 
   const resolveRef = (obj, ref) => {
@@ -454,7 +210,6 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
     if (resolved.example !== undefined) return resolved.example;
     if (resolved.default !== undefined) return resolved.default;
-
     if (resolved.enum && resolved.enum.length > 0) return resolved.enum[0];
 
     if (resolved.type === "string") return "";
@@ -470,9 +225,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
       const props = resolved.properties || {};
 
       Object.entries(props).forEach(entry => {
-        const key = entry[0];
-        const propSchema = entry[1];
-        obj[key] = getExampleFromSchema(propSchema);
+        obj[entry[0]] = getExampleFromSchema(entry[1]);
       });
 
       return obj;
@@ -491,6 +244,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
       resolved.allOf.forEach(item => {
         const example = getExampleFromSchema(item);
+
         if (example && typeof example === "object" && !Array.isArray(example)) {
           Object.assign(merged, example);
         }
@@ -528,7 +282,10 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
     if (jsonMedia.schema) {
       const schemaExample = getExampleFromSchema(jsonMedia.schema);
-      if (schemaExample !== null) return prettyJson(schemaExample);
+
+      if (schemaExample !== null) {
+        return prettyJson(schemaExample);
+      }
     }
 
     return "";
@@ -556,7 +313,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
     return "";
   };
 
-  const tryParseSpec = async response => {
+  const parseSpecResponse = async response => {
     const text = await response.text();
 
     try {
@@ -570,129 +327,93 @@ export const LiveEndpointDirectoryFromSpec = props => {
     }
   };
 
-  const loadSpecIntoState = loadedSpec => {
+  const findEndpoint = loadedSpec => {
     if (!loadedSpec || !loadedSpec.paths) {
       throw new Error("Spec loaded, but no paths object was found.");
     }
 
-    const foundEndpoints = [];
+    const pathItem = loadedSpec.paths[endpointPath];
 
-    Object.entries(loadedSpec.paths).forEach(pathEntry => {
-      const path = pathEntry[0];
-      const operations = pathEntry[1] || {};
+    if (!pathItem) {
+      throw new Error("Could not find path in spec: " + endpointPath);
+    }
 
-      Object.entries(operations).forEach(operationEntry => {
-        const method = operationEntry[0];
-        const operation = operationEntry[1];
+    const operation = pathItem[endpointMethod.toLowerCase()];
 
-        if (!httpMethods[method]) return;
+    if (!operation) {
+      throw new Error("Could not find method for " + endpointMethod + " " + endpointPath);
+    }
 
-        const op = operation || {};
-        const key = method.toUpperCase() + " " + path;
-        const operationParams = Array.isArray(op.parameters) ? op.parameters : [];
-        const pathItemParams = Array.isArray(operations.parameters) ? operations.parameters : [];
-        const allParams = pathItemParams.concat(operationParams).map(param => {
-          if (param && param.$ref) return resolveRef(loadedSpec, param.$ref) || param;
-          return param;
-        });
-
-        foundEndpoints.push({
-          key: key,
-          path: path,
-          method: method.toUpperCase(),
-          operation: op,
-          summary: op.summary || "",
-          description: op.description || "",
-          tags: op.tags || [],
-          params: allParams
-        });
-      });
+    const operationParams = Array.isArray(operation.parameters) ? operation.parameters : [];
+    const pathItemParams = Array.isArray(pathItem.parameters) ? pathItem.parameters : [];
+    const allParams = pathItemParams.concat(operationParams).map(param => {
+      if (param && param.$ref) return resolveRef(loadedSpec, param.$ref) || param;
+      return param;
     });
 
-    setSpec(loadedSpec);
-    setEndpoints(foundEndpoints);
-    setApiBaseUrlInput(getServerUrl(loadedSpec));
-
-    if (foundEndpoints.length > 0 && defaultOpenFirstEndpoint) {
-      setSelectedKey(foundEndpoints[0].key);
-    }
+    return {
+      path: endpointPath,
+      method: endpointMethod,
+      operation: operation,
+      summary: operation.summary || "",
+      description: operation.description || "",
+      params: allParams
+    };
   };
 
-  const fetchSpec = async () => {
+  const loadSpec = async () => {
     setLoadingSpec(true);
-    setSpecError("");
+    setError("");
     setResult(null);
 
     try {
+      let loadedSpec = null;
+
       if (!specUrl) {
-        loadSpecIntoState(getFallbackSpec());
-        setLoadingSpec(false);
-        return;
+        loadedSpec = getFallbackSpec();
+      } else {
+        const response = await fetch(specUrl);
+
+        if (!response.ok) {
+          throw new Error("Spec fetch failed with HTTP " + response.status);
+        }
+
+        loadedSpec = await parseSpecResponse(response);
       }
 
-      const response = await fetch(specUrl);
+      const foundEndpoint = findEndpoint(loadedSpec);
 
-      if (!response.ok) {
-        throw new Error("Spec fetch failed with HTTP " + response.status);
-      }
-
-      const loadedSpec = await tryParseSpec(response);
-
-      loadSpecIntoState(loadedSpec);
+      setSpec(loadedSpec);
+      setEndpoint(foundEndpoint);
+      setApiBaseUrlInput(getServerUrl(loadedSpec));
       setLoadingSpec(false);
     } catch (err) {
-      setSpecError(err && err.message ? err.message : "Failed to fetch spec.");
+      setError(err && err.message ? err.message : "Failed to load endpoint.");
       setLoadingSpec(false);
     }
   };
 
   useEffect(() => {
-    fetchSpec();
-  }, [specUrl]);
-
-  const selectedEndpoint = useMemo(() => {
-    return endpoints.find(endpoint => endpoint.key === selectedKey) || null;
-  }, [endpoints, selectedKey]);
-
-  const visibleEndpoints = useMemo(() => {
-    const term = searchTerm.toLowerCase();
-
-    if (!term) return endpoints;
-
-    return endpoints.filter(endpoint => {
-      const text = (
-        endpoint.method +
-        " " +
-        endpoint.path +
-        " " +
-        endpoint.summary +
-        " " +
-        endpoint.description +
-        " " +
-        endpoint.tags.join(" ")
-      ).toLowerCase();
-
-      return text.indexOf(term) > -1;
-    });
-  }, [endpoints, searchTerm]);
+    loadSpec();
+  }, [specUrl, endpointPath, endpointMethod]);
 
   const pathParams = useMemo(() => {
-    if (!selectedEndpoint) return [];
-    return selectedEndpoint.params.filter(param => param && param.in === "path");
-  }, [selectedEndpoint]);
+    if (!endpoint) return [];
+    return endpoint.params.filter(param => param && param.in === "path");
+  }, [endpoint]);
 
   const queryParams = useMemo(() => {
-    if (!selectedEndpoint) return [];
-    return selectedEndpoint.params.filter(param => param && param.in === "query");
-  }, [selectedEndpoint]);
+    if (!endpoint) return [];
+    return endpoint.params.filter(param => param && param.in === "query");
+  }, [endpoint]);
 
   const headerParams = useMemo(() => {
-    if (!selectedEndpoint) return [];
-    return selectedEndpoint.params.filter(param => param && param.in === "header");
-  }, [selectedEndpoint]);
+    if (!endpoint) return [];
+    return endpoint.params.filter(param => param && param.in === "header");
+  }, [endpoint]);
 
   useEffect(() => {
-    if (!selectedEndpoint) return;
+    if (!endpoint || !spec) return;
 
     const nextPathValues = {};
     const nextQueryValues = {};
@@ -734,17 +455,8 @@ export const LiveEndpointDirectoryFromSpec = props => {
     setPathValues(nextPathValues);
     setQueryValues(nextQueryValues);
     setHeaderValues(nextHeaderValues);
-    setRequestBody(getRequestBodyExample(selectedEndpoint.operation));
-    setResult(null);
-  }, [selectedKey]);
-
-  const getAuthModeLabel = value => {
-    if (value === "none") return "No auth";
-    if (value === "bearer") return "Bearer token";
-    if (value === "apiKey") return "API key";
-    if (value === "basic") return "Basic auth";
-    return value;
-  };
+    setRequestBody(getRequestBodyExample(endpoint.operation));
+  }, [endpoint, spec]);
 
   const buildUrl = () => {
     const cleanBase = safeString(apiBaseUrlInput).replace(/\/$/, "");
@@ -753,7 +465,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
       throw new Error("Missing API base URL.");
     }
 
-    let resolvedPath = selectedEndpoint.path;
+    let resolvedPath = endpoint.path;
 
     pathParams.forEach(param => {
       const rawValue = pathValues[param.name] || "";
@@ -775,6 +487,19 @@ export const LiveEndpointDirectoryFromSpec = props => {
     }
 
     return url.toString();
+  };
+
+  const getDisplayUrl = url => {
+    if (authMode !== "apiKey") return url;
+    if (apiKeyLocation !== "query") return url;
+
+    try {
+      const parsed = new URL(url);
+      parsed.searchParams.set(apiKeyQueryName || "api_key", "••••••••");
+      return parsed.toString();
+    } catch (e) {
+      return url;
+    }
   };
 
   const applyEditableHeaders = headers => {
@@ -812,7 +537,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
   };
 
   const runRequest = async () => {
-    if (!selectedEndpoint) return;
+    if (!endpoint) return;
 
     setRunning(true);
     setResult(null);
@@ -840,12 +565,12 @@ export const LiveEndpointDirectoryFromSpec = props => {
       applyAuthHeaders(headers);
 
       const options = {
-        method: selectedEndpoint.method,
+        method: endpoint.method,
         headers: headers
       };
 
       const methodAllowsBody =
-        selectedEndpoint.method !== "GET" && selectedEndpoint.method !== "HEAD";
+        endpoint.method !== "GET" && endpoint.method !== "HEAD";
 
       if (methodAllowsBody && requestBody.trim()) {
         headers["Content-Type"] = "application/json";
@@ -871,7 +596,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
         status: response.status,
         statusText: response.statusText,
         duration: duration,
-        url: url,
+        url: getDisplayUrl(url),
         body: bodyText || "(empty response)"
       });
     } catch (err) {
@@ -897,371 +622,322 @@ export const LiveEndpointDirectoryFromSpec = props => {
     return "#4b5563";
   };
 
+  const getAuthModeLabel = value => {
+    if (value === "none") return "No auth";
+    if (value === "bearer") return "Bearer token";
+    if (value === "apiKey") return "API key";
+    if (value === "basic") return "Basic auth";
+    return value;
+  };
+
   const styles =
-    ".liveSpecWrap{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--color-text-default,#111827)}" +
-    ".liveSpecTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}" +
-    ".liveSpecTop h2{margin:0 0 6px 0;font-size:1.6rem}" +
-    ".liveSpecTop p{margin:0;color:var(--color-text-muted,#4b5563)}" +
-    ".liveSpecControls{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}" +
-    ".liveSpecInput,.liveSpecSelect,.liveSpecTextarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 10px;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827);font:inherit}" +
-    ".liveSpecTextarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}" +
-    ".liveSpecButton{border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827)}" +
-    ".liveSpecButton:disabled{opacity:.6;cursor:not-allowed}" +
-    ".liveSpecRun{background:#111827;color:#fff;border-color:#111827}" +
-    ".liveSpecGrid{display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:16px;align-items:start}" +
-    ".liveSpecList{border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;overflow:hidden;background:var(--color-bg-page,#fff);max-height:720px;overflow-y:auto}" +
-    ".liveSpecListItem{display:block;width:100%;text-align:left;padding:11px 12px;border:0;border-bottom:1px solid var(--color-border-default,#e5e7eb);background:transparent;color:var(--color-text-default,#111827);cursor:pointer}" +
-    ".liveSpecListItem:hover{background:var(--color-bg-muted,#f9fafb)}" +
-    ".liveSpecListItemActive{background:var(--color-bg-muted,#f3f4f6)}" +
-    ".liveSpecMethod{display:inline-block;color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:3px 7px;margin-right:6px}" +
-    ".liveSpecPath{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}" +
-    ".liveSpecSummary{display:block;margin-top:6px;color:var(--color-text-muted,#6b7280);font-size:12px}" +
-    ".liveSpecPanel{border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;padding:16px;background:var(--color-bg-page,#fff)}" +
-    ".liveSpecPanel h3{margin:0 0 8px 0}" +
-    ".liveSpecField{margin-top:12px}" +
-    ".liveSpecField label{display:block;font-weight:700;margin-bottom:5px}" +
-    ".liveSpecHelp{font-size:12px;color:var(--color-text-muted,#6b7280);margin-top:4px}" +
-    ".liveSpecSubgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}" +
-    ".liveSpecAuthBox{margin-top:14px;border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;padding:12px;background:var(--color-bg-muted,#f9fafb)}" +
-    ".liveSpecAuthTop{display:flex;align-items:center;justify-content:space-between;gap:10px}" +
-    ".liveSpecPill{display:inline-block;border:1px solid var(--color-border-default,#d1d5db);border-radius:999px;padding:3px 8px;font-size:12px;font-weight:700;background:var(--color-bg-page,#fff)}" +
-    ".liveSpecResult{margin-top:16px;border-radius:12px;border:1px solid var(--color-border-default,#e5e7eb);overflow:hidden}" +
-    ".liveSpecResultHead{padding:10px 12px;font-weight:700;background:var(--color-bg-muted,#f3f4f6)}" +
-    ".liveSpecPre{margin:0;padding:12px;overflow:auto;max-height:420px;background:var(--color-bg-muted,#f9fafb);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;white-space:pre-wrap}" +
-    ".liveSpecError{color:#dc2626;font-weight:700}" +
-    "@media(max-width:800px){.liveSpecGrid{grid-template-columns:1fr}.liveSpecSubgrid{grid-template-columns:1fr}}";
+    ".endpointBlock{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--color-text-default,#111827);border:1px solid var(--color-border-default,#e5e7eb);border-radius:14px;padding:16px;background:var(--color-bg-page,#fff);box-shadow:0 4px 14px rgba(0,0,0,.05);max-width:760px}" +
+    ".endpointBlockTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--color-border-default,#e5e7eb);padding-bottom:12px;margin-bottom:12px}" +
+    ".endpointBlock h3{margin:0 0 6px 0;font-size:1.15rem}" +
+    ".endpointBlock p{margin:0;color:var(--color-text-muted,#6b7280)}" +
+    ".endpointMethod{display:inline-block;color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:4px 8px;margin-right:8px}" +
+    ".endpointPath{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}" +
+    ".endpointPill{display:inline-block;border:1px solid var(--color-border-default,#d1d5db);border-radius:999px;padding:3px 8px;font-size:12px;font-weight:700;background:var(--color-bg-muted,#f9fafb);white-space:nowrap}" +
+    ".endpointField{margin-top:12px}" +
+    ".endpointField label{display:block;font-weight:700;margin-bottom:5px}" +
+    ".endpointInput,.endpointSelect,.endpointTextarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 10px;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827);font:inherit}" +
+    ".endpointTextarea{min-height:120px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}" +
+    ".endpointHelp{font-size:12px;color:var(--color-text-muted,#6b7280);margin-top:4px}" +
+    ".endpointAuth{margin-top:14px;border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;padding:12px;background:var(--color-bg-muted,#f9fafb)}" +
+    ".endpointAuthTop{display:flex;align-items:center;justify-content:space-between;gap:10px}" +
+    ".endpointGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}" +
+    ".endpointControls{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}" +
+    ".endpointButton{border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827)}" +
+    ".endpointButton:disabled{opacity:.6;cursor:not-allowed}" +
+    ".endpointRun{background:#111827;color:#fff;border-color:#111827}" +
+    ".endpointResult{margin-top:16px;border-radius:12px;border:1px solid var(--color-border-default,#e5e7eb);overflow:hidden}" +
+    ".endpointResultHead{padding:10px 12px;font-weight:700;background:var(--color-bg-muted,#f3f4f6)}" +
+    ".endpointPre{margin:0;padding:12px;overflow:auto;max-height:420px;background:var(--color-bg-muted,#f9fafb);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;white-space:pre-wrap}" +
+    ".endpointError{color:#dc2626;font-weight:700}" +
+    "@media(max-width:700px){.endpointGrid{grid-template-columns:1fr}.endpointBlockTop{flex-direction:column}}";
 
   return (
-    <div className="liveSpecWrap">
+    <div className="endpointBlock">
       <style>{styles}</style>
 
-      <div className="liveSpecTop">
+      {loadingSpec && <p>Loading endpoint...</p>}
+
+      {error && <p className="endpointError">{error}</p>}
+
+      {!loadingSpec && !error && endpoint && (
         <div>
-          <h2>Live Endpoint Tester</h2>
-          <p>Pulls endpoints from an OpenAPI spec and runs a browser-side request.</p>
-        </div>
-        <button className="liveSpecButton" onClick={fetchSpec} disabled={loadingSpec}>
-          {loadingSpec ? "Loading..." : "Reload spec"}
-        </button>
-      </div>
-
-      <div className="liveSpecControls">
-        <input
-          className="liveSpecInput"
-          value={searchTerm}
-          onChange={event => setSearchTerm(event.target.value)}
-          placeholder="Search endpoints..."
-        />
-      </div>
-
-      {specError && <p className="liveSpecError">{specError}</p>}
-
-      {!specError && loadingSpec && <p>Loading API specification...</p>}
-
-      {!loadingSpec && !specError && (
-        <div className="liveSpecGrid">
-          <div className="liveSpecList">
-            {visibleEndpoints.map(endpoint => (
-              <button
-                key={endpoint.key}
-                className={
-                  endpoint.key === selectedKey
-                    ? "liveSpecListItem liveSpecListItemActive"
-                    : "liveSpecListItem"
-                }
-                onClick={() => setSelectedKey(endpoint.key)}
-              >
+          <div className="endpointBlockTop">
+            <div>
+              <h3>
                 <span
-                  className="liveSpecMethod"
+                  className="endpointMethod"
                   style={{ background: methodColor(endpoint.method) }}
                 >
                   {endpoint.method}
                 </span>
-                <span className="liveSpecPath">{endpoint.path}</span>
-                {endpoint.summary && (
-                  <span className="liveSpecSummary">{endpoint.summary}</span>
-                )}
-              </button>
-            ))}
+                <span className="endpointPath">{endpoint.path}</span>
+              </h3>
+              {endpoint.summary && <p>{endpoint.summary}</p>}
+            </div>
+            <span className="endpointPill">{getAuthModeLabel(authMode)}</span>
           </div>
 
-          <div className="liveSpecPanel">
-            {!selectedEndpoint && <p>Select an endpoint.</p>}
+          <div className="endpointField">
+            <label>API base URL</label>
+            <input
+              className="endpointInput"
+              value={apiBaseUrlInput}
+              onChange={event => setApiBaseUrlInput(event.target.value)}
+              placeholder="https://api.example.com"
+            />
+          </div>
 
-            {selectedEndpoint && (
+          <div className="endpointAuth">
+            <div className="endpointAuthTop">
+              <strong>Authorization</strong>
+              <span className="endpointPill">{getAuthModeLabel(authMode)}</span>
+            </div>
+
+            <div className="endpointField">
+              <label>Auth type</label>
+              <select
+                className="endpointSelect"
+                value={authMode}
+                onChange={event => setAuthMode(event.target.value)}
+              >
+                <option value="none">No auth</option>
+                <option value="bearer">Bearer token</option>
+                <option value="apiKey">API key</option>
+                <option value="basic">Basic auth</option>
+              </select>
+            </div>
+
+            {authMode === "bearer" && (
+              <div className="endpointField">
+                <label>Bearer token</label>
+                <input
+                  className="endpointInput"
+                  type="password"
+                  value={bearerToken}
+                  onChange={event => setBearerToken(event.target.value)}
+                  placeholder="Paste bearer token"
+                />
+              </div>
+            )}
+
+            {authMode === "apiKey" && (
               <div>
-                <h3>
-                  {selectedEndpoint.method} {selectedEndpoint.path}
-                </h3>
+                <div className="endpointGrid">
+                  <div className="endpointField">
+                    <label>API key location</label>
+                    <select
+                      className="endpointSelect"
+                      value={apiKeyLocation}
+                      onChange={event => setApiKeyLocation(event.target.value)}
+                    >
+                      <option value="header">Header</option>
+                      <option value="query">Query param</option>
+                    </select>
+                  </div>
 
-                {selectedEndpoint.summary && <p>{selectedEndpoint.summary}</p>}
+                  {apiKeyLocation === "header" && (
+                    <div className="endpointField">
+                      <label>Header name</label>
+                      <input
+                        className="endpointInput"
+                        value={apiKeyHeaderName}
+                        onChange={event => setApiKeyHeaderName(event.target.value)}
+                        placeholder="x-api-key"
+                      />
+                    </div>
+                  )}
 
-                <div className="liveSpecField">
-                  <label>API base URL</label>
+                  {apiKeyLocation === "query" && (
+                    <div className="endpointField">
+                      <label>Query name</label>
+                      <input
+                        className="endpointInput"
+                        value={apiKeyQueryName}
+                        onChange={event => setApiKeyQueryName(event.target.value)}
+                        placeholder="api_key"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="endpointField">
+                  <label>API key</label>
                   <input
-                    className="liveSpecInput"
-                    value={apiBaseUrlInput}
-                    onChange={event => setApiBaseUrlInput(event.target.value)}
-                    placeholder="https://api.example.com"
+                    className="endpointInput"
+                    type="password"
+                    value={apiKeyValue}
+                    onChange={event => setApiKeyValue(event.target.value)}
+                    placeholder="Paste API key"
                   />
-                  <div className="liveSpecHelp">
-                    Defaults to spec.servers[0].url unless apiBaseUrl is provided.
-                  </div>
+                </div>
+              </div>
+            )}
+
+            {authMode === "basic" && (
+              <div className="endpointGrid">
+                <div className="endpointField">
+                  <label>Username / API key</label>
+                  <input
+                    className="endpointInput"
+                    type="password"
+                    value={basicUsername}
+                    onChange={event => setBasicUsername(event.target.value)}
+                    placeholder="Username or API key"
+                  />
                 </div>
 
-                <div className="liveSpecAuthBox">
-                  <div className="liveSpecAuthTop">
-                    <strong>Authorization</strong>
-                    <span className="liveSpecPill">{getAuthModeLabel(authMode)}</span>
+                <div className="endpointField">
+                  <label>Password</label>
+                  <input
+                    className="endpointInput"
+                    type="password"
+                    value={basicPassword}
+                    onChange={event => setBasicPassword(event.target.value)}
+                    placeholder="Optional"
+                  />
+                  <div className="endpointHelp">
+                    Some APIs use the API key as username and a blank password.
                   </div>
-
-                  {allowAuthModeToggle && (
-                    <div className="liveSpecField">
-                      <label>Auth type</label>
-                      <select
-                        className="liveSpecSelect"
-                        value={authMode}
-                        onChange={event => setAuthMode(event.target.value)}
-                      >
-                        <option value="none">No auth</option>
-                        <option value="bearer">Bearer token</option>
-                        <option value="apiKey">API key</option>
-                        <option value="basic">Basic auth</option>
-                      </select>
-                    </div>
-                  )}
-
-                  {authMode === "bearer" && (
-                    <div className="liveSpecField">
-                      <label>Bearer token</label>
-                      <input
-                        className="liveSpecInput"
-                        type="password"
-                        value={bearerToken}
-                        onChange={event => setBearerToken(event.target.value)}
-                        placeholder="Paste bearer token"
-                      />
-                    </div>
-                  )}
-
-                  {authMode === "apiKey" && (
-                    <div>
-                      <div className="liveSpecSubgrid">
-                        <div className="liveSpecField">
-                          <label>API key location</label>
-                          <select
-                            className="liveSpecSelect"
-                            value={apiKeyLocation}
-                            onChange={event => setApiKeyLocation(event.target.value)}
-                          >
-                            <option value="header">Header</option>
-                            <option value="query">Query param</option>
-                          </select>
-                        </div>
-
-                        {apiKeyLocation === "header" && (
-                          <div className="liveSpecField">
-                            <label>Header name</label>
-                            <input
-                              className="liveSpecInput"
-                              value={apiKeyHeaderName}
-                              onChange={event => setApiKeyHeaderName(event.target.value)}
-                              placeholder="x-api-key"
-                            />
-                          </div>
-                        )}
-
-                        {apiKeyLocation === "query" && (
-                          <div className="liveSpecField">
-                            <label>Query name</label>
-                            <input
-                              className="liveSpecInput"
-                              value={apiKeyQueryName}
-                              onChange={event => setApiKeyQueryName(event.target.value)}
-                              placeholder="api_key"
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="liveSpecField">
-                        <label>API key</label>
-                        <input
-                          className="liveSpecInput"
-                          type="password"
-                          value={apiKeyValue}
-                          onChange={event => setApiKeyValue(event.target.value)}
-                          placeholder="Paste API key"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {authMode === "basic" && (
-                    <div className="liveSpecSubgrid">
-                      <div className="liveSpecField">
-                        <label>Username / API key</label>
-                        <input
-                          className="liveSpecInput"
-                          type="password"
-                          value={basicUsername}
-                          onChange={event => setBasicUsername(event.target.value)}
-                          placeholder="Username or API key"
-                        />
-                      </div>
-
-                      <div className="liveSpecField">
-                        <label>Password</label>
-                        <input
-                          className="liveSpecInput"
-                          type="password"
-                          value={basicPassword}
-                          onChange={event => setBasicPassword(event.target.value)}
-                          placeholder="Optional"
-                        />
-                        <div className="liveSpecHelp">
-                          Some APIs use the API key as username and a blank password.
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
-
-                <div className="liveSpecControls">
-                  <button
-                    className="liveSpecButton"
-                    onClick={() => setShowAdvanced(!showAdvanced)}
-                    type="button"
-                  >
-                    {showAdvanced ? "Hide advanced settings" : "Show advanced settings"}
-                  </button>
-                </div>
-
-                {showAdvanced && showHeadersEditor && (
-                  <div className="liveSpecField">
-                    <label>Default headers JSON</label>
-                    <textarea
-                      className="liveSpecTextarea"
-                      value={headersText}
-                      onChange={event => setHeadersText(event.target.value)}
-                      placeholder='{"Accept":"application/json"}'
-                    />
-                    <div className="liveSpecHelp">
-                      Leave as {"{}"} for JSONPlaceholder. Customers can use this for Accept, version, or custom headers.
-                    </div>
-                  </div>
-                )}
-
-                {pathParams.map(param => (
-                  <div className="liveSpecField" key={"path-" + param.name}>
-                    <label>
-                      Path: {param.name}
-                      {param.required ? " *" : ""}
-                    </label>
-                    <input
-                      className="liveSpecInput"
-                      value={pathValues[param.name] || ""}
-                      onChange={event =>
-                        setPathValues(
-                          Object.assign({}, pathValues, {
-                            [param.name]: event.target.value
-                          })
-                        )
-                      }
-                    />
-                  </div>
-                ))}
-
-                {queryParams.map(param => (
-                  <div className="liveSpecField" key={"query-" + param.name}>
-                    <label>
-                      Query: {param.name}
-                      {param.required ? " *" : ""}
-                    </label>
-                    <input
-                      className="liveSpecInput"
-                      value={queryValues[param.name] || ""}
-                      onChange={event =>
-                        setQueryValues(
-                          Object.assign({}, queryValues, {
-                            [param.name]: event.target.value
-                          })
-                        )
-                      }
-                    />
-                  </div>
-                ))}
-
-                {headerParams.map(param => {
-                  const lowerName = safeString(param.name).toLowerCase();
-
-                  if (lowerName === "authorization") return null;
-                  if (lowerName === "accept") return null;
-                  if (lowerName === "content-type") return null;
-
-                  return (
-                    <div className="liveSpecField" key={"header-" + param.name}>
-                      <label>
-                        Header: {param.name}
-                        {param.required ? " *" : ""}
-                      </label>
-                      <input
-                        className="liveSpecInput"
-                        value={headerValues[param.name] || ""}
-                        onChange={event =>
-                          setHeaderValues(
-                            Object.assign({}, headerValues, {
-                              [param.name]: event.target.value
-                            })
-                          )
-                        }
-                      />
-                    </div>
-                  );
-                })}
-
-                {selectedEndpoint.method !== "GET" && selectedEndpoint.method !== "HEAD" && (
-                  <div className="liveSpecField">
-                    <label>JSON body</label>
-                    <textarea
-                      className="liveSpecTextarea"
-                      value={requestBody}
-                      onChange={event => setRequestBody(event.target.value)}
-                      placeholder='{"example":"value"}'
-                    />
-                  </div>
-                )}
-
-                <div className="liveSpecControls">
-                  <button
-                    className="liveSpecButton liveSpecRun"
-                    onClick={runRequest}
-                    disabled={running}
-                  >
-                    {running ? "Running..." : "Run request"}
-                  </button>
-                </div>
-
-                {result && (
-                  <div className="liveSpecResult">
-                    <div className="liveSpecResultHead">
-                      {result.status} {result.statusText}
-                      {result.duration ? " · " + result.duration + "ms" : ""}
-                    </div>
-                    {result.url && <pre className="liveSpecPre">{result.url}</pre>}
-                    <pre className="liveSpecPre">{result.body}</pre>
-                  </div>
-                )}
               </div>
             )}
           </div>
+
+          {pathParams.map(param => (
+            <div className="endpointField" key={"path-" + param.name}>
+              <label>
+                Path: {param.name}
+                {param.required ? " *" : ""}
+              </label>
+              <input
+                className="endpointInput"
+                value={pathValues[param.name] || ""}
+                onChange={event =>
+                  setPathValues(
+                    Object.assign({}, pathValues, {
+                      [param.name]: event.target.value
+                    })
+                  )
+                }
+              />
+            </div>
+          ))}
+
+          {queryParams.map(param => (
+            <div className="endpointField" key={"query-" + param.name}>
+              <label>
+                Query: {param.name}
+                {param.required ? " *" : ""}
+              </label>
+              <input
+                className="endpointInput"
+                value={queryValues[param.name] || ""}
+                onChange={event =>
+                  setQueryValues(
+                    Object.assign({}, queryValues, {
+                      [param.name]: event.target.value
+                    })
+                  )
+                }
+              />
+            </div>
+          ))}
+
+          {headerParams.map(param => {
+            const lowerName = safeString(param.name).toLowerCase();
+
+            if (lowerName === "authorization") return null;
+            if (lowerName === "accept") return null;
+            if (lowerName === "content-type") return null;
+
+            return (
+              <div className="endpointField" key={"header-" + param.name}>
+                <label>
+                  Header: {param.name}
+                  {param.required ? " *" : ""}
+                </label>
+                <input
+                  className="endpointInput"
+                  value={headerValues[param.name] || ""}
+                  onChange={event =>
+                    setHeaderValues(
+                      Object.assign({}, headerValues, {
+                        [param.name]: event.target.value
+                      })
+                    )
+                  }
+                />
+              </div>
+            );
+          })}
+
+          {endpoint.method !== "GET" && endpoint.method !== "HEAD" && (
+            <div className="endpointField">
+              <label>JSON body</label>
+              <textarea
+                className="endpointTextarea"
+                value={requestBody}
+                onChange={event => setRequestBody(event.target.value)}
+                placeholder='{"example":"value"}'
+              />
+            </div>
+          )}
+
+          <div className="endpointControls">
+            <button
+              className="endpointButton"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+              type="button"
+            >
+              {showAdvanced ? "Hide advanced" : "Show advanced"}
+            </button>
+
+            <button
+              className="endpointButton endpointRun"
+              onClick={runRequest}
+              disabled={running}
+            >
+              {running ? "Running..." : "Run request"}
+            </button>
+          </div>
+
+          {showAdvanced && (
+            <div className="endpointField">
+              <label>Default headers JSON</label>
+              <textarea
+                className="endpointTextarea"
+                value={headersText}
+                onChange={event => setHeadersText(event.target.value)}
+                placeholder='{"Accept":"application/json"}'
+              />
+              <div className="endpointHelp">
+                Use this for Accept, API version, or other static headers.
+              </div>
+            </div>
+          )}
+
+          {result && (
+            <div className="endpointResult">
+              <div className="endpointResultHead">
+                {result.status} {result.statusText}
+                {result.duration ? " · " + result.duration + "ms" : ""}
+              </div>
+              {result.url && <pre className="endpointPre">{result.url}</pre>}
+              <pre className="endpointPre">{result.body}</pre>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-<LiveEndpointDirectoryFromSpec
-  authMode="none"
-  defaultHeadersJson="{}"
-/>
+<LiveEndpointFromSpecBlock
+  path="/posts/{id}"
+  method="GET"
+/> 
