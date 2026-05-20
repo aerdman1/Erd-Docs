@@ -4,11 +4,13 @@ name: QuickTryAPI
 import React, { useEffect, useMemo, useState } from "react";
 
 export const LiveEndpointDirectoryFromSpec = props => {
-  const specUrl = props.specUrl || "https://erdman.readme.io/openapi/v2021-02-25.json";
+  const specUrl = props.specUrl || "";
   const apiBaseUrlOverride = props.apiBaseUrl || "";
-  const defaultAuthMode = props.authMode || "basic";
-  const defaultHeadersJson = props.defaultHeadersJson || '{"Accept":"application/vnd.recurly.v2021-02-25+json"}';
+  const defaultAuthMode = props.authMode || "none";
+  const apiKeyHeaderName = props.apiKeyHeaderName || "x-api-key";
+  const defaultHeadersJson = props.defaultHeadersJson || "{}";
   const defaultOpenFirstEndpoint = props.openFirstEndpoint !== false;
+  const showHeadersEditor = props.showHeadersEditor !== false;
 
   const [spec, setSpec] = useState(null);
   const [endpoints, setEndpoints] = useState([]);
@@ -23,6 +25,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
   const [requestBody, setRequestBody] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [apiBaseUrlInput, setApiBaseUrlInput] = useState(apiBaseUrlOverride);
+  const [headersText, setHeadersText] = useState(defaultHeadersJson);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -34,6 +37,362 @@ export const LiveEndpointDirectoryFromSpec = props => {
     delete: true,
     options: true,
     head: true
+  };
+
+  const getFallbackSpec = () => {
+    return {
+      openapi: "3.0.3",
+      info: {
+        title: "JSONPlaceholder Sandbox API",
+        version: "1.0.0",
+        description: "Sandbox spec for testing a ReadMe MDX live endpoint tester."
+      },
+      servers: [
+        {
+          url: "https://jsonplaceholder.typicode.com",
+          description: "JSONPlaceholder public sandbox API"
+        }
+      ],
+      tags: [
+        {
+          name: "Posts",
+          description: "Fake post resources"
+        },
+        {
+          name: "Users",
+          description: "Fake user resources"
+        },
+        {
+          name: "Comments",
+          description: "Fake comment resources"
+        }
+      ],
+      paths: {
+        "/posts": {
+          get: {
+            tags: ["Posts"],
+            summary: "List posts",
+            description: "Returns a list of fake posts.",
+            parameters: [
+              {
+                name: "userId",
+                in: "query",
+                required: false,
+                description: "Optional user ID filter.",
+                schema: {
+                  type: "integer",
+                  example: 1
+                }
+              }
+            ],
+            responses: {
+              "200": {
+                description: "A list of posts.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: {
+                        "$ref": "#/components/schemas/Post"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          post: {
+            tags: ["Posts"],
+            summary: "Create a post",
+            description: "Creates a fake post. The response is simulated and not persisted.",
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    "$ref": "#/components/schemas/NewPost"
+                  },
+                  example: {
+                    title: "Hello from ReadMe MDX",
+                    body: "This is a sandbox request body.",
+                    userId: 1
+                  }
+                }
+              }
+            },
+            responses: {
+              "201": {
+                description: "Fake created post response.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/posts/{id}": {
+          get: {
+            tags: ["Posts"],
+            summary: "Get a post",
+            description: "Returns one fake post by ID.",
+            parameters: [
+              {
+                name: "id",
+                in: "path",
+                required: true,
+                description: "Post ID.",
+                schema: {
+                  type: "integer",
+                  example: 1
+                }
+              }
+            ],
+            responses: {
+              "200": {
+                description: "A single post.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          put: {
+            tags: ["Posts"],
+            summary: "Replace a post",
+            description: "Replaces a fake post. The response is simulated and not persisted.",
+            parameters: [
+              {
+                name: "id",
+                in: "path",
+                required: true,
+                description: "Post ID.",
+                schema: {
+                  type: "integer",
+                  example: 1
+                }
+              }
+            ],
+            requestBody: {
+              required: true,
+              content: {
+                "application/json": {
+                  schema: {
+                    "$ref": "#/components/schemas/NewPost"
+                  },
+                  example: {
+                    title: "Updated from ReadMe MDX",
+                    body: "Updated sandbox request body.",
+                    userId: 1
+                  }
+                }
+              }
+            },
+            responses: {
+              "200": {
+                description: "Fake updated post response.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      "$ref": "#/components/schemas/Post"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          delete: {
+            tags: ["Posts"],
+            summary: "Delete a post",
+            description: "Deletes a fake post. The response is simulated and not persisted.",
+            parameters: [
+              {
+                name: "id",
+                in: "path",
+                required: true,
+                description: "Post ID.",
+                schema: {
+                  type: "integer",
+                  example: 1
+                }
+              }
+            ],
+            responses: {
+              "200": {
+                description: "Fake deleted post response.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/users/{id}": {
+          get: {
+            tags: ["Users"],
+            summary: "Get a user",
+            description: "Returns one fake user by ID.",
+            parameters: [
+              {
+                name: "id",
+                in: "path",
+                required: true,
+                description: "User ID.",
+                schema: {
+                  type: "integer",
+                  example: 1
+                }
+              }
+            ],
+            responses: {
+              "200": {
+                description: "A single user.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "/comments": {
+          get: {
+            tags: ["Comments"],
+            summary: "List comments",
+            description: "Returns fake comments, optionally filtered by post ID.",
+            parameters: [
+              {
+                name: "postId",
+                in: "query",
+                required: false,
+                description: "Optional post ID filter.",
+                schema: {
+                  type: "integer",
+                  example: 1
+                }
+              }
+            ],
+            responses: {
+              "200": {
+                description: "A list of comments.",
+                content: {
+                  "application/json": {
+                    schema: {
+                      type: "array",
+                      items: {
+                        "$ref": "#/components/schemas/Comment"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      components: {
+        schemas: {
+          Post: {
+            type: "object",
+            properties: {
+              userId: {
+                type: "integer",
+                example: 1
+              },
+              id: {
+                type: "integer",
+                example: 1
+              },
+              title: {
+                type: "string",
+                example: "Hello from ReadMe MDX"
+              },
+              body: {
+                type: "string",
+                example: "This is a sandbox post body."
+              }
+            }
+          },
+          NewPost: {
+            type: "object",
+            properties: {
+              title: {
+                type: "string",
+                example: "Hello from ReadMe MDX"
+              },
+              body: {
+                type: "string",
+                example: "This is a sandbox request body."
+              },
+              userId: {
+                type: "integer",
+                example: 1
+              }
+            }
+          },
+          User: {
+            type: "object",
+            properties: {
+              id: {
+                type: "integer",
+                example: 1
+              },
+              name: {
+                type: "string",
+                example: "Leanne Graham"
+              },
+              username: {
+                type: "string",
+                example: "Bret"
+              },
+              email: {
+                type: "string",
+                example: "Sincere@april.biz"
+              }
+            }
+          },
+          Comment: {
+            type: "object",
+            properties: {
+              postId: {
+                type: "integer",
+                example: 1
+              },
+              id: {
+                type: "integer",
+                example: 1
+              },
+              name: {
+                type: "string",
+                example: "id labore ex et quam laborum"
+              },
+              email: {
+                type: "string",
+                example: "Eliseo@gardner.biz"
+              },
+              body: {
+                type: "string",
+                example: "laudantium enim quasi est quidem magnam voluptate ipsam eos"
+              }
+            }
+          }
+        }
+      }
+    };
   };
 
   const safeString = value => {
@@ -83,9 +442,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
     if (resolved.example !== undefined) return resolved.example;
     if (resolved.default !== undefined) return resolved.default;
 
-    if (resolved.enum && resolved.enum.length > 0) {
-      return resolved.enum[0];
-    }
+    if (resolved.enum && resolved.enum.length > 0) return resolved.enum[0];
 
     if (resolved.type === "string") return "";
     if (resolved.type === "integer" || resolved.type === "number") return 0;
@@ -164,6 +521,14 @@ export const LiveEndpointDirectoryFromSpec = props => {
     return "";
   };
 
+  const normalizeServerUrl = url => {
+    let nextUrl = safeString(url);
+
+    nextUrl = nextUrl.replace("{scheme}", "https");
+
+    return nextUrl.replace(/\/$/, "");
+  };
+
   const getServerUrl = loadedSpec => {
     if (apiBaseUrlOverride) return apiBaseUrlOverride.replace(/\/$/, "");
 
@@ -171,7 +536,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
       const firstServer = loadedSpec.servers[0];
 
       if (firstServer && firstServer.url) {
-        return firstServer.url.replace(/\/$/, "");
+        return normalizeServerUrl(firstServer.url);
       }
     }
 
@@ -184,7 +549,59 @@ export const LiveEndpointDirectoryFromSpec = props => {
     try {
       return JSON.parse(text);
     } catch (jsonError) {
-      throw new Error("Could not parse the spec as JSON.");
+      if (typeof window !== "undefined" && window.jsyaml && window.jsyaml.load) {
+        return window.jsyaml.load(text);
+      }
+
+      throw new Error("Could not parse the spec as JSON. If this is YAML, expose a JSON version or load js-yaml on the page.");
+    }
+  };
+
+  const loadSpecIntoState = loadedSpec => {
+    if (!loadedSpec || !loadedSpec.paths) {
+      throw new Error("Spec loaded, but no paths object was found.");
+    }
+
+    const foundEndpoints = [];
+
+    Object.entries(loadedSpec.paths).forEach(pathEntry => {
+      const path = pathEntry[0];
+      const operations = pathEntry[1] || {};
+
+      Object.entries(operations).forEach(operationEntry => {
+        const method = operationEntry[0];
+        const operation = operationEntry[1];
+
+        if (!httpMethods[method]) return;
+
+        const op = operation || {};
+        const key = method.toUpperCase() + " " + path;
+        const operationParams = Array.isArray(op.parameters) ? op.parameters : [];
+        const pathItemParams = Array.isArray(operations.parameters) ? operations.parameters : [];
+        const allParams = pathItemParams.concat(operationParams).map(param => {
+          if (param && param.$ref) return resolveRef(loadedSpec, param.$ref) || param;
+          return param;
+        });
+
+        foundEndpoints.push({
+          key: key,
+          path: path,
+          method: method.toUpperCase(),
+          operation: op,
+          summary: op.summary || "",
+          description: op.description || "",
+          tags: op.tags || [],
+          params: allParams
+        });
+      });
+    });
+
+    setSpec(loadedSpec);
+    setEndpoints(foundEndpoints);
+    setApiBaseUrlInput(getServerUrl(loadedSpec));
+
+    if (foundEndpoints.length > 0 && defaultOpenFirstEndpoint) {
+      setSelectedKey(foundEndpoints[0].key);
     }
   };
 
@@ -194,6 +611,12 @@ export const LiveEndpointDirectoryFromSpec = props => {
     setResult(null);
 
     try {
+      if (!specUrl) {
+        loadSpecIntoState(getFallbackSpec());
+        setLoadingSpec(false);
+        return;
+      }
+
       const response = await fetch(specUrl);
 
       if (!response.ok) {
@@ -202,49 +625,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
       const loadedSpec = await tryParseSpec(response);
 
-      if (!loadedSpec || !loadedSpec.paths) {
-        throw new Error("Spec loaded, but no paths object was found.");
-      }
-
-      const foundEndpoints = [];
-
-      Object.entries(loadedSpec.paths).forEach(pathEntry => {
-        const path = pathEntry[0];
-        const operations = pathEntry[1] || {};
-
-        Object.entries(operations).forEach(operationEntry => {
-          const method = operationEntry[0];
-          const operation = operationEntry[1];
-
-          if (!httpMethods[method]) return;
-
-          const op = operation || {};
-          const key = method.toUpperCase() + " " + path;
-          const operationParams = Array.isArray(op.parameters) ? op.parameters : [];
-          const pathItemParams = Array.isArray(operations.parameters) ? operations.parameters : [];
-          const allParams = pathItemParams.concat(operationParams).map(param => deref(param));
-
-          foundEndpoints.push({
-            key: key,
-            path: path,
-            method: method.toUpperCase(),
-            operation: op,
-            summary: op.summary || "",
-            description: op.description || "",
-            tags: op.tags || [],
-            params: allParams
-          });
-        });
-      });
-
-      setSpec(loadedSpec);
-      setEndpoints(foundEndpoints);
-      setApiBaseUrlInput(getServerUrl(loadedSpec));
-
-      if (foundEndpoints.length > 0 && defaultOpenFirstEndpoint) {
-        setSelectedKey(foundEndpoints[0].key);
-      }
-
+      loadSpecIntoState(loadedSpec);
       setLoadingSpec(false);
     } catch (err) {
       setSpecError(err && err.message ? err.message : "Failed to fetch spec.");
@@ -327,6 +708,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
       if (lowerName === "authorization") return;
       if (lowerName === "accept") return;
+      if (lowerName === "content-type") return;
 
       const example =
         param.example !== undefined
@@ -370,19 +752,21 @@ export const LiveEndpointDirectoryFromSpec = props => {
     return url.toString();
   };
 
-  const applyDefaultHeaders = headers => {
-    if (!defaultHeadersJson) return headers;
+  const applyEditableHeaders = headers => {
+    if (!headersText || !headersText.trim()) return headers;
 
     try {
-      const defaultHeaders = JSON.parse(defaultHeadersJson);
+      const parsedHeaders = JSON.parse(headersText);
 
-      Object.entries(defaultHeaders).forEach(entry => {
-        headers[entry[0]] = entry[1];
+      Object.entries(parsedHeaders).forEach(entry => {
+        if (entry[0] && entry[1] !== undefined && entry[1] !== null) {
+          headers[entry[0]] = String(entry[1]);
+        }
       });
 
       return headers;
     } catch (e) {
-      throw new Error("defaultHeadersJson is not valid JSON.");
+      throw new Error("Headers JSON is not valid.");
     }
   };
 
@@ -396,13 +780,14 @@ export const LiveEndpointDirectoryFromSpec = props => {
       const url = buildUrl();
       const headers = {};
 
-      applyDefaultHeaders(headers);
+      applyEditableHeaders(headers);
 
       headerParams.forEach(param => {
         const lowerName = safeString(param.name).toLowerCase();
 
         if (lowerName === "authorization") return;
         if (lowerName === "accept") return;
+        if (lowerName === "content-type") return;
 
         const value = headerValues[param.name];
 
@@ -416,7 +801,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
       }
 
       if (defaultAuthMode === "apiKey" && authToken.trim()) {
-        headers["x-api-key"] = authToken.trim();
+        headers[apiKeyHeaderName] = authToken.trim();
       }
 
       if (defaultAuthMode === "basic" && authToken.trim()) {
@@ -487,7 +872,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
     ".liveSpecTop h2{margin:0 0 6px 0;font-size:1.6rem}" +
     ".liveSpecTop p{margin:0;color:var(--color-text-muted,#4b5563)}" +
     ".liveSpecControls{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}" +
-    ".liveSpecInput,.liveSpecSelect,.liveSpecTextarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 10px;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827);font:inherit}" +
+    ".liveSpecInput,.liveSpecTextarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 10px;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827);font:inherit}" +
     ".liveSpecTextarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}" +
     ".liveSpecButton{border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827)}" +
     ".liveSpecRun{background:#111827;color:#fff;border-color:#111827}" +
@@ -517,7 +902,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
       <div className="liveSpecTop">
         <div>
           <h2>Live Endpoint Tester</h2>
-          <p>Pulls endpoints from the OpenAPI spec and runs a browser-side request.</p>
+          <p>Pulls endpoints from an OpenAPI spec and runs a browser-side request.</p>
         </div>
         <button className="liveSpecButton" onClick={fetchSpec} disabled={loadingSpec}>
           {loadingSpec ? "Loading..." : "Reload spec"}
@@ -581,10 +966,10 @@ export const LiveEndpointDirectoryFromSpec = props => {
                     className="liveSpecInput"
                     value={apiBaseUrlInput}
                     onChange={event => setApiBaseUrlInput(event.target.value)}
-                    placeholder="https://v3.recurly.com"
+                    placeholder="https://api.example.com"
                   />
                   <div className="liveSpecHelp">
-                    Pulled from spec.servers[0].url unless you pass apiBaseUrl.
+                    Defaults to spec.servers[0].url unless apiBaseUrl is provided.
                   </div>
                 </div>
 
@@ -592,7 +977,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
                   <div className="liveSpecField">
                     <label>
                       {defaultAuthMode === "basic"
-                        ? "Recurly API key"
+                        ? "API key / username"
                         : defaultAuthMode === "apiKey"
                           ? "API key"
                           : "Bearer token"}
@@ -604,7 +989,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
                       onChange={event => setAuthToken(event.target.value)}
                       placeholder={
                         defaultAuthMode === "basic"
-                          ? "Paste Recurly API key"
+                          ? "Paste API key or username"
                           : defaultAuthMode === "apiKey"
                             ? "Paste API key"
                             : "Paste bearer token"
@@ -612,9 +997,24 @@ export const LiveEndpointDirectoryFromSpec = props => {
                     />
                     {defaultAuthMode === "basic" && (
                       <div className="liveSpecHelp">
-                        Sends Basic Auth using the API key as the username and an empty password.
+                        Sends Basic Auth using this value as the username and an empty password.
                       </div>
                     )}
+                  </div>
+                )}
+
+                {showHeadersEditor && (
+                  <div className="liveSpecField">
+                    <label>Default headers JSON</label>
+                    <textarea
+                      className="liveSpecTextarea"
+                      value={headersText}
+                      onChange={event => setHeadersText(event.target.value)}
+                      placeholder='{"Accept":"application/json"}'
+                    />
+                    <div className="liveSpecHelp">
+                      Leave as {"{}"} for JSONPlaceholder. Customers can use this for Accept, version, or custom headers.
+                    </div>
                   </div>
                 )}
 
@@ -663,6 +1063,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
                   if (lowerName === "authorization") return null;
                   if (lowerName === "accept") return null;
+                  if (lowerName === "content-type") return null;
 
                   return (
                     <div className="liveSpecField" key={"header-" + param.name}>
@@ -692,7 +1093,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
                       className="liveSpecTextarea"
                       value={requestBody}
                       onChange={event => setRequestBody(event.target.value)}
-                      placeholder={'{"example":"value"}'}
+                      placeholder='{"example":"value"}'
                     />
                   </div>
                 )}
@@ -727,8 +1128,6 @@ export const LiveEndpointDirectoryFromSpec = props => {
 };
 
 <LiveEndpointDirectoryFromSpec
-  specUrl="https://erdman.readme.io/openapi/v2021-02-25.json"
-  apiBaseUrl="https://v3.recurly.com"
-  authMode="basic"
-  defaultHeadersJson='{"Accept":"application/vnd.recurly.v2021-02-25+json"}'
+  authMode="none"
+  defaultHeadersJson="{}"
 />
