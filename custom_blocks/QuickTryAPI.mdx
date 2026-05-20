@@ -6,7 +6,8 @@ import React, { useEffect, useMemo, useState } from "react";
 export const LiveEndpointDirectoryFromSpec = props => {
   const specUrl = props.specUrl || "https://erdman.readme.io/openapi/v2021-02-25.json";
   const apiBaseUrlOverride = props.apiBaseUrl || "";
-  const defaultAuthMode = props.authMode || "bearer";
+  const defaultAuthMode = props.authMode || "basic";
+  const defaultHeadersJson = props.defaultHeadersJson || '{"Accept":"application/vnd.recurly.v2021-02-25+json"}';
   const defaultOpenFirstEndpoint = props.openFirstEndpoint !== false;
 
   const [spec, setSpec] = useState(null);
@@ -183,13 +184,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
     try {
       return JSON.parse(text);
     } catch (jsonError) {
-      if (typeof window !== "undefined" && window.jsyaml && window.jsyaml.load) {
-        return window.jsyaml.load(text);
-      }
-
-      throw new Error(
-        "Could not parse the spec as JSON. If this is a real YAML file, either expose a JSON version of the spec or load js-yaml on the page."
-      );
+      throw new Error("Could not parse the spec as JSON.");
     }
   };
 
@@ -328,6 +323,11 @@ export const LiveEndpointDirectoryFromSpec = props => {
     });
 
     headerParams.forEach(param => {
+      const lowerName = safeString(param.name).toLowerCase();
+
+      if (lowerName === "authorization") return;
+      if (lowerName === "accept") return;
+
       const example =
         param.example !== undefined
           ? param.example
@@ -370,6 +370,22 @@ export const LiveEndpointDirectoryFromSpec = props => {
     return url.toString();
   };
 
+  const applyDefaultHeaders = headers => {
+    if (!defaultHeadersJson) return headers;
+
+    try {
+      const defaultHeaders = JSON.parse(defaultHeadersJson);
+
+      Object.entries(defaultHeaders).forEach(entry => {
+        headers[entry[0]] = entry[1];
+      });
+
+      return headers;
+    } catch (e) {
+      throw new Error("defaultHeadersJson is not valid JSON.");
+    }
+  };
+
   const runRequest = async () => {
     if (!selectedEndpoint) return;
 
@@ -380,7 +396,14 @@ export const LiveEndpointDirectoryFromSpec = props => {
       const url = buildUrl();
       const headers = {};
 
+      applyDefaultHeaders(headers);
+
       headerParams.forEach(param => {
+        const lowerName = safeString(param.name).toLowerCase();
+
+        if (lowerName === "authorization") return;
+        if (lowerName === "accept") return;
+
         const value = headerValues[param.name];
 
         if (value !== undefined && value !== null && String(value).trim() !== "") {
@@ -394,6 +417,10 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
       if (defaultAuthMode === "apiKey" && authToken.trim()) {
         headers["x-api-key"] = authToken.trim();
+      }
+
+      if (defaultAuthMode === "basic" && authToken.trim()) {
+        headers.Authorization = "Basic " + btoa(authToken.trim() + ":");
       }
 
       const options = {
@@ -465,7 +492,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
     ".liveSpecButton{border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827)}" +
     ".liveSpecRun{background:#111827;color:#fff;border-color:#111827}" +
     ".liveSpecGrid{display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:16px;align-items:start}" +
-    ".liveSpecList{border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;overflow:hidden;background:var(--color-bg-page,#fff)}" +
+    ".liveSpecList{border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;overflow:hidden;background:var(--color-bg-page,#fff);max-height:720px;overflow-y:auto}" +
     ".liveSpecListItem{display:block;width:100%;text-align:left;padding:11px 12px;border:0;border-bottom:1px solid var(--color-border-default,#e5e7eb);background:transparent;color:var(--color-text-default,#111827);cursor:pointer}" +
     ".liveSpecListItem:hover{background:var(--color-bg-muted,#f9fafb)}" +
     ".liveSpecListItemActive{background:var(--color-bg-muted,#f3f4f6)}" +
@@ -554,7 +581,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
                     className="liveSpecInput"
                     value={apiBaseUrlInput}
                     onChange={event => setApiBaseUrlInput(event.target.value)}
-                    placeholder="https://api.example.com"
+                    placeholder="https://v3.recurly.com"
                   />
                   <div className="liveSpecHelp">
                     Pulled from spec.servers[0].url unless you pass apiBaseUrl.
@@ -564,7 +591,11 @@ export const LiveEndpointDirectoryFromSpec = props => {
                 {defaultAuthMode !== "none" && (
                   <div className="liveSpecField">
                     <label>
-                      {defaultAuthMode === "apiKey" ? "API key" : "Bearer token"}
+                      {defaultAuthMode === "basic"
+                        ? "Recurly API key"
+                        : defaultAuthMode === "apiKey"
+                          ? "API key"
+                          : "Bearer token"}
                     </label>
                     <input
                       className="liveSpecInput"
@@ -572,11 +603,18 @@ export const LiveEndpointDirectoryFromSpec = props => {
                       value={authToken}
                       onChange={event => setAuthToken(event.target.value)}
                       placeholder={
-                        defaultAuthMode === "apiKey"
-                          ? "Paste API key"
-                          : "Paste bearer token"
+                        defaultAuthMode === "basic"
+                          ? "Paste Recurly API key"
+                          : defaultAuthMode === "apiKey"
+                            ? "Paste API key"
+                            : "Paste bearer token"
                       }
                     />
+                    {defaultAuthMode === "basic" && (
+                      <div className="liveSpecHelp">
+                        Sends Basic Auth using the API key as the username and an empty password.
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -620,25 +658,32 @@ export const LiveEndpointDirectoryFromSpec = props => {
                   </div>
                 ))}
 
-                {headerParams.map(param => (
-                  <div className="liveSpecField" key={"header-" + param.name}>
-                    <label>
-                      Header: {param.name}
-                      {param.required ? " *" : ""}
-                    </label>
-                    <input
-                      className="liveSpecInput"
-                      value={headerValues[param.name] || ""}
-                      onChange={event =>
-                        setHeaderValues(
-                          Object.assign({}, headerValues, {
-                            [param.name]: event.target.value
-                          })
-                        )
-                      }
-                    />
-                  </div>
-                ))}
+                {headerParams.map(param => {
+                  const lowerName = safeString(param.name).toLowerCase();
+
+                  if (lowerName === "authorization") return null;
+                  if (lowerName === "accept") return null;
+
+                  return (
+                    <div className="liveSpecField" key={"header-" + param.name}>
+                      <label>
+                        Header: {param.name}
+                        {param.required ? " *" : ""}
+                      </label>
+                      <input
+                        className="liveSpecInput"
+                        value={headerValues[param.name] || ""}
+                        onChange={event =>
+                          setHeaderValues(
+                            Object.assign({}, headerValues, {
+                              [param.name]: event.target.value
+                            })
+                          )
+                        }
+                      />
+                    </div>
+                  );
+                })}
 
                 {selectedEndpoint.method !== "GET" && selectedEndpoint.method !== "HEAD" && (
                   <div className="liveSpecField">
@@ -683,5 +728,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
 
 <LiveEndpointDirectoryFromSpec
   specUrl="https://erdman.readme.io/openapi/v2021-02-25.json"
-  authMode="none"
+  apiBaseUrl="https://v3.recurly.com"
+  authMode="basic"
+  defaultHeadersJson='{"Accept":"application/vnd.recurly.v2021-02-25+json"}'
 />
