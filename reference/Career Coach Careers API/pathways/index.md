@@ -1,4 +1,0 @@
----
-title: /pathways
-hidden: false
----
