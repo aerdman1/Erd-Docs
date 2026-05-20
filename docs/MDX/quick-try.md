@@ -7,6 +7,6 @@ metadata:
   robots: index
 ---
 <LiveEndpointDirectoryFromSpec
-  specUrl="https://erdman.readme.io/openapi/v2021-02-25.json"
   authMode="none"
+  defaultHeadersJson="{}"
 />
