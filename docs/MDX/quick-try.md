@@ -6,7 +6,9 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
+<br />
+
 <LiveEndpointDirectoryFromSpec
-  specUrl="https://erdman.readme.io/openapi/TagExamples.yaml"
+  specUrl="https://erdman.readme.io/openapi/Placeholder.json"
   authMode="none"
 />
