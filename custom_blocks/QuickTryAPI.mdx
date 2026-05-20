@@ -1,0 +1,687 @@
+---
+name: QuickTryAPI
+---
+import React, { useEffect, useMemo, useState } from "react";
+
+export const LiveEndpointDirectoryFromSpec = props => {
+  const specUrl = props.specUrl || "https://erdman.readme.io/openapi/TagExamples.yaml";
+  const apiBaseUrlOverride = props.apiBaseUrl || "";
+  const defaultAuthMode = props.authMode || "bearer";
+  const defaultOpenFirstEndpoint = props.openFirstEndpoint !== false;
+
+  const [spec, setSpec] = useState(null);
+  const [endpoints, setEndpoints] = useState([]);
+  const [selectedKey, setSelectedKey] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [loadingSpec, setLoadingSpec] = useState(false);
+  const [specError, setSpecError] = useState("");
+
+  const [pathValues, setPathValues] = useState({});
+  const [queryValues, setQueryValues] = useState({});
+  const [headerValues, setHeaderValues] = useState({});
+  const [requestBody, setRequestBody] = useState("");
+  const [authToken, setAuthToken] = useState("");
+  const [apiBaseUrlInput, setApiBaseUrlInput] = useState(apiBaseUrlOverride);
+  const [running, setRunning] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const httpMethods = {
+    get: true,
+    post: true,
+    put: true,
+    patch: true,
+    delete: true,
+    options: true,
+    head: true
+  };
+
+  const safeString = value => {
+    if (value === null || value === undefined) return "";
+    return String(value);
+  };
+
+  const prettyJson = value => {
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch (e) {
+      return "";
+    }
+  };
+
+  const resolveRef = (obj, ref) => {
+    if (!obj || !ref || ref.indexOf("#/") !== 0) return null;
+
+    const parts = ref
+      .replace("#/", "")
+      .split("/")
+      .map(part => part.replace(/~1/g, "/").replace(/~0/g, "~"));
+
+    let current = obj;
+
+    for (let i = 0; i < parts.length; i += 1) {
+      if (!current || current[parts[i]] === undefined) return null;
+      current = current[parts[i]];
+    }
+
+    return current;
+  };
+
+  const deref = value => {
+    if (value && value.$ref && spec) {
+      return resolveRef(spec, value.$ref) || value;
+    }
+
+    return value;
+  };
+
+  const getExampleFromSchema = schema => {
+    const resolved = deref(schema);
+
+    if (!resolved) return null;
+
+    if (resolved.example !== undefined) return resolved.example;
+    if (resolved.default !== undefined) return resolved.default;
+
+    if (resolved.enum && resolved.enum.length > 0) {
+      return resolved.enum[0];
+    }
+
+    if (resolved.type === "string") return "";
+    if (resolved.type === "integer" || resolved.type === "number") return 0;
+    if (resolved.type === "boolean") return false;
+
+    if (resolved.type === "array") {
+      return [getExampleFromSchema(resolved.items)];
+    }
+
+    if (resolved.type === "object" || resolved.properties) {
+      const obj = {};
+      const props = resolved.properties || {};
+
+      Object.entries(props).forEach(entry => {
+        const key = entry[0];
+        const propSchema = entry[1];
+        obj[key] = getExampleFromSchema(propSchema);
+      });
+
+      return obj;
+    }
+
+    if (resolved.oneOf && resolved.oneOf.length > 0) {
+      return getExampleFromSchema(resolved.oneOf[0]);
+    }
+
+    if (resolved.anyOf && resolved.anyOf.length > 0) {
+      return getExampleFromSchema(resolved.anyOf[0]);
+    }
+
+    if (resolved.allOf && resolved.allOf.length > 0) {
+      const merged = {};
+
+      resolved.allOf.forEach(item => {
+        const example = getExampleFromSchema(item);
+        if (example && typeof example === "object" && !Array.isArray(example)) {
+          Object.assign(merged, example);
+        }
+      });
+
+      return merged;
+    }
+
+    return null;
+  };
+
+  const getRequestBodyExample = operation => {
+    const requestBodyObj = deref(operation.requestBody);
+
+    if (!requestBodyObj || !requestBodyObj.content) return "";
+
+    const jsonMedia =
+      requestBodyObj.content["application/json"] ||
+      requestBodyObj.content["application/*+json"];
+
+    if (!jsonMedia) return "";
+
+    if (jsonMedia.example !== undefined) {
+      return prettyJson(jsonMedia.example);
+    }
+
+    if (jsonMedia.examples) {
+      const firstExample = Object.values(jsonMedia.examples)[0];
+      const resolvedExample = deref(firstExample);
+
+      if (resolvedExample && resolvedExample.value !== undefined) {
+        return prettyJson(resolvedExample.value);
+      }
+    }
+
+    if (jsonMedia.schema) {
+      const schemaExample = getExampleFromSchema(jsonMedia.schema);
+      if (schemaExample !== null) return prettyJson(schemaExample);
+    }
+
+    return "";
+  };
+
+  const getServerUrl = loadedSpec => {
+    if (apiBaseUrlOverride) return apiBaseUrlOverride.replace(/\/$/, "");
+
+    if (loadedSpec && loadedSpec.servers && loadedSpec.servers.length > 0) {
+      const firstServer = loadedSpec.servers[0];
+
+      if (firstServer && firstServer.url) {
+        return firstServer.url.replace(/\/$/, "");
+      }
+    }
+
+    return "";
+  };
+
+  const tryParseSpec = async response => {
+    const text = await response.text();
+
+    try {
+      return JSON.parse(text);
+    } catch (jsonError) {
+      if (typeof window !== "undefined" && window.jsyaml && window.jsyaml.load) {
+        return window.jsyaml.load(text);
+      }
+
+      throw new Error(
+        "Could not parse the spec as JSON. If this is a real YAML file, either expose a JSON version of the spec or load js-yaml on the page."
+      );
+    }
+  };
+
+  const fetchSpec = async () => {
+    setLoadingSpec(true);
+    setSpecError("");
+    setResult(null);
+
+    try {
+      const response = await fetch(specUrl);
+
+      if (!response.ok) {
+        throw new Error("Spec fetch failed with HTTP " + response.status);
+      }
+
+      const loadedSpec = await tryParseSpec(response);
+
+      if (!loadedSpec || !loadedSpec.paths) {
+        throw new Error("Spec loaded, but no paths object was found.");
+      }
+
+      const foundEndpoints = [];
+
+      Object.entries(loadedSpec.paths).forEach(pathEntry => {
+        const path = pathEntry[0];
+        const operations = pathEntry[1] || {};
+
+        Object.entries(operations).forEach(operationEntry => {
+          const method = operationEntry[0];
+          const operation = operationEntry[1];
+
+          if (!httpMethods[method]) return;
+
+          const op = operation || {};
+          const key = method.toUpperCase() + " " + path;
+          const operationParams = Array.isArray(op.parameters) ? op.parameters : [];
+          const pathItemParams = Array.isArray(operations.parameters) ? operations.parameters : [];
+          const allParams = pathItemParams.concat(operationParams).map(param => deref(param));
+
+          foundEndpoints.push({
+            key: key,
+            path: path,
+            method: method.toUpperCase(),
+            operation: op,
+            summary: op.summary || "",
+            description: op.description || "",
+            tags: op.tags || [],
+            params: allParams
+          });
+        });
+      });
+
+      setSpec(loadedSpec);
+      setEndpoints(foundEndpoints);
+      setApiBaseUrlInput(getServerUrl(loadedSpec));
+
+      if (foundEndpoints.length > 0 && defaultOpenFirstEndpoint) {
+        setSelectedKey(foundEndpoints[0].key);
+      }
+
+      setLoadingSpec(false);
+    } catch (err) {
+      setSpecError(err && err.message ? err.message : "Failed to fetch spec.");
+      setLoadingSpec(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSpec();
+  }, [specUrl]);
+
+  const selectedEndpoint = useMemo(() => {
+    return endpoints.find(endpoint => endpoint.key === selectedKey) || null;
+  }, [endpoints, selectedKey]);
+
+  const visibleEndpoints = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+
+    if (!term) return endpoints;
+
+    return endpoints.filter(endpoint => {
+      const text = (
+        endpoint.method +
+        " " +
+        endpoint.path +
+        " " +
+        endpoint.summary +
+        " " +
+        endpoint.description +
+        " " +
+        endpoint.tags.join(" ")
+      ).toLowerCase();
+
+      return text.indexOf(term) > -1;
+    });
+  }, [endpoints, searchTerm]);
+
+  const pathParams = useMemo(() => {
+    if (!selectedEndpoint) return [];
+    return selectedEndpoint.params.filter(param => param && param.in === "path");
+  }, [selectedEndpoint]);
+
+  const queryParams = useMemo(() => {
+    if (!selectedEndpoint) return [];
+    return selectedEndpoint.params.filter(param => param && param.in === "query");
+  }, [selectedEndpoint]);
+
+  const headerParams = useMemo(() => {
+    if (!selectedEndpoint) return [];
+    return selectedEndpoint.params.filter(param => param && param.in === "header");
+  }, [selectedEndpoint]);
+
+  useEffect(() => {
+    if (!selectedEndpoint) return;
+
+    const nextPathValues = {};
+    const nextQueryValues = {};
+    const nextHeaderValues = {};
+
+    pathParams.forEach(param => {
+      const example =
+        param.example !== undefined
+          ? param.example
+          : getExampleFromSchema(param.schema);
+
+      nextPathValues[param.name] = safeString(example);
+    });
+
+    queryParams.forEach(param => {
+      const example =
+        param.example !== undefined
+          ? param.example
+          : getExampleFromSchema(param.schema);
+
+      nextQueryValues[param.name] = safeString(example);
+    });
+
+    headerParams.forEach(param => {
+      const example =
+        param.example !== undefined
+          ? param.example
+          : getExampleFromSchema(param.schema);
+
+      nextHeaderValues[param.name] = safeString(example);
+    });
+
+    setPathValues(nextPathValues);
+    setQueryValues(nextQueryValues);
+    setHeaderValues(nextHeaderValues);
+    setRequestBody(getRequestBodyExample(selectedEndpoint.operation));
+    setResult(null);
+  }, [selectedKey]);
+
+  const buildUrl = () => {
+    const cleanBase = safeString(apiBaseUrlInput).replace(/\/$/, "");
+
+    if (!cleanBase) {
+      throw new Error("Missing API base URL.");
+    }
+
+    let resolvedPath = selectedEndpoint.path;
+
+    pathParams.forEach(param => {
+      const rawValue = pathValues[param.name] || "";
+      resolvedPath = resolvedPath.replace("{" + param.name + "}", encodeURIComponent(rawValue));
+    });
+
+    const url = new URL(cleanBase + resolvedPath);
+
+    queryParams.forEach(param => {
+      const value = queryValues[param.name];
+
+      if (value !== undefined && value !== null && String(value).trim() !== "") {
+        url.searchParams.set(param.name, value);
+      }
+    });
+
+    return url.toString();
+  };
+
+  const runRequest = async () => {
+    if (!selectedEndpoint) return;
+
+    setRunning(true);
+    setResult(null);
+
+    try {
+      const url = buildUrl();
+      const headers = {};
+
+      headerParams.forEach(param => {
+        const value = headerValues[param.name];
+
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+          headers[param.name] = value;
+        }
+      });
+
+      if (defaultAuthMode === "bearer" && authToken.trim()) {
+        headers.Authorization = "Bearer " + authToken.trim();
+      }
+
+      if (defaultAuthMode === "apiKey" && authToken.trim()) {
+        headers["x-api-key"] = authToken.trim();
+      }
+
+      const options = {
+        method: selectedEndpoint.method,
+        headers: headers
+      };
+
+      const methodAllowsBody =
+        selectedEndpoint.method !== "GET" && selectedEndpoint.method !== "HEAD";
+
+      if (methodAllowsBody && requestBody.trim()) {
+        headers["Content-Type"] = "application/json";
+        options.body = requestBody;
+      }
+
+      const startedAt = Date.now();
+      const response = await fetch(url, options);
+      const duration = Date.now() - startedAt;
+      const contentType = response.headers.get("content-type") || "";
+
+      let bodyText = "";
+
+      if (contentType.indexOf("application/json") > -1) {
+        const json = await response.json();
+        bodyText = prettyJson(json);
+      } else {
+        bodyText = await response.text();
+      }
+
+      setResult({
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        duration: duration,
+        url: url,
+        body: bodyText || "(empty response)"
+      });
+    } catch (err) {
+      setResult({
+        ok: false,
+        status: "Request failed",
+        statusText: "",
+        duration: 0,
+        url: "",
+        body: err && err.message ? err.message : "Request failed."
+      });
+    }
+
+    setRunning(false);
+  };
+
+  const methodColor = method => {
+    if (method === "GET") return "#2563eb";
+    if (method === "POST") return "#16a34a";
+    if (method === "PUT") return "#ca8a04";
+    if (method === "PATCH") return "#ea580c";
+    if (method === "DELETE") return "#dc2626";
+    return "#4b5563";
+  };
+
+  const styles =
+    ".liveSpecWrap{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--color-text-default,#111827)}" +
+    ".liveSpecTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}" +
+    ".liveSpecTop h2{margin:0 0 6px 0;font-size:1.6rem}" +
+    ".liveSpecTop p{margin:0;color:var(--color-text-muted,#4b5563)}" +
+    ".liveSpecControls{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}" +
+    ".liveSpecInput,.liveSpecSelect,.liveSpecTextarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 10px;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827);font:inherit}" +
+    ".liveSpecTextarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}" +
+    ".liveSpecButton{border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827)}" +
+    ".liveSpecRun{background:#111827;color:#fff;border-color:#111827}" +
+    ".liveSpecGrid{display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:16px;align-items:start}" +
+    ".liveSpecList{border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;overflow:hidden;background:var(--color-bg-page,#fff)}" +
+    ".liveSpecListItem{display:block;width:100%;text-align:left;padding:11px 12px;border:0;border-bottom:1px solid var(--color-border-default,#e5e7eb);background:transparent;color:var(--color-text-default,#111827);cursor:pointer}" +
+    ".liveSpecListItem:hover{background:var(--color-bg-muted,#f9fafb)}" +
+    ".liveSpecListItemActive{background:var(--color-bg-muted,#f3f4f6)}" +
+    ".liveSpecMethod{display:inline-block;color:#fff;border-radius:999px;font-size:11px;font-weight:800;padding:3px 7px;margin-right:6px}" +
+    ".liveSpecPath{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px}" +
+    ".liveSpecSummary{display:block;margin-top:6px;color:var(--color-text-muted,#6b7280);font-size:12px}" +
+    ".liveSpecPanel{border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;padding:16px;background:var(--color-bg-page,#fff)}" +
+    ".liveSpecPanel h3{margin:0 0 8px 0}" +
+    ".liveSpecField{margin-top:12px}" +
+    ".liveSpecField label{display:block;font-weight:700;margin-bottom:5px}" +
+    ".liveSpecHelp{font-size:12px;color:var(--color-text-muted,#6b7280);margin-top:4px}" +
+    ".liveSpecResult{margin-top:16px;border-radius:12px;border:1px solid var(--color-border-default,#e5e7eb);overflow:hidden}" +
+    ".liveSpecResultHead{padding:10px 12px;font-weight:700;background:var(--color-bg-muted,#f3f4f6)}" +
+    ".liveSpecPre{margin:0;padding:12px;overflow:auto;max-height:420px;background:var(--color-bg-muted,#f9fafb);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;white-space:pre-wrap}" +
+    ".liveSpecError{color:#dc2626;font-weight:700}" +
+    "@media(max-width:800px){.liveSpecGrid{grid-template-columns:1fr}}";
+
+  return (
+    <div className="liveSpecWrap">
+      <style>{styles}</style>
+
+      <div className="liveSpecTop">
+        <div>
+          <h2>Live Endpoint Tester</h2>
+          <p>Pulls endpoints from the OpenAPI spec and runs a browser-side request.</p>
+        </div>
+        <button className="liveSpecButton" onClick={fetchSpec} disabled={loadingSpec}>
+          {loadingSpec ? "Loading..." : "Reload spec"}
+        </button>
+      </div>
+
+      <div className="liveSpecControls">
+        <input
+          className="liveSpecInput"
+          value={searchTerm}
+          onChange={event => setSearchTerm(event.target.value)}
+          placeholder="Search endpoints..."
+        />
+      </div>
+
+      {specError && <p className="liveSpecError">{specError}</p>}
+
+      {!specError && loadingSpec && <p>Loading API specification...</p>}
+
+      {!loadingSpec && !specError && (
+        <div className="liveSpecGrid">
+          <div className="liveSpecList">
+            {visibleEndpoints.map(endpoint => (
+              <button
+                key={endpoint.key}
+                className={
+                  endpoint.key === selectedKey
+                    ? "liveSpecListItem liveSpecListItemActive"
+                    : "liveSpecListItem"
+                }
+                onClick={() => setSelectedKey(endpoint.key)}
+              >
+                <span
+                  className="liveSpecMethod"
+                  style={{ background: methodColor(endpoint.method) }}
+                >
+                  {endpoint.method}
+                </span>
+                <span className="liveSpecPath">{endpoint.path}</span>
+                {endpoint.summary && (
+                  <span className="liveSpecSummary">{endpoint.summary}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <div className="liveSpecPanel">
+            {!selectedEndpoint && <p>Select an endpoint.</p>}
+
+            {selectedEndpoint && (
+              <div>
+                <h3>
+                  {selectedEndpoint.method} {selectedEndpoint.path}
+                </h3>
+
+                {selectedEndpoint.summary && <p>{selectedEndpoint.summary}</p>}
+
+                <div className="liveSpecField">
+                  <label>API base URL</label>
+                  <input
+                    className="liveSpecInput"
+                    value={apiBaseUrlInput}
+                    onChange={event => setApiBaseUrlInput(event.target.value)}
+                    placeholder="https://api.example.com"
+                  />
+                  <div className="liveSpecHelp">
+                    Pulled from spec.servers[0].url unless you pass apiBaseUrl.
+                  </div>
+                </div>
+
+                {defaultAuthMode !== "none" && (
+                  <div className="liveSpecField">
+                    <label>
+                      {defaultAuthMode === "apiKey" ? "API key" : "Bearer token"}
+                    </label>
+                    <input
+                      className="liveSpecInput"
+                      type="password"
+                      value={authToken}
+                      onChange={event => setAuthToken(event.target.value)}
+                      placeholder={
+                        defaultAuthMode === "apiKey"
+                          ? "Paste API key"
+                          : "Paste bearer token"
+                      }
+                    />
+                  </div>
+                )}
+
+                {pathParams.map(param => (
+                  <div className="liveSpecField" key={"path-" + param.name}>
+                    <label>
+                      Path: {param.name}
+                      {param.required ? " *" : ""}
+                    </label>
+                    <input
+                      className="liveSpecInput"
+                      value={pathValues[param.name] || ""}
+                      onChange={event =>
+                        setPathValues(
+                          Object.assign({}, pathValues, {
+                            [param.name]: event.target.value
+                          })
+                        )
+                      }
+                    />
+                  </div>
+                ))}
+
+                {queryParams.map(param => (
+                  <div className="liveSpecField" key={"query-" + param.name}>
+                    <label>
+                      Query: {param.name}
+                      {param.required ? " *" : ""}
+                    </label>
+                    <input
+                      className="liveSpecInput"
+                      value={queryValues[param.name] || ""}
+                      onChange={event =>
+                        setQueryValues(
+                          Object.assign({}, queryValues, {
+                            [param.name]: event.target.value
+                          })
+                        )
+                      }
+                    />
+                  </div>
+                ))}
+
+                {headerParams.map(param => (
+                  <div className="liveSpecField" key={"header-" + param.name}>
+                    <label>
+                      Header: {param.name}
+                      {param.required ? " *" : ""}
+                    </label>
+                    <input
+                      className="liveSpecInput"
+                      value={headerValues[param.name] || ""}
+                      onChange={event =>
+                        setHeaderValues(
+                          Object.assign({}, headerValues, {
+                            [param.name]: event.target.value
+                          })
+                        )
+                      }
+                    />
+                  </div>
+                ))}
+
+                {selectedEndpoint.method !== "GET" && selectedEndpoint.method !== "HEAD" && (
+                  <div className="liveSpecField">
+                    <label>JSON body</label>
+                    <textarea
+                      className="liveSpecTextarea"
+                      value={requestBody}
+                      onChange={event => setRequestBody(event.target.value)}
+                      placeholder={'{"example":"value"}'}
+                    />
+                  </div>
+                )}
+
+                <div className="liveSpecControls">
+                  <button
+                    className="liveSpecButton liveSpecRun"
+                    onClick={runRequest}
+                    disabled={running}
+                  >
+                    {running ? "Running..." : "Run request"}
+                  </button>
+                </div>
+
+                {result && (
+                  <div className="liveSpecResult">
+                    <div className="liveSpecResultHead">
+                      {result.status} {result.statusText}
+                      {result.duration ? " · " + result.duration + "ms" : ""}
+                    </div>
+                    {result.url && <pre className="liveSpecPre">{result.url}</pre>}
+                    <pre className="liveSpecPre">{result.body}</pre>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+<LiveEndpointDirectoryFromSpec
+  specUrl="https://erdman.readme.io/openapi/TagExamples.yaml"
+  authMode="none"
+/>
