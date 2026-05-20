@@ -6,7 +6,7 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-<LiveEndpointDirectoryFromSpec
-  authMode="none"
-  defaultHeadersJson="{}"
+<LiveEndpointFromSpecBlock
+  path="/posts/{id}"
+  method="GET"
 />
