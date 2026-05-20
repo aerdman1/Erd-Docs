@@ -4,7 +4,7 @@ name: QuickTryAPI
 import React, { useEffect, useMemo, useState } from "react";
 
 export const LiveEndpointDirectoryFromSpec = props => {
-  const specUrl = props.specUrl || "https://erdman.readme.io/openapi/TagExamples.yaml";
+  const specUrl = props.specUrl || "https://erdman.readme.io/openapi/Placeholder.json";
   const apiBaseUrlOverride = props.apiBaseUrl || "";
   const defaultAuthMode = props.authMode || "bearer";
   const defaultOpenFirstEndpoint = props.openFirstEndpoint !== false;
@@ -682,6 +682,6 @@ export const LiveEndpointDirectoryFromSpec = props => {
 };
 
 <LiveEndpointDirectoryFromSpec
-  specUrl="https://erdman.readme.io/openapi/TagExamples.yaml"
+  specUrl="https://erdman.readme.io/openapi/Placeholder.json"
   authMode="none"
 />
