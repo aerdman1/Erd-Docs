@@ -7,10 +7,13 @@ export const LiveEndpointDirectoryFromSpec = props => {
   const specUrl = props.specUrl || "";
   const apiBaseUrlOverride = props.apiBaseUrl || "";
   const defaultAuthMode = props.authMode || "none";
-  const apiKeyHeaderName = props.apiKeyHeaderName || "x-api-key";
+  const defaultApiKeyLocation = props.apiKeyLocation || "header";
+  const defaultApiKeyHeaderName = props.apiKeyHeaderName || "x-api-key";
+  const defaultApiKeyQueryName = props.apiKeyQueryName || "api_key";
   const defaultHeadersJson = props.defaultHeadersJson || "{}";
   const defaultOpenFirstEndpoint = props.openFirstEndpoint !== false;
   const showHeadersEditor = props.showHeadersEditor !== false;
+  const allowAuthModeToggle = props.allowAuthModeToggle !== false;
 
   const [spec, setSpec] = useState(null);
   const [endpoints, setEndpoints] = useState([]);
@@ -23,9 +26,19 @@ export const LiveEndpointDirectoryFromSpec = props => {
   const [queryValues, setQueryValues] = useState({});
   const [headerValues, setHeaderValues] = useState({});
   const [requestBody, setRequestBody] = useState("");
-  const [authToken, setAuthToken] = useState("");
   const [apiBaseUrlInput, setApiBaseUrlInput] = useState(apiBaseUrlOverride);
   const [headersText, setHeadersText] = useState(defaultHeadersJson);
+
+  const [authMode, setAuthMode] = useState(defaultAuthMode);
+  const [apiKeyLocation, setApiKeyLocation] = useState(defaultApiKeyLocation);
+  const [apiKeyHeaderName, setApiKeyHeaderName] = useState(defaultApiKeyHeaderName);
+  const [apiKeyQueryName, setApiKeyQueryName] = useState(defaultApiKeyQueryName);
+  const [bearerToken, setBearerToken] = useState("");
+  const [apiKeyValue, setApiKeyValue] = useState("");
+  const [basicUsername, setBasicUsername] = useState("");
+  const [basicPassword, setBasicPassword] = useState("");
+
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
 
@@ -725,6 +738,14 @@ export const LiveEndpointDirectoryFromSpec = props => {
     setResult(null);
   }, [selectedKey]);
 
+  const getAuthModeLabel = value => {
+    if (value === "none") return "No auth";
+    if (value === "bearer") return "Bearer token";
+    if (value === "apiKey") return "API key";
+    if (value === "basic") return "Basic auth";
+    return value;
+  };
+
   const buildUrl = () => {
     const cleanBase = safeString(apiBaseUrlInput).replace(/\/$/, "");
 
@@ -749,6 +770,10 @@ export const LiveEndpointDirectoryFromSpec = props => {
       }
     });
 
+    if (authMode === "apiKey" && apiKeyLocation === "query" && apiKeyValue.trim()) {
+      url.searchParams.set(apiKeyQueryName || "api_key", apiKeyValue.trim());
+    }
+
     return url.toString();
   };
 
@@ -768,6 +793,22 @@ export const LiveEndpointDirectoryFromSpec = props => {
     } catch (e) {
       throw new Error("Headers JSON is not valid.");
     }
+  };
+
+  const applyAuthHeaders = headers => {
+    if (authMode === "bearer" && bearerToken.trim()) {
+      headers.Authorization = "Bearer " + bearerToken.trim();
+    }
+
+    if (authMode === "apiKey" && apiKeyLocation === "header" && apiKeyValue.trim()) {
+      headers[apiKeyHeaderName || "x-api-key"] = apiKeyValue.trim();
+    }
+
+    if (authMode === "basic" && basicUsername.trim()) {
+      headers.Authorization = "Basic " + btoa(basicUsername.trim() + ":" + basicPassword);
+    }
+
+    return headers;
   };
 
   const runRequest = async () => {
@@ -796,17 +837,7 @@ export const LiveEndpointDirectoryFromSpec = props => {
         }
       });
 
-      if (defaultAuthMode === "bearer" && authToken.trim()) {
-        headers.Authorization = "Bearer " + authToken.trim();
-      }
-
-      if (defaultAuthMode === "apiKey" && authToken.trim()) {
-        headers[apiKeyHeaderName] = authToken.trim();
-      }
-
-      if (defaultAuthMode === "basic" && authToken.trim()) {
-        headers.Authorization = "Basic " + btoa(authToken.trim() + ":");
-      }
+      applyAuthHeaders(headers);
 
       const options = {
         method: selectedEndpoint.method,
@@ -872,9 +903,10 @@ export const LiveEndpointDirectoryFromSpec = props => {
     ".liveSpecTop h2{margin:0 0 6px 0;font-size:1.6rem}" +
     ".liveSpecTop p{margin:0;color:var(--color-text-muted,#4b5563)}" +
     ".liveSpecControls{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}" +
-    ".liveSpecInput,.liveSpecTextarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 10px;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827);font:inherit}" +
+    ".liveSpecInput,.liveSpecSelect,.liveSpecTextarea{width:100%;box-sizing:border-box;border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 10px;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827);font:inherit}" +
     ".liveSpecTextarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px}" +
     ".liveSpecButton{border:1px solid var(--color-border-default,#d1d5db);border-radius:8px;padding:9px 13px;font-weight:700;cursor:pointer;background:var(--color-bg-page,#fff);color:var(--color-text-default,#111827)}" +
+    ".liveSpecButton:disabled{opacity:.6;cursor:not-allowed}" +
     ".liveSpecRun{background:#111827;color:#fff;border-color:#111827}" +
     ".liveSpecGrid{display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:16px;align-items:start}" +
     ".liveSpecList{border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;overflow:hidden;background:var(--color-bg-page,#fff);max-height:720px;overflow-y:auto}" +
@@ -889,11 +921,15 @@ export const LiveEndpointDirectoryFromSpec = props => {
     ".liveSpecField{margin-top:12px}" +
     ".liveSpecField label{display:block;font-weight:700;margin-bottom:5px}" +
     ".liveSpecHelp{font-size:12px;color:var(--color-text-muted,#6b7280);margin-top:4px}" +
+    ".liveSpecSubgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}" +
+    ".liveSpecAuthBox{margin-top:14px;border:1px solid var(--color-border-default,#e5e7eb);border-radius:12px;padding:12px;background:var(--color-bg-muted,#f9fafb)}" +
+    ".liveSpecAuthTop{display:flex;align-items:center;justify-content:space-between;gap:10px}" +
+    ".liveSpecPill{display:inline-block;border:1px solid var(--color-border-default,#d1d5db);border-radius:999px;padding:3px 8px;font-size:12px;font-weight:700;background:var(--color-bg-page,#fff)}" +
     ".liveSpecResult{margin-top:16px;border-radius:12px;border:1px solid var(--color-border-default,#e5e7eb);overflow:hidden}" +
     ".liveSpecResultHead{padding:10px 12px;font-weight:700;background:var(--color-bg-muted,#f3f4f6)}" +
     ".liveSpecPre{margin:0;padding:12px;overflow:auto;max-height:420px;background:var(--color-bg-muted,#f9fafb);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:13px;white-space:pre-wrap}" +
     ".liveSpecError{color:#dc2626;font-weight:700}" +
-    "@media(max-width:800px){.liveSpecGrid{grid-template-columns:1fr}}";
+    "@media(max-width:800px){.liveSpecGrid{grid-template-columns:1fr}.liveSpecSubgrid{grid-template-columns:1fr}}";
 
   return (
     <div className="liveSpecWrap">
@@ -973,37 +1009,135 @@ export const LiveEndpointDirectoryFromSpec = props => {
                   </div>
                 </div>
 
-                {defaultAuthMode !== "none" && (
-                  <div className="liveSpecField">
-                    <label>
-                      {defaultAuthMode === "basic"
-                        ? "API key / username"
-                        : defaultAuthMode === "apiKey"
-                          ? "API key"
-                          : "Bearer token"}
-                    </label>
-                    <input
-                      className="liveSpecInput"
-                      type="password"
-                      value={authToken}
-                      onChange={event => setAuthToken(event.target.value)}
-                      placeholder={
-                        defaultAuthMode === "basic"
-                          ? "Paste API key or username"
-                          : defaultAuthMode === "apiKey"
-                            ? "Paste API key"
-                            : "Paste bearer token"
-                      }
-                    />
-                    {defaultAuthMode === "basic" && (
-                      <div className="liveSpecHelp">
-                        Sends Basic Auth using this value as the username and an empty password.
-                      </div>
-                    )}
+                <div className="liveSpecAuthBox">
+                  <div className="liveSpecAuthTop">
+                    <strong>Authorization</strong>
+                    <span className="liveSpecPill">{getAuthModeLabel(authMode)}</span>
                   </div>
-                )}
 
-                {showHeadersEditor && (
+                  {allowAuthModeToggle && (
+                    <div className="liveSpecField">
+                      <label>Auth type</label>
+                      <select
+                        className="liveSpecSelect"
+                        value={authMode}
+                        onChange={event => setAuthMode(event.target.value)}
+                      >
+                        <option value="none">No auth</option>
+                        <option value="bearer">Bearer token</option>
+                        <option value="apiKey">API key</option>
+                        <option value="basic">Basic auth</option>
+                      </select>
+                    </div>
+                  )}
+
+                  {authMode === "bearer" && (
+                    <div className="liveSpecField">
+                      <label>Bearer token</label>
+                      <input
+                        className="liveSpecInput"
+                        type="password"
+                        value={bearerToken}
+                        onChange={event => setBearerToken(event.target.value)}
+                        placeholder="Paste bearer token"
+                      />
+                    </div>
+                  )}
+
+                  {authMode === "apiKey" && (
+                    <div>
+                      <div className="liveSpecSubgrid">
+                        <div className="liveSpecField">
+                          <label>API key location</label>
+                          <select
+                            className="liveSpecSelect"
+                            value={apiKeyLocation}
+                            onChange={event => setApiKeyLocation(event.target.value)}
+                          >
+                            <option value="header">Header</option>
+                            <option value="query">Query param</option>
+                          </select>
+                        </div>
+
+                        {apiKeyLocation === "header" && (
+                          <div className="liveSpecField">
+                            <label>Header name</label>
+                            <input
+                              className="liveSpecInput"
+                              value={apiKeyHeaderName}
+                              onChange={event => setApiKeyHeaderName(event.target.value)}
+                              placeholder="x-api-key"
+                            />
+                          </div>
+                        )}
+
+                        {apiKeyLocation === "query" && (
+                          <div className="liveSpecField">
+                            <label>Query name</label>
+                            <input
+                              className="liveSpecInput"
+                              value={apiKeyQueryName}
+                              onChange={event => setApiKeyQueryName(event.target.value)}
+                              placeholder="api_key"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="liveSpecField">
+                        <label>API key</label>
+                        <input
+                          className="liveSpecInput"
+                          type="password"
+                          value={apiKeyValue}
+                          onChange={event => setApiKeyValue(event.target.value)}
+                          placeholder="Paste API key"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {authMode === "basic" && (
+                    <div className="liveSpecSubgrid">
+                      <div className="liveSpecField">
+                        <label>Username / API key</label>
+                        <input
+                          className="liveSpecInput"
+                          type="password"
+                          value={basicUsername}
+                          onChange={event => setBasicUsername(event.target.value)}
+                          placeholder="Username or API key"
+                        />
+                      </div>
+
+                      <div className="liveSpecField">
+                        <label>Password</label>
+                        <input
+                          className="liveSpecInput"
+                          type="password"
+                          value={basicPassword}
+                          onChange={event => setBasicPassword(event.target.value)}
+                          placeholder="Optional"
+                        />
+                        <div className="liveSpecHelp">
+                          Some APIs use the API key as username and a blank password.
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="liveSpecControls">
+                  <button
+                    className="liveSpecButton"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    type="button"
+                  >
+                    {showAdvanced ? "Hide advanced settings" : "Show advanced settings"}
+                  </button>
+                </div>
+
+                {showAdvanced && showHeadersEditor && (
                   <div className="liveSpecField">
                     <label>Default headers JSON</label>
                     <textarea
