@@ -1,0 +1,252 @@
+openapi: 3.1.0
+info:
+  title: Example Webhooks API
+  version: 1.0.0
+  description: |
+    Example OpenAPI 3.1 file showing how to document webhooks in ReadMe.
+
+    This file demonstrates a webhook event that can send either a basic event
+    payload or a fuller resource payload.
+servers:
+  - url: https://api.example.com
+    description: Example API server
+paths: {}
+tags:
+  - name: Webhooks
+    description: Events sent from ExampleCo to your configured webhook endpoint.
+webhooks:
+  resource.event:
+    post:
+      tags:
+        - Webhooks
+      summary: Resource event
+      operationId: resourceEventWebhook
+      description: >
+        ExampleCo sends this webhook to the endpoint URL configured in your
+        account.
+
+
+        This event can be delivered in one of two payload modes:
+
+
+        - **Basic event payload** — includes event metadata only.
+
+        - **Full resource payload** — includes the same event metadata plus the
+        resource object.
+
+
+        In ReadMe, these payloads are documented as request body examples
+        because
+
+        a webhook is technically an outbound HTTP request from the API provider
+        to the customer.
+      x-readme:
+        explorer-enabled: false
+      parameters:
+        - name: X-Example-Event
+          in: header
+          required: true
+          description: The event type that triggered the webhook.
+          schema:
+            type: string
+            example: resource.updated
+        - name: X-Example-Delivery
+          in: header
+          required: true
+          description: Unique delivery ID for this webhook attempt.
+          schema:
+            type: string
+            format: uuid
+            example: 6f8a7a2c-2db3-470e-87df-fd2ddc7e2f53
+        - name: X-Example-Signature
+          in: header
+          required: true
+          description: >-
+            HMAC SHA-256 signature used to verify the webhook came from
+            ExampleCo.
+          schema:
+            type: string
+            example: sha256=7c0f5c2e1b8c2f2a9d0e8b1a...
+      requestBody:
+        required: true
+        description: |
+          Payload sent to your webhook endpoint. Use the examples below to show
+          the basic event payload and the fuller resource payload.
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/WebhookBasicPayload'
+                - $ref: '#/components/schemas/WebhookFullPayload'
+            examples:
+              basicEvent:
+                summary: Basic event payload
+                description: Event metadata only.
+                value:
+                  id: evt_01HZN7A7J1E4EXAMPLE000001
+                  type: resource.updated
+                  created_at: '2026-05-28T19:27:00Z'
+                  delivery_id: 6f8a7a2c-2db3-470e-87df-fd2ddc7e2f53
+                  resource:
+                    id: res_12345
+                    type: customer
+              fullResource:
+                summary: Full resource payload
+                description: Event metadata plus the full resource object.
+                value:
+                  id: evt_01HZN7A7J1E4EXAMPLE000002
+                  type: resource.updated
+                  created_at: '2026-05-28T19:27:00Z'
+                  delivery_id: 1cf88412-a934-4031-8a1f-c8f903d9e173
+                  resource:
+                    id: cus_12345
+                    type: customer
+                    object:
+                      id: cus_12345
+                      name: Acme Corporation
+                      email: dev@example.com
+                      status: active
+                      created_at: '2026-05-01T14:22:00Z'
+                      updated_at: '2026-05-28T19:26:58Z'
+      responses:
+        '200':
+          description: Return any 2xx response to acknowledge receipt of the webhook.
+        '400':
+          description: >-
+            The webhook was not accepted. ExampleCo may retry delivery depending
+            on your retry policy.
+components:
+  schemas:
+    WebhookBasicPayload:
+      title: Basic event payload
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - type
+        - created_at
+        - delivery_id
+        - resource
+      properties:
+        id:
+          type: string
+          description: Unique event ID.
+          example: evt_01HZN7A7J1E4EXAMPLE000001
+        type:
+          type: string
+          description: Event type.
+          enum:
+            - resource.created
+            - resource.updated
+            - resource.deleted
+          example: resource.updated
+        created_at:
+          type: string
+          format: date-time
+          description: Time the event was created.
+          example: '2026-05-28T19:27:00Z'
+        delivery_id:
+          type: string
+          format: uuid
+          description: Unique ID for this delivery attempt.
+          example: 6f8a7a2c-2db3-470e-87df-fd2ddc7e2f53
+        resource:
+          type: object
+          additionalProperties: false
+          required:
+            - id
+            - type
+          description: Basic reference to the resource that changed.
+          properties:
+            id:
+              type: string
+              example: res_12345
+            type:
+              type: string
+              example: customer
+    WebhookFullPayload:
+      title: Full resource payload
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - type
+        - created_at
+        - delivery_id
+        - resource
+      properties:
+        id:
+          type: string
+          description: Unique event ID.
+          example: evt_01HZN7A7J1E4EXAMPLE000002
+        type:
+          type: string
+          description: Event type.
+          enum:
+            - resource.created
+            - resource.updated
+            - resource.deleted
+          example: resource.updated
+        created_at:
+          type: string
+          format: date-time
+          description: Time the event was created.
+          example: '2026-05-28T19:27:00Z'
+        delivery_id:
+          type: string
+          format: uuid
+          description: Unique ID for this delivery attempt.
+          example: 1cf88412-a934-4031-8a1f-c8f903d9e173
+        resource:
+          type: object
+          additionalProperties: false
+          required:
+            - id
+            - type
+            - object
+          description: Full details for the resource that changed.
+          properties:
+            id:
+              type: string
+              example: cus_12345
+            type:
+              type: string
+              example: customer
+            object:
+              $ref: '#/components/schemas/Customer'
+    Customer:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - email
+        - status
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          example: cus_12345
+        name:
+          type: string
+          example: Acme Corporation
+        email:
+          type: string
+          format: email
+          example: dev@example.com
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - archived
+          example: active
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-05-01T14:22:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-05-28T19:26:58Z'
