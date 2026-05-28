@@ -1,4 +1,0 @@
----
-title: coupon
-hidden: false
----

@@ -1,4 +1,0 @@
----
-title: note
-hidden: false
----

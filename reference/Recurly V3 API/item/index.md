@@ -1,4 +1,0 @@
----
-title: item
-hidden: false
----
