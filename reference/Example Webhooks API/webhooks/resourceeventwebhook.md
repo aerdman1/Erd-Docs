@@ -5,3 +5,12 @@ api:
   webhook: true
 hidden: false
 ---
+<HTMLBlock>{`
+<style>
+.InputDropdownOzifjjbrJipm {
+    pointer-events: none;
+}
+</style>
+`}</HTMLBlock>
+
+<br />
