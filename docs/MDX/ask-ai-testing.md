@@ -14,6 +14,8 @@ Specific Store and Product
 2. Select the store.
 3. Click save for later and copy the link. This link will direct you back to the exact view of the product locator for this store.
 
+<Image align="center" src="https://files.readme.io/a465dceb670c7e930ac3bd1e8de584ce1bf7cc76d473f29b61b1a589ce4a0fb0-Screenshot_2026-06-01_at_10.18.49_AM.png" />
+
 ![Create Cart Shopping Links](https://storage.googleapis.com/lcly-docs-legacy/r5.avif)
 
 ![Create Cart Shopping Links](https://storage.googleapis.com/lcly-docs-legacy/r6.avif)
