@@ -6,8 +6,6 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-<br />
-
 **How do I direct shoppers to nearby dealers with product?**
 
 Specific Store and Product
