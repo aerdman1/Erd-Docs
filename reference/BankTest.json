@@ -1,0 +1,589 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Nóminas API - OpenBanking",
+    "version": "1.0.0",
+    "description": "Colección de endpoints para gestión de nóminas en la plataforma OpenBanking Bedchi"
+  },
+  "servers": [
+    {
+      "url": "https://api.opb.bedchi.dev.fsapps.app/api/v1/srvreccomercial-api",
+      "description": "Servidor DEV"
+    },
+    {
+      "url": "https://api.opb.bedchi.prd.fsapps.app/api/v1/srvreccomercial-api",
+      "description": "Servidor PRD"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtenido desde Keycloak (fintech_token)"
+      }
+    },
+    "schemas": {
+      "Cuenta": {
+        "type": "object",
+        "required": [
+          "nrocuenta",
+          "rut"
+        ],
+        "properties": {
+          "nrocuenta": {
+            "type": "integer",
+            "example": 1234567
+          },
+          "rut": {
+            "type": "string",
+            "example": "12345678K"
+          }
+        }
+      },
+      "ValidacionCuentasRequest": {
+        "type": "object",
+        "required": [
+          "rutempresa",
+          "numConvenio",
+          "cuentas"
+        ],
+        "properties": {
+          "rutempresa": {
+            "type": "string",
+            "example": "12345678K"
+          },
+          "numConvenio": {
+            "type": "integer",
+            "example": 32901192011
+          },
+          "cuentas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cuenta"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Verificación de disponibilidad del servicio"
+    },
+    {
+      "name": "Nóminas",
+      "description": "Operaciones de creación y consulta de nóminas"
+    },
+    {
+      "name": "Validaciones",
+      "description": "Validación de cuentas asociadas a nóminas"
+    }
+  ],
+  "paths": {
+    "/healthcheck": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Verificar estado del servicio",
+        "operationId": "healthcheck",
+        "description": "Comprueba que el servicio comercial esté disponible y funcionando correctamente.",
+        "responses": {
+          "200": {
+            "description": "Servicio disponible"
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "503": {
+            "description": "Servicio no disponible"
+          }
+        }
+      }
+    },
+    "/nominas": {
+      "post": {
+        "tags": [
+          "Nóminas"
+        ],
+        "summary": "Crear nómina",
+        "operationId": "crearNomina",
+        "description": "Esta API permite a su empresa o institución enviar de forma segura y eficiente nóminas para el pago de remuneraciones y proveedores, todo dentro de un mismo flujo de integración. Con esta herramienta, podrás automatizar procesos clave, reducir tiempos operativos y asegurar una gestión más ágil y confiable de tus pagos masivos. Es relevante considerar que el horario en que se reciben las nóminas y su procesamiento corresponderá a los indicados en el contrato que se firme (Ej: 00 horas o 24 horas)",
+        "parameters": [
+          {
+            "name": "conceptopago",
+            "in": "header",
+            "required": true,
+            "description": "Corresponde a una marca para segmentar los registros de pago. Solo están permitidos los valores del anexo C (largo 10 dígitos)",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          },
+          {
+            "name": "fechapago",
+            "in": "header",
+            "required": true,
+            "description": "Fecha en la que se deberán hacer efectivo los pagos informados en la nómina, con formato “YYYY-MM-DD”.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "2025-01-20 00:00:00"
+          },
+          {
+            "name": "plantillaopenbanking",
+            "in": "header",
+            "required": true,
+            "description": "Corresponde al codigo de plantilla que será creado durante la implementación",
+            "schema": {
+              "type": "string"
+            },
+            "example": "20149"
+          },
+          {
+            "name": "monto",
+            "in": "header",
+            "required": true,
+            "description": "Monto total de la nómina",
+            "schema": {
+              "type": "string"
+            },
+            "example": "100"
+          },
+          {
+            "name": "cantidad",
+            "in": "header",
+            "required": true,
+            "description": "Cantidad de registros en la nómina",
+            "schema": {
+              "type": "string"
+            },
+            "example": "50"
+          },
+          {
+            "name": "nombrenomina",
+            "in": "header",
+            "required": true,
+            "description": "Nombre identificador de la nómina",
+            "schema": {
+              "type": "string"
+            },
+            "example": "TEST"
+          },
+          {
+            "name": "RUT_FILIAL",
+            "in": "header",
+            "required": false,
+            "description": "Rut Filial consiste en que una empresa es parte de una holding o que posee una empresa matriz. Es un parametro opcional aplicable solamente a empresas que tengan su estructura organizacional en ese formato Matriz y Filiales",
+            "schema": {
+              "type": "string"
+            },
+            "example": "712357002"
+          },
+          {
+            "name": "numconvenio",
+            "in": "header",
+            "required": true,
+            "description": "Número de convenio bancario",
+            "schema": {
+              "type": "string"
+            },
+            "example": "9640100451"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo de nómina en formato .txt"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Nómina creada exitosamente"
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    },
+    "/nominas/{idNomina}": {
+      "get": {
+        "tags": [
+          "Nóminas"
+        ],
+        "summary": "Consulta de registros (Rendición)",
+        "operationId": "getNominaById",
+        "description": "Retorna el detalle de una nómina específica filtrada por rango de fechas y datos del convenio.",
+        "parameters": [
+          {
+            "name": "idNomina",
+            "in": "path",
+            "required": true,
+            "description": "Identificador único de la nómina",
+            "schema": {
+              "type": "string"
+            },
+            "example": "10002220"
+          },
+          {
+            "name": "fechapagodesde",
+            "in": "header",
+            "required": true,
+            "description": "Fecha de pago inicio del filtro (timestamp o 0 para sin filtro)",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          },
+          {
+            "name": "fechapagohasta",
+            "in": "header",
+            "required": true,
+            "description": "Fecha de pago fin del filtro (timestamp o 0 para sin filtro)",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          },
+          {
+            "name": "rutempresa",
+            "in": "header",
+            "required": true,
+            "description": "RUT de la empresa",
+            "schema": {
+              "type": "string"
+            },
+            "example": "833827006"
+          },
+          {
+            "name": "numconvenio",
+            "in": "header",
+            "required": true,
+            "description": "Número de convenio bancario",
+            "schema": {
+              "type": "string"
+            },
+            "example": "32901192011"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de la nómina"
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Nómina no encontrada"
+          }
+        }
+      }
+    },
+    "/nominas/{idNomina}/registros": {
+      "get": {
+        "tags": [
+          "Nóminas"
+        ],
+        "summary": "Consultar registros de una nómina",
+        "operationId": "getRegistrosNomina",
+        "description": "Retorna los registros individuales (destinatarios de pago) de una nómina específica. A través de esta consulta, podrá conocer la situación actual del procesamiento de cada nómina, lo que facilita el seguimiento, control y gestión de sus pagos masivos.",
+        "parameters": [
+          {
+            "name": "idNomina",
+            "in": "path",
+            "required": true,
+            "description": "Identificador único de la nómina",
+            "schema": {
+              "type": "string"
+            },
+            "example": "10000973"
+          },
+          {
+            "name": "fechapagodesde",
+            "in": "header",
+            "required": true,
+            "description": "Fecha de pago inicio del filtro",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          },
+          {
+            "name": "fechapagohasta",
+            "in": "header",
+            "required": true,
+            "description": "Fecha de pago fin del filtro",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          },
+          {
+            "name": "xTrackID",
+            "in": "header",
+            "required": true,
+            "description": "ID de trazabilidad de la solicitud",
+            "schema": {
+              "type": "string"
+            },
+            "example": "test"
+          },
+          {
+            "name": "codigosesion",
+            "in": "header",
+            "required": true,
+            "description": "Código de sesión del cliente",
+            "schema": {
+              "type": "string"
+            },
+            "example": "test"
+          },
+          {
+            "name": "canal",
+            "in": "header",
+            "required": true,
+            "description": "Canal de origen de la solicitud",
+            "schema": {
+              "type": "string"
+            },
+            "example": "test"
+          },
+          {
+            "name": "etapa",
+            "in": "header",
+            "required": true,
+            "description": "Etapa del proceso",
+            "schema": {
+              "type": "string"
+            },
+            "example": "test"
+          },
+          {
+            "name": "funcionalidad",
+            "in": "header",
+            "required": true,
+            "description": "Funcionalidad que origina la solicitud",
+            "schema": {
+              "type": "string"
+            },
+            "example": "test"
+          },
+          {
+            "name": "rutempresa",
+            "in": "header",
+            "required": true,
+            "description": "RUT de la empresa",
+            "schema": {
+              "type": "string"
+            },
+            "example": "833827006"
+          },
+          {
+            "name": "numconvenio",
+            "in": "header",
+            "required": true,
+            "description": "Número de convenio bancario",
+            "schema": {
+              "type": "string"
+            },
+            "example": "3290119201"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de registros de la nómina"
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Nómina no encontrada"
+          }
+        }
+      }
+    },
+    "/nominas/validacion-cuentas": {
+      "post": {
+        "tags": [
+          "Validaciones"
+        ],
+        "summary": "Validar cuentas de una nómina",
+        "operationId": "validarCuentasNomina",
+        "description": "Valida la existencia y estado de las cuentas bancarias asociadas a los registros de una nómina.",
+        "parameters": [
+          {
+            "name": "xTrackID",
+            "in": "header",
+            "required": true,
+            "description": "ID de trazabilidad de la solicitud",
+            "schema": {
+              "type": "string"
+            },
+            "example": "123"
+          },
+          {
+            "name": "codigosesion",
+            "in": "header",
+            "required": true,
+            "description": "Código de sesión del cliente",
+            "schema": {
+              "type": "string"
+            },
+            "example": "234"
+          },
+          {
+            "name": "canal",
+            "in": "header",
+            "required": true,
+            "description": "Canal de origen de la solicitud",
+            "schema": {
+              "type": "string"
+            },
+            "example": "345"
+          },
+          {
+            "name": "etapa",
+            "in": "header",
+            "required": true,
+            "description": "Etapa del proceso",
+            "schema": {
+              "type": "string"
+            },
+            "example": "456"
+          },
+          {
+            "name": "funcionalidad",
+            "in": "header",
+            "required": true,
+            "description": "Funcionalidad que origina la solicitud",
+            "schema": {
+              "type": "string"
+            },
+            "example": "567"
+          },
+          {
+            "name": "rutpersona",
+            "in": "header",
+            "required": true,
+            "description": "RUT de la persona que realiza la solicitud",
+            "schema": {
+              "type": "string"
+            },
+            "example": "789"
+          },
+          {
+            "name": "rutempresa",
+            "in": "header",
+            "required": true,
+            "description": "RUT de la empresa",
+            "schema": {
+              "type": "string"
+            },
+            "example": "833827006"
+          },
+          {
+            "name": "numconvenio",
+            "in": "header",
+            "required": true,
+            "description": "Número de convenio bancario",
+            "schema": {
+              "type": "string"
+            },
+            "example": "32901192011"
+          },
+          {
+            "name": "numnomina",
+            "in": "header",
+            "required": true,
+            "description": "Número identificador de la nómina",
+            "schema": {
+              "type": "string"
+            },
+            "example": "19201230253"
+          },
+          {
+            "name": "fechapagodesde",
+            "in": "header",
+            "required": true,
+            "description": "Fecha de pago inicio del filtro",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          },
+          {
+            "name": "fechapagohasta",
+            "in": "header",
+            "required": true,
+            "description": "Fecha de pago fin del filtro",
+            "schema": {
+              "type": "string"
+            },
+            "example": "0"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidacionCuentasRequest"
+              },
+              "example": {
+                "rutempresa": "12345678K",
+                "numConvenio": 32901192011,
+                "cuentas": [
+                  {
+                    "nrocuenta": 1234567,
+                    "rut": "12345678K"
+                  },
+                  {
+                    "nrocuenta": 1234567,
+                    "rut": "12345678K"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado de la validación de cuentas"
+          },
+          "400": {
+            "description": "Solicitud inválida"
+          },
+          "401": {
+            "description": "No autorizado"
+          }
+        }
+      }
+    }
+  }
+}
