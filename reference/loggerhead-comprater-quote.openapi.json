@@ -1,0 +1,2880 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Loggerhead Comp Rater Quote API",
+    "description": "REST API for the Loggerhead Comparative Rater. Creates and updates homeowners (**HO3**) and dwelling-fire (**DP3**) insurance quotes for Florida properties.\n\n**Products**\n- `HO3` – Homeowners Policy Form 3 (owner-occupied primary/secondary residences). Requires eligibility questions.\n- `DP3` – Dwelling Fire Policy Form 3 (rental / non-owner-occupied dwellings). Supports entity-owned properties; no eligibility questions.\n\nThe product is selected via the top-level `productType` field. Most of the request body is shared across products; product-specific fields are noted in each field description (`HO3 only` / `DP3 only` / `Conditional`).\n\n**Authentication** – Requests are authenticated at the Azure API Management gateway with a subscription key (`Ocp-Apim-Subscription-Key` header). NOTE: Loggerhead's internal reference doc also describes an OAuth2 Bearer token (Azure AD B2C) – confirm whether a bearer token is additionally required for the public endpoints before publishing.",
+    "version": "2.0",
+    "contact": {
+      "name": "Loggerhead Insurance"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://apim-prd-dep.azure-api.net/ni/comprater",
+      "description": "Production (Azure API Management gateway)"
+    }
+  ],
+  "paths": {
+    "/v2/quote": {
+      "post": {
+        "tags": [
+          "Quotes"
+        ],
+        "summary": "Create Quote (v2)",
+        "description": "Create Quote (v2)",
+        "operationId": "createSubmissionQuoteV2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompRaterQuoteRequest"
+              },
+              "example": {
+                "productType": "HO3",
+                "policyEffectiveDate": "12/24/2024",
+                "agentInfo": {
+                  "agencyId": "A1000-000",
+                  "agentId": "P99999",
+                  "email": "email@agencydomain.com"
+                },
+                "applicantDetails": {
+                  "firstName": "John",
+                  "middleName": "D",
+                  "lastName": "Smith",
+                  "dob": "01/10/1970",
+                  "email": "jsmith@domain.com",
+                  "phoneNumber": "8131234567",
+                  "maritalStatus": "Single",
+                  "living2YearsInTheProperty": "yes"
+                },
+                "coApplicantDetails": null,
+                "riskAddress": [
+                  {
+                    "addressLine1": "415 Kula Gulf Way",
+                    "addressLine2": "Suite 500",
+                    "city": "Tampa",
+                    "state": "FL",
+                    "zipCode": "33592",
+                    "squareFootage": 3255,
+                    "yearBuilt": 1981
+                  }
+                ],
+                "coverages": [
+                  {
+                    "coverageA": "$500,000",
+                    "coverageB": "2%",
+                    "coverageC": "25%",
+                    "coverageD": "10%",
+                    "coverageE": "$300,000",
+                    "coverageF": "$1,000",
+                    "hurricaneDeductible": "2%",
+                    "nonHurricaneDeductible": "$2,500"
+                  }
+                ],
+                "propertyDetails": {
+                  "constructionAndWindMitigation": {
+                    "exteriorWallConstruction": "Masonry",
+                    "roofMaterial": "Shingle",
+                    "roofType": "Hip",
+                    "openingProtection": "Hurricane",
+                    "roofDeckAttachment": "Level B",
+                    "roofToWallConnection": "Clips",
+                    "secondaryWaterResistance": "Yes",
+                    "reinforcedConcreteRoofDeck": "No",
+                    "yearRoofReplaced": 2018,
+                    "roofCoverageBuildingCode": "Florida Building Code 2001 or Later"
+                  },
+                  "electricalAndPlumbing": {
+                    "castIronPlumbing": "No",
+                    "swimmingPool": "No Pool",
+                    "yearElectricalReplaced": 2015,
+                    "yearPlumbingReplaced": 2015,
+                    "yearWaterHeaterReplaced": 2018,
+                    "yearHVACReplaced": 2019
+                  },
+                  "safetyAndOccupancy": {
+                    "burglarAlarm": "Central Station",
+                    "fireAlarm": "Central Station",
+                    "homeSprinklerSystem": "No",
+                    "smartWaterProtection": "None",
+                    "securedCommunity": "Single Entry",
+                    "distanceToHydrant": "Less than 1000ft away from home",
+                    "numberMonthsOccupied": "8-12 months",
+                    "managedProperty": "No"
+                  },
+                  "optionalReplacementCostFeatures": {
+                    "buildingGrade": "Standard",
+                    "exteriorWallFinish": "Stucco - Traditional Hard Coat",
+                    "foundationType": "Concrete Slab",
+                    "numberOfStories": "2"
+                  },
+                  "supplementalInformation": {
+                    "buildingCodeEffectivenessGrade": "3",
+                    "protectionClass": "4",
+                    "typeOfResidence": "Single-Family",
+                    "distanceToCoast": "5"
+                  }
+                },
+                "optionalCoverage": {
+                  "additionalFungi": "$25,000/$50,000",
+                  "ordinanceOrLaw": "10%",
+                  "sinkhole": "No",
+                  "personalPropertyReplacementCost": "Yes",
+                  "waterDamage": "Full",
+                  "windHailExclusion": "No"
+                },
+                "eligibilityQuestions": {
+                  "elgOwnedByCompany": "No",
+                  "elgFiledSuit": "No",
+                  "elgPrevailSuit": "No",
+                  "elgConvictedFraud": "No",
+                  "elgConvictedFelony": "No",
+                  "elgBusinessOnProperty": "No",
+                  "elgBusinessFootTraffic": "No",
+                  "elgSinkhole": "No",
+                  "elgVacant": "No",
+                  "elgVacantMore30Days": "No",
+                  "elgRentedToOthers60Days": "No",
+                  "elgTwoFamilies": "No",
+                  "elgUnderAge21": "No",
+                  "elgDuplicateInsurance": "No",
+                  "elgRejectedCoverage": "No",
+                  "elgLapseCoverage": "No",
+                  "elgLapseOver30Days": "No"
+                },
+                "consent": {
+                  "consentInsurancePractices": "Yes"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quote created/updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseWrapperDTO"
+                },
+                "example": {
+                  "data": {
+                    "quoteId": "QLH-HO31234567",
+                    "eligible": true,
+                    "totalPolicyPremium": "4254.56",
+                    "coverageA": "500000",
+                    "coverageB": "0.02",
+                    "coverageC": "0.25",
+                    "coverageD": "0.1",
+                    "coverageE": "300000",
+                    "coverageF": "1000",
+                    "hurricaneDeductible": "0.02",
+                    "nonHurricaneDeductible": "2500",
+                    "xWind": "No",
+                    "bridgeURL": "https://portal.loggerhead.example/12345678",
+                    "message": "Quote generated successfully."
+                  },
+                  "error": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "error": {
+                    "coverages[0].coverageA": "Coverage A must be between $100,000 and $1,500,000."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/quote/{quoteId}": {
+      "put": {
+        "tags": [
+          "Quotes"
+        ],
+        "summary": "Update Quote (v2)",
+        "description": "Update Quote (v2)",
+        "operationId": "updateSubmissionQuoteV2",
+        "parameters": [
+          {
+            "name": "quoteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompRaterQuoteRequest"
+              },
+              "example": {
+                "productType": "HO3",
+                "policyEffectiveDate": "12/24/2024",
+                "agentInfo": {
+                  "agencyId": "A1000-000",
+                  "agentId": "P99999",
+                  "email": "email@agencydomain.com"
+                },
+                "applicantDetails": {
+                  "firstName": "John",
+                  "middleName": "D",
+                  "lastName": "Smith",
+                  "dob": "01/10/1970",
+                  "email": "jsmith@domain.com",
+                  "phoneNumber": "8131234567",
+                  "maritalStatus": "Single",
+                  "living2YearsInTheProperty": "yes"
+                },
+                "coApplicantDetails": null,
+                "riskAddress": [
+                  {
+                    "addressLine1": "415 Kula Gulf Way",
+                    "addressLine2": "Suite 500",
+                    "city": "Tampa",
+                    "state": "FL",
+                    "zipCode": "33592",
+                    "squareFootage": 3255,
+                    "yearBuilt": 1981
+                  }
+                ],
+                "coverages": [
+                  {
+                    "coverageA": "$500,000",
+                    "coverageB": "2%",
+                    "coverageC": "25%",
+                    "coverageD": "10%",
+                    "coverageE": "$300,000",
+                    "coverageF": "$1,000",
+                    "hurricaneDeductible": "2%",
+                    "nonHurricaneDeductible": "$2,500"
+                  }
+                ],
+                "propertyDetails": {
+                  "constructionAndWindMitigation": {
+                    "exteriorWallConstruction": "Masonry",
+                    "roofMaterial": "Shingle",
+                    "roofType": "Hip",
+                    "openingProtection": "Hurricane",
+                    "roofDeckAttachment": "Level B",
+                    "roofToWallConnection": "Clips",
+                    "secondaryWaterResistance": "Yes",
+                    "reinforcedConcreteRoofDeck": "No",
+                    "yearRoofReplaced": 2018,
+                    "roofCoverageBuildingCode": "Florida Building Code 2001 or Later"
+                  },
+                  "electricalAndPlumbing": {
+                    "castIronPlumbing": "No",
+                    "swimmingPool": "No Pool",
+                    "yearElectricalReplaced": 2015,
+                    "yearPlumbingReplaced": 2015,
+                    "yearWaterHeaterReplaced": 2018,
+                    "yearHVACReplaced": 2019
+                  },
+                  "safetyAndOccupancy": {
+                    "burglarAlarm": "Central Station",
+                    "fireAlarm": "Central Station",
+                    "homeSprinklerSystem": "No",
+                    "smartWaterProtection": "None",
+                    "securedCommunity": "Single Entry",
+                    "distanceToHydrant": "Less than 1000ft away from home",
+                    "numberMonthsOccupied": "8-12 months",
+                    "managedProperty": "No"
+                  },
+                  "optionalReplacementCostFeatures": {
+                    "buildingGrade": "Standard",
+                    "exteriorWallFinish": "Stucco - Traditional Hard Coat",
+                    "foundationType": "Concrete Slab",
+                    "numberOfStories": "2"
+                  },
+                  "supplementalInformation": {
+                    "buildingCodeEffectivenessGrade": "3",
+                    "protectionClass": "4",
+                    "typeOfResidence": "Single-Family",
+                    "distanceToCoast": "5"
+                  }
+                },
+                "optionalCoverage": {
+                  "additionalFungi": "$25,000/$50,000",
+                  "ordinanceOrLaw": "10%",
+                  "sinkhole": "No",
+                  "personalPropertyReplacementCost": "Yes",
+                  "waterDamage": "Full",
+                  "windHailExclusion": "No"
+                },
+                "eligibilityQuestions": {
+                  "elgOwnedByCompany": "No",
+                  "elgFiledSuit": "No",
+                  "elgPrevailSuit": "No",
+                  "elgConvictedFraud": "No",
+                  "elgConvictedFelony": "No",
+                  "elgBusinessOnProperty": "No",
+                  "elgBusinessFootTraffic": "No",
+                  "elgSinkhole": "No",
+                  "elgVacant": "No",
+                  "elgVacantMore30Days": "No",
+                  "elgRentedToOthers60Days": "No",
+                  "elgTwoFamilies": "No",
+                  "elgUnderAge21": "No",
+                  "elgDuplicateInsurance": "No",
+                  "elgRejectedCoverage": "No",
+                  "elgLapseCoverage": "No",
+                  "elgLapseOver30Days": "No"
+                },
+                "consent": {
+                  "consentInsurancePractices": "Yes"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quote created/updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseWrapperDTO"
+                },
+                "example": {
+                  "data": {
+                    "quoteId": "QLH-HO31234567",
+                    "eligible": true,
+                    "totalPolicyPremium": "4254.56",
+                    "coverageA": "500000",
+                    "coverageB": "0.02",
+                    "coverageC": "0.25",
+                    "coverageD": "0.1",
+                    "coverageE": "300000",
+                    "coverageF": "1000",
+                    "hurricaneDeductible": "0.02",
+                    "nonHurricaneDeductible": "2500",
+                    "xWind": "No",
+                    "bridgeURL": "https://portal.loggerhead.example/12345678",
+                    "message": "Quote generated successfully."
+                  },
+                  "error": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "error": {
+                    "coverages[0].coverageA": "Coverage A must be between $100,000 and $1,500,000."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quote/v1/create-quote": {
+      "post": {
+        "tags": [
+          "Quotes"
+        ],
+        "summary": "Create Quote (v1-deprecated)",
+        "description": "Deprecated. Use POST /v2/quote. Create Quote (v1-deprecated)",
+        "operationId": "createSubmissionQuote",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompRaterQuoteRequest"
+              },
+              "example": {
+                "productType": "HO3",
+                "policyEffectiveDate": "12/24/2024",
+                "agentInfo": {
+                  "agencyId": "A1000-000",
+                  "agentId": "P99999",
+                  "email": "email@agencydomain.com"
+                },
+                "applicantDetails": {
+                  "firstName": "John",
+                  "middleName": "D",
+                  "lastName": "Smith",
+                  "dob": "01/10/1970",
+                  "email": "jsmith@domain.com",
+                  "phoneNumber": "8131234567",
+                  "maritalStatus": "Single",
+                  "living2YearsInTheProperty": "yes"
+                },
+                "coApplicantDetails": null,
+                "riskAddress": [
+                  {
+                    "addressLine1": "415 Kula Gulf Way",
+                    "addressLine2": "Suite 500",
+                    "city": "Tampa",
+                    "state": "FL",
+                    "zipCode": "33592",
+                    "squareFootage": 3255,
+                    "yearBuilt": 1981
+                  }
+                ],
+                "coverages": [
+                  {
+                    "coverageA": "$500,000",
+                    "coverageB": "2%",
+                    "coverageC": "25%",
+                    "coverageD": "10%",
+                    "coverageE": "$300,000",
+                    "coverageF": "$1,000",
+                    "hurricaneDeductible": "2%",
+                    "nonHurricaneDeductible": "$2,500"
+                  }
+                ],
+                "propertyDetails": {
+                  "constructionAndWindMitigation": {
+                    "exteriorWallConstruction": "Masonry",
+                    "roofMaterial": "Shingle",
+                    "roofType": "Hip",
+                    "openingProtection": "Hurricane",
+                    "roofDeckAttachment": "Level B",
+                    "roofToWallConnection": "Clips",
+                    "secondaryWaterResistance": "Yes",
+                    "reinforcedConcreteRoofDeck": "No",
+                    "yearRoofReplaced": 2018,
+                    "roofCoverageBuildingCode": "Florida Building Code 2001 or Later"
+                  },
+                  "electricalAndPlumbing": {
+                    "castIronPlumbing": "No",
+                    "swimmingPool": "No Pool",
+                    "yearElectricalReplaced": 2015,
+                    "yearPlumbingReplaced": 2015,
+                    "yearWaterHeaterReplaced": 2018,
+                    "yearHVACReplaced": 2019
+                  },
+                  "safetyAndOccupancy": {
+                    "burglarAlarm": "Central Station",
+                    "fireAlarm": "Central Station",
+                    "homeSprinklerSystem": "No",
+                    "smartWaterProtection": "None",
+                    "securedCommunity": "Single Entry",
+                    "distanceToHydrant": "Less than 1000ft away from home",
+                    "numberMonthsOccupied": "8-12 months",
+                    "managedProperty": "No"
+                  },
+                  "optionalReplacementCostFeatures": {
+                    "buildingGrade": "Standard",
+                    "exteriorWallFinish": "Stucco - Traditional Hard Coat",
+                    "foundationType": "Concrete Slab",
+                    "numberOfStories": "2"
+                  },
+                  "supplementalInformation": {
+                    "buildingCodeEffectivenessGrade": "3",
+                    "protectionClass": "4",
+                    "typeOfResidence": "Single-Family",
+                    "distanceToCoast": "5"
+                  }
+                },
+                "optionalCoverage": {
+                  "additionalFungi": "$25,000/$50,000",
+                  "ordinanceOrLaw": "10%",
+                  "sinkhole": "No",
+                  "personalPropertyReplacementCost": "Yes",
+                  "waterDamage": "Full",
+                  "windHailExclusion": "No"
+                },
+                "eligibilityQuestions": {
+                  "elgOwnedByCompany": "No",
+                  "elgFiledSuit": "No",
+                  "elgPrevailSuit": "No",
+                  "elgConvictedFraud": "No",
+                  "elgConvictedFelony": "No",
+                  "elgBusinessOnProperty": "No",
+                  "elgBusinessFootTraffic": "No",
+                  "elgSinkhole": "No",
+                  "elgVacant": "No",
+                  "elgVacantMore30Days": "No",
+                  "elgRentedToOthers60Days": "No",
+                  "elgTwoFamilies": "No",
+                  "elgUnderAge21": "No",
+                  "elgDuplicateInsurance": "No",
+                  "elgRejectedCoverage": "No",
+                  "elgLapseCoverage": "No",
+                  "elgLapseOver30Days": "No"
+                },
+                "consent": {
+                  "consentInsurancePractices": "Yes"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quote created/updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseWrapperDTO"
+                },
+                "example": {
+                  "data": {
+                    "quoteId": "QLH-HO31234567",
+                    "eligible": true,
+                    "totalPolicyPremium": "4254.56",
+                    "coverageA": "500000",
+                    "coverageB": "0.02",
+                    "coverageC": "0.25",
+                    "coverageD": "0.1",
+                    "coverageE": "300000",
+                    "coverageF": "1000",
+                    "hurricaneDeductible": "0.02",
+                    "nonHurricaneDeductible": "2500",
+                    "xWind": "No",
+                    "bridgeURL": "https://portal.loggerhead.example/12345678",
+                    "message": "Quote generated successfully."
+                  },
+                  "error": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "error": {
+                    "coverages[0].coverageA": "Coverage A must be between $100,000 and $1,500,000."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/v1/quote/{quoteId}": {
+      "put": {
+        "tags": [
+          "Quotes"
+        ],
+        "summary": "Update Quote (v1)",
+        "description": "Update Quote (v1)",
+        "operationId": "updateSubmissionQuoteV1",
+        "parameters": [
+          {
+            "name": "quoteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompRaterQuoteRequest"
+              },
+              "example": {
+                "productType": "HO3",
+                "policyEffectiveDate": "12/24/2024",
+                "agentInfo": {
+                  "agencyId": "A1000-000",
+                  "agentId": "P99999",
+                  "email": "email@agencydomain.com"
+                },
+                "applicantDetails": {
+                  "firstName": "John",
+                  "middleName": "D",
+                  "lastName": "Smith",
+                  "dob": "01/10/1970",
+                  "email": "jsmith@domain.com",
+                  "phoneNumber": "8131234567",
+                  "maritalStatus": "Single",
+                  "living2YearsInTheProperty": "yes"
+                },
+                "coApplicantDetails": null,
+                "riskAddress": [
+                  {
+                    "addressLine1": "415 Kula Gulf Way",
+                    "addressLine2": "Suite 500",
+                    "city": "Tampa",
+                    "state": "FL",
+                    "zipCode": "33592",
+                    "squareFootage": 3255,
+                    "yearBuilt": 1981
+                  }
+                ],
+                "coverages": [
+                  {
+                    "coverageA": "$500,000",
+                    "coverageB": "2%",
+                    "coverageC": "25%",
+                    "coverageD": "10%",
+                    "coverageE": "$300,000",
+                    "coverageF": "$1,000",
+                    "hurricaneDeductible": "2%",
+                    "nonHurricaneDeductible": "$2,500"
+                  }
+                ],
+                "propertyDetails": {
+                  "constructionAndWindMitigation": {
+                    "exteriorWallConstruction": "Masonry",
+                    "roofMaterial": "Shingle",
+                    "roofType": "Hip",
+                    "openingProtection": "Hurricane",
+                    "roofDeckAttachment": "Level B",
+                    "roofToWallConnection": "Clips",
+                    "secondaryWaterResistance": "Yes",
+                    "reinforcedConcreteRoofDeck": "No",
+                    "yearRoofReplaced": 2018,
+                    "roofCoverageBuildingCode": "Florida Building Code 2001 or Later"
+                  },
+                  "electricalAndPlumbing": {
+                    "castIronPlumbing": "No",
+                    "swimmingPool": "No Pool",
+                    "yearElectricalReplaced": 2015,
+                    "yearPlumbingReplaced": 2015,
+                    "yearWaterHeaterReplaced": 2018,
+                    "yearHVACReplaced": 2019
+                  },
+                  "safetyAndOccupancy": {
+                    "burglarAlarm": "Central Station",
+                    "fireAlarm": "Central Station",
+                    "homeSprinklerSystem": "No",
+                    "smartWaterProtection": "None",
+                    "securedCommunity": "Single Entry",
+                    "distanceToHydrant": "Less than 1000ft away from home",
+                    "numberMonthsOccupied": "8-12 months",
+                    "managedProperty": "No"
+                  },
+                  "optionalReplacementCostFeatures": {
+                    "buildingGrade": "Standard",
+                    "exteriorWallFinish": "Stucco - Traditional Hard Coat",
+                    "foundationType": "Concrete Slab",
+                    "numberOfStories": "2"
+                  },
+                  "supplementalInformation": {
+                    "buildingCodeEffectivenessGrade": "3",
+                    "protectionClass": "4",
+                    "typeOfResidence": "Single-Family",
+                    "distanceToCoast": "5"
+                  }
+                },
+                "optionalCoverage": {
+                  "additionalFungi": "$25,000/$50,000",
+                  "ordinanceOrLaw": "10%",
+                  "sinkhole": "No",
+                  "personalPropertyReplacementCost": "Yes",
+                  "waterDamage": "Full",
+                  "windHailExclusion": "No"
+                },
+                "eligibilityQuestions": {
+                  "elgOwnedByCompany": "No",
+                  "elgFiledSuit": "No",
+                  "elgPrevailSuit": "No",
+                  "elgConvictedFraud": "No",
+                  "elgConvictedFelony": "No",
+                  "elgBusinessOnProperty": "No",
+                  "elgBusinessFootTraffic": "No",
+                  "elgSinkhole": "No",
+                  "elgVacant": "No",
+                  "elgVacantMore30Days": "No",
+                  "elgRentedToOthers60Days": "No",
+                  "elgTwoFamilies": "No",
+                  "elgUnderAge21": "No",
+                  "elgDuplicateInsurance": "No",
+                  "elgRejectedCoverage": "No",
+                  "elgLapseCoverage": "No",
+                  "elgLapseOver30Days": "No"
+                },
+                "consent": {
+                  "consentInsurancePractices": "Yes"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quote created/updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseWrapperDTO"
+                },
+                "example": {
+                  "data": {
+                    "quoteId": "QLH-HO31234567",
+                    "eligible": true,
+                    "totalPolicyPremium": "4254.56",
+                    "coverageA": "500000",
+                    "coverageB": "0.02",
+                    "coverageC": "0.25",
+                    "coverageD": "0.1",
+                    "coverageE": "300000",
+                    "coverageF": "1000",
+                    "hurricaneDeductible": "0.02",
+                    "nonHurricaneDeductible": "2500",
+                    "xWind": "No",
+                    "bridgeURL": "https://portal.loggerhead.example/12345678",
+                    "message": "Quote generated successfully."
+                  },
+                  "error": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "error": {
+                    "coverages[0].coverageA": "Coverage A must be between $100,000 and $1,500,000."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/quote": {
+      "post": {
+        "tags": [
+          "Quotes"
+        ],
+        "summary": "Create Quote (v1)",
+        "description": "Create Quote (v1)",
+        "operationId": "createSubmissionQuoteV1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompRaterQuoteRequest"
+              },
+              "example": {
+                "productType": "HO3",
+                "policyEffectiveDate": "12/24/2024",
+                "agentInfo": {
+                  "agencyId": "A1000-000",
+                  "agentId": "P99999",
+                  "email": "email@agencydomain.com"
+                },
+                "applicantDetails": {
+                  "firstName": "John",
+                  "middleName": "D",
+                  "lastName": "Smith",
+                  "dob": "01/10/1970",
+                  "email": "jsmith@domain.com",
+                  "phoneNumber": "8131234567",
+                  "maritalStatus": "Single",
+                  "living2YearsInTheProperty": "yes"
+                },
+                "coApplicantDetails": null,
+                "riskAddress": [
+                  {
+                    "addressLine1": "415 Kula Gulf Way",
+                    "addressLine2": "Suite 500",
+                    "city": "Tampa",
+                    "state": "FL",
+                    "zipCode": "33592",
+                    "squareFootage": 3255,
+                    "yearBuilt": 1981
+                  }
+                ],
+                "coverages": [
+                  {
+                    "coverageA": "$500,000",
+                    "coverageB": "2%",
+                    "coverageC": "25%",
+                    "coverageD": "10%",
+                    "coverageE": "$300,000",
+                    "coverageF": "$1,000",
+                    "hurricaneDeductible": "2%",
+                    "nonHurricaneDeductible": "$2,500"
+                  }
+                ],
+                "propertyDetails": {
+                  "constructionAndWindMitigation": {
+                    "exteriorWallConstruction": "Masonry",
+                    "roofMaterial": "Shingle",
+                    "roofType": "Hip",
+                    "openingProtection": "Hurricane",
+                    "roofDeckAttachment": "Level B",
+                    "roofToWallConnection": "Clips",
+                    "secondaryWaterResistance": "Yes",
+                    "reinforcedConcreteRoofDeck": "No",
+                    "yearRoofReplaced": 2018,
+                    "roofCoverageBuildingCode": "Florida Building Code 2001 or Later"
+                  },
+                  "electricalAndPlumbing": {
+                    "castIronPlumbing": "No",
+                    "swimmingPool": "No Pool",
+                    "yearElectricalReplaced": 2015,
+                    "yearPlumbingReplaced": 2015,
+                    "yearWaterHeaterReplaced": 2018,
+                    "yearHVACReplaced": 2019
+                  },
+                  "safetyAndOccupancy": {
+                    "burglarAlarm": "Central Station",
+                    "fireAlarm": "Central Station",
+                    "homeSprinklerSystem": "No",
+                    "smartWaterProtection": "None",
+                    "securedCommunity": "Single Entry",
+                    "distanceToHydrant": "Less than 1000ft away from home",
+                    "numberMonthsOccupied": "8-12 months",
+                    "managedProperty": "No"
+                  },
+                  "optionalReplacementCostFeatures": {
+                    "buildingGrade": "Standard",
+                    "exteriorWallFinish": "Stucco - Traditional Hard Coat",
+                    "foundationType": "Concrete Slab",
+                    "numberOfStories": "2"
+                  },
+                  "supplementalInformation": {
+                    "buildingCodeEffectivenessGrade": "3",
+                    "protectionClass": "4",
+                    "typeOfResidence": "Single-Family",
+                    "distanceToCoast": "5"
+                  }
+                },
+                "optionalCoverage": {
+                  "additionalFungi": "$25,000/$50,000",
+                  "ordinanceOrLaw": "10%",
+                  "sinkhole": "No",
+                  "personalPropertyReplacementCost": "Yes",
+                  "waterDamage": "Full",
+                  "windHailExclusion": "No"
+                },
+                "eligibilityQuestions": {
+                  "elgOwnedByCompany": "No",
+                  "elgFiledSuit": "No",
+                  "elgPrevailSuit": "No",
+                  "elgConvictedFraud": "No",
+                  "elgConvictedFelony": "No",
+                  "elgBusinessOnProperty": "No",
+                  "elgBusinessFootTraffic": "No",
+                  "elgSinkhole": "No",
+                  "elgVacant": "No",
+                  "elgVacantMore30Days": "No",
+                  "elgRentedToOthers60Days": "No",
+                  "elgTwoFamilies": "No",
+                  "elgUnderAge21": "No",
+                  "elgDuplicateInsurance": "No",
+                  "elgRejectedCoverage": "No",
+                  "elgLapseCoverage": "No",
+                  "elgLapseOver30Days": "No"
+                },
+                "consent": {
+                  "consentInsurancePractices": "Yes"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Quote created/updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseWrapperDTO"
+                },
+                "example": {
+                  "data": {
+                    "quoteId": "QLH-HO31234567",
+                    "eligible": true,
+                    "totalPolicyPremium": "4254.56",
+                    "coverageA": "500000",
+                    "coverageB": "0.02",
+                    "coverageC": "0.25",
+                    "coverageD": "0.1",
+                    "coverageE": "300000",
+                    "coverageF": "1000",
+                    "hurricaneDeductible": "0.02",
+                    "nonHurricaneDeductible": "2500",
+                    "xWind": "No",
+                    "bridgeURL": "https://portal.loggerhead.example/12345678",
+                    "message": "Quote generated successfully."
+                  },
+                  "error": null
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "error": {
+                    "coverages[0].coverageA": "Coverage A must be between $100,000 and $1,500,000."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agencytoolkit/comprater-app-agencies": {
+      "get": {
+        "tags": [
+          "Agency Toolkit"
+        ],
+        "summary": "List all agency/rater associations (desc by lastModifiedDate)",
+        "description": "List all agency/rater associations (desc by lastModifiedDate)",
+        "operationId": "listAllAgencyRaters",
+        "parameters": [
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgencyRaterResponse"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ResponseWrapperDTO"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Agency Toolkit"
+        ],
+        "summary": "Create an agency/rater association (also writes audit)",
+        "description": "Create an agency/rater association (also writes audit)",
+        "operationId": "createAssociation",
+        "parameters": [
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgencyRaterRequest"
+              },
+              "example": {
+                "agencyId": "string",
+                "clientName": "string",
+                "userMetaData": {
+                  "email": "string",
+                  "role": "string",
+                  "name": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgencyRaterResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ResponseWrapperDTO"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Agency Toolkit"
+        ],
+        "summary": "Disable an association (soft-delete: sets active=false and writes audit)",
+        "description": "Disable an association (soft-delete: sets active=false and writes audit)",
+        "operationId": "disableAssociation",
+        "parameters": [
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgencyRaterRequest"
+              },
+              "example": {
+                "agencyId": "string",
+                "clientName": "string",
+                "userMetaData": {
+                  "email": "string",
+                  "role": "string",
+                  "name": "string"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgencyRaterResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ResponseWrapperDTO"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agencytoolkit/comprater-apps": {
+      "get": {
+        "tags": [
+          "Agency Toolkit"
+        ],
+        "summary": "List all comparative rater apps (ordered by name)",
+        "description": "List all comparative rater apps (ordered by name)",
+        "operationId": "listApps",
+        "parameters": [
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CompRaterAppResponse"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ResponseWrapperDTO"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agencytoolkit/comprater-app-agencies/{agencyId}": {
+      "get": {
+        "tags": [
+          "Agency Toolkit"
+        ],
+        "summary": "List associations for a specific agency (desc by lastModifiedDate)",
+        "description": "List associations for a specific agency (desc by lastModifiedDate)",
+        "operationId": "listByAgency",
+        "parameters": [
+          {
+            "name": "agencyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AgencyRaterResponse"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ResponseWrapperDTO"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "string"
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "value": null
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ResponseWrapperDTO": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CompRaterQuoteResponse"
+          },
+          "error": {
+            "type": "object",
+            "nullable": true,
+            "description": "Populated on failure; null on success."
+          }
+        }
+      },
+      "AgentInfo": {
+        "type": "object",
+        "required": [
+          "agencyId",
+          "agentId",
+          "email"
+        ],
+        "properties": {
+          "agencyId": {
+            "type": "string",
+            "pattern": "^A\\d{4}-\\d{3}$",
+            "description": "Agency identifier. Agency must be set up and provided by Loggerhead.",
+            "example": "A1000-000"
+          },
+          "agentId": {
+            "type": "string",
+            "description": "Agent identifier. Agent must be set up and provided by Loggerhead.",
+            "example": "P99999"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Must match the agent's onboarded email address.",
+            "example": "email@agencydomain.com"
+          }
+        }
+      },
+      "ApplicantDetails": {
+        "type": "object",
+        "required": [
+          "firstName",
+          "lastName",
+          "maritalStatus"
+        ],
+        "description": "Primary policyholder. For DP3 entity-owned properties, use entity/entityName/entityOwnerDOB instead of the individual name fields.",
+        "properties": {
+          "entity": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "DP3 only. Will the named insured be an entity (corporation, LLC)? If No, individual applicant info is required.",
+            "example": "No"
+          },
+          "entityName": {
+            "type": "string",
+            "pattern": "^.{1,64}$",
+            "description": "DP3 only. Required if entity = Yes.",
+            "example": "ABC Holdings LLC"
+          },
+          "entityOwnerDOB": {
+            "type": "string",
+            "description": "DP3 only. Required if entity = Yes. Owner must be 18 or older. Format MM/DD/YYYY.",
+            "example": "03/22/1975"
+          },
+          "firstName": {
+            "type": "string",
+            "pattern": "^[a-zA-Z .\\-'_]{0,64}$",
+            "description": "Applicant first name (required for individual applicants).",
+            "example": "John"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Applicant middle name.",
+            "example": "D",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "pattern": "^[a-zA-Z .\\-'_]{0,64}$",
+            "description": "Applicant last name (required for individual applicants).",
+            "example": "Smith"
+          },
+          "dob": {
+            "type": "string",
+            "description": "Date of birth. Applicant must be 18 or older. Format MM/DD/YYYY.",
+            "example": "01/10/1970"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Applicant email address.",
+            "example": "jsmith@domain.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "pattern": "^\\d{10}$",
+            "description": "10-digit phone number.",
+            "example": "8131234567"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "enum": [
+              "Single",
+              "Married",
+              "Widowed",
+              "Separated",
+              "Divorced"
+            ],
+            "description": "Marital status. 'Married' and 'Separated' require a co-applicant.",
+            "example": "Single"
+          },
+          "living2YearsInTheProperty": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "description": "HO3 only. Has the applicant lived at the property for at least two years? If 'no', provide priorAddress.",
+            "example": "yes"
+          },
+          "priorAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PriorAddress"
+              }
+            ],
+            "description": "HO3 only. Required when living2YearsInTheProperty = no."
+          },
+          "mailingAddress": {
+            "$ref": "#/components/schemas/MailingAddress"
+          }
+        }
+      },
+      "CoApplicantDetails": {
+        "type": "object",
+        "description": "Secondary policyholder. Required when the applicant's maritalStatus is 'Married' or 'Separated'; otherwise may be null.",
+        "required": [
+          "firstName",
+          "lastName",
+          "maritalStatus"
+        ],
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "pattern": "^[a-zA-Z .\\-'_]{0,64}$",
+            "description": "Co-applicant first name. Required if co-applicant present.",
+            "example": "Jane"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Co-applicant middle name.",
+            "example": "Marie",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "pattern": "^[a-zA-Z .\\-'_]{0,64}$",
+            "description": "Co-applicant last name. Required if co-applicant present.",
+            "example": "Smith"
+          },
+          "dob": {
+            "type": "string",
+            "description": "Co-applicant date of birth. Format MM/DD/YYYY. Required if co-applicant present.",
+            "example": "06/15/1985"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Co-applicant email address.",
+            "example": "jane.smith@domain.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "pattern": "^\\d{10}$",
+            "description": "10-digit phone number.",
+            "example": "8132345678"
+          },
+          "maritalStatus": {
+            "type": "string",
+            "enum": [
+              "Single",
+              "Married",
+              "Widowed",
+              "Separated",
+              "Divorced"
+            ],
+            "description": "Co-applicant marital status. Required if co-applicant present.",
+            "example": "Married"
+          },
+          "sameAsPropertyAddress": {
+            "type": "string",
+            "enum": [
+              "yes",
+              "no"
+            ],
+            "description": "Does the co-applicant share the applicant's address? If no, provide mailingAddress.",
+            "example": "yes"
+          },
+          "mailingAddress": {
+            "$ref": "#/components/schemas/MailingAddress"
+          }
+        }
+      },
+      "CompRaterQuoteRequest": {
+        "type": "object",
+        "required": [
+          "agentInfo",
+          "applicantDetails",
+          "consent",
+          "coverages",
+          "policyEffectiveDate",
+          "productType",
+          "riskAddress"
+        ],
+        "properties": {
+          "productType": {
+            "type": "string",
+            "enum": [
+              "HO3",
+              "DP3"
+            ],
+            "description": "Insurance product. Determines which conditional fields apply.",
+            "example": "HO3"
+          },
+          "policyEffectiveDate": {
+            "type": "string",
+            "description": "Policy effective date (MM/DD/YYYY). Cannot be in the past; no more than 60 days in the future.",
+            "example": "12/24/2024"
+          },
+          "agentInfo": {
+            "$ref": "#/components/schemas/AgentInfo"
+          },
+          "applicantDetails": {
+            "$ref": "#/components/schemas/ApplicantDetails"
+          },
+          "coApplicantDetails": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CoApplicantDetails"
+              }
+            ],
+            "nullable": true,
+            "description": "Required when applicant maritalStatus is Married or Separated; otherwise null."
+          },
+          "riskAddress": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RiskAddress"
+            }
+          },
+          "coverages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Coverage"
+            }
+          },
+          "propertyDetails": {
+            "$ref": "#/components/schemas/PropertyDetails"
+          },
+          "optionalCoverage": {
+            "$ref": "#/components/schemas/OptionalCoverage"
+          },
+          "eligibilityQuestions": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EligibilityQuestions"
+              }
+            ],
+            "description": "HO3 only."
+          },
+          "consent": {
+            "$ref": "#/components/schemas/Consent"
+          }
+        }
+      },
+      "Consent": {
+        "type": "object",
+        "required": [
+          "consentInsurancePractices"
+        ],
+        "properties": {
+          "consentInsurancePractices": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Consent to Loggerhead's Insurance Information Practices (insurance score).",
+            "example": "Yes"
+          },
+          "assumedCreditRating": {
+            "type": "string",
+            "enum": [
+              "Excellent",
+              "Very Good",
+              "Average",
+              "Below Average",
+              "Poor"
+            ],
+            "description": "Assumed credit rating. Only valid when consentInsurancePractices is No.",
+            "example": "Average"
+          }
+        }
+      },
+      "ConstructionAndWindMitigation": {
+        "type": "object",
+        "properties": {
+          "exteriorWallConstruction": {
+            "type": "string",
+            "enum": [
+              "Frame",
+              "Masonry",
+              "Superior"
+            ],
+            "description": "Exterior wall construction.",
+            "example": "Masonry"
+          },
+          "roofCoverageBuildingCode": {
+            "type": "string",
+            "enum": [
+              "None",
+              "South Florida Building Code 1994",
+              "Florida Building Code 2001 or Later"
+            ],
+            "description": "Indicates whether all roof coverings meet the Florida Building Code or South Florida Building Code at installation, or have a permit on/after 3/1/02, or the roof is original and built 2004 or later.",
+            "example": "Florida Building Code 2001 or Later"
+          },
+          "roofMaterial": {
+            "type": "string",
+            "enum": [
+              "Metal",
+              "Other",
+              "Shingle",
+              "Slate",
+              "Tile",
+              "Wood",
+              "Flat Tile"
+            ],
+            "description": "Roof covering material.",
+            "example": "Shingle"
+          },
+          "roofDeckAttachment": {
+            "type": "string",
+            "enum": [
+              "Level A",
+              "Level B",
+              "Level C",
+              "Level C Dimensional Lumber",
+              "Level D",
+              "Reinforced Concrete"
+            ],
+            "description": "Roof deck attachment level.",
+            "example": "Level B"
+          },
+          "roofToWallConnection": {
+            "type": "string",
+            "enum": [
+              "Clips",
+              "Double Wraps or Structural",
+              "Single Wraps",
+              "Toe Nails"
+            ],
+            "description": "Roof-to-wall connection type.",
+            "example": "Clips"
+          },
+          "roofType": {
+            "type": "string",
+            "enum": [
+              "Complex/Custom",
+              "Flat",
+              "Gable",
+              "Gambrel",
+              "Hip",
+              "Mansard",
+              "Shed",
+              "Unknown"
+            ],
+            "description": "Roof shape.",
+            "example": "Hip"
+          },
+          "openingProtection": {
+            "type": "string",
+            "enum": [
+              "Basic",
+              "Hurricane",
+              "None"
+            ],
+            "description": "Opening protection. Selecting Basic or Hurricane requires ALL openings rated accordingly per the Uniform Wind Mitigation Inspection Form.",
+            "example": "Hurricane"
+          },
+          "reinforcedConcreteRoofDeck": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Reinforced concrete roof deck?",
+            "example": "No"
+          },
+          "secondaryWaterResistance": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Secondary water resistance present?",
+            "example": "Yes"
+          },
+          "yearRoofReplaced": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Most recent year the entire roof surface was replaced (YYYY).",
+            "example": 2018
+          },
+          "coveredPorch": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "DP3 only. Is there an exterior covered porch attached to the dwelling?",
+            "example": "No"
+          }
+        }
+      },
+      "Coverage": {
+        "type": "object",
+        "description": "Coverage limits and deductibles. HO3 uses separate Coverage E and F; DP3 combines them into a single Coverage E/F value (see coverageEF). NOTE: the data mapping expresses percentages as decimals (e.g. 0.02) while this spec documents them as percent strings (e.g. '2%') – confirm the exact wire format before publishing.",
+        "required": [
+          "coverageA",
+          "coverageB",
+          "hurricaneDeductible",
+          "nonHurricaneDeductible"
+        ],
+        "properties": {
+          "coverageA": {
+            "type": "string",
+            "description": "Coverage A – Dwelling structure. Currency string. Min $100,000; max $1,500,000.",
+            "example": "$500,000"
+          },
+          "coverageB": {
+            "type": "string",
+            "description": "Coverage B – Other structures, as a percentage of Coverage A.",
+            "example": "2%"
+          },
+          "coverageC": {
+            "type": "string",
+            "description": "Coverage C – Personal property. HO3: percentage of Coverage A. DP3: currency amount (Primary/Secondary limit $250K, Rental $100K, not eligible when Vacant).",
+            "example": "25%"
+          },
+          "coverageD": {
+            "type": "string",
+            "description": "Coverage D – Loss of use, as a percentage of Coverage A. For DP3, 10% is the only value.",
+            "example": "10%"
+          },
+          "coverageE": {
+            "type": "string",
+            "description": "HO3 only. Coverage E – Personal liability (currency).",
+            "example": "$300,000"
+          },
+          "coverageF": {
+            "type": "string",
+            "description": "HO3 only. Coverage F – Medical payments to others (currency).",
+            "example": "$1,000"
+          },
+          "coverageEF": {
+            "type": "string",
+            "description": "DP3 only. Combined Coverage E/F (liability/medical). Allowed values include 'Excluded', '$100,000/$1,000', '$300,000/$5,000', '$500,000/$5,000'. [VERIFY exact JSON key – mapping labels this 'coverageE/F'.]",
+            "example": "$300,000/$5,000"
+          },
+          "hurricaneDeductible": {
+            "type": "string",
+            "description": "Hurricane deductible (percent or $500). Not applicable for xWind policies. Cannot be less than the non-hurricane deductible. $500 not valid when Coverage A ≥ $250K.",
+            "example": "2%"
+          },
+          "nonHurricaneDeductible": {
+            "type": "string",
+            "description": "All-other-perils (AOP) deductible.",
+            "example": "$2,500"
+          }
+        }
+      },
+      "ElectricalAndPlumbing": {
+        "type": "object",
+        "properties": {
+          "castIronPlumbing": {
+            "type": "string",
+            "enum": [
+              "No",
+              "Yes",
+              "Retrofitted"
+            ],
+            "description": "Cast iron plumbing status.",
+            "example": "No"
+          },
+          "swimmingPool": {
+            "type": "string",
+            "enum": [
+              "No Pool",
+              "4 ft Fence with Locking Gate",
+              "No Safety Barrier",
+              "Other Pool Barrier",
+              "Screened Enclosure",
+              "Surrounding Wall"
+            ],
+            "description": "Swimming pool / barrier type.",
+            "example": "No Pool"
+          },
+          "yearElectricalReplaced": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Year electrical system was last replaced (YYYY).",
+            "example": 2015
+          },
+          "yearPlumbingReplaced": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Year plumbing was last replaced (YYYY).",
+            "example": 2015
+          },
+          "yearWaterHeaterReplaced": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Year water heater was last replaced (YYYY). Older than 20 years is ineligible.",
+            "example": 2015
+          },
+          "yearHVACReplaced": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Year HVAC was last replaced (YYYY). Older than 20 years is ineligible.",
+            "example": 2015
+          }
+        }
+      },
+      "EligibilityQuestions": {
+        "type": "object",
+        "description": "HO3 only. Underwriting eligibility questions (Yes/No). May be null or omitted; third-party systems may send only the answered questions.",
+        "properties": {
+          "elgOwnedByCompany": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Is the property owned by a corporation, LLC, LLP, or estate?",
+            "example": "No"
+          },
+          "elgFiledSuit": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Have any residents ever filed suit against a home or auto insurance company?",
+            "example": "No"
+          },
+          "elgPrevailSuit": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Conditional. Did the resident who sued prevail in that lawsuit?",
+            "example": "No"
+          },
+          "elgConvictedFraud": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Has any applicant been convicted of insurance fraud or arson, or been canceled for material misrepresentation?",
+            "example": "No"
+          },
+          "elgConvictedFelony": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Have any residents been convicted of a felony?",
+            "example": "No"
+          },
+          "elgBusinessOnProperty": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Does the applicant operate a business on the property?",
+            "example": "No"
+          },
+          "elgBusinessFootTraffic": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Conditional. Does this business result in customer/vendor foot traffic on the premises?",
+            "example": "No"
+          },
+          "elgSinkhole": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Are you aware of any sinkhole activity within 1500' of the property?",
+            "example": "No"
+          },
+          "elgVacant": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Is the property vacant, unoccupied, for sale, in foreclosure, or pending foreclosure?",
+            "example": "No"
+          },
+          "elgVacantMore30Days": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Will the property be vacant for 30 days or more after the effective date?",
+            "example": "No"
+          },
+          "elgRentedToOthers60Days": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Is any portion rented to others (outside family) more than 60 days per year?",
+            "example": "No"
+          },
+          "elgTwoFamilies": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Are there more than two (2) families living on the property? [VERIFY field name: data mapping spells this 'elgTwoFamiles'.]",
+            "example": "No"
+          },
+          "elgUnderAge21": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Is anyone under age 21 living on the property?",
+            "example": "No"
+          },
+          "elgDuplicateInsurance": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Do you have duplicate insurance coverage on this property?",
+            "example": "No"
+          },
+          "elgRejectedCoverage": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Has coverage been rejected/canceled/non-renewed in the past 5 years for non-exposure reasons?",
+            "example": "No"
+          },
+          "elgLapseCoverage": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Has the applicant had a lapse of insurance coverage in the last 12 months?",
+            "example": "No"
+          },
+          "elgLapseOver30Days": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Conditional. Was the lapse in coverage over 30 days?",
+            "example": "No"
+          }
+        }
+      },
+      "MailingAddress": {
+        "type": "object",
+        "properties": {
+          "addressLine1": {
+            "type": "string",
+            "pattern": "^.{1,100}$",
+            "description": "Primary street address line.",
+            "example": "415 Kula Gulf Way"
+          },
+          "addressLine2": {
+            "type": "string",
+            "pattern": "^.{0,100}$",
+            "description": "Secondary address line (unit / suite).",
+            "example": "Suite 500",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "City.",
+            "example": "Tampa"
+          },
+          "state": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "description": "Two-letter state code.",
+            "example": "FL"
+          },
+          "zipCode": {
+            "type": "string",
+            "pattern": "^[0-9]{5}$",
+            "description": "5-digit ZIP code. Provide a mailing address only if it differs from the risk address.",
+            "example": "33592"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country.",
+            "example": "USA"
+          }
+        }
+      },
+      "OptionalCoverage": {
+        "type": "object",
+        "description": "Optional coverage endorsements. Field availability and value formats differ between HO3 and DP3 (see each field). [VERIFY value formats – the mapping uses $ strings for HO3 and plain numbers for DP3 on several of these.]",
+        "properties": {
+          "additionalCoverageA": {
+            "type": "string",
+            "description": "HO3 only. Additional dwelling coverage (percentage increase to Coverage A).",
+            "example": "20%"
+          },
+          "additionalFungi": {
+            "type": "string",
+            "description": "Additional fungi/mold coverage. Base includes $10,000/$10,000. HO3 values: $10,000/$10,000, $25,000/$50,000, $50,000/$50,000.",
+            "example": "$25,000/$50,000"
+          },
+          "animalLiability": {
+            "type": "string",
+            "enum": [
+              "$25,000",
+              "$50,000",
+              "$100,000"
+            ],
+            "description": "HO3 only. Animal liability coverage limit.",
+            "example": "$50,000"
+          },
+          "hurricaneScreenedEnclosure": {
+            "type": "string",
+            "description": "Hurricane screened enclosure / carport coverage limit.",
+            "example": "$25,000"
+          },
+          "identityTheft": {
+            "type": "string",
+            "enum": [
+              "Yes"
+            ],
+            "description": "HO3 only. Identity theft coverage.",
+            "example": "Yes"
+          },
+          "ordinanceOrLaw": {
+            "type": "string",
+            "enum": [
+              "0%",
+              "10%",
+              "25%",
+              "50%"
+            ],
+            "description": "Ordinance or law coverage. Base coverage includes 10%.",
+            "example": "10%"
+          },
+          "personalInjury": {
+            "type": "string",
+            "enum": [
+              "Yes"
+            ],
+            "description": "HO3 only. Personal injury liability coverage (e.g. false arrest, detention).",
+            "example": "Yes"
+          },
+          "personalPropertyReplacementCost": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Replacement-cost settlement on Coverage C. Requires Coverage C > $0.",
+            "example": "Yes"
+          },
+          "roofSurfacePaymentSchedule": {
+            "type": "string",
+            "enum": [
+              "Scheduled",
+              "Replacement Cost"
+            ],
+            "description": "HO3 only. Roof surface loss settlement. Roofs 11+ years old must be 'Scheduled'.",
+            "example": "Scheduled"
+          },
+          "sinkhole": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Sinkhole coverage.",
+            "example": "No"
+          },
+          "supplementalLossAssessment": {
+            "type": "string",
+            "enum": [
+              "$0",
+              "$1,000",
+              "$5,000",
+              "$10,000"
+            ],
+            "description": "HO3 only. Supplemental loss assessment coverage limit.",
+            "example": "$5,000"
+          },
+          "lossAssessment": {
+            "type": "string",
+            "description": "DP3 only. Loss assessment coverage. Values: Exclude, 5000, 10000.",
+            "example": "5000"
+          },
+          "waterBackup": {
+            "type": "string",
+            "enum": [
+              "$0",
+              "$5,000",
+              "$10,000",
+              "$25,000"
+            ],
+            "description": "HO3 only. Water/sewer backup coverage limit.",
+            "example": "$5,000"
+          },
+          "waterDamage": {
+            "type": "string",
+            "description": "Water damage coverage. HO3: Full / Limited ($10K-$50K) / Excluded.",
+            "example": "Full"
+          },
+          "windHailExclusion": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Wind/hail exclusion (xWind).",
+            "example": "No"
+          },
+          "theft": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "DP3 only. Theft coverage.",
+            "example": "No"
+          }
+        }
+      },
+      "OptionalReplacementCostFeatures": {
+        "type": "object",
+        "properties": {
+          "buildingGrade": {
+            "type": "string",
+            "enum": [
+              "Economy",
+              "Standard",
+              "Above Average",
+              "Custom",
+              "Premium"
+            ],
+            "description": "Building/construction grade.",
+            "example": "Standard"
+          },
+          "exteriorWallFinish": {
+            "type": "string",
+            "enum": [
+              "Brick - Solid",
+              "Brick - Solid - Custom",
+              "Brick Veneer",
+              "Brick Veneer - Custom",
+              "Cement Fiber (Shingle)",
+              "Concrete Block - Decorative",
+              "Cut Limestone Veneer",
+              "Cypress - Reclaimed",
+              "Metal - Copper Shingle",
+              "Metal - Corrugated Galvanized",
+              "Metal - Painted Ribbed",
+              "None - Included In Ext. Wall Construction",
+              "Siding - Alum. or Metal",
+              "Siding - Board and Batten",
+              "Siding - Cedar (Clapboard)",
+              "Siding - Cedar (Tongue & Groove)",
+              "Siding - Cement Fiber (Clapboard)",
+              "Siding - Hardboard/Masonite",
+              "Siding - Log",
+              "Siding - Pine (Clapboard)",
+              "Siding - Pine (Tongue & Groove)",
+              "Siding - Plywood (Vertical Groove)",
+              "Siding - Redwood (Clapboard)",
+              "Siding - Redwood (Tongue & Groove)",
+              "Siding - Steel",
+              "Siding - Vinyl",
+              "Siding - Vinyl Shingles",
+              "Solid Log - Large (13\" or more)",
+              "Solid Log - Medium (9\"-12\")",
+              "Solid Log - Small (6\"-8\")",
+              "Solid Stone",
+              "Stone Veneer (Manufactured)",
+              "Stone Veneer (Natural)",
+              "Stucco - Synthetic (EIFS)",
+              "Stucco - Traditional Hard Coat",
+              "Unknown",
+              "Wood Shingle/Shake",
+              "Wood Shingle/Shake (Scalloped)"
+            ],
+            "description": "Exterior wall finish.",
+            "example": "Stucco - Traditional Hard Coat"
+          },
+          "foundationType": {
+            "type": "string",
+            "enum": [
+              "Basement",
+              "Shallow Basement",
+              "Concrete Slab",
+              "Crawlspace",
+              "Pier & Grade Beam",
+              "Elevated Post/Pier & Beam (Stilts)",
+              "Stilts with Sweep Away Walls",
+              "Deep Pilings"
+            ],
+            "description": "Foundation type.",
+            "example": "Concrete Slab"
+          },
+          "numberOfStories": {
+            "type": "string",
+            "enum": [
+              "1",
+              "1.5",
+              "2",
+              "2.5",
+              "3",
+              "4",
+              "Bi-Level",
+              "Tri-Level"
+            ],
+            "description": "Number of stories.",
+            "example": "2"
+          },
+          "garage": {
+            "type": "string",
+            "enum": [
+              "Attached",
+              "Basement",
+              "Carport",
+              "Unknown"
+            ],
+            "description": "DP3 only. Garage type.",
+            "example": "Attached"
+          }
+        }
+      },
+      "PriorAddress": {
+        "type": "object",
+        "properties": {
+          "addressLine1": {
+            "type": "string",
+            "pattern": "^.{1,100}$",
+            "description": "Primary street address line.",
+            "example": "415 Kula Gulf Way"
+          },
+          "addressLine2": {
+            "type": "string",
+            "pattern": "^.{0,100}$",
+            "description": "Secondary address line (unit / suite).",
+            "example": "Suite 500",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "City.",
+            "example": "Tampa"
+          },
+          "state": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "description": "Two-letter state code.",
+            "example": "FL"
+          },
+          "zipCode": {
+            "type": "string",
+            "pattern": "^[0-9]{5}$",
+            "description": "5-digit ZIP code. Required when applicant has lived at the property less than two years.",
+            "example": "33592"
+          },
+          "country": {
+            "type": "string",
+            "description": "Country.",
+            "example": "USA"
+          }
+        }
+      },
+      "PropertyDetails": {
+        "type": "object",
+        "properties": {
+          "constructionAndWindMitigation": {
+            "$ref": "#/components/schemas/ConstructionAndWindMitigation"
+          },
+          "electricalAndPlumbing": {
+            "$ref": "#/components/schemas/ElectricalAndPlumbing"
+          },
+          "safetyAndOccupancy": {
+            "$ref": "#/components/schemas/SafetyAndOccupancy"
+          },
+          "optionalReplacementCostFeatures": {
+            "$ref": "#/components/schemas/OptionalReplacementCostFeatures"
+          },
+          "supplementalInformation": {
+            "$ref": "#/components/schemas/SupplementalInformation"
+          }
+        }
+      },
+      "RiskAddress": {
+        "type": "object",
+        "required": [
+          "addressLine1",
+          "city",
+          "state",
+          "zipCode",
+          "squareFootage",
+          "yearBuilt"
+        ],
+        "properties": {
+          "addressLine1": {
+            "type": "string",
+            "pattern": "^.{1,100}$",
+            "description": "Insured property street address.",
+            "example": "415 Kula Gulf Way"
+          },
+          "addressLine2": {
+            "type": "string",
+            "pattern": "^.{0,100}$",
+            "description": "Secondary address line (unit / suite).",
+            "example": "Suite 500",
+            "nullable": true
+          },
+          "city": {
+            "type": "string",
+            "description": "City.",
+            "example": "Tampa"
+          },
+          "state": {
+            "type": "string",
+            "pattern": "^FL$",
+            "description": "Two-letter state code. Florida only.",
+            "example": "FL"
+          },
+          "zipCode": {
+            "type": "string",
+            "pattern": "^[0-9]{5}$",
+            "description": "5-digit ZIP code.",
+            "example": "33592"
+          },
+          "squareFootage": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1,
+            "maximum": 99999,
+            "description": "Heated/living square footage of the dwelling.",
+            "example": 3255
+          },
+          "yearBuilt": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Year the dwelling was built (YYYY).",
+            "example": 1981
+          }
+        }
+      },
+      "SafetyAndOccupancy": {
+        "type": "object",
+        "properties": {
+          "burglarAlarm": {
+            "type": "string",
+            "enum": [
+              "Central Station",
+              "Local",
+              "None",
+              "Police Station"
+            ],
+            "description": "Burglar alarm type.",
+            "example": "Central Station"
+          },
+          "fireAlarm": {
+            "type": "string",
+            "enum": [
+              "Central Station",
+              "Fire Station",
+              "Local",
+              "None"
+            ],
+            "description": "Fire alarm type.",
+            "example": "Central Station"
+          },
+          "homeSprinklerSystem": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "Home sprinkler system present?",
+            "example": "No"
+          },
+          "smartWaterProtection": {
+            "type": "string",
+            "enum": [
+              "None",
+              "Level 1",
+              "Level 2",
+              "Level 3"
+            ],
+            "description": "Smart water leak protection level.",
+            "example": "None"
+          },
+          "securedCommunity": {
+            "type": "string",
+            "enum": [
+              "24-hour Manned Gates",
+              "24-hour Passkey Gates",
+              "24-hour Security",
+              "Single Entry",
+              "No"
+            ],
+            "description": "Secured community type.",
+            "example": "Single Entry"
+          },
+          "distanceToHydrant": {
+            "type": "string",
+            "enum": [
+              "Less than 1000ft away from home",
+              "More than 1000ft away from home"
+            ],
+            "description": "Distance to nearest fire hydrant.",
+            "example": "Less than 1000ft away from home"
+          },
+          "numberMonthsOccupied": {
+            "type": "string",
+            "enum": [
+              "4-7 consecutive months",
+              "4-7 non-consecutive months",
+              "8-12 months",
+              "Less than 4 months"
+            ],
+            "description": "HO3 only. Number of months the property is occupied per year.",
+            "example": "8-12 months"
+          },
+          "managedProperty": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "HO3 only. Is the property professionally managed?",
+            "example": "No"
+          },
+          "occupancy": {
+            "type": "string",
+            "enum": [
+              "Primary",
+              "Seasonal",
+              "Secondary",
+              "Vacant",
+              "Short-term Rental",
+              "Long-term Rental"
+            ],
+            "description": "DP3 only. Occupancy type.",
+            "example": "Primary"
+          },
+          "openWaterExposure": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "DP3 only. Is the property adjacent to open water greater than 1/4 mile wide?",
+            "example": "No"
+          }
+        }
+      },
+      "SupplementalInformation": {
+        "type": "object",
+        "properties": {
+          "buildingCodeEffectivenessGrade": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10",
+              "Ungraded",
+              "Non-Participating"
+            ],
+            "description": "Building Code Effectiveness Grading (BCEGS).",
+            "example": "3"
+          },
+          "protectionClass": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10"
+            ],
+            "description": "ISO public protection class.",
+            "example": "4"
+          },
+          "typeOfResidence": {
+            "type": "string",
+            "enum": [
+              "Single-Family",
+              "Townhouse",
+              "Rowhouse",
+              "Duplex",
+              "Condo",
+              "Other"
+            ],
+            "description": "Type of residence. (DP3 adds Condo / Other; HO3 set shown.)",
+            "example": "Single-Family"
+          },
+          "distanceToCoast": {
+            "type": "string",
+            "description": "Distance to the nearest body of water, in miles.",
+            "example": "5"
+          },
+          "permittedIncidentalOccupancy": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No"
+            ],
+            "description": "DP3 only. Permitted incidental occupancy. Default No.",
+            "example": "No"
+          }
+        }
+      },
+      "AgencyRaterRequest": {
+        "required": [
+          "agencyId",
+          "clientName",
+          "userMetaData"
+        ],
+        "type": "object",
+        "properties": {
+          "agencyId": {
+            "type": "string"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "userMetaData": {
+            "$ref": "#/components/schemas/UserMetaData"
+          }
+        }
+      },
+      "UserMetaData": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "AgencyRaterResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "agencyId": {
+            "type": "string"
+          },
+          "compRaterName": {
+            "type": "string"
+          },
+          "dateAdded": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "addedBy": {
+            "type": "string"
+          },
+          "lastModifiedDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string"
+          }
+        }
+      },
+      "CompRaterAppResponse": {
+        "type": "object",
+        "properties": {
+          "appId": {
+            "type": "string"
+          },
+          "compRaterName": {
+            "type": "string"
+          }
+        }
+      },
+      "CompRaterQuoteResponse": {
+        "type": "object",
+        "description": "Quote result returned by create/update operations.",
+        "properties": {
+          "quoteId": {
+            "type": "string",
+            "description": "Generated quote identifier.",
+            "example": "QLH-HO31234567"
+          },
+          "eligible": {
+            "type": "boolean",
+            "description": "Whether the risk is eligible to be quoted.",
+            "example": true
+          },
+          "totalPolicyPremium": {
+            "type": "string",
+            "description": "Total policy premium including all taxes and fees.",
+            "example": "4254.56"
+          },
+          "coverageA": {
+            "type": "string",
+            "description": "Coverage A – dwelling.",
+            "example": "123456"
+          },
+          "coverageB": {
+            "type": "string",
+            "description": "Coverage B.",
+            "example": "0.05"
+          },
+          "coverageC": {
+            "type": "string",
+            "description": "Coverage C.",
+            "example": "0.1"
+          },
+          "coverageD": {
+            "type": "string",
+            "description": "Coverage D.",
+            "example": "0.15"
+          },
+          "coverageE": {
+            "type": "string",
+            "description": "Coverage E.",
+            "example": "100000"
+          },
+          "coverageF": {
+            "type": "string",
+            "description": "Coverage F.",
+            "example": "2500"
+          },
+          "hurricaneDeductible": {
+            "type": "string",
+            "description": "Hurricane deductible.",
+            "example": "500"
+          },
+          "nonHurricaneDeductible": {
+            "type": "string",
+            "description": "Non-hurricane (AOP) deductible.",
+            "example": "0.05"
+          },
+          "additionalCoverageA": {
+            "type": "string",
+            "description": "Echo of additional Coverage A endorsement.",
+            "nullable": true
+          },
+          "additionalFungi": {
+            "type": "string",
+            "description": "Echo of additional fungi endorsement.",
+            "nullable": true
+          },
+          "animalLiability": {
+            "type": "string",
+            "description": "Echo of animal liability endorsement.",
+            "nullable": true
+          },
+          "hurricaneScreenedEnclosure": {
+            "type": "string",
+            "description": "Echo of hurricane screened enclosure endorsement.",
+            "nullable": true
+          },
+          "identityTheft": {
+            "type": "string",
+            "description": "Echo of identity theft endorsement.",
+            "nullable": true
+          },
+          "ordinanceOrLaw": {
+            "type": "string",
+            "description": "Echo of ordinance or law endorsement.",
+            "nullable": true
+          },
+          "personalInjury": {
+            "type": "string",
+            "description": "Echo of personal injury endorsement.",
+            "nullable": true
+          },
+          "personalPropertyReplacementCost": {
+            "type": "string",
+            "description": "Echo of personal property replacement cost endorsement.",
+            "nullable": true
+          },
+          "roofSurfacePaymentSchedule": {
+            "type": "string",
+            "description": "Echo of roof surface payment schedule.",
+            "nullable": true
+          },
+          "sinkhole": {
+            "type": "string",
+            "description": "Echo of sinkhole endorsement.",
+            "nullable": true
+          },
+          "supplementalLossAssessment": {
+            "type": "string",
+            "description": "Echo of supplemental loss assessment endorsement.",
+            "nullable": true
+          },
+          "waterBackup": {
+            "type": "string",
+            "description": "Echo of water backup endorsement.",
+            "nullable": true
+          },
+          "waterDamage": {
+            "type": "string",
+            "description": "Echo of water damage endorsement.",
+            "nullable": true
+          },
+          "xWind": {
+            "type": "string",
+            "description": "Denotes the quote has no wind coverage.",
+            "example": "Yes"
+          },
+          "bridgeURL": {
+            "type": "string",
+            "description": "Bridge URL for accessing the quote on the Loggerhead Agent Portal.",
+            "example": "https://portal.loggerhead.example/12345678"
+          },
+          "message": {
+            "type": "string",
+            "description": "Additional information for the agent.",
+            "example": "Quote generated successfully.",
+            "nullable": true
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "apiKeyHeader": {
+        "type": "apiKey",
+        "name": "Ocp-Apim-Subscription-Key",
+        "in": "header"
+      },
+      "apiKeyQuery": {
+        "type": "apiKey",
+        "name": "subscription-key",
+        "in": "query"
+      }
+    }
+  },
+  "security": [
+    {
+      "apiKeyHeader": []
+    },
+    {
+      "apiKeyQuery": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Quotes",
+      "description": "Create and update HO3/DP3 insurance quotes (public)."
+    },
+    {
+      "name": "Agency Toolkit",
+      "description": "Internal agency/rater association management (not for public portal)."
+    }
+  ]
+}
