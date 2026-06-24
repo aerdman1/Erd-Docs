@@ -7,7 +7,7 @@ metadata:
   robots: index
 ---
 <HTMLBlock>{`
-Test
+<style></style>
 `}</HTMLBlock>
 
 <br />
