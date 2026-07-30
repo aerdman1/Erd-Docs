@@ -17,15 +17,14 @@ hidden: false
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
 html,body{margin:0;padding:0}
-
-.jfaisc *,.jfaisc *::before,.jfaisc *::after{box-sizing:border-box}
-/* Guard against host typography that this component does not declare on every
-   element. ReadMe (or any wrapper) setting e.g. *{letter-spacing:.05em} would
-   otherwise widen the diagram's fixed-position nowrap labels. Elements that DO
-   want tracking set it inline or in a later rule, so both still win. */
-.jfaisc,.jfaisc *{letter-spacing:normal;word-spacing:normal;text-indent:0;
-  font-style:normal;font-variant:normal;text-transform:none;text-shadow:none}
-.jfaisc{
+.jfaisc.jfaisc *,.jfaisc.jfaisc *::before,.jfaisc.jfaisc *::after{box-sizing:border-box}/* Guard against host typography this component does not declare on every element.
+   ReadMe's .markdown-body.markdown-body rules target h1-h6/p/a directly and set font-family,
+   font-size, letter-spacing etc. A directly-targeted rule beats inheritance from
+   our root regardless of specificity,so font-family must be forced back to
+   inherit. Elements that DO want tracking set it inline or in a later rule. */
+.jfaisc.jfaisc,.jfaisc.jfaisc *{font-family:inherit;letter-spacing:normal;word-spacing:normal;
+  text-indent:0;font-style:normal;font-variant:normal;text-transform:none;
+  text-shadow:none;clear:none}.jfaisc.jfaisc{
   --green:#40BE46;
   /* the flow diagram carries its own literal colours (identical in both
      themes), so only tokens the surrounding chrome needs live here */
@@ -47,145 +46,51 @@ html,body{margin:0;padding:0}
   font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
   background:var(--band); color:var(--body);
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
-}
-.jfaisc p,.jfaisc h1,.jfaisc h2,.jfaisc h3{margin:0}
-.jfaisc :where(button){font:inherit;color:inherit;background:none;border:0;padding:0}
-
-/* ---------- hero ---------- */
-.jfaisc-hero{position:relative;overflow:hidden;background:var(--hero-band);padding:40px 96px;min-height:200px;display:flex;align-items:center}
-.jfaisc-hero-inner{position:relative;z-index:1;max-width:1728px;margin:0 auto;width:100%}
-.jf-hero-art{position:absolute;left:0;top:0;width:100%;height:194.63px;z-index:0;pointer-events:none}
-.jfaisc-h1{
+}.jfaisc.jfaisc p,.jfaisc.jfaisc h1,.jfaisc.jfaisc h2,.jfaisc.jfaisc h3{margin:0}.jfaisc.jfaisc :where(button){font:inherit;color:inherit;background:none;border:0;padding:0}/* ---------- hero ---------- */
+.jfaisc-hero.jfaisc-hero{position:relative;overflow:hidden;background:var(--hero-band);padding:40px 96px;min-height:200px;display:flex;align-items:center}.jfaisc-hero-inner.jfaisc-hero-inner{position:relative;z-index:1;max-width:1728px;margin:0 auto;width:100%}.jf-hero-art.jf-hero-art{position:absolute;left:0;top:0;width:100%;height:194.63px;z-index:0;pointer-events:none}.jfaisc-h1.jfaisc-h1{
   font-weight:700;font-size:48px;line-height:60px;text-align:center;
   background:linear-gradient(176.44deg, #36A13B 13.18%, #184EA0 90.7%);-webkit-background-clip:text;background-clip:text;
   -webkit-text-fill-color:transparent;color:transparent;
 }
-@supports not ((-webkit-background-clip:text) or (background-clip:text)){
-  .jfaisc-h1{-webkit-text-fill-color:currentColor;color:#36A13B;background:none}
-}
-
-/* ---------- main band ---------- */
-.jfaisc-main{background:var(--band);padding:40px 96px 0}
-.jfaisc-shell{max-width:1728px;margin:0 auto;display:flex;flex-direction:column;gap:40px}
-.jfaisc-head{display:flex;flex-direction:column;gap:40px;align-items:center}
-.jfaisc-caption{font-weight:600;font-size:24px;line-height:32px;color:var(--white);text-align:center}
-
-/* ---------- tabs ---------- */
-.jfaisc-tabs{display:inline-flex;gap:8px;padding:22px 24px;background:#000;border-radius:45px;max-width:100%;flex-wrap:wrap;justify-content:center;align-items:center}
-.jfaisc-tab{
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){.jfaisc-h1.jfaisc-h1{-webkit-text-fill-color:currentColor;color:#36A13B;background:none}
+}/* ---------- main band ---------- */
+.jfaisc-main.jfaisc-main{background:var(--band);padding:40px 96px 0}.jfaisc-shell.jfaisc-shell{max-width:1728px;margin:0 auto;display:flex;flex-direction:column;gap:40px}.jfaisc-head.jfaisc-head{display:flex;flex-direction:column;gap:40px;align-items:center}.jfaisc-caption.jfaisc-caption{font-weight:600;font-size:24px;line-height:32px;color:var(--white);text-align:center}/* ---------- tabs ---------- */
+.jfaisc-tabs.jfaisc-tabs{display:inline-flex;gap:8px;padding:22px 24px;background:#000;border-radius:45px;max-width:100%;flex-wrap:wrap;justify-content:center;align-items:center}.jfaisc-tab.jfaisc-tab{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:16px 24px;border-radius:60px;cursor:pointer;color:var(--tab-t);
   font-weight:400;font-size:16px;line-height:20px;
   box-shadow:inset 0 0 0 1px var(--chip);
   transition:box-shadow .18s,background-color .18s,color .18s;
-}
-.jfaisc-tab:hover{box-shadow:inset 0 0 0 1px var(--green)}
-.jfaisc-tab[aria-current="true"]{background:var(--band);box-shadow:inset 0 0 0 1px var(--green);color:var(--hi);font-weight:600}
-.jfaisc-tab:focus-visible{outline:2px solid var(--green);outline-offset:3px}
-/* Labels hug their text, exactly like Figma's tab row, which also shifts a
+}.jfaisc-tab.jfaisc-tab:hover{box-shadow:inset 0 0 0 1px var(--green)}.jfaisc-tab.jfaisc-tab[aria-current="true"]{background:var(--band);box-shadow:inset 0 0 0 1px var(--green);color:var(--hi);font-weight:600}.jfaisc-tab.jfaisc-tab:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+/* Labels hug their text, exactly like Figma's tab row,which also shifts a
    couple of px between states as the bold tab changes. */
-.jf-tl{display:inline-block}
-
-/* ---------- split ---------- */
-.jfaisc-split{display:flex;gap:24px;align-items:flex-start}
-.jfaisc-dwrap{flex:0 0 auto;width:calc(998px * var(--jf-scale));height:calc(1370.23px * var(--jf-scale))}
-.jfaisc-diagram{position:relative;width:998px;height:1370.23px;transform:scale(var(--jf-scale));transform-origin:top left}
-.jfaisc-diagram .jf-b{position:absolute;--jf-ring:none;box-shadow:var(--jf-ring)}
-.jfaisc-diagram .jf-t{position:absolute;display:block;white-space:pre-wrap}
-.jfaisc-diagram .jf-iconbox{position:absolute;display:flex;align-items:center;justify-content:center}
-.jfaisc-diagram .jf-iconbox svg{width:100%;height:100%;display:block;overflow:visible}
-.jfaisc-diagram .jf-line{position:absolute;line-height:0}
-.jfaisc-diagram .jf-vec{overflow:visible}
-.jfaisc-diagram .jf-dash{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-
-/* clickable diagram panels */
-.jfaisc-diagram .jf-panel{cursor:pointer;transition:box-shadow .2s;box-shadow:inset 0 0 0 var(--pw,1px) var(--pc,transparent)}
-.jfaisc-diagram .jf-panel:hover{--pc:var(--green)}
-.jfaisc-diagram .jf-panel:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-.jfaisc-diagram .jf-panel::after{
+.jf-tl.jf-tl{display:inline-block}/* ---------- split ---------- */
+.jfaisc-split.jfaisc-split{display:flex;gap:24px;align-items:flex-start}.jfaisc-dwrap.jfaisc-dwrap{flex:0 0 auto;width:calc(998px * var(--jf-scale));height:calc(1370.23px * var(--jf-scale))}.jfaisc-diagram.jfaisc-diagram{position:relative;width:998px;height:1370.23px;transform:scale(var(--jf-scale));transform-origin:top left}.jfaisc-diagram.jfaisc-diagram .jf-b{position:absolute;--jf-ring:none;box-shadow:var(--jf-ring)}.jfaisc-diagram.jfaisc-diagram .jf-t{position:absolute;display:block;white-space:pre-wrap}.jfaisc-diagram.jfaisc-diagram .jf-iconbox{position:absolute;display:flex;align-items:center;justify-content:center}.jfaisc-diagram.jfaisc-diagram .jf-iconbox svg{width:100%;height:100%;display:block;overflow:visible}.jfaisc-diagram.jfaisc-diagram .jf-line{position:absolute;line-height:0}.jfaisc-diagram.jfaisc-diagram .jf-vec{overflow:visible}.jfaisc-diagram.jfaisc-diagram .jf-dash{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}/* clickable diagram panels */
+.jfaisc-diagram.jfaisc-diagram .jf-panel{cursor:pointer;transition:box-shadow .2s;box-shadow:inset 0 0 0 var(--pw,1px) var(--pc,transparent)}.jfaisc-diagram.jfaisc-diagram .jf-panel:hover{--pc:var(--green)}.jfaisc-diagram.jfaisc-diagram .jf-panel:focus-visible{outline:2px solid var(--green);outline-offset:2px}.jfaisc-diagram.jfaisc-diagram .jf-panel::after{
   content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;
   opacity:0;transition:opacity .2s;pointer-events:none;
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   mask-composite:exclude;
-}
-.jfaisc-diagram .jf-panel.is-active{box-shadow:var(--glow)}
-.jfaisc-diagram .jf-panel.is-active::after{opacity:1}
-
-/* diagram item cards: Figma wires ON_HOVER on all 13 of them */
-.jfaisc-diagram .jf-item{transition:box-shadow .18s}
-.jfaisc-diagram .jf-item:hover{--jf-ring:inset 0 0 0 1px var(--green);--itc:#FFFFFF}
-.jfaisc-diagram .jf-panel[data-state="threat-detection"]::after{background:linear-gradient(166.1deg,#36A13B 13.18%,#184EA0 90.7%)}
-.jfaisc-diagram .jf-panel[data-state="secure-developer-environment"]::after{background:linear-gradient(116.62deg,#36A13B 13.18%,#184EA0 90.7%)}
-.jfaisc-diagram .jf-panel[data-state="centralized-oversight"]::after{background:linear-gradient(147.8deg,#36A13B 13.18%,#184EA0 90.7%)}
-.jfaisc-diagram .jf-panel[data-state="ai-discovery"]::after{background:linear-gradient(161.76deg,#36A13B 13.18%,#184EA0 90.7%)}
-
-/* ---------- rail ---------- */
-.jfaisc-rail{flex:1 1 706px;min-width:0;height:1370.23px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+}.jfaisc-diagram.jfaisc-diagram .jf-panel.is-active{box-shadow:var(--glow)}.jfaisc-diagram.jfaisc-diagram .jf-panel.is-active::after{opacity:1}/* diagram item cards: Figma wires ON_HOVER on all 13 of them */
+.jfaisc-diagram.jfaisc-diagram .jf-item{transition:box-shadow .18s}.jfaisc-diagram.jfaisc-diagram .jf-item:hover{--jf-ring:inset 0 0 0 1px var(--green);--itc:#FFFFFF}.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="threat-detection"]::after{background:linear-gradient(166.1deg,#36A13B 13.18%,#184EA0 90.7%)}.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="secure-developer-environment"]::after{background:linear-gradient(116.62deg,#36A13B 13.18%,#184EA0 90.7%)}.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="centralized-oversight"]::after{background:linear-gradient(147.8deg,#36A13B 13.18%,#184EA0 90.7%)}.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="ai-discovery"]::after{background:linear-gradient(161.76deg,#36A13B 13.18%,#184EA0 90.7%)}/* ---------- rail ---------- */
+.jfaisc-rail.jfaisc-rail{flex:1 1 706px;min-width:0;height:1370.23px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
 /* Figma has no scrollbar here and the rail must stay exactly 706 wide so the
-   cards land on 341. A reserved gutter steals 8-17px depending on platform, so
+   cards land on 341. A reserved gutter steals 8-17px depending on platform,so
    the bar is hidden; tabs and diagram panels are the intended navigation and
    wheel/trackpad/keyboard still scroll. Restore by deleting this block. */
-.jfaisc-rail::-webkit-scrollbar{width:0;height:0}
-.jfaisc-railin{display:flex;flex-direction:column;gap:48px}
-.jfaisc-spacer{flex:none;height:0}
-.jfaisc-sec{display:flex;flex-direction:column;gap:28px;opacity:.4;transition:opacity .25s;scroll-margin-top:0}
-.jfaisc-sec.is-active{opacity:1}
-.jf-sec-head{display:flex;flex-direction:column;gap:12px;align-items:flex-start;max-width:560px}
-.jf-tag{display:inline-flex;align-items:center;justify-content:center;min-width:49px;height:32px;padding:0 10px;border-radius:6px;background:var(--item);color:var(--green);font-weight:400;font-size:12px;line-height:16px;letter-spacing:.02em}
-.jf-sec-title{font-weight:600;font-size:22px;line-height:1.2;color:var(--white)}
-.jf-sec-body{font-weight:400;font-size:16px;line-height:24px;color:var(--body);max-width:560px}
-.jf-sec-body+.jf-sec-body{margin-top:16px}
-.jf-sec-h3{font-weight:600;font-size:18px;line-height:1.2;color:var(--white);max-width:560px}
-.jf-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
-
-.jf-card{display:flex;flex-direction:column;gap:12px;padding:16px 20px;border-radius:12px;background:var(--card-bg);box-shadow:inset 0 0 0 1px var(--card-bd);text-decoration:none;transition:box-shadow .18s}
-a.jf-card:hover,.jf-card:hover{box-shadow:inset 0 0 0 1px var(--green)}
-.jf-card-ic{width:40px;height:40px;border-radius:20px;background:var(--chip);display:flex;align-items:center;justify-content:center;color:var(--green);flex:none}
-.jf-card-ic svg{width:24px;height:24px;display:block;overflow:visible}
-.jf-sec-link{color:inherit;text-decoration:none}
-.jf-sec-link:hover{text-decoration:underline;text-underline-offset:3px}
-a.jf-card{color:inherit;text-decoration:none;display:flex}
-a.jf-card:focus-visible,.jf-sec-link:focus-visible,.jfaisc-ctabtn:focus-visible{outline:2px solid var(--green);outline-offset:3px}
-.jf-card-t{font-weight:600;font-size:16px;line-height:22px;color:var(--hi)}
-.jf-card-b{font-weight:400;font-size:14px;line-height:24px;color:var(--card-body);margin-top:-4px}
-.jf-card{align-self:stretch}
-
-/* ---------- cta ---------- */
-.jfaisc-cta{background:var(--band);padding:40px 24px 80px}
-.jfaisc-ctacard{max-width:998px;margin:0 auto;padding:24px 40px;border-radius:20px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--card-bd);display:flex;gap:48px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
-.jfaisc-ctatext{display:flex;flex-direction:column;gap:8px;min-width:0}
-.jfaisc-ctatext b{font-weight:600;font-size:16px;line-height:24px;color:var(--hi)}
-.jfaisc-ctatext span{font-weight:400;font-size:14px;line-height:22px;color:var(--body)}
-.jfaisc-ctabtn{display:inline-flex;align-items:center;gap:0;padding:12px 40px;border-radius:50px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--hi);color:var(--white);font-weight:600;font-size:14px;line-height:20px;text-decoration:none;white-space:nowrap;transition:box-shadow .18s,background-color .18s}
-.jfaisc-ctabtn:hover{box-shadow:inset 0 0 0 1px var(--green)}
-/* the chevron sits in the right padding and contributes no width (Figma) */
-.jfaisc-ctabtn .jf-chev{width:16px;height:16px;color:var(--green);flex:none;margin-right:-16px}
+.jfaisc-rail.jfaisc-rail::-webkit-scrollbar{width:0;height:0}.jfaisc-railin.jfaisc-railin{display:flex;flex-direction:column;gap:48px}.jfaisc-spacer.jfaisc-spacer{flex:none;height:0}.jfaisc-sec.jfaisc-sec{display:flex;flex-direction:column;gap:28px;opacity:.4;transition:opacity .25s;scroll-margin-top:0}.jfaisc-sec.jfaisc-sec.is-active{opacity:1}.jf-sec-head.jf-sec-head{display:flex;flex-direction:column;gap:12px;align-items:flex-start;max-width:560px}.jf-tag.jf-tag{display:inline-flex;align-items:center;justify-content:center;min-width:49px;height:32px;padding:0 10px;border-radius:6px;background:var(--item);color:var(--green);font-weight:400;font-size:12px;line-height:16px;letter-spacing:.02em}.jf-sec-title.jf-sec-title{font-weight:600;font-size:22px;line-height:1.2;color:var(--white)}.jf-sec-body.jf-sec-body{font-weight:400;font-size:16px;line-height:24px;color:var(--body);max-width:560px}.jf-sec-body.jf-sec-body+.jf-sec-body{margin-top:16px}.jf-sec-h3.jf-sec-h3{font-weight:600;font-size:18px;line-height:1.2;color:var(--white);max-width:560px}.jf-cards.jf-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}.jf-card.jf-card{display:flex;flex-direction:column;gap:12px;padding:16px 20px;border-radius:12px;background:var(--card-bg);box-shadow:inset 0 0 0 1px var(--card-bd);text-decoration:none;transition:box-shadow .18s}a.jf-card.jf-card:hover,.jf-card.jf-card:hover{box-shadow:inset 0 0 0 1px var(--green)}.jf-card-ic.jf-card-ic{width:40px;height:40px;border-radius:20px;background:var(--chip);display:flex;align-items:center;justify-content:center;color:var(--green);flex:none}.jf-card-ic.jf-card-ic svg{width:24px;height:24px;display:block;overflow:visible}.jf-sec-link.jf-sec-link{color:inherit;text-decoration:none}.jf-sec-link.jf-sec-link:hover{text-decoration:underline;text-underline-offset:3px}a.jf-card.jf-card{color:inherit;text-decoration:none;display:flex}a.jf-card.jf-card:focus-visible,.jf-sec-link.jf-sec-link:focus-visible,.jfaisc-ctabtn.jfaisc-ctabtn:focus-visible{outline:2px solid var(--green);outline-offset:3px}.jf-card-t.jf-card-t{font-weight:600;font-size:16px;line-height:22px;color:var(--hi)}.jf-card-b.jf-card-b{font-weight:400;font-size:14px;line-height:24px;color:var(--card-body);margin-top:-4px}.jf-card.jf-card{align-self:stretch}/* ---------- cta ---------- */
+.jfaisc-cta.jfaisc-cta{background:var(--band);padding:40px 24px 80px}.jfaisc-ctacard.jfaisc-ctacard{max-width:998px;margin:0 auto;padding:24px 40px;border-radius:20px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--card-bd);display:flex;gap:48px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}.jfaisc-ctatext.jfaisc-ctatext{display:flex;flex-direction:column;gap:8px;min-width:0}.jfaisc-ctatext.jfaisc-ctatext b{font-weight:600;font-size:16px;line-height:24px;color:var(--hi)}.jfaisc-ctatext.jfaisc-ctatext span{font-weight:400;font-size:14px;line-height:22px;color:var(--body)}.jfaisc-ctabtn.jfaisc-ctabtn{display:inline-flex;align-items:center;gap:0;padding:12px 40px;border-radius:50px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--hi);color:var(--white);font-weight:600;font-size:14px;line-height:20px;text-decoration:none;white-space:nowrap;transition:box-shadow .18s,background-color .18s}.jfaisc-ctabtn.jfaisc-ctabtn:hover{box-shadow:inset 0 0 0 1px var(--green)}/* the chevron sits in the right padding and contributes no width (Figma) */
+.jfaisc-ctabtn.jfaisc-ctabtn .jf-chev{width:16px;height:16px;color:var(--green);flex:none;margin-right:-16px}
 
 /* ---------- responsive ---------- */
-@media (max-width:1500px){
-  .jfaisc-hero{padding:40px 48px}
-  .jfaisc-main{padding:40px 48px 0}
+@media (max-width:1500px){.jfaisc-hero.jfaisc-hero{padding:40px 48px}.jfaisc-main.jfaisc-main{padding:40px 48px 0}
 }
-@media (max-width:1180px){
-  .jfaisc-split{flex-direction:column}
-  .jfaisc-dwrap{width:100%;max-width:calc(998px * var(--jf-scale));margin:0 auto}
-  .jfaisc-rail{flex:1 1 auto;width:100%;height:auto;overflow:visible}
-  .jfaisc-railin{gap:56px}
-  .jfaisc-sec{opacity:1}
-  .jfaisc-h1{font-size:38px;line-height:48px}
+@media (max-width:1180px){.jfaisc-split.jfaisc-split{flex-direction:column}.jfaisc-dwrap.jfaisc-dwrap{width:100%;max-width:calc(998px * var(--jf-scale));margin:0 auto}.jfaisc-rail.jfaisc-rail{flex:1 1 auto;width:100%;height:auto;overflow:visible}.jfaisc-railin.jfaisc-railin{gap:56px}.jfaisc-sec.jfaisc-sec{opacity:1}.jfaisc-h1.jfaisc-h1{font-size:38px;line-height:48px}
 }
-@media (max-width:860px){
-  .jfaisc-hero{padding:32px 24px}
-  .jfaisc-main{padding:32px 24px 0}
-  .jf-cards{grid-template-columns:minmax(0,1fr)}
-  .jfaisc-h1{font-size:30px;line-height:40px}
-  .jfaisc-caption{font-size:20px;line-height:28px}
-  .jfaisc-tabs{border-radius:24px;padding:10px 12px}
-  .jfaisc-tab{padding:12px 18px;font-size:15px}
+@media (max-width:860px){.jfaisc-hero.jfaisc-hero{padding:32px 24px}.jfaisc-main.jfaisc-main{padding:32px 24px 0}.jf-cards.jf-cards{grid-template-columns:minmax(0,1fr)}.jfaisc-h1.jfaisc-h1{font-size:30px;line-height:40px}.jfaisc-caption.jfaisc-caption{font-size:20px;line-height:28px}.jfaisc-tabs.jfaisc-tabs{border-radius:24px;padding:10px 12px}.jfaisc-tab.jfaisc-tab{padding:12px 18px;font-size:15px}
 }
-@media (prefers-reduced-motion:reduce){
-  .jfaisc *{transition:none!important;scroll-behavior:auto!important}
+@media (prefers-reduced-motion:reduce){.jfaisc.jfaisc *{transition:none!important;scroll-behavior:auto!important}
 }
 
 /* ---------- ReadMe host overrides (not namespaced on purpose) ---------- */
@@ -200,10 +105,8 @@ a.jf-card:focus-visible,.jf-sec-link:focus-visible,.jfaisc-ctabtn:focus-visible{
   padding:0;
 }
 header.SuperHubCustomPage-content-header,
-header[class*="SuperHubCustomPage-content-header"]{display:none}
-
-/* ---------- dark mode (ReadMe) ---------- */
-[data-color-mode="dark"] .jfaisc{
+header[class*="SuperHubCustomPage-content-header"]{display:none}/* ---------- dark mode (ReadMe) ---------- */
+[data-color-mode="dark"] .jfaisc.jfaisc{
   --band:#121212;
   --card-bg:#202124;
   --card-bd:#323B3E;
@@ -213,8 +116,7 @@ header[class*="SuperHubCustomPage-content-header"]{display:none}
   --cta-bg:#000000;
   --hero-band:linear-gradient(180deg,#0C1D37 37.5%,#121212 100%);
 }
-@media (prefers-color-scheme:dark){
-  [data-color-mode="system"] .jfaisc{
+@media (prefers-color-scheme:dark){[data-color-mode="system"] .jfaisc.jfaisc{
     --band:#121212;
     --card-bg:#202124;
     --card-bd:#323B3E;
