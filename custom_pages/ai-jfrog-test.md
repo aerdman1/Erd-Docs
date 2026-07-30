@@ -187,6 +187,17 @@ a.jf-card:focus-visible,.jf-sec-link:focus-visible,.jfaisc-ctabtn:focus-visible{
 
 /* ---------- ReadMe host overrides (not namespaced on purpose) ---------- */
 #rmps-wrap.rmps-visible{display:none}
+/* Full-bleed the custom-page shell and hide its page header. ReadMe's
+   hashed class rotates on their rebuilds, so the substring selector is the
+   durable one; the exact class is kept alongside it. */
+.SuperHubCustomPage-content2y25YXtWEbiK,
+[class*="SuperHubCustomPage-content"]:not(header):not([class*="content-header"]){
+  margin:0 auto;
+  max-width:100%;
+  padding:0;
+}
+header.SuperHubCustomPage-content-header,
+header[class*="SuperHubCustomPage-content-header"]{display:none}
 
 /* ---------- dark mode (ReadMe) ---------- */
 [data-color-mode="dark"] .jfaisc{
