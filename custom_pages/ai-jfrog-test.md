@@ -79,10 +79,9 @@ html,body{margin:0;padding:0}
 .jfaisc-tab:hover{box-shadow:inset 0 0 0 1px var(--green)}
 .jfaisc-tab[aria-current="true"]{background:var(--band);box-shadow:inset 0 0 0 1px var(--green);color:var(--hi);font-weight:600}
 .jfaisc-tab:focus-visible{outline:2px solid var(--green);outline-offset:3px}
-/* reserve the semibold width so selecting a tab never reflows the row */
-.jf-tl{display:inline-grid;grid-template-areas:"t";place-items:center}
-.jf-tl>span{grid-area:t}
-.jf-tl::after{grid-area:t;content:attr(data-label);font-weight:600;height:0;visibility:hidden;pointer-events:none}
+/* Labels hug their text, exactly like Figma's tab row, which also shifts a
+   couple of px between states as the bold tab changes. */
+.jf-tl{display:inline-block}
 
 /* ---------- split ---------- */
 .jfaisc-split{display:flex;gap:24px;align-items:flex-start}
@@ -155,9 +154,10 @@ a.jf-card:focus-visible,.jf-sec-link:focus-visible,.jfaisc-ctabtn:focus-visible{
 .jfaisc-ctatext{display:flex;flex-direction:column;gap:8px;min-width:0}
 .jfaisc-ctatext b{font-weight:600;font-size:16px;line-height:24px;color:var(--hi)}
 .jfaisc-ctatext span{font-weight:400;font-size:14px;line-height:22px;color:var(--body)}
-.jfaisc-ctabtn{display:inline-flex;align-items:center;gap:8px;padding:12px 40px;border-radius:50px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--hi);color:var(--white);font-weight:600;font-size:14px;line-height:20px;text-decoration:none;white-space:nowrap;transition:box-shadow .18s,background-color .18s}
+.jfaisc-ctabtn{display:inline-flex;align-items:center;gap:0;padding:12px 40px;border-radius:50px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--hi);color:var(--white);font-weight:600;font-size:14px;line-height:20px;text-decoration:none;white-space:nowrap;transition:box-shadow .18s,background-color .18s}
 .jfaisc-ctabtn:hover{box-shadow:inset 0 0 0 1px var(--green)}
-.jfaisc-ctabtn .jf-chev{width:16px;height:16px;color:var(--green);flex:none}
+/* the chevron sits in the right padding and contributes no width (Figma) */
+.jfaisc-ctabtn .jf-chev{width:16px;height:16px;color:var(--green);flex:none;margin-right:-16px}
 
 /* ---------- responsive ---------- */
 @media (max-width:1500px){
