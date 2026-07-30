@@ -62,9 +62,15 @@ html,body{margin:0;padding:0}
   box-shadow:inset 0 0 0 1px var(--chip);
   transition:box-shadow .18s,background-color .18s,color .18s;
 }.jfaisc-tab.jfaisc-tab.jfaisc-tab:hover{box-shadow:inset 0 0 0 1px var(--green)}.jfaisc-tab.jfaisc-tab.jfaisc-tab[aria-current="true"]{background:var(--band);box-shadow:inset 0 0 0 1px var(--green);color:var(--hi);font-weight:600}.jfaisc-tab.jfaisc-tab.jfaisc-tab:focus-visible{outline:2px solid var(--green);outline-offset:3px}
-/* Labels hug their text, exactly like Figma's tab row,which also shifts a
-   couple of px between states as the bold tab changes. */
-.jf-tl.jf-tl.jf-tl{display:inline-block}/* ---------- split ---------- */
+/* The active tab is SemiBold, which is 3-5px wider than Regular, so a naive
+   implementation makes each pill grow on click and shoves its neighbours along.
+   Reserve the SemiBold width up front with a hidden bold copy in the same grid
+   cell,so every pill is a constant size and the row never reflows.
+   Cost: the row is ~20px wider than Figma's 1003-1005 (which measures one bold
+   tab plus four regular). That is 1.8.8.8% on a centred container,i.e.e.e. ~10px per
+   side,versus a layout jump on every single click. */
+.jf-tl.jf-tl.jf-tl{display:inline-grid;grid-template-areas:"t";place-items:center}.jf-tl.jf-tl.jf-tl>span{grid-area:t}.jf-tl.jf-tl.jf-tl::after{grid-area:t;content:attr(data-label);font-weight:600;height:0;
+  visibility:hidden;pointer-events:none;overflow:hidden}/* ---------- split ---------- */
 .jfaisc-split.jfaisc-split.jfaisc-split{display:flex;gap:24px;align-items:flex-start}.jfaisc-dwrap.jfaisc-dwrap.jfaisc-dwrap{flex:0 0 auto;width:calc(998px * var(--jf-scale));height:calc(1370.23px * var(--jf-scale))}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram{position:relative;width:998px;height:1370.23px;transform:scale(var(--jf-scale));transform-origin:top left}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-b{position:absolute;--jf-ring:none;box-shadow:var(--jf-ring)}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-t{position:absolute;display:block;white-space:pre-wrap}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-iconbox{position:absolute;display:flex;align-items:center;justify-content:center}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-iconbox svg{width:100%;height:100%;display:block;overflow:visible}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-line{position:absolute;line-height:0}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-vec{overflow:visible}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-dash{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}/* clickable diagram panels */
 .jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel{cursor:pointer;transition:box-shadow .2s;box-shadow:inset 0 0 0 var(--pw,1px) var(--pc,transparent)}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel:hover{--pc:var(--green)}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel:focus-visible{outline:2px solid var(--green);outline-offset:2px}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel::after{
   content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;
