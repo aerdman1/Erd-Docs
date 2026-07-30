@@ -80,7 +80,7 @@ html,body{margin:0;padding:0}
   mask-composite:exclude;
 }.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel.is-active{box-shadow:var(--glow)}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel.is-active::after{opacity:1}/* diagram item cards: Figma wires ON_HOVER on all 13 of them */
 .jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-item{transition:box-shadow .18s}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-item:hover{--jf-ring:inset 0 0 0 1px var(--green);--itc:#FFFFFF}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="threat-detection"]::after{background:linear-gradient(166.1deg,#36A13B 13.18%,#184EA0 90.7%)}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="secure-developer-environment"]::after{background:linear-gradient(116.62deg,#36A13B 13.18%,#184EA0 90.7%)}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="centralized-oversight"]::after{background:linear-gradient(147.8deg,#36A13B 13.18%,#184EA0 90.7%)}.jfaisc-diagram.jfaisc-diagram.jfaisc-diagram .jf-panel[data-state="ai-discovery"]::after{background:linear-gradient(161.76deg,#36A13B 13.18%,#184EA0 90.7%)}/* ---------- rail ---------- */
-.jfaisc-rail.jfaisc-rail.jfaisc-rail{flex:1 1 706px;min-width:0;height:1370.23px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.jfaisc-rail.jfaisc-rail.jfaisc-rail{flex:1 1 706px;min-width:0;height:1370.23px;overflow-y:auto;overscroll-behavior:auto;scrollbar-width:none}
 /* Figma has no scrollbar here and the rail must stay exactly 706 wide so the
    cards land on 341. A reserved gutter steals 8-17px depending on platform,so
    the bar is hidden; tabs and diagram panels are the intended navigation and
