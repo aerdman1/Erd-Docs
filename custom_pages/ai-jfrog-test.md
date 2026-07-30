@@ -41,7 +41,10 @@ html,body{margin:0;padding:0}
   --hero-band:linear-gradient(180deg,#0C1D37 22.67%,#111821 89.33%);
   --glow:0 0 20px rgba(102,204,178,.25);
   --jf-scale:1;
-  font-family:'Open Sans','Open Sans Fallback',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  /* Figma uses Open Sans exclusively (Regular 400 / SemiBold 600 / Bold 700).
+     To inherit ReadMe's own font instead of forcing Open Sans, replace this one
+     declaration with: font-family:inherit; */
+  font-family:'Open Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
   background:var(--band); color:var(--body);
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
