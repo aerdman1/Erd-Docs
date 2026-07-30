@@ -30,6 +30,7 @@ html,body{margin:0;padding:0}
      themes), so only tokens the surrounding chrome needs live here */
   --item:#1E2528;
   --hi:#F9FAFA; --white:#fff; --tab-t:#CED7D9;
+  --tab-bd:#2A323C; --tab-on-bg:#111821;
   --band:#111821;
   --card-bg:#111821;
   --card-bd:#324152;
@@ -37,6 +38,7 @@ html,body{margin:0;padding:0}
   --body:#8C9FA4;
   --card-body:#8C9FA4;
   --cta-bg:#111821;
+  --cta-btn-bg:#111821;
   --hero-band:linear-gradient(180deg,#0C1D37 22.67%,#111821 89.33%);
   --glow:0 0 20px rgba(102,204,178,.25);
   --jf-scale:1;
@@ -59,9 +61,9 @@ html,body{margin:0;padding:0}
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:16px 24px;border-radius:60px;cursor:pointer;color:var(--tab-t);
   font-weight:400;font-size:16px;line-height:20px;
-  box-shadow:inset 0 0 0 1px var(--chip);
+  box-shadow:inset 0 0 0 1px var(--tab-bd);
   transition:box-shadow .18s,background-color .18s,color .18s;
-}.jfaisc-tab.jfaisc-tab.jfaisc-tab:hover{box-shadow:inset 0 0 0 1px var(--green)}.jfaisc-tab.jfaisc-tab.jfaisc-tab[aria-current="true"]{background:var(--band);box-shadow:inset 0 0 0 1px var(--green);color:var(--hi);font-weight:600}.jfaisc-tab.jfaisc-tab.jfaisc-tab:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+}.jfaisc-tab.jfaisc-tab.jfaisc-tab:hover{box-shadow:inset 0 0 0 1px var(--green)}.jfaisc-tab.jfaisc-tab.jfaisc-tab[aria-current="true"]{background:var(--tab-on-bg);box-shadow:inset 0 0 0 1px var(--green);color:var(--hi);font-weight:600}.jfaisc-tab.jfaisc-tab.jfaisc-tab:focus-visible{outline:2px solid var(--green);outline-offset:3px}
 /* The active tab is SemiBold, which is 3-5px wider than Regular, so a naive
    implementation makes each pill grow on click and shoves its neighbours along.
    Reserve the SemiBold width up front with a hidden bold copy in the same grid
@@ -96,7 +98,7 @@ html,body{margin:0;padding:0}
    to one rather than squeezing below ~260px when the rail narrows on smaller
    desktops. 706/607/547 all still give two; 481 and below give one. */
 .jf-cards.jf-cards.jf-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}.jf-card.jf-card.jf-card{display:flex;flex-direction:column;gap:12px;padding:16px 20px;border-radius:12px;background:var(--card-bg);box-shadow:inset 0 0 0 1px var(--card-bd);text-decoration:none;transition:box-shadow .18s}a.jf-card.jf-card.jf-card:hover,.jf-card.jf-card.jf-card:hover{box-shadow:inset 0 0 0 1px var(--green)}.jf-card-ic.jf-card-ic.jf-card-ic{width:40px;height:40px;border-radius:20px;background:var(--chip);display:flex;align-items:center;justify-content:center;color:var(--green);flex:none}.jf-card-ic.jf-card-ic.jf-card-ic svg{width:24px;height:24px;display:block;overflow:visible}.jf-sec-link.jf-sec-link.jf-sec-link{color:inherit;text-decoration:none}.jf-sec-link.jf-sec-link.jf-sec-link:hover{text-decoration:underline;text-underline-offset:3px}a.jf-card.jf-card.jf-card{color:inherit;text-decoration:none;display:flex}a.jf-card.jf-card.jf-card:focus-visible,.jf-sec-link.jf-sec-link.jf-sec-link:focus-visible,.jfaisc-ctabtn.jfaisc-ctabtn.jfaisc-ctabtn:focus-visible{outline:2px solid var(--green);outline-offset:3px}.jf-card-t.jf-card-t.jf-card-t{font-weight:600;font-size:16px;line-height:22px;color:var(--hi)}.jf-card-b.jf-card-b.jf-card-b{font-weight:400;font-size:14px;line-height:24px;color:var(--card-body);margin-top:-4px}.jf-card.jf-card.jf-card{align-self:stretch}/* ---------- cta ---------- */
-.jfaisc-cta.jfaisc-cta.jfaisc-cta{background:var(--band);padding:40px 24px 80px}.jfaisc-ctacard.jfaisc-ctacard.jfaisc-ctacard{max-width:998px;margin:0 auto;padding:24px 40px;border-radius:20px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--card-bd);display:flex;gap:48px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}.jfaisc-ctatext.jfaisc-ctatext.jfaisc-ctatext{display:flex;flex-direction:column;gap:8px;min-width:0}.jfaisc-ctatext.jfaisc-ctatext.jfaisc-ctatext b{font-weight:600;font-size:16px;line-height:24px;color:var(--hi)}.jfaisc-ctatext.jfaisc-ctatext.jfaisc-ctatext span{font-weight:400;font-size:14px;line-height:22px;color:var(--body)}.jfaisc-ctabtn.jfaisc-ctabtn.jfaisc-ctabtn{display:inline-flex;align-items:center;gap:0;padding:12px 40px;border-radius:50px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--hi);color:var(--white);font-weight:600;font-size:14px;line-height:20px;text-decoration:none;white-space:nowrap;transition:box-shadow .18s,background-color .18s}.jfaisc-ctabtn.jfaisc-ctabtn.jfaisc-ctabtn:hover{box-shadow:inset 0 0 0 1px var(--green)}/* the chevron sits in the right padding and contributes no width (Figma) */
+.jfaisc-cta.jfaisc-cta.jfaisc-cta{background:var(--band);padding:40px 24px 80px}.jfaisc-ctacard.jfaisc-ctacard.jfaisc-ctacard{max-width:998px;margin:0 auto;padding:24px 40px;border-radius:20px;background:var(--cta-bg);box-shadow:inset 0 0 0 1px var(--card-bd);display:flex;gap:48px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}.jfaisc-ctatext.jfaisc-ctatext.jfaisc-ctatext{display:flex;flex-direction:column;gap:8px;min-width:0}.jfaisc-ctatext.jfaisc-ctatext.jfaisc-ctatext b{font-weight:600;font-size:16px;line-height:24px;color:var(--hi)}.jfaisc-ctatext.jfaisc-ctatext.jfaisc-ctatext span{font-weight:400;font-size:14px;line-height:22px;color:var(--body)}.jfaisc-ctabtn.jfaisc-ctabtn.jfaisc-ctabtn{display:inline-flex;align-items:center;gap:0;padding:12px 40px;border-radius:50px;background:var(--cta-btn-bg);box-shadow:inset 0 0 0 1px var(--hi);color:var(--white);font-weight:600;font-size:14px;line-height:20px;text-decoration:none;white-space:nowrap;transition:box-shadow .18s,background-color .18s}.jfaisc-ctabtn.jfaisc-ctabtn.jfaisc-ctabtn:hover{box-shadow:inset 0 0 0 1px var(--green)}/* the chevron sits in the right padding and contributes no width (Figma) */
 .jfaisc-ctabtn.jfaisc-ctabtn.jfaisc-ctabtn .jf-chev{width:16px;height:16px;color:var(--green);flex:none;margin-right:-16px}
 
 /* ---------- responsive ---------- */
@@ -130,6 +132,7 @@ header[class*="SuperHubCustomPage-content-header"]{display:none}/* ---------- da
   --body:#B4BACC;
   --card-body:#C9D0E3;
   --cta-bg:#000000;
+  --cta-btn-bg:#000000;
   --hero-band:linear-gradient(180deg,#0C1D37 37.5%,#121212 100%);
 }
 @media (prefers-color-scheme:dark){[data-color-mode="system"] .jfaisc.jfaisc.jfaisc{
@@ -140,6 +143,7 @@ header[class*="SuperHubCustomPage-content-header"]{display:none}/* ---------- da
     --body:#B4BACC;
     --card-body:#C9D0E3;
     --cta-bg:#000000;
+    --cta-btn-bg:#000000;
     --hero-band:linear-gradient(180deg,#0C1D37 37.5%,#121212 100%);
   }
 </style>
