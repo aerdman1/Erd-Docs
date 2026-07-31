@@ -55,8 +55,19 @@ html,body{margin:0;padding:0}
   -webkit-text-fill-color:transparent;color:transparent;
 }
 @supports not ((-webkit-background-clip:text) or (background-clip:text)){.jfaisc-h1.jfaisc-h1.jfaisc-h1{-webkit-text-fill-color:currentColor;color:#36A13B;background:none}
-}/* ---------- main band ---------- */
-.jfaisc-main.jfaisc-main.jfaisc-main{background:var(--band);padding:40px 96px 0}.jfaisc-shell.jfaisc-shell.jfaisc-shell{max-width:1728px;margin:0 auto;display:flex;flex-direction:column;gap:40px}.jfaisc-head.jfaisc-head.jfaisc-head{display:flex;flex-direction:column;gap:40px;align-items:center}.jfaisc-caption.jfaisc-caption.jfaisc-caption{font-weight:600;font-size:24px;line-height:32px;color:var(--white);text-align:center}/* ---------- tabs ---------- */
+}
+
+/* ---------- main band ---------- */
+/* = Figma "Frame 45" (662:2586),an auto-layout frame with 96px horizontal and
+   40px vertical padding: h 1658.2266.2266.2266 == 40 + 1578.2266 (Frame 51) + 40 exactly.
+   The 40px BOTTOM was missing,which pulled the CTA card 40px too close to the
+   diagram/rail. Total authored gap from the split's bottom to the CTA card is
+   40 (here) + 40 (the CTA band's own top padding) = 80px.
+   No export can arbitrate this - every 1:1 PNG stops at or above the CTA band -
+   so the auto-layout padding is the evidence. The other four state frames use a
+   plain fixed-height Frame 45 with 73.77px.77px.77px of unallocated slack instead; that is
+   leftover designer slop, not an authored value,and it differs per state. */
+.jfaisc-main.jfaisc-main.jfaisc-main{background:var(--band);padding:40px 96px}.jfaisc-shell.jfaisc-shell.jfaisc-shell{max-width:1728px;margin:0 auto;display:flex;flex-direction:column;gap:40px}.jfaisc-head.jfaisc-head.jfaisc-head{display:flex;flex-direction:column;gap:40px;align-items:center}.jfaisc-caption.jfaisc-caption.jfaisc-caption{font-weight:600;font-size:24px;line-height:32px;color:var(--white);text-align:center}/* ---------- tabs ---------- */
 .jfaisc-tabs.jfaisc-tabs.jfaisc-tabs{display:inline-flex;gap:8px;padding:22px 24px;background:#000;border-radius:45px;max-width:100%;flex-wrap:wrap;justify-content:center;align-items:center}.jfaisc-tab.jfaisc-tab.jfaisc-tab{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   padding:16px 24px;border-radius:60px;cursor:pointer;color:var(--tab-t);
@@ -93,7 +104,16 @@ html,body{margin:0;padding:0}
    section you had scrolled fully into stayed faded,which reads as a bug (and
    fails contrast at 2.1.1.1:1). \`is-lit\` marks sections you have reached,so anything
    you can actually read is full opacity while the peek below stays dimmed. */
-.jfaisc-sec.jfaisc-sec.jfaisc-sec{display:flex;flex-direction:column;gap:28px;opacity:.4;transition:opacity .25s;scroll-margin-top:0}.jfaisc-sec.jfaisc-sec.jfaisc-sec.is-active,.jfaisc-sec.jfaisc-sec.jfaisc-sec.is-lit{opacity:1}.jf-sec-head.jf-sec-head.jf-sec-head{display:flex;flex-direction:column;gap:12px;align-items:flex-start;max-width:560px}.jf-tag.jf-tag.jf-tag{display:inline-flex;align-items:center;justify-content:center;min-width:49px;height:32px;padding:0 10px;border-radius:6px;background:var(--item);color:var(--green);font-weight:400;font-size:12px;line-height:16px;letter-spacing:.02em}.jf-sec-title.jf-sec-title.jf-sec-title{font-weight:600;font-size:22px;line-height:1.2;color:var(--white)}.jf-sec-body.jf-sec-body.jf-sec-body{font-weight:400;font-size:16px;line-height:24px;color:var(--body);max-width:560px}.jf-sec-body.jf-sec-body.jf-sec-body+.jf-sec-body{margin-top:16px}.jf-sec-h3.jf-sec-h3.jf-sec-h3{font-weight:600;font-size:18px;line-height:1.2;color:var(--white);max-width:560px}
+.jfaisc-sec.jfaisc-sec.jfaisc-sec{display:flex;flex-direction:column;gap:28px;opacity:.4;transition:opacity .25s;scroll-margin-top:0}.jfaisc-sec.jfaisc-sec.jfaisc-sec.is-active,.jfaisc-sec.jfaisc-sec.jfaisc-sec.is-lit{opacity:1}.jf-sec-head.jf-sec-head.jf-sec-head{display:flex;flex-direction:column;gap:12px;align-items:flex-start;max-width:560px}.jf-tag.jf-tag.jf-tag{display:inline-flex;align-items:center;justify-content:center;min-width:49px;height:32px;padding:0 10px;border-radius:6px;background:var(--item);color:var(--green);font-weight:400;font-size:12px;line-height:16px;letter-spacing:.02em}.jf-sec-title.jf-sec-title.jf-sec-title{font-weight:600;font-size:22px;line-height:1.2;color:var(--white)}.jf-sec-body.jf-sec-body.jf-sec-body{font-weight:400;font-size:16px;line-height:24px;color:var(--body);max-width:560px}
+/* Figma writes the paragraph break as a DOUBLED U+2028 and the text node carries
+   no paragraphSpacing (so Figma's default 0 applies): the break is therefore
+   exactly one blank line = one 24px line box, no more. A flex gap stacks on top
+   of margin rather than replacing it,so inside .jf-sec-head.jf-sec-head.jf-sec-head (a 12px-gap flex
+   column) the margin must be 24-12 to total 24. The old flat 16px totalled 28 and
+   put every line from the second paragraph onward 4px low - measured against
+   DarkMode.png,which matches line-for-line to the paragraph break and then
+   drifts +4px for the remaining 7 lines. */
+.jf-sec-body.jf-sec-body.jf-sec-body+.jf-sec-body{margin-top:24px}.jf-sec-head.jf-sec-head.jf-sec-head>.jf-sec-body+.jf-sec-body{margin-top:12px}.jf-sec-h3.jf-sec-h3.jf-sec-h3{font-weight:600;font-size:18px;line-height:1.2;color:var(--white);max-width:560px}
 /* Two columns exactly as Figma at full width (rail 706 -> 341px cards),but fold
    to one rather than squeezing below ~260px when the rail narrows on smaller
    desktops. 706/607/547 all still give two; 481 and below give one. */
@@ -368,7 +388,7 @@ header[class*="SuperHubCustomPage-content-header"]{display:none}/* ---------- da
         <b>Connect your Agents to JFrog</b>
         <span>Set up AI coding assistants, MCP servers, and IDE plugins with the JFrog Platform</span>
       </div>
-      <a class="jfaisc-ctabtn" href="/XXXX">AI Tools and integrations <svg viewBox="0 0 16 16" aria-hidden="true" class="jf-chev"><path d="M5.7 3.3 10.4 8l-4.7 4.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a class="jfaisc-ctabtn" href="https://docs.jfrog.com/ai-ml/docs/ai-tools-and-integrations">AI Tools and integrations <svg viewBox="0 0 16 16" aria-hidden="true" class="jf-chev"><path d="M5.7 3.3 10.4 8l-4.7 4.7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     </div>
   </div>
 
