@@ -5,7 +5,7 @@ name: EndpointPicker
 title: "EndpointPicker"
 description: "Auto-detect ReadMe OpenAPI specs from /openapi, select an endpoint, or browse the complete specification."
 author: "@andrewerdman"
-version: "2.0.0"
+version: "2.0.1"
 ---
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -448,7 +448,11 @@ export const EndpointPicker = props => {
           --ee-radius-lg: 16px;
           --ee-radius-md: 10px;
           --ee-radius-sm: 7px;
-          --ee-shadow: 0 18px 48px rgba(15, 23, 42, 0.10);
+          --ee-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+          --ee-modal-surface: #ffffff;
+          --ee-modal-subtle: #f6f8fb;
+          --ee-modal-text: #172033;
+          --ee-modal-border: #dce2ea;
           display: grid;
           gap: 24px;
           padding: 28px;
@@ -738,8 +742,9 @@ export const EndpointPicker = props => {
           display: grid;
           place-items: center;
           padding: 28px;
-          background: rgba(15, 23, 42, 0.62);
-          backdrop-filter: blur(3px);
+          background: rgba(15, 23, 42, 0.68);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
         }
 
         [data-ee-picker] .full-spec-modal {
@@ -748,9 +753,13 @@ export const EndpointPicker = props => {
           width: min(1220px, 96vw);
           height: min(900px, 92vh);
           overflow: hidden;
-          border: 1px solid var(--color-border-default);
+          isolation: isolate;
+          opacity: 1 !important;
+          filter: none !important;
+          border: 1px solid var(--ee-modal-border);
           border-radius: 18px;
-          background: var(--color-bg-default);
+          background: var(--ee-modal-surface) !important;
+          color: var(--ee-modal-text) !important;
           box-shadow: var(--ee-shadow);
         }
 
@@ -761,7 +770,8 @@ export const EndpointPicker = props => {
           gap: 20px;
           min-width: 0;
           padding: 20px 24px;
-          border-bottom: 1px solid var(--color-border-default);
+          border-bottom: 1px solid var(--ee-modal-border);
+          background: var(--ee-modal-surface) !important;
         }
 
         [data-ee-picker] .full-spec-title-wrap {
@@ -819,27 +829,31 @@ export const EndpointPicker = props => {
           grid-template-rows: auto auto minmax(0, 1fr);
           min-width: 0;
           min-height: 0;
-          border-right: 1px solid var(--color-border-default);
-          background: var(--color-bg-subtle, var(--color-bg-default));
+          border-right: 1px solid var(--ee-modal-border);
+          background: var(--ee-modal-subtle) !important;
+          color: var(--ee-modal-text) !important;
         }
 
         [data-ee-picker] .full-spec-sidebar-controls {
           display: grid;
           gap: 10px;
           padding: 16px;
-          border-bottom: 1px solid var(--color-border-default);
+          border-bottom: 1px solid var(--ee-modal-border);
+          background: var(--ee-modal-subtle) !important;
         }
 
         [data-ee-picker] .full-spec-sidebar-controls input,
         [data-ee-picker] .full-spec-sidebar-controls select {
           height: 40px;
-          background: var(--color-bg-default);
+          border-color: var(--ee-modal-border) !important;
+          background: var(--ee-modal-surface) !important;
+          color: var(--ee-modal-text) !important;
           font-size: 0.82rem;
         }
 
         [data-ee-picker] .sidebar-count {
           padding: 10px 16px;
-          border-bottom: 1px solid var(--color-border-default);
+          border-bottom: 1px solid var(--ee-modal-border);
           font-size: 0.73rem;
           font-weight: 700;
           letter-spacing: 0.04em;
@@ -881,14 +895,14 @@ export const EndpointPicker = props => {
         }
 
         [data-ee-picker] .endpoint-list-item:hover {
-          background: var(--color-bg-default);
-          border-color: var(--color-border-default);
+          background: var(--ee-modal-surface) !important;
+          border-color: var(--ee-modal-border);
         }
 
         [data-ee-picker] .endpoint-list-item.is-active {
-          background: var(--color-bg-default);
-          border-color: var(--color-primary, var(--color-border-default));
-          box-shadow: 0 2px 10px rgba(15, 23, 42, 0.07);
+          background: var(--ee-modal-surface) !important;
+          border-color: var(--color-primary, #2563eb);
+          box-shadow: 0 2px 10px rgba(15, 23, 42, 0.10);
         }
 
         [data-ee-picker] .endpoint-list-item .method-badge {
@@ -927,6 +941,8 @@ export const EndpointPicker = props => {
           min-height: 0;
           overflow: auto;
           padding: 30px 34px 44px;
+          background: var(--ee-modal-surface) !important;
+          color: var(--ee-modal-text) !important;
         }
 
         [data-ee-picker] .spec-heading {
@@ -954,9 +970,9 @@ export const EndpointPicker = props => {
 
         [data-ee-picker] .spec-stat {
           padding: 15px;
-          border: 1px solid var(--color-border-default);
+          border: 1px solid var(--ee-modal-border);
           border-radius: 11px;
-          background: var(--color-bg-subtle, var(--color-bg-default));
+          background: var(--ee-modal-subtle) !important;
         }
 
         [data-ee-picker] .spec-stat-label {
@@ -1150,13 +1166,75 @@ export const EndpointPicker = props => {
           justify-content: flex-end;
           gap: 10px;
           padding: 14px 20px;
-          border-top: 1px solid var(--color-border-default);
-          background: var(--color-bg-default);
+          border-top: 1px solid var(--ee-modal-border);
+          background: var(--ee-modal-surface) !important;
+          color: var(--ee-modal-text) !important;
         }
 
         [data-ee-picker] .full-spec-footer .button-link,
         [data-ee-picker] .full-spec-footer .button-secondary {
           min-height: 38px;
+        }
+
+        [data-ee-picker] .full-spec-modal .button-ghost,
+        [data-ee-picker] .full-spec-modal .button-secondary,
+        [data-ee-picker] .full-spec-modal .icon-button {
+          border-color: var(--ee-modal-border) !important;
+          background: var(--ee-modal-surface) !important;
+          color: var(--ee-modal-text) !important;
+        }
+
+        [data-ee-picker] .full-spec-modal .button-ghost:hover,
+        [data-ee-picker] .full-spec-modal .button-secondary:hover,
+        [data-ee-picker] .full-spec-modal .icon-button:hover {
+          background: var(--ee-modal-subtle) !important;
+        }
+
+        [data-ee-picker] .full-spec-modal .detail-table th,
+        [data-ee-picker] .full-spec-modal .detail-table td,
+        [data-ee-picker] .full-spec-modal .detail-section-title,
+        [data-ee-picker] .full-spec-modal .endpoint-detail-top,
+        [data-ee-picker] .full-spec-modal .request-card,
+        [data-ee-picker] .full-spec-modal .response-card,
+        [data-ee-picker] .full-spec-modal .request-card-header,
+        [data-ee-picker] .full-spec-modal .response-card-header {
+          border-color: var(--ee-modal-border) !important;
+        }
+
+        [data-ee-picker] .full-spec-modal .request-card,
+        [data-ee-picker] .full-spec-modal .response-card,
+        [data-ee-picker] .full-spec-modal .request-card-body,
+        [data-ee-picker] .full-spec-modal .response-card-body {
+          background: var(--ee-modal-surface) !important;
+        }
+
+        [data-ee-picker] .full-spec-modal .request-card-header,
+        [data-ee-picker] .full-spec-modal .response-card-header,
+        [data-ee-picker] .full-spec-modal .metadata-pill,
+        [data-ee-picker] .full-spec-modal .code,
+        [data-ee-picker] .full-spec-modal .empty-detail {
+          background: var(--ee-modal-subtle) !important;
+          color: var(--ee-modal-text) !important;
+        }
+
+        html[data-color-mode="dark"] [data-ee-picker],
+        html.dark [data-ee-picker],
+        body.dark [data-ee-picker],
+        [data-theme="dark"] [data-ee-picker],
+        [data-color-scheme="dark"] [data-ee-picker] {
+          --ee-modal-surface: #111827;
+          --ee-modal-subtle: #182233;
+          --ee-modal-text: #f3f6fb;
+          --ee-modal-border: #334155;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          [data-ee-picker] {
+            --ee-modal-surface: #111827;
+            --ee-modal-subtle: #182233;
+            --ee-modal-text: #f3f6fb;
+            --ee-modal-border: #334155;
+          }
         }
 
         @media (max-width: 900px) {
