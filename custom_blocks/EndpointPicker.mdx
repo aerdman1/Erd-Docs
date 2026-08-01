@@ -102,112 +102,415 @@ export const EndpointPicker = props => {
   const referenceUrl = current ? `${base}/reference/${current.slug}` : "#";
 
   return (
-    <div data-ee-picker style={{
-      display: "grid",
-      gap: 12,
-      padding: 12,
-      border: "1px solid var(--color-border-default)",
-      borderRadius: 8
-    }}>
+    <div data-ee-picker>
       <style>{`
-        [data-ee-picker] input,
-        [data-ee-picker] select,
-        [data-ee-picker] a.button-link {
-          background: var(--color-bg-default);
-          color: var(--color-text-default);
+        [data-ee-picker] {
+          display: grid;
+          gap: 24px;
+          padding: 28px;
           border: 1px solid var(--color-border-default);
+          border-radius: 16px;
+          background: var(--color-bg-default);
+          box-shadow:
+            0 1px 2px rgba(0, 0, 0, 0.04),
+            0 12px 32px rgba(0, 0, 0, 0.06);
         }
+
+        [data-ee-picker],
+        [data-ee-picker] * {
+          box-sizing: border-box;
+        }
+
+        [data-ee-picker] .picker-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 20px;
+          padding-bottom: 22px;
+          border-bottom: 1px solid var(--color-border-default);
+        }
+
+        [data-ee-picker] .picker-title {
+          margin: 0;
+          color: var(--color-text-default);
+          font-size: 1.25rem;
+          font-weight: 750;
+          line-height: 1.3;
+          letter-spacing: -0.02em;
+        }
+
+        [data-ee-picker] .picker-description {
+          max-width: 640px;
+          margin: 6px 0 0;
+          color: var(--color-text-default);
+          font-size: 0.92rem;
+          line-height: 1.6;
+          opacity: 0.7;
+        }
+
+        [data-ee-picker] .picker-count {
+          flex-shrink: 0;
+          padding: 6px 10px;
+          border: 1px solid var(--color-border-default);
+          border-radius: 999px;
+          background: var(--color-bg-subtle, var(--color-bg-default));
+          color: var(--color-text-default);
+          font-size: 0.75rem;
+          font-weight: 700;
+          line-height: 1;
+          white-space: nowrap;
+          opacity: 0.8;
+        }
+
+        [data-ee-picker] .controls {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 18px;
+        }
+
+        [data-ee-picker] .field {
+          display: grid;
+          align-content: start;
+          gap: 8px;
+          min-width: 0;
+        }
+
+        [data-ee-picker] .field-full {
+          grid-column: 1 / -1;
+        }
+
+        [data-ee-picker] label {
+          display: block;
+          margin: 0;
+          color: var(--color-text-default);
+          font-size: 0.8rem;
+          font-weight: 700;
+          line-height: 1.4;
+          letter-spacing: 0.01em;
+        }
+
         [data-ee-picker] input,
         [data-ee-picker] select {
-          padding: 8px 10px;
-          border-radius: 6px;
- 					margin-left:10px;
+          width: 100%;
+          min-width: 0;
+          height: 44px;
+          margin: 0;
+          padding: 0 13px;
+          border: 1px solid var(--color-border-default);
+          border-radius: 9px;
+          outline: none;
+          background: var(--color-bg-default);
+          color: var(--color-text-default);
+          font: inherit;
+          font-size: 0.9rem;
+          line-height: 1.4;
+          transition:
+            border-color 160ms ease,
+            box-shadow 160ms ease,
+            background-color 160ms ease;
         }
+
+        [data-ee-picker] input::placeholder {
+          color: var(--color-text-default);
+          opacity: 0.45;
+        }
+
+        [data-ee-picker] input:hover,
+        [data-ee-picker] select:hover {
+          border-color: var(--color-text-default);
+        }
+
+        [data-ee-picker] input:focus,
+        [data-ee-picker] select:focus {
+          border-color: var(--color-primary, var(--color-text-default));
+          box-shadow: 0 0 0 3px color-mix(
+            in srgb,
+            var(--color-primary, var(--color-text-default)) 14%,
+            transparent
+          );
+        }
+
         [data-ee-picker] option {
           color: var(--color-text-default);
           background: var(--color-bg-default);
         }
-        [data-ee-picker] .panel {
+
+        [data-ee-picker] .status {
+          display: flex;
+          align-items: center;
+          min-height: 44px;
+          padding: 12px 14px;
+          border: 1px dashed var(--color-border-default);
+          border-radius: 9px;
+          color: var(--color-text-default);
+          font-size: 0.88rem;
+          opacity: 0.7;
+        }
+
+        [data-ee-picker] .result-panel {
+          overflow: hidden;
+          border: 1px solid var(--color-border-default);
+          border-radius: 12px;
+          background: var(--color-bg-default);
+        }
+
+        [data-ee-picker] .result-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          min-width: 0;
+          padding: 16px 18px;
+          border-bottom: 1px solid var(--color-border-default);
+          background: var(--color-bg-subtle, var(--color-bg-default));
+        }
+
+        [data-ee-picker] .method-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          min-width: 56px;
+          height: 28px;
+          padding: 0 9px;
+          border: 1px solid var(--color-border-default);
+          border-radius: 6px;
+          background: var(--color-bg-default);
+          color: var(--color-text-default);
+          font-size: 0.72rem;
+          font-weight: 800;
+          line-height: 1;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        [data-ee-picker] .endpoint-path {
+          min-width: 0;
+          overflow: hidden;
+          color: var(--color-text-default);
+          font-family: ${mono};
+          font-size: 0.86rem;
+          font-weight: 600;
+          line-height: 1.5;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        [data-ee-picker] .result-body {
+          display: grid;
+          gap: 18px;
+          padding: 20px;
+        }
+
+        [data-ee-picker] .summary {
+          margin: 0;
+          color: var(--color-text-default);
+          font-size: 0.93rem;
+          line-height: 1.65;
+          opacity: 0.72;
+        }
+
+        [data-ee-picker] .button-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
+        [data-ee-picker] .button-link {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 40px;
+          padding: 0 15px;
+          border: 1px solid var(--color-primary, var(--color-text-default));
+          border-radius: 8px;
+          background: var(--color-primary, var(--color-text-default));
+          color: var(--color-primary-inverse, var(--color-bg-default));
+          font-size: 0.84rem;
+          font-weight: 750;
+          line-height: 1;
+          text-decoration: none;
+          transition:
+            transform 150ms ease,
+            opacity 150ms ease,
+            box-shadow 150ms ease;
+        }
+
+        [data-ee-picker] .button-link:hover {
+          color: var(--color-primary-inverse, var(--color-bg-default));
+          text-decoration: none;
+          opacity: 0.9;
+          transform: translateY(-1px);
+          box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+        }
+
+        [data-ee-picker] .snippet-section {
+          display: grid;
+          gap: 8px;
+          padding-top: 17px;
+          border-top: 1px solid var(--color-border-default);
+        }
+
+        [data-ee-picker] .snippet-label {
+          color: var(--color-text-default);
+          font-size: 0.77rem;
+          font-weight: 700;
+          line-height: 1.4;
+          letter-spacing: 0.01em;
+        }
+
+        [data-ee-picker] .code {
+          width: 100%;
+          overflow-x: auto;
+          padding: 13px 14px;
           border: 1px solid var(--color-border-default);
           border-radius: 8px;
-          padding: 12px;
-        }
-        [data-ee-picker] .button-link {
-          display: inline-block;
-          text-decoration: none;
-          font-weight: 700;
-          border-radius: 6px;
-          padding: 8px 10px;
-        }
-        [data-ee-picker] .code {
+          background: var(--color-bg-subtle, var(--color-bg-default));
+          color: var(--color-text-default);
           font-family: ${mono};
-          font-size: .9rem;
-          padding: 8px 10px;
-          border-radius: 6px;
-          border: 1px solid var(--color-border-default);
-          overflow-x: auto;
+          font-size: 0.8rem;
+          line-height: 1.6;
+          white-space: nowrap;
         }
-        [data-ee-picker] .muted { opacity: .75; }
+
+        @media (max-width: 720px) {
+          [data-ee-picker] {
+            gap: 20px;
+            padding: 20px;
+            border-radius: 12px;
+          }
+
+          [data-ee-picker] .picker-header {
+            display: grid;
+            gap: 12px;
+          }
+
+          [data-ee-picker] .picker-count {
+            justify-self: start;
+          }
+
+          [data-ee-picker] .controls {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          [data-ee-picker] .field-full {
+            grid-column: auto;
+          }
+
+          [data-ee-picker] .result-header {
+            align-items: flex-start;
+          }
+
+          [data-ee-picker] .endpoint-path {
+            overflow-wrap: anywhere;
+            text-overflow: initial;
+            white-space: normal;
+          }
+
+          [data-ee-picker] .button-link {
+            width: 100%;
+          }
+        }
       `}</style>
 
-      <div>
-        <label style={{ fontWeight: 600 }}>OpenAPI file</label>
-        {loadingIndex ? (
-          <div>Loading…</div>
-        ) : specs.length ? (
-          <select value={specUrl} onChange={e => setSpecUrl(e.target.value)}>
-            {specs.map(s => <option key={s.href} value={base + s.href}>{s.name}</option>)}
-          </select>
+      <div className="picker-header">
+        <div>
+          <h3 className="picker-title">Endpoint Picker</h3>
+          <p className="picker-description">
+            Select an OpenAPI file, find an endpoint, and generate a direct link to its API reference page.
+          </p>
+        </div>
+
+        {!loadingSpec && endpoints.length ? (
+          <div className="picker-count">
+            {filtered.length} endpoint{filtered.length === 1 ? "" : "s"}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="controls">
+        <div className="field">
+          <label>OpenAPI file</label>
+          {loadingIndex ? (
+            <div className="status">Loading OpenAPI files…</div>
+          ) : specs.length ? (
+            <select value={specUrl} onChange={e => setSpecUrl(e.target.value)}>
+              {specs.map(s => <option key={s.href} value={base + s.href}>{s.name}</option>)}
+            </select>
+          ) : (
+            <div className="status">No specs found</div>
+          )}
+        </div>
+
+        <div className="field">
+          <label>Find endpoint</label>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Filter by path, method, or summary"
+          />
+        </div>
+
+        {loadingSpec ? (
+          <div className="field field-full">
+            <div className="status">Loading endpoints…</div>
+          </div>
+        ) : filtered.length ? (
+          <>
+            <div className="field">
+              <label>Endpoint</label>
+              <select value={selectedPath} onChange={e => setSelectedPath(e.target.value)}>
+                {[...new Set(filtered.map(f => f.path))].map(p => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+
+            <div className="field">
+              <label>Method</label>
+              <select value={selectedMethod} onChange={e => setSelectedMethod(e.target.value)}>
+                {filtered.filter(f => f.path === selectedPath).map(f => (
+                  <option key={f.path + f.method}>{f.method}</option>
+                ))}
+              </select>
+            </div>
+          </>
         ) : (
-          <div>No specs found</div>
+          <div className="field field-full">
+            <div className="status">No matches.</div>
+          </div>
         )}
       </div>
 
-      <div>
-        <label style={{ fontWeight: 600 }}>Find endpoint</label>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter by path or method" />
-      </div>
-
-      {loadingSpec ? (
-        <div>Loading endpoints…</div>
-      ) : filtered.length ? (
-        <>
-          <div>
-            <label style={{ fontWeight: 600 }}>Endpoint</label>
-            <select value={selectedPath} onChange={e => setSelectedPath(e.target.value)}>
-              {[...new Set(filtered.map(f => f.path))].map(p => <option key={p}>{p}</option>)}
-            </select>
+      {!loadingSpec && filtered.length ? (
+        <div className="result-panel">
+          <div className="result-header">
+            <span className="method-badge">{selectedMethod}</span>
+            <span className="endpoint-path">{selectedPath}</span>
           </div>
 
-          <div>
-            <label style={{ fontWeight: 600 }}>Method</label>
-            <select value={selectedMethod} onChange={e => setSelectedMethod(e.target.value)}>
-              {filtered.filter(f => f.path === selectedPath).map(f => (
-                <option key={f.path + f.method}>{f.method}</option>
-              ))}
-            </select>
-          </div>
+          <div className="result-body">
+            {current?.summary ? (
+              <p className="summary">{current.summary}</p>
+            ) : null}
 
-          <div className="panel">
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontWeight: 700, textTransform: "uppercase", fontSize: ".8rem" }}>{selectedMethod}</span>
-              <span style={{ fontFamily: mono, fontSize: ".9rem" }}>{selectedPath}</span>
+            <div className="button-row">
+              <a
+                className="button-link"
+                href={referenceUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Open reference
+              </a>
             </div>
-            <div className="muted">{current?.summary}</div>
-            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-              <a className="button-link" href={referenceUrl} target="_blank" rel="noreferrer">Open reference</a>
-            </div>
-            <div style={{ marginTop: 10 }}>
-              <div style={{ fontWeight: 600, marginBottom: 6 }}>MDX link snippet</div>
+
+            <div className="snippet-section">
+              <div className="snippet-label">MDX link snippet</div>
               <div className="code">
                 [{current?.summary || `${selectedMethod} ${selectedPath}`}]({referenceUrl})
               </div>
             </div>
           </div>
-        </>
-      ) : (
-        <div>No matches.</div>
-      )}
+        </div>
+      ) : null}
     </div>
   );
 };
