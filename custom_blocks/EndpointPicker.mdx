@@ -3,9 +3,9 @@ name: EndpointPicker
 ---
 ---
 title: "EndpointPicker"
-description: "Auto-detect ReadMe OpenAPI specs from /openapi, select a spec + endpoint, and view key details."
+description: "Auto-detect ReadMe OpenAPI specs from /openapi, select an endpoint, or browse the complete specification."
 author: "@andrewerdman"
-version: "1.0.5"
+version: "2.0.0"
 ---
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -20,14 +20,21 @@ export const EndpointPicker = props => {
   }, [websiteBaseUrl]);
 
   const denySlugs = ["health"];
+
   const [specs, setSpecs] = useState([]);
   const [specUrl, setSpecUrl] = useState("");
+  const [specData, setSpecData] = useState(null);
   const [loadingIndex, setLoadingIndex] = useState(true);
   const [endpoints, setEndpoints] = useState([]);
   const [loadingSpec, setLoadingSpec] = useState(false);
   const [selectedPath, setSelectedPath] = useState("");
   const [selectedMethod, setSelectedMethod] = useState("");
   const [search, setSearch] = useState("");
+  const [showFullSpec, setShowFullSpec] = useState(false);
+  const [fullSpecSearch, setFullSpecSearch] = useState("");
+  const [fullSpecTag, setFullSpecTag] = useState("All");
+  const [fullSpecSelection, setFullSpecSelection] = useState(null);
+  const [copied, setCopied] = useState("");
 
   const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
@@ -37,125 +44,463 @@ export const EndpointPicker = props => {
     .replace(/^-+|-+$/g, "")
     || "endpoint";
 
+  const methodOrder = ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS", "TRACE"];
+
+  const methodClass = method => `method-${String(method || "").toLowerCase()}`;
+
+  const resolveRef = (value, rootSpec) => {
+    if (!value || typeof value !== "object" || !value.$ref) return value;
+    if (!value.$ref.startsWith("#/")) return value;
+
+    return value.$ref
+      .slice(2)
+      .split("/")
+      .reduce((current, key) => current?.[key.replace(/~1/g, "/").replace(/~0/g, "~")], rootSpec);
+  };
+
+  const schemaLabel = (schema, rootSpec) => {
+    const resolved = resolveRef(schema, rootSpec);
+    if (!resolved) return "any";
+
+    if (resolved.type === "array") {
+      return `array<${schemaLabel(resolved.items, rootSpec)}>`;
+    }
+
+    if (Array.isArray(resolved.type)) {
+      return resolved.type.join(" | ");
+    }
+
+    if (resolved.enum?.length) {
+      return resolved.type ? `${resolved.type} enum` : "enum";
+    }
+
+    if (resolved.type) return resolved.type;
+    if (resolved.oneOf) return "oneOf";
+    if (resolved.anyOf) return "anyOf";
+    if (resolved.allOf) return "allOf";
+    if (resolved.properties) return "object";
+
+    return "any";
+  };
+
+  const stringifyExample = value => {
+    if (value === undefined || value === null) return "";
+    if (typeof value === "string") return value;
+
+    try {
+      return JSON.stringify(value, null, 2);
+    } catch {
+      return String(value);
+    }
+  };
+
+  const getSchemaExample = (schema, rootSpec, depth = 0) => {
+    if (!schema || depth > 5) return undefined;
+
+    const resolved = resolveRef(schema, rootSpec);
+    if (!resolved) return undefined;
+
+    if (resolved.example !== undefined) return resolved.example;
+    if (resolved.default !== undefined) return resolved.default;
+    if (resolved.enum?.length) return resolved.enum[0];
+
+    if (resolved.oneOf?.length) return getSchemaExample(resolved.oneOf[0], rootSpec, depth + 1);
+    if (resolved.anyOf?.length) return getSchemaExample(resolved.anyOf[0], rootSpec, depth + 1);
+
+    if (resolved.allOf?.length) {
+      return resolved.allOf.reduce((combined, part) => {
+        const example = getSchemaExample(part, rootSpec, depth + 1);
+        return example && typeof example === "object" && !Array.isArray(example)
+          ? { ...combined, ...example }
+          : combined;
+      }, {});
+    }
+
+    if (resolved.type === "array") {
+      const item = getSchemaExample(resolved.items, rootSpec, depth + 1);
+      return item === undefined ? [] : [item];
+    }
+
+    if (resolved.type === "object" || resolved.properties) {
+      return Object.entries(resolved.properties || {}).reduce((output, [key, propertySchema]) => {
+        const example = getSchemaExample(propertySchema, rootSpec, depth + 1);
+        output[key] = example === undefined ? null : example;
+        return output;
+      }, {});
+    }
+
+    if (resolved.type === "string") {
+      if (resolved.format === "date-time") return "2026-01-01T00:00:00Z";
+      if (resolved.format === "date") return "2026-01-01";
+      if (resolved.format === "email") return "user@example.com";
+      if (resolved.format === "uuid") return "00000000-0000-0000-0000-000000000000";
+      return "string";
+    }
+
+    if (resolved.type === "integer" || resolved.type === "number") return 0;
+    if (resolved.type === "boolean") return true;
+
+    return undefined;
+  };
+
   async function fetchSpecIndex(indexUrl) {
     const res = await fetch(indexUrl, { headers: { Accept: "text/html,*/*" } });
+    if (!res.ok) throw new Error(`Unable to load OpenAPI index (${res.status})`);
+
     const html = await res.text();
     const doc = new DOMParser().parseFromString(html, "text/html");
+
     return Array.from(doc.querySelectorAll('.container .item a[href^="/openapi/"]'))
-      .map(a => ({ name: (a.textContent || "").trim(), href: a.getAttribute("href") }));
+      .map(a => ({
+        name: (a.textContent || "").trim(),
+        href: a.getAttribute("href")
+      }));
   }
 
   async function fetchSpecJson(url) {
     const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error(`Unable to load OpenAPI file (${res.status})`);
     return res.json();
   }
 
   const listPathsAndMethods = spec => {
     const out = [];
-    Object.entries(spec?.paths || {}).forEach(([path, ops]) => {
-      Object.entries(ops).forEach(([m, op]) => {
-        if (!["get","post","put","delete","patch","head","options","trace"].includes(m)) return;
-        const slug = slugForReference(path, op.operationId || "");
+
+    Object.entries(spec?.paths || {}).forEach(([path, pathItem]) => {
+      const resolvedPathItem = resolveRef(pathItem, spec) || {};
+      const pathParameters = resolvedPathItem.parameters || [];
+
+      Object.entries(resolvedPathItem).forEach(([method, operation]) => {
+        if (!["get", "post", "put", "delete", "patch", "head", "options", "trace"].includes(method)) return;
+
+        const resolvedOperation = resolveRef(operation, spec) || {};
+        const slug = slugForReference(path, resolvedOperation.operationId || "");
         if (denySlugs.includes(slug.toLowerCase())) return;
-        out.push({ path, method: m.toUpperCase(), summary: op.summary || "", description: op.description || "", slug });
+
+        const tags = resolvedOperation.tags?.length ? resolvedOperation.tags : ["General"];
+
+        out.push({
+          path,
+          method: method.toUpperCase(),
+          summary: resolvedOperation.summary || "",
+          description: resolvedOperation.description || "",
+          slug,
+          operationId: resolvedOperation.operationId || "",
+          tags,
+          operation: resolvedOperation,
+          pathParameters
+        });
       });
     });
-    return out.sort((a,b)=>a.path.localeCompare(b.path) || a.method.localeCompare(b.method));
+
+    return out.sort((a, b) =>
+      a.path.localeCompare(b.path) ||
+      methodOrder.indexOf(a.method) - methodOrder.indexOf(b.method)
+    );
+  };
+
+  const copyText = async (text, key) => {
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(key);
+      window.setTimeout(() => setCopied(""), 1600);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      setCopied(key);
+      window.setTimeout(() => setCopied(""), 1600);
+    }
   };
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
+      setLoadingIndex(true);
+
       try {
         const list = await fetchSpecIndex(base + "/openapi");
+        if (cancelled) return;
+
         setSpecs(list);
         if (list?.[0]) setSpecUrl(base + list[0].href);
-      } finally { setLoadingIndex(false); }
+      } catch {
+        if (!cancelled) setSpecs([]);
+      } finally {
+        if (!cancelled) setLoadingIndex(false);
+      }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [base]);
 
   useEffect(() => {
     if (!specUrl) return;
+
+    let cancelled = false;
+
     (async () => {
       setLoadingSpec(true);
+
       try {
         const spec = await fetchSpecJson(specUrl);
         const list = listPathsAndMethods(spec);
+        if (cancelled) return;
+
+        setSpecData(spec);
         setEndpoints(list);
+
         if (list[0]) {
           setSelectedPath(list[0].path);
           setSelectedMethod(list[0].method);
+          setFullSpecSelection(list[0]);
+        } else {
+          setSelectedPath("");
+          setSelectedMethod("");
+          setFullSpecSelection(null);
         }
-      } finally { setLoadingSpec(false); }
+      } catch {
+        if (cancelled) return;
+        setSpecData(null);
+        setEndpoints([]);
+        setSelectedPath("");
+        setSelectedMethod("");
+        setFullSpecSelection(null);
+      } finally {
+        if (!cancelled) setLoadingSpec(false);
+      }
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [specUrl]);
 
+  useEffect(() => {
+    if (!showFullSpec || typeof document === "undefined") return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = event => {
+      if (event.key === "Escape") setShowFullSpec(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [showFullSpec]);
+
   const filtered = useMemo(() => {
-    const q = search.toLowerCase();
-    return endpoints.filter(e =>
-      e.path.toLowerCase().includes(q) ||
-      e.method.toLowerCase().includes(q) ||
-      (e.summary || "").toLowerCase().includes(q)
+    const q = search.trim().toLowerCase();
+
+    return endpoints.filter(endpoint =>
+      endpoint.path.toLowerCase().includes(q) ||
+      endpoint.method.toLowerCase().includes(q) ||
+      endpoint.summary.toLowerCase().includes(q)
     );
   }, [endpoints, search]);
 
-  const current = filtered.find(e => e.path === selectedPath && e.method === selectedMethod) || filtered[0];
+  useEffect(() => {
+    if (!filtered.length) return;
+
+    const selectedStillExists = filtered.some(endpoint =>
+      endpoint.path === selectedPath && endpoint.method === selectedMethod
+    );
+
+    if (!selectedStillExists) {
+      setSelectedPath(filtered[0].path);
+      setSelectedMethod(filtered[0].method);
+    }
+  }, [filtered, selectedPath, selectedMethod]);
+
+  useEffect(() => {
+    const methodsForPath = filtered.filter(endpoint => endpoint.path === selectedPath);
+    if (!methodsForPath.length) return;
+
+    if (!methodsForPath.some(endpoint => endpoint.method === selectedMethod)) {
+      setSelectedMethod(methodsForPath[0].method);
+    }
+  }, [selectedPath, selectedMethod, filtered]);
+
+  const current = filtered.find(endpoint =>
+    endpoint.path === selectedPath && endpoint.method === selectedMethod
+  ) || filtered[0];
+
   const referenceUrl = current ? `${base}/reference/${current.slug}` : "#";
+
+  const tags = useMemo(() => {
+    return ["All", ...Array.from(new Set(endpoints.flatMap(endpoint => endpoint.tags))).sort()];
+  }, [endpoints]);
+
+  const fullSpecFiltered = useMemo(() => {
+    const q = fullSpecSearch.trim().toLowerCase();
+
+    return endpoints.filter(endpoint => {
+      const matchesTag = fullSpecTag === "All" || endpoint.tags.includes(fullSpecTag);
+      const matchesSearch =
+        !q ||
+        endpoint.path.toLowerCase().includes(q) ||
+        endpoint.method.toLowerCase().includes(q) ||
+        endpoint.summary.toLowerCase().includes(q) ||
+        endpoint.tags.some(tag => tag.toLowerCase().includes(q));
+
+      return matchesTag && matchesSearch;
+    });
+  }, [endpoints, fullSpecSearch, fullSpecTag]);
+
+  const groupedFullSpecEndpoints = useMemo(() => {
+    return fullSpecFiltered.reduce((groups, endpoint) => {
+      const groupName = fullSpecTag === "All"
+        ? endpoint.tags[0] || "General"
+        : fullSpecTag;
+
+      if (!groups[groupName]) groups[groupName] = [];
+      groups[groupName].push(endpoint);
+      return groups;
+    }, {});
+  }, [fullSpecFiltered, fullSpecTag]);
+
+  useEffect(() => {
+    if (!showFullSpec || !fullSpecFiltered.length) return;
+
+    const currentStillVisible = fullSpecSelection && fullSpecFiltered.some(endpoint =>
+      endpoint.path === fullSpecSelection.path &&
+      endpoint.method === fullSpecSelection.method
+    );
+
+    if (!currentStillVisible) {
+      setFullSpecSelection(fullSpecFiltered[0]);
+    }
+  }, [showFullSpec, fullSpecFiltered, fullSpecSelection]);
+
+  const selectedFullSpecEndpoint = fullSpecSelection || fullSpecFiltered[0] || endpoints[0];
+
+  const selectedOperation = selectedFullSpecEndpoint?.operation || {};
+  const selectedReferenceUrl = selectedFullSpecEndpoint
+    ? `${base}/reference/${selectedFullSpecEndpoint.slug}`
+    : "#";
+
+  const selectedParameters = useMemo(() => {
+    if (!selectedFullSpecEndpoint || !specData) return [];
+
+    const combined = [
+      ...(selectedFullSpecEndpoint.pathParameters || []),
+      ...(selectedOperation.parameters || [])
+    ];
+
+    const unique = new Map();
+
+    combined.forEach(parameter => {
+      const resolved = resolveRef(parameter, specData);
+      if (!resolved) return;
+      unique.set(`${resolved.in}:${resolved.name}`, resolved);
+    });
+
+    return Array.from(unique.values());
+  }, [selectedFullSpecEndpoint, selectedOperation, specData]);
+
+  const requestBody = useMemo(() => {
+    if (!selectedOperation.requestBody || !specData) return null;
+    return resolveRef(selectedOperation.requestBody, specData);
+  }, [selectedOperation, specData]);
+
+  const responseEntries = useMemo(() => {
+    if (!specData) return [];
+
+    return Object.entries(selectedOperation.responses || {}).map(([status, response]) => ({
+      status,
+      response: resolveRef(response, specData) || {}
+    }));
+  }, [selectedOperation, specData]);
+
+  const specTitle =
+    specData?.info?.title ||
+    specs.find(spec => base + spec.href === specUrl)?.name ||
+    "OpenAPI Specification";
+
+  const specVersion = specData?.info?.version || "";
+  const pathCount = Object.keys(specData?.paths || {}).length;
+  const tagCount = new Set(endpoints.flatMap(endpoint => endpoint.tags)).size;
 
   return (
     <div data-ee-picker>
       <style>{`
+        [data-ee-picker],
+        [data-ee-picker] * {
+          box-sizing: border-box;
+        }
+
         [data-ee-picker] {
+          --ee-radius-lg: 16px;
+          --ee-radius-md: 10px;
+          --ee-radius-sm: 7px;
+          --ee-shadow: 0 18px 48px rgba(15, 23, 42, 0.10);
           display: grid;
           gap: 24px;
           padding: 28px;
           border: 1px solid var(--color-border-default);
-          border-radius: 16px;
+          border-radius: var(--ee-radius-lg);
           background: var(--color-bg-default);
-          box-shadow:
-            0 1px 2px rgba(0, 0, 0, 0.04),
-            0 12px 32px rgba(0, 0, 0, 0.06);
+          color: var(--color-text-default);
+          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 28px rgba(15, 23, 42, 0.06);
         }
 
-        [data-ee-picker],
-        [data-ee-picker] * {
-          box-sizing: border-box;
+        [data-ee-picker] button,
+        [data-ee-picker] input,
+        [data-ee-picker] select {
+          font: inherit;
+        }
+
+        [data-ee-picker] button {
+          color: inherit;
         }
 
         [data-ee-picker] .picker-header {
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
-          gap: 20px;
+          gap: 24px;
           padding-bottom: 22px;
           border-bottom: 1px solid var(--color-border-default);
         }
 
         [data-ee-picker] .picker-title {
           margin: 0;
-          color: var(--color-text-default);
-          font-size: 1.25rem;
+          font-size: 1.28rem;
           font-weight: 750;
-          line-height: 1.3;
-          letter-spacing: -0.02em;
+          line-height: 1.25;
+          letter-spacing: -0.025em;
         }
 
         [data-ee-picker] .picker-description {
-          max-width: 640px;
-          margin: 6px 0 0;
-          color: var(--color-text-default);
+          max-width: 680px;
+          margin: 7px 0 0;
           font-size: 0.92rem;
           line-height: 1.6;
           opacity: 0.7;
         }
 
         [data-ee-picker] .picker-count {
-          flex-shrink: 0;
-          padding: 6px 10px;
+          flex: 0 0 auto;
+          padding: 7px 11px;
           border: 1px solid var(--color-border-default);
           border-radius: 999px;
           background: var(--color-bg-subtle, var(--color-bg-default));
-          color: var(--color-text-default);
-          font-size: 0.75rem;
+          font-size: 0.76rem;
           font-weight: 700;
           line-height: 1;
           white-space: nowrap;
@@ -179,10 +524,10 @@ export const EndpointPicker = props => {
           grid-column: 1 / -1;
         }
 
-        [data-ee-picker] label {
+        [data-ee-picker] label,
+        [data-ee-picker] .field-label {
           display: block;
           margin: 0;
-          color: var(--color-text-default);
           font-size: 0.8rem;
           font-weight: 700;
           line-height: 1.4;
@@ -197,17 +542,13 @@ export const EndpointPicker = props => {
           margin: 0;
           padding: 0 13px;
           border: 1px solid var(--color-border-default);
-          border-radius: 9px;
+          border-radius: var(--ee-radius-md);
           outline: none;
           background: var(--color-bg-default);
           color: var(--color-text-default);
-          font: inherit;
           font-size: 0.9rem;
           line-height: 1.4;
-          transition:
-            border-color 160ms ease,
-            box-shadow 160ms ease,
-            background-color 160ms ease;
+          transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
         }
 
         [data-ee-picker] input::placeholder {
@@ -217,17 +558,13 @@ export const EndpointPicker = props => {
 
         [data-ee-picker] input:hover,
         [data-ee-picker] select:hover {
-          border-color: var(--color-text-default);
+          border-color: currentColor;
         }
 
         [data-ee-picker] input:focus,
         [data-ee-picker] select:focus {
-          border-color: var(--color-primary, var(--color-text-default));
-          box-shadow: 0 0 0 3px color-mix(
-            in srgb,
-            var(--color-primary, var(--color-text-default)) 14%,
-            transparent
-          );
+          border-color: var(--color-primary, currentColor);
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
         }
 
         [data-ee-picker] option {
@@ -241,16 +578,15 @@ export const EndpointPicker = props => {
           min-height: 44px;
           padding: 12px 14px;
           border: 1px dashed var(--color-border-default);
-          border-radius: 9px;
-          color: var(--color-text-default);
+          border-radius: var(--ee-radius-md);
           font-size: 0.88rem;
-          opacity: 0.7;
+          opacity: 0.68;
         }
 
         [data-ee-picker] .result-panel {
           overflow: hidden;
           border: 1px solid var(--color-border-default);
-          border-radius: 12px;
+          border-radius: 13px;
           background: var(--color-bg-default);
         }
 
@@ -268,14 +604,12 @@ export const EndpointPicker = props => {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          flex-shrink: 0;
-          min-width: 56px;
+          flex: 0 0 auto;
+          min-width: 60px;
           height: 28px;
           padding: 0 9px;
-          border: 1px solid var(--color-border-default);
           border-radius: 6px;
-          background: var(--color-bg-default);
-          color: var(--color-text-default);
+          color: #fff;
           font-size: 0.72rem;
           font-weight: 800;
           line-height: 1;
@@ -283,10 +617,18 @@ export const EndpointPicker = props => {
           text-transform: uppercase;
         }
 
+        [data-ee-picker] .method-get { background: #0f9f61; }
+        [data-ee-picker] .method-post { background: #2563eb; }
+        [data-ee-picker] .method-put { background: #d97706; }
+        [data-ee-picker] .method-patch { background: #7c3aed; }
+        [data-ee-picker] .method-delete { background: #dc2626; }
+        [data-ee-picker] .method-head,
+        [data-ee-picker] .method-options,
+        [data-ee-picker] .method-trace { background: #475569; }
+
         [data-ee-picker] .endpoint-path {
           min-width: 0;
           overflow: hidden;
-          color: var(--color-text-default);
           font-family: ${mono};
           font-size: 0.86rem;
           font-weight: 600;
@@ -303,7 +645,6 @@ export const EndpointPicker = props => {
 
         [data-ee-picker] .summary {
           margin: 0;
-          color: var(--color-text-default);
           font-size: 0.93rem;
           line-height: 1.65;
           opacity: 0.72;
@@ -315,32 +656,52 @@ export const EndpointPicker = props => {
           gap: 10px;
         }
 
-        [data-ee-picker] .button-link {
+        [data-ee-picker] .button-link,
+        [data-ee-picker] .button-secondary,
+        [data-ee-picker] .button-ghost,
+        [data-ee-picker] .icon-button {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-height: 40px;
-          padding: 0 15px;
-          border: 1px solid var(--color-primary, var(--color-text-default));
-          border-radius: 8px;
-          background: var(--color-primary, var(--color-text-default));
-          color: var(--color-primary-inverse, var(--color-bg-default));
+          border-radius: 9px;
+          cursor: pointer;
           font-size: 0.84rem;
           font-weight: 750;
           line-height: 1;
           text-decoration: none;
-          transition:
-            transform 150ms ease,
-            opacity 150ms ease,
-            box-shadow 150ms ease;
+          transition: transform 150ms ease, opacity 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+        }
+
+        [data-ee-picker] .button-link {
+          min-height: 40px;
+          padding: 0 15px;
+          border: 1px solid var(--color-primary, var(--color-text-default));
+          background: var(--color-primary, var(--color-text-default));
+          color: var(--color-primary-inverse, var(--color-bg-default));
         }
 
         [data-ee-picker] .button-link:hover {
           color: var(--color-primary-inverse, var(--color-bg-default));
           text-decoration: none;
-          opacity: 0.9;
+          opacity: 0.92;
           transform: translateY(-1px);
-          box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+        }
+
+        [data-ee-picker] .button-secondary,
+        [data-ee-picker] .button-ghost {
+          min-height: 40px;
+          padding: 0 15px;
+          border: 1px solid var(--color-border-default);
+          background: var(--color-bg-default);
+          color: var(--color-text-default);
+        }
+
+        [data-ee-picker] .button-secondary:hover,
+        [data-ee-picker] .button-ghost:hover,
+        [data-ee-picker] .icon-button:hover {
+          background: var(--color-bg-subtle, var(--color-bg-default));
+          transform: translateY(-1px);
         }
 
         [data-ee-picker] .snippet-section {
@@ -351,7 +712,6 @@ export const EndpointPicker = props => {
         }
 
         [data-ee-picker] .snippet-label {
-          color: var(--color-text-default);
           font-size: 0.77rem;
           font-weight: 700;
           line-height: 1.4;
@@ -365,11 +725,459 @@ export const EndpointPicker = props => {
           border: 1px solid var(--color-border-default);
           border-radius: 8px;
           background: var(--color-bg-subtle, var(--color-bg-default));
-          color: var(--color-text-default);
           font-family: ${mono};
           font-size: 0.8rem;
           line-height: 1.6;
+          white-space: pre;
+        }
+
+        [data-ee-picker] .full-spec-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 2147483000;
+          display: grid;
+          place-items: center;
+          padding: 28px;
+          background: rgba(15, 23, 42, 0.62);
+          backdrop-filter: blur(3px);
+        }
+
+        [data-ee-picker] .full-spec-modal {
+          display: grid;
+          grid-template-rows: auto minmax(0, 1fr) auto;
+          width: min(1220px, 96vw);
+          height: min(900px, 92vh);
+          overflow: hidden;
+          border: 1px solid var(--color-border-default);
+          border-radius: 18px;
+          background: var(--color-bg-default);
+          box-shadow: var(--ee-shadow);
+        }
+
+        [data-ee-picker] .full-spec-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          min-width: 0;
+          padding: 20px 24px;
+          border-bottom: 1px solid var(--color-border-default);
+        }
+
+        [data-ee-picker] .full-spec-title-wrap {
+          min-width: 0;
+        }
+
+        [data-ee-picker] .full-spec-title {
+          margin: 0;
+          overflow: hidden;
+          font-size: 1.18rem;
+          font-weight: 780;
+          line-height: 1.3;
+          letter-spacing: -0.02em;
+          text-overflow: ellipsis;
           white-space: nowrap;
+        }
+
+        [data-ee-picker] .full-spec-version {
+          margin-top: 5px;
+          font-size: 0.78rem;
+          opacity: 0.58;
+        }
+
+        [data-ee-picker] .full-spec-top-actions {
+          display: flex;
+          align-items: center;
+          flex: 0 0 auto;
+          gap: 9px;
+        }
+
+        [data-ee-picker] .full-spec-top-actions .button-ghost {
+          min-height: 36px;
+          padding: 0 12px;
+          font-size: 0.78rem;
+        }
+
+        [data-ee-picker] .icon-button {
+          width: 40px;
+          height: 40px;
+          padding: 0;
+          border: 1px solid var(--color-border-default);
+          background: var(--color-bg-default);
+          font-size: 1.35rem;
+          font-weight: 400;
+        }
+
+        [data-ee-picker] .full-spec-layout {
+          display: grid;
+          grid-template-columns: 340px minmax(0, 1fr);
+          min-height: 0;
+        }
+
+        [data-ee-picker] .full-spec-sidebar {
+          display: grid;
+          grid-template-rows: auto auto minmax(0, 1fr);
+          min-width: 0;
+          min-height: 0;
+          border-right: 1px solid var(--color-border-default);
+          background: var(--color-bg-subtle, var(--color-bg-default));
+        }
+
+        [data-ee-picker] .full-spec-sidebar-controls {
+          display: grid;
+          gap: 10px;
+          padding: 16px;
+          border-bottom: 1px solid var(--color-border-default);
+        }
+
+        [data-ee-picker] .full-spec-sidebar-controls input,
+        [data-ee-picker] .full-spec-sidebar-controls select {
+          height: 40px;
+          background: var(--color-bg-default);
+          font-size: 0.82rem;
+        }
+
+        [data-ee-picker] .sidebar-count {
+          padding: 10px 16px;
+          border-bottom: 1px solid var(--color-border-default);
+          font-size: 0.73rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          opacity: 0.58;
+        }
+
+        [data-ee-picker] .endpoint-list {
+          min-height: 0;
+          overflow: auto;
+          padding: 8px;
+        }
+
+        [data-ee-picker] .endpoint-group {
+          margin-bottom: 12px;
+        }
+
+        [data-ee-picker] .endpoint-group-title {
+          padding: 9px 9px 6px;
+          font-size: 0.76rem;
+          font-weight: 800;
+          letter-spacing: 0.02em;
+        }
+
+        [data-ee-picker] .endpoint-list-item {
+          display: grid;
+          grid-template-columns: 66px minmax(0, 1fr);
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          margin: 0 0 3px;
+          padding: 8px;
+          border: 1px solid transparent;
+          border-radius: 8px;
+          background: transparent;
+          color: var(--color-text-default);
+          cursor: pointer;
+          text-align: left;
+        }
+
+        [data-ee-picker] .endpoint-list-item:hover {
+          background: var(--color-bg-default);
+          border-color: var(--color-border-default);
+        }
+
+        [data-ee-picker] .endpoint-list-item.is-active {
+          background: var(--color-bg-default);
+          border-color: var(--color-primary, var(--color-border-default));
+          box-shadow: 0 2px 10px rgba(15, 23, 42, 0.07);
+        }
+
+        [data-ee-picker] .endpoint-list-item .method-badge {
+          min-width: 0;
+          width: 66px;
+          height: 25px;
+          font-size: 0.66rem;
+        }
+
+        [data-ee-picker] .endpoint-list-copy {
+          min-width: 0;
+        }
+
+        [data-ee-picker] .endpoint-list-path {
+          overflow: hidden;
+          font-family: ${mono};
+          font-size: 0.76rem;
+          font-weight: 600;
+          line-height: 1.35;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        [data-ee-picker] .endpoint-list-summary {
+          margin-top: 3px;
+          overflow: hidden;
+          font-size: 0.7rem;
+          line-height: 1.3;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          opacity: 0.58;
+        }
+
+        [data-ee-picker] .full-spec-content {
+          min-width: 0;
+          min-height: 0;
+          overflow: auto;
+          padding: 30px 34px 44px;
+        }
+
+        [data-ee-picker] .spec-heading {
+          margin: 0;
+          font-size: 1.8rem;
+          font-weight: 800;
+          line-height: 1.2;
+          letter-spacing: -0.035em;
+        }
+
+        [data-ee-picker] .spec-description {
+          max-width: 840px;
+          margin: 10px 0 0;
+          font-size: 0.92rem;
+          line-height: 1.65;
+          opacity: 0.68;
+        }
+
+        [data-ee-picker] .spec-stats {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+          margin-top: 22px;
+        }
+
+        [data-ee-picker] .spec-stat {
+          padding: 15px;
+          border: 1px solid var(--color-border-default);
+          border-radius: 11px;
+          background: var(--color-bg-subtle, var(--color-bg-default));
+        }
+
+        [data-ee-picker] .spec-stat-label {
+          font-size: 0.67rem;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          opacity: 0.52;
+        }
+
+        [data-ee-picker] .spec-stat-value {
+          margin-top: 7px;
+          font-size: 1.15rem;
+          font-weight: 800;
+        }
+
+        [data-ee-picker] .endpoint-detail {
+          margin-top: 28px;
+        }
+
+        [data-ee-picker] .endpoint-detail-top {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 20px;
+          padding-top: 22px;
+          border-top: 1px solid var(--color-border-default);
+        }
+
+        [data-ee-picker] .endpoint-detail-title {
+          display: flex;
+          align-items: center;
+          min-width: 0;
+          gap: 12px;
+        }
+
+        [data-ee-picker] .endpoint-detail-path {
+          min-width: 0;
+          overflow-wrap: anywhere;
+          font-family: ${mono};
+          font-size: 1rem;
+          font-weight: 750;
+        }
+
+        [data-ee-picker] .endpoint-detail-actions {
+          display: flex;
+          flex: 0 0 auto;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 8px;
+        }
+
+        [data-ee-picker] .endpoint-detail-actions .button-ghost {
+          min-height: 34px;
+          padding: 0 11px;
+          font-size: 0.74rem;
+        }
+
+        [data-ee-picker] .endpoint-summary {
+          margin: 18px 0 0;
+          font-size: 1rem;
+          font-weight: 700;
+          line-height: 1.45;
+        }
+
+        [data-ee-picker] .endpoint-description {
+          margin: 10px 0 0;
+          font-size: 0.89rem;
+          line-height: 1.7;
+          opacity: 0.72;
+          white-space: pre-wrap;
+        }
+
+        [data-ee-picker] .metadata-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 7px;
+          margin-top: 16px;
+        }
+
+        [data-ee-picker] .metadata-pill {
+          padding: 6px 9px;
+          border: 1px solid var(--color-border-default);
+          border-radius: 999px;
+          background: var(--color-bg-subtle, var(--color-bg-default));
+          font-size: 0.72rem;
+          line-height: 1;
+          opacity: 0.75;
+        }
+
+        [data-ee-picker] .detail-section {
+          margin-top: 26px;
+        }
+
+        [data-ee-picker] .detail-section-title {
+          margin: 0 0 10px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid var(--color-border-default);
+          font-size: 0.78rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        [data-ee-picker] .detail-table {
+          width: 100%;
+          border-collapse: collapse;
+          table-layout: fixed;
+        }
+
+        [data-ee-picker] .detail-table th,
+        [data-ee-picker] .detail-table td {
+          padding: 12px 10px;
+          border-bottom: 1px solid var(--color-border-default);
+          text-align: left;
+          vertical-align: top;
+          overflow-wrap: anywhere;
+        }
+
+        [data-ee-picker] .detail-table th {
+          font-size: 0.73rem;
+          font-weight: 750;
+          opacity: 0.68;
+        }
+
+        [data-ee-picker] .detail-table td {
+          font-size: 0.78rem;
+          line-height: 1.55;
+        }
+
+        [data-ee-picker] .parameter-name {
+          font-family: ${mono};
+          font-weight: 700;
+        }
+
+        [data-ee-picker] .parameter-meta {
+          margin-top: 4px;
+          font-size: 0.68rem;
+          opacity: 0.58;
+        }
+
+        [data-ee-picker] .request-grid,
+        [data-ee-picker] .response-list {
+          display: grid;
+          gap: 10px;
+        }
+
+        [data-ee-picker] .request-card,
+        [data-ee-picker] .response-card {
+          overflow: hidden;
+          border: 1px solid var(--color-border-default);
+          border-radius: 10px;
+        }
+
+        [data-ee-picker] .request-card-header,
+        [data-ee-picker] .response-card-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          padding: 11px 13px;
+          border-bottom: 1px solid var(--color-border-default);
+          background: var(--color-bg-subtle, var(--color-bg-default));
+          font-size: 0.75rem;
+          font-weight: 750;
+        }
+
+        [data-ee-picker] .request-card-body,
+        [data-ee-picker] .response-card-body {
+          padding: 13px;
+          font-size: 0.78rem;
+          line-height: 1.55;
+        }
+
+        [data-ee-picker] .response-status {
+          font-family: ${mono};
+          font-weight: 800;
+        }
+
+        [data-ee-picker] .empty-detail {
+          padding: 18px;
+          border: 1px dashed var(--color-border-default);
+          border-radius: 9px;
+          font-size: 0.8rem;
+          opacity: 0.62;
+        }
+
+        [data-ee-picker] .full-spec-footer {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 10px;
+          padding: 14px 20px;
+          border-top: 1px solid var(--color-border-default);
+          background: var(--color-bg-default);
+        }
+
+        [data-ee-picker] .full-spec-footer .button-link,
+        [data-ee-picker] .full-spec-footer .button-secondary {
+          min-height: 38px;
+        }
+
+        @media (max-width: 900px) {
+          [data-ee-picker] .full-spec-overlay {
+            padding: 0;
+          }
+
+          [data-ee-picker] .full-spec-modal {
+            width: 100vw;
+            height: 100vh;
+            border: 0;
+            border-radius: 0;
+          }
+
+          [data-ee-picker] .full-spec-layout {
+            grid-template-columns: 290px minmax(0, 1fr);
+          }
+
+          [data-ee-picker] .full-spec-content {
+            padding: 24px;
+          }
         }
 
         @media (max-width: 720px) {
@@ -396,18 +1204,69 @@ export const EndpointPicker = props => {
             grid-column: auto;
           }
 
-          [data-ee-picker] .result-header {
-            align-items: flex-start;
-          }
-
           [data-ee-picker] .endpoint-path {
             overflow-wrap: anywhere;
             text-overflow: initial;
             white-space: normal;
           }
 
-          [data-ee-picker] .button-link {
+          [data-ee-picker] .button-row .button-link,
+          [data-ee-picker] .button-row .button-secondary {
             width: 100%;
+          }
+
+          [data-ee-picker] .full-spec-topbar {
+            padding: 14px;
+          }
+
+          [data-ee-picker] .full-spec-top-actions .button-ghost {
+            display: none;
+          }
+
+          [data-ee-picker] .full-spec-layout {
+            display: block;
+            overflow: auto;
+          }
+
+          [data-ee-picker] .full-spec-sidebar {
+            display: block;
+            border-right: 0;
+            border-bottom: 1px solid var(--color-border-default);
+          }
+
+          [data-ee-picker] .endpoint-list {
+            max-height: 280px;
+          }
+
+          [data-ee-picker] .full-spec-content {
+            overflow: visible;
+            padding: 22px 16px 34px;
+          }
+
+          [data-ee-picker] .spec-heading {
+            font-size: 1.42rem;
+          }
+
+          [data-ee-picker] .spec-stats {
+            grid-template-columns: 1fr;
+          }
+
+          [data-ee-picker] .endpoint-detail-top {
+            display: grid;
+          }
+
+          [data-ee-picker] .endpoint-detail-actions {
+            justify-content: flex-start;
+          }
+
+          [data-ee-picker] .detail-table {
+            display: block;
+            overflow-x: auto;
+          }
+
+          [data-ee-picker] .detail-table th,
+          [data-ee-picker] .detail-table td {
+            min-width: 150px;
           }
         }
       `}</style>
@@ -416,7 +1275,7 @@ export const EndpointPicker = props => {
         <div>
           <h3 className="picker-title">Endpoint Picker</h3>
           <p className="picker-description">
-            Select an OpenAPI file, find an endpoint, and generate a direct link to its API reference page.
+            Select an OpenAPI file, find an endpoint, generate a direct reference link, or browse the complete specification.
           </p>
         </div>
 
@@ -430,11 +1289,16 @@ export const EndpointPicker = props => {
       <div className="controls">
         <div className="field">
           <label>OpenAPI file</label>
+
           {loadingIndex ? (
             <div className="status">Loading OpenAPI files…</div>
           ) : specs.length ? (
-            <select value={specUrl} onChange={e => setSpecUrl(e.target.value)}>
-              {specs.map(s => <option key={s.href} value={base + s.href}>{s.name}</option>)}
+            <select value={specUrl} onChange={event => setSpecUrl(event.target.value)}>
+              {specs.map(spec => (
+                <option key={spec.href} value={base + spec.href}>
+                  {spec.name}
+                </option>
+              ))}
             </select>
           ) : (
             <div className="status">No specs found</div>
@@ -445,7 +1309,7 @@ export const EndpointPicker = props => {
           <label>Find endpoint</label>
           <input
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={event => setSearch(event.target.value)}
             placeholder="Filter by path, method, or summary"
           />
         </div>
@@ -458,17 +1322,21 @@ export const EndpointPicker = props => {
           <>
             <div className="field">
               <label>Endpoint</label>
-              <select value={selectedPath} onChange={e => setSelectedPath(e.target.value)}>
-                {[...new Set(filtered.map(f => f.path))].map(p => <option key={p}>{p}</option>)}
+              <select value={selectedPath} onChange={event => setSelectedPath(event.target.value)}>
+                {[...new Set(filtered.map(endpoint => endpoint.path))].map(path => (
+                  <option key={path}>{path}</option>
+                ))}
               </select>
             </div>
 
             <div className="field">
               <label>Method</label>
-              <select value={selectedMethod} onChange={e => setSelectedMethod(e.target.value)}>
-                {filtered.filter(f => f.path === selectedPath).map(f => (
-                  <option key={f.path + f.method}>{f.method}</option>
-                ))}
+              <select value={selectedMethod} onChange={event => setSelectedMethod(event.target.value)}>
+                {filtered
+                  .filter(endpoint => endpoint.path === selectedPath)
+                  .map(endpoint => (
+                    <option key={endpoint.path + endpoint.method}>{endpoint.method}</option>
+                  ))}
               </select>
             </div>
           </>
@@ -482,7 +1350,9 @@ export const EndpointPicker = props => {
       {!loadingSpec && filtered.length ? (
         <div className="result-panel">
           <div className="result-header">
-            <span className="method-badge">{selectedMethod}</span>
+            <span className={`method-badge ${methodClass(selectedMethod)}`}>
+              {selectedMethod}
+            </span>
             <span className="endpoint-path">{selectedPath}</span>
           </div>
 
@@ -500,6 +1370,17 @@ export const EndpointPicker = props => {
               >
                 Open reference
               </a>
+
+              <button
+                className="button-secondary"
+                type="button"
+                onClick={() => {
+                  setFullSpecSelection(current || endpoints[0]);
+                  setShowFullSpec(true);
+                }}
+              >
+                View full spec
+              </button>
             </div>
 
             <div className="snippet-section">
@@ -507,6 +1388,361 @@ export const EndpointPicker = props => {
               <div className="code">
                 [{current?.summary || `${selectedMethod} ${selectedPath}`}]({referenceUrl})
               </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {showFullSpec ? (
+        <div
+          className="full-spec-overlay"
+          role="presentation"
+          onMouseDown={event => {
+            if (event.target === event.currentTarget) setShowFullSpec(false);
+          }}
+        >
+          <div
+            className="full-spec-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${specTitle} full specification`}
+          >
+            <div className="full-spec-topbar">
+              <div className="full-spec-title-wrap">
+                <h2 className="full-spec-title">{specTitle}</h2>
+                <div className="full-spec-version">
+                  {specVersion ? `Version ${specVersion} · ` : ""}
+                  {specs.find(spec => base + spec.href === specUrl)?.name || specUrl}
+                </div>
+              </div>
+
+              <div className="full-spec-top-actions">
+                <button
+                  className="button-ghost"
+                  type="button"
+                  onClick={() => copyText(specUrl, "spec-url")}
+                >
+                  {copied === "spec-url" ? "Copied!" : "Copy spec URL"}
+                </button>
+
+                <button
+                  className="icon-button"
+                  type="button"
+                  aria-label="Close full specification"
+                  onClick={() => setShowFullSpec(false)}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div className="full-spec-layout">
+              <aside className="full-spec-sidebar">
+                <div className="full-spec-sidebar-controls">
+                  <input
+                    value={fullSpecSearch}
+                    onChange={event => setFullSpecSearch(event.target.value)}
+                    placeholder="Search all endpoints"
+                    aria-label="Search all endpoints"
+                  />
+
+                  <select
+                    value={fullSpecTag}
+                    onChange={event => setFullSpecTag(event.target.value)}
+                    aria-label="Filter endpoints by tag"
+                  >
+                    {tags.map(tag => (
+                      <option key={tag} value={tag}>{tag}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="sidebar-count">
+                  {fullSpecFiltered.length} endpoint{fullSpecFiltered.length === 1 ? "" : "s"}
+                </div>
+
+                <div className="endpoint-list">
+                  {fullSpecFiltered.length ? (
+                    Object.entries(groupedFullSpecEndpoints).map(([groupName, groupEndpoints]) => (
+                      <div className="endpoint-group" key={groupName}>
+                        <div className="endpoint-group-title">{groupName}</div>
+
+                        {groupEndpoints.map(endpoint => {
+                          const isActive =
+                            selectedFullSpecEndpoint?.path === endpoint.path &&
+                            selectedFullSpecEndpoint?.method === endpoint.method;
+
+                          return (
+                            <button
+                              className={`endpoint-list-item${isActive ? " is-active" : ""}`}
+                              key={`${endpoint.method}:${endpoint.path}`}
+                              type="button"
+                              onClick={() => setFullSpecSelection(endpoint)}
+                            >
+                              <span className={`method-badge ${methodClass(endpoint.method)}`}>
+                                {endpoint.method}
+                              </span>
+
+                              <span className="endpoint-list-copy">
+                                <span className="endpoint-list-path">{endpoint.path}</span>
+                                <span className="endpoint-list-summary">
+                                  {endpoint.summary || "No summary"}
+                                </span>
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="empty-detail">No endpoints match your filters.</div>
+                  )}
+                </div>
+              </aside>
+
+              <main className="full-spec-content">
+                <h2 className="spec-heading">{specTitle}</h2>
+
+                {specData?.info?.description ? (
+                  <div className="spec-description">{specData.info.description}</div>
+                ) : null}
+
+                <div className="spec-stats">
+                  <div className="spec-stat">
+                    <div className="spec-stat-label">Endpoints</div>
+                    <div className="spec-stat-value">{endpoints.length}</div>
+                  </div>
+
+                  <div className="spec-stat">
+                    <div className="spec-stat-label">Paths</div>
+                    <div className="spec-stat-value">{pathCount}</div>
+                  </div>
+
+                  <div className="spec-stat">
+                    <div className="spec-stat-label">Tags</div>
+                    <div className="spec-stat-value">{tagCount}</div>
+                  </div>
+                </div>
+
+                {selectedFullSpecEndpoint ? (
+                  <div className="endpoint-detail">
+                    <div className="endpoint-detail-top">
+                      <div className="endpoint-detail-title">
+                        <span className={`method-badge ${methodClass(selectedFullSpecEndpoint.method)}`}>
+                          {selectedFullSpecEndpoint.method}
+                        </span>
+                        <span className="endpoint-detail-path">
+                          {selectedFullSpecEndpoint.path}
+                        </span>
+                      </div>
+
+                      <div className="endpoint-detail-actions">
+                        <button
+                          className="button-ghost"
+                          type="button"
+                          onClick={() => copyText(selectedFullSpecEndpoint.path, "path")}
+                        >
+                          {copied === "path" ? "Copied!" : "Copy path"}
+                        </button>
+
+                        <button
+                          className="button-ghost"
+                          type="button"
+                          onClick={() => copyText(
+                            `${selectedFullSpecEndpoint.method} ${selectedFullSpecEndpoint.path}`,
+                            "endpoint"
+                          )}
+                        >
+                          {copied === "endpoint" ? "Copied!" : "Copy endpoint"}
+                        </button>
+
+                        <a
+                          className="button-ghost"
+                          href={selectedReferenceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open reference
+                        </a>
+                      </div>
+                    </div>
+
+                    {selectedFullSpecEndpoint.summary ? (
+                      <div className="endpoint-summary">
+                        {selectedFullSpecEndpoint.summary}
+                      </div>
+                    ) : null}
+
+                    {selectedFullSpecEndpoint.description ? (
+                      <div className="endpoint-description">
+                        {selectedFullSpecEndpoint.description}
+                      </div>
+                    ) : null}
+
+                    <div className="metadata-row">
+                      {selectedFullSpecEndpoint.operationId ? (
+                        <span className="metadata-pill">
+                          Operation ID: {selectedFullSpecEndpoint.operationId}
+                        </span>
+                      ) : null}
+
+                      <span className="metadata-pill">
+                        {selectedParameters.length} parameter{selectedParameters.length === 1 ? "" : "s"}
+                      </span>
+
+                      <span className="metadata-pill">
+                        {responseEntries.length} response{responseEntries.length === 1 ? "" : "s"}
+                      </span>
+
+                      {selectedFullSpecEndpoint.tags.map(tag => (
+                        <span className="metadata-pill" key={tag}>{tag}</span>
+                      ))}
+                    </div>
+
+                    <section className="detail-section">
+                      <h3 className="detail-section-title">Parameters</h3>
+
+                      {selectedParameters.length ? (
+                        <table className="detail-table">
+                          <thead>
+                            <tr>
+                              <th style={{ width: "24%" }}>Name</th>
+                              <th style={{ width: "18%" }}>Type</th>
+                              <th>Description</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {selectedParameters.map(parameter => (
+                              <tr key={`${parameter.in}:${parameter.name}`}>
+                                <td>
+                                  <div className="parameter-name">{parameter.name}</div>
+                                  <div className="parameter-meta">
+                                    {parameter.in}
+                                    {parameter.required ? " · required" : ""}
+                                  </div>
+                                </td>
+                                <td>{schemaLabel(parameter.schema, specData)}</td>
+                                <td>{parameter.description || "No description provided."}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <div className="empty-detail">This endpoint has no parameters.</div>
+                      )}
+                    </section>
+
+                    <section className="detail-section">
+                      <h3 className="detail-section-title">Request body</h3>
+
+                      {requestBody?.content ? (
+                        <div className="request-grid">
+                          {Object.entries(requestBody.content).map(([contentType, media]) => {
+                            const example =
+                              media.example !== undefined
+                                ? media.example
+                                : getSchemaExample(media.schema, specData);
+
+                            return (
+                              <div className="request-card" key={contentType}>
+                                <div className="request-card-header">
+                                  <span>{contentType}</span>
+                                  <span>
+                                    {schemaLabel(media.schema, specData)}
+                                    {requestBody.required ? " · required" : ""}
+                                  </span>
+                                </div>
+
+                                <div className="request-card-body">
+                                  {example !== undefined ? (
+                                    <div className="code">{stringifyExample(example)}</div>
+                                  ) : (
+                                    requestBody.description || "No request example provided."
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="empty-detail">This endpoint has no request body.</div>
+                      )}
+                    </section>
+
+                    <section className="detail-section">
+                      <h3 className="detail-section-title">Responses</h3>
+
+                      {responseEntries.length ? (
+                        <div className="response-list">
+                          {responseEntries.map(({ status, response }) => {
+                            const responseContent = Object.entries(response.content || {});
+
+                            return (
+                              <div className="response-card" key={status}>
+                                <div className="response-card-header">
+                                  <span className="response-status">{status}</span>
+                                  <span>{response.description || "Response"}</span>
+                                </div>
+
+                                <div className="response-card-body">
+                                  {responseContent.length ? (
+                                    responseContent.map(([contentType, media]) => {
+                                      const example =
+                                        media.example !== undefined
+                                          ? media.example
+                                          : getSchemaExample(media.schema, specData);
+
+                                      return (
+                                        <div key={contentType} style={{ marginBottom: 12 }}>
+                                          <div style={{ fontWeight: 700, marginBottom: 7 }}>
+                                            {contentType} · {schemaLabel(media.schema, specData)}
+                                          </div>
+
+                                          {example !== undefined ? (
+                                            <div className="code">{stringifyExample(example)}</div>
+                                          ) : (
+                                            <div>No response example provided.</div>
+                                          )}
+                                        </div>
+                                      );
+                                    })
+                                  ) : (
+                                    <div>No response body documented.</div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="empty-detail">No responses are documented for this endpoint.</div>
+                      )}
+                    </section>
+                  </div>
+                ) : (
+                  <div className="empty-detail" style={{ marginTop: 28 }}>
+                    Select an endpoint from the sidebar to view its details.
+                  </div>
+                )}
+              </main>
+            </div>
+
+            <div className="full-spec-footer">
+              <button
+                className="button-secondary"
+                type="button"
+                onClick={() => copyText(specUrl, "footer-spec-url")}
+              >
+                {copied === "footer-spec-url" ? "Copied!" : "Copy spec URL"}
+              </button>
+
+              <button
+                className="button-link"
+                type="button"
+                onClick={() => setShowFullSpec(false)}
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
