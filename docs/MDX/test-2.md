@@ -10,6 +10,6 @@ metadata:
   Blah blah blah
 </Accordion>
 
-<Accordion title="Another Accordian" icon="fa-info-circle">
+<Accordion title="Another Accordion" icon="fa-info-circle">
   Blah blah blah
 </Accordion>
