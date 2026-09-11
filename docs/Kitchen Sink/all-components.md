@@ -6,12 +6,14 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-<Accordion title="" icon="fa-info-circle">
-
+<Accordion title="test title" icon="fa-info-circle">
+  blah blah blah
 </Accordion>
 
 <Callout icon="📘" theme="info">
+  ### Optional Title
 
+  blah blah blah
 </Callout>
 
 <Cards>
@@ -29,6 +31,7 @@ metadata:
 </Cards>
 
 ```text
+teateasteawtasdf
 ```
 
 <Columns layout="fixed">
@@ -42,7 +45,7 @@ metadata:
 </Columns>
 
 <HTMLBlock>{`
-
+asdfasdfasdfads
 `}</HTMLBlock>
 
 ***
