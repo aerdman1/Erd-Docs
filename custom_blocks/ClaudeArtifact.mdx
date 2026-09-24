@@ -1,25 +1,75 @@
 ---
 name: ClaudeArtifact
 ---
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-export const ClaudeArtifact = ({ url, height = 800 }) => {
+export const ClaudeArtifact = ({ url }) => {
+  const [html, setHtml] = useState("");
+  const [status, setStatus] = useState("Loading…");
+
+  useEffect(() => {
+    if (!url) return;
+
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const res = await fetch(url, {
+          method: "GET",
+          credentials: "omit",
+          headers: {
+            Accept: "text/html"
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const text = await res.text();
+
+        if (!cancelled) {
+          setHtml(text);
+          setStatus("");
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setStatus(`FAILED: ${err.message}`);
+        }
+      }
+    }
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
   if (!url) return null;
+
+  if (!html) {
+    return (
+      <pre style={{ whiteSpace: "pre-wrap" }}>
+        {status}
+      </pre>
+    );
+  }
 
   return (
     <iframe
-      src={url}
       title="Claude Artifact"
+      srcDoc={html}
       style={{
-        display: "block",
         width: "100%",
-        height: `${height}px`,
-        border: 0,
-        borderRadius: "12px"
+        minHeight: "800px",
+        border: 0
       }}
-      allow="clipboard-write"
     />
   );
 };
 
-<ClaudeArtifact url="https://b694d80a-355f-440d-b337-af7eaa270eac.frame.claudeusercontent.com/_f/1787850018-e41e/" />
+<ClaudeArtifact
+  url="https://b694d80a-355f-440d-b337-af7eaa270eac.frame.claudeusercontent.com/_f/1787850018-e41e/_src/index.html?__frame_t=oDW8_7XbekqvnT27SvlimiwI.10ce2adc-4b55-4fea-b2c1-6a098995d14b.bbb5a31a-ea62-4cb1-8fef-24c4036601d7.1790287765"
+  height={1000}
+/>
