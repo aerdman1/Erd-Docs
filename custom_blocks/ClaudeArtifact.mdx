@@ -1,203 +1,27 @@
 ---
 name: ClaudeArtifact
 ---
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-export const ClaudeArtifact = ({ url }) => {
-  const [content, setContent] = useState("");
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!url) return;
-
-    let cancelled = false;
-
-    async function loadArtifact() {
-      setContent("");
-      setError("");
-
-      try {
-        const parsed = new URL(url);
-        const artifactId = parsed.pathname.split("/artifact/")[1]?.split("/")[0];
-        const shareKey = parsed.searchParams.get("sk");
-
-        if (!artifactId) {
-          throw new Error("Invalid Claude artifact URL");
-        }
-
-        const candidates = [
-          `https://claude.ai/api/artifact/${artifactId}${shareKey ? `?sk=${encodeURIComponent(shareKey)}` : ""}`,
-          `https://claude.ai/api/artifacts/${artifactId}${shareKey ? `?sk=${encodeURIComponent(shareKey)}` : ""}`,
-          url
-        ];
-
-        let response = null;
-        let body = "";
-
-        for (const candidate of candidates) {
-          try {
-            const res = await fetch(candidate, {
-              method: "GET",
-              credentials: "include",
-              headers: {
-                Accept: "application/json,text/html,text/plain,*/*"
-              }
-            });
-
-            if (!res.ok) continue;
-
-            const text = await res.text();
-
-            if (text) {
-              response = res;
-              body = text;
-              break;
-            }
-          } catch {
-            // Try next candidate.
-          }
-        }
-
-        if (!response || !body) {
-          throw new Error(
-            "Claude blocked the browser request. Open DevTools → Console for details."
-          );
-        }
-
-        let result = "";
-
-        /*
-         * JSON response
-         */
-        try {
-          const data = JSON.parse(body);
-
-          result =
-            data.content ||
-            data.artifact?.content ||
-            data.artifact_content ||
-            data.artifactContent ||
-            data.current_version?.content ||
-            data.version?.content ||
-            data.file?.content ||
-            data.files?.find?.(file => file.path === "index.html")?.content ||
-            "";
-        } catch {
-          // Not JSON.
-        }
-
-        /*
-         * Serialized content embedded in HTML.
-         */
-        if (!result) {
-          const patterns = [
-            /"artifactContent"\s*:\s*"((?:\\.|[^"\\])*)"/,
-            /"artifact_content"\s*:\s*"((?:\\.|[^"\\])*)"/,
-            /"content"\s*:\s*"((?:\\.|[^"\\])*)"/
-          ];
-
-          for (const pattern of patterns) {
-            const match = body.match(pattern);
-
-            if (!match?.[1]) continue;
-
-            try {
-              result = JSON.parse(`"${match[1]}"`);
-            } catch {
-              result = match[1]
-                .replace(/\\n/g, "\n")
-                .replace(/\\"/g, '"')
-                .replace(/\\\\/g, "\\");
-            }
-
-            if (result) break;
-          }
-        }
-
-        /*
-         * If Claude actually returned an HTML artifact,
-         * use the response itself.
-         */
-        if (
-          !result &&
-          /^\s*(<!doctype html|<html)/i.test(body)
-        ) {
-          result = body;
-        }
-
-        if (!result) {
-          throw new Error("Claude responded, but artifact content wasn't found.");
-        }
-
-        if (!cancelled) setContent(result);
-      } catch (err) {
-        if (!cancelled) {
-          setError(err?.message || "Unable to load Claude artifact.");
-        }
-      }
-    }
-
-    loadArtifact();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [url]);
-
+export const ClaudeArtifact = ({ url, height = 800 }) => {
   if (!url) return null;
 
-  if (error) {
-    return (
-      <div
-        style={{
-          padding: "16px",
-          border: "1px solid var(--color-border-default)",
-          borderRadius: "8px"
-        }}
-      >
-        {error}
-      </div>
-    );
-  }
-
-  if (!content) {
-    return <div>Loading artifact…</div>;
-  }
-
-  /*
-   * Claude artifact is HTML: sandbox it so its styles don't
-   * destroy the surrounding ReadMe page.
-   */
-  if (/^\s*(<!doctype html|<html)/i.test(content)) {
-    return (
-      <iframe
-        title="Claude Artifact"
-        srcDoc={content}
-        sandbox="allow-scripts allow-forms allow-popups"
-        style={{
-          display: "block",
-          width: "100%",
-          minHeight: "700px",
-          border: 0
-        }}
-      />
-    );
-  }
-
-  /*
-   * Markdown/text artifact.
-   */
   return (
-    <div
-      className="claude-artifact"
+    <iframe
+      src={url}
+      title="Claude Artifact"
       style={{
-        whiteSpace: "pre-wrap",
-        lineHeight: 1.65
+        display: "block",
+        width: "100%",
+        height: `${height}px`,
+        border: 0,
+        borderRadius: "12px"
       }}
-    >
-      {content}
-    </div>
+      allow="clipboard-write"
+    />
   );
 };
 
-<ClaudeArtifact url="https://claude.ai/artifact/PYfWwrCd8FUjmmPfJPCgXm?sk=mq7btu1n_EehmyCg9FTskA" />
+<ClaudeArtifact
+  url="https://b694d80a-355f-440d-b337-af7eaa270eac.frame.claudeusercontent.com/_f/1787850018-e41e/"
+/>
