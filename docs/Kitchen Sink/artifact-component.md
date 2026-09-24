@@ -6,4 +6,6 @@ icon: fad fa-file-lines
 metadata:
   robots: index
 ---
-<ClaudeArtifact url="https://claude.ai/artifact/PYfWwrCd8FUjmmPfJPCgXm?sk=mq7btu1n_EehmyCg9FTskA" />
+<ClaudeArtifact
+  url="https://b694d80a-355f-440d-b337-af7eaa270eac.frame.claudeusercontent.com/_f/1787850018-e41e/"
+/>
