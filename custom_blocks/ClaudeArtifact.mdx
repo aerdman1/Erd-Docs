@@ -5,40 +5,102 @@ import React, { useEffect, useState } from "react";
 
 export const ClaudeArtifact = ({ url }) => {
   const [content, setContent] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!url) return;
 
     let cancelled = false;
 
-    async function load() {
-      try {
-        const response = await fetch(url, {
-          credentials: "include",
-          headers: {
-            Accept: "text/html,application/xhtml+xml",
-          },
-        });
+    async function loadArtifact() {
+      setContent("");
+      setError("");
 
-        if (!response.ok) {
-          throw new Error(`Request failed (${response.status})`);
+      try {
+        const parsed = new URL(url);
+        const artifactId = parsed.pathname.split("/artifact/")[1]?.split("/")[0];
+        const shareKey = parsed.searchParams.get("sk");
+
+        if (!artifactId) {
+          throw new Error("Invalid Claude artifact URL");
         }
 
-        const html = await response.text();
-
-        const patterns = [
-          /"artifactContent"\s*:\s*"((?:\\.|[^"\\])*)"/,
-          /"artifact_content"\s*:\s*"((?:\\.|[^"\\])*)"/,
-          /"content"\s*:\s*"((?:\\.|[^"\\])*)"/,
+        const candidates = [
+          `https://claude.ai/api/artifact/${artifactId}${shareKey ? `?sk=${encodeURIComponent(shareKey)}` : ""}`,
+          `https://claude.ai/api/artifacts/${artifactId}${shareKey ? `?sk=${encodeURIComponent(shareKey)}` : ""}`,
+          url
         ];
+
+        let response = null;
+        let body = "";
+
+        for (const candidate of candidates) {
+          try {
+            const res = await fetch(candidate, {
+              method: "GET",
+              credentials: "include",
+              headers: {
+                Accept: "application/json,text/html,text/plain,*/*"
+              }
+            });
+
+            if (!res.ok) continue;
+
+            const text = await res.text();
+
+            if (text) {
+              response = res;
+              body = text;
+              break;
+            }
+          } catch {
+            // Try next candidate.
+          }
+        }
+
+        if (!response || !body) {
+          throw new Error(
+            "Claude blocked the browser request. Open DevTools → Console for details."
+          );
+        }
 
         let result = "";
 
-        for (const pattern of patterns) {
-          const match = html.match(pattern);
+        /*
+         * JSON response
+         */
+        try {
+          const data = JSON.parse(body);
 
-          if (match?.[1]) {
+          result =
+            data.content ||
+            data.artifact?.content ||
+            data.artifact_content ||
+            data.artifactContent ||
+            data.current_version?.content ||
+            data.version?.content ||
+            data.file?.content ||
+            data.files?.find?.(file => file.path === "index.html")?.content ||
+            "";
+        } catch {
+          // Not JSON.
+        }
+
+        /*
+         * Serialized content embedded in HTML.
+         */
+        if (!result) {
+          const patterns = [
+            /"artifactContent"\s*:\s*"((?:\\.|[^"\\])*)"/,
+            /"artifact_content"\s*:\s*"((?:\\.|[^"\\])*)"/,
+            /"content"\s*:\s*"((?:\\.|[^"\\])*)"/
+          ];
+
+          for (const pattern of patterns) {
+            const match = body.match(pattern);
+
+            if (!match?.[1]) continue;
+
             try {
               result = JSON.parse(`"${match[1]}"`);
             } catch {
@@ -52,17 +114,30 @@ export const ClaudeArtifact = ({ url }) => {
           }
         }
 
+        /*
+         * If Claude actually returned an HTML artifact,
+         * use the response itself.
+         */
+        if (
+          !result &&
+          /^\s*(<!doctype html|<html)/i.test(body)
+        ) {
+          result = body;
+        }
+
         if (!result) {
-          throw new Error("Artifact content was not found in Claude's response.");
+          throw new Error("Claude responded, but artifact content wasn't found.");
         }
 
         if (!cancelled) setContent(result);
       } catch (err) {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) {
+          setError(err?.message || "Unable to load Claude artifact.");
+        }
       }
     }
 
-    load();
+    loadArtifact();
 
     return () => {
       cancelled = true;
@@ -73,22 +148,51 @@ export const ClaudeArtifact = ({ url }) => {
 
   if (error) {
     return (
-      <div style={{ padding: "16px" }}>
-        Unable to load this Claude artifact: {error}
+      <div
+        style={{
+          padding: "16px",
+          border: "1px solid var(--color-border-default)",
+          borderRadius: "8px"
+        }}
+      >
+        {error}
       </div>
     );
   }
 
   if (!content) {
-    return <div style={{ padding: "16px" }}>Loading…</div>;
+    return <div>Loading artifact…</div>;
   }
 
+  /*
+   * Claude artifact is HTML: sandbox it so its styles don't
+   * destroy the surrounding ReadMe page.
+   */
+  if (/^\s*(<!doctype html|<html)/i.test(content)) {
+    return (
+      <iframe
+        title="Claude Artifact"
+        srcDoc={content}
+        sandbox="allow-scripts allow-forms allow-popups"
+        style={{
+          display: "block",
+          width: "100%",
+          minHeight: "700px",
+          border: 0
+        }}
+      />
+    );
+  }
+
+  /*
+   * Markdown/text artifact.
+   */
   return (
     <div
       className="claude-artifact"
       style={{
         whiteSpace: "pre-wrap",
-        lineHeight: 1.65,
+        lineHeight: 1.65
       }}
     >
       {content}
