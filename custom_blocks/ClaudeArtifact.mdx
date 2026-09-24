@@ -1,39 +1,97 @@
 ---
 name: ClaudeArtifact
 ---
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-export const ClaudeArtifact = ({ url, height = 700 }) => {
-  if (!url) {
+export const ClaudeArtifact = ({ url }) => {
+  const [content, setContent] = useState("");
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!url) return;
+
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const response = await fetch(url, {
+          credentials: "include",
+          headers: {
+            Accept: "text/html,application/xhtml+xml",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Request failed (${response.status})`);
+        }
+
+        const html = await response.text();
+
+        const patterns = [
+          /"artifactContent"\s*:\s*"((?:\\.|[^"\\])*)"/,
+          /"artifact_content"\s*:\s*"((?:\\.|[^"\\])*)"/,
+          /"content"\s*:\s*"((?:\\.|[^"\\])*)"/,
+        ];
+
+        let result = "";
+
+        for (const pattern of patterns) {
+          const match = html.match(pattern);
+
+          if (match?.[1]) {
+            try {
+              result = JSON.parse(`"${match[1]}"`);
+            } catch {
+              result = match[1]
+                .replace(/\\n/g, "\n")
+                .replace(/\\"/g, '"')
+                .replace(/\\\\/g, "\\");
+            }
+
+            if (result) break;
+          }
+        }
+
+        if (!result) {
+          throw new Error("Artifact content was not found in Claude's response.");
+        }
+
+        if (!cancelled) setContent(result);
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      }
+    }
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  if (!url) return null;
+
+  if (error) {
     return (
-      <div style={{ padding: "16px", border: "1px solid #ddd", borderRadius: "8px" }}>
-        Add a Claude Artifact URL using the <code>url</code> prop.
+      <div style={{ padding: "16px" }}>
+        Unable to load this Claude artifact: {error}
       </div>
     );
   }
 
+  if (!content) {
+    return <div style={{ padding: "16px" }}>Loading…</div>;
+  }
+
   return (
     <div
+      className="claude-artifact"
       style={{
-        width: "100%",
-        overflow: "hidden",
-        border: "1px solid var(--color-border-default)",
-        borderRadius: "12px",
-        background: "var(--color-bg-default)",
+        whiteSpace: "pre-wrap",
+        lineHeight: 1.65,
       }}
     >
-      <iframe
-        src={url}
-        title="Claude Artifact"
-        style={{
-          display: "block",
-          width: "100%",
-          height: `${height}px`,
-          border: 0,
-        }}
-        loading="lazy"
-        allow="clipboard-write"
-      />
+      {content}
     </div>
   );
 };
