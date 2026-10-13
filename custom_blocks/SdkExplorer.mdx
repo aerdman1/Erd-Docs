@@ -3,84 +3,71 @@ name: SdkExplorer
 ---
 import { useEffect, useMemo, useRef, useState } from "react";
 
-export const SDKX_CSS=`.sdkx{--sx-bg:var(--color-bg-page,#fff);--sx-panel:#f8fafc;--sx-panel2:#f1f5f9;--sx-bd:var(--color-border-default,#e2e8f0);--sx-bd2:#cbd5e1;--sx-text:var(--color-text-default,#0f172a);--sx-muted:var(--color-text-minimum,#64748b);--sx-link:var(--color-link-primary,#2563eb);--sx-accent:#4f46e5;--sx-accent-bg:#eef2ff;--sx-acc\
-ent-bd:#c7d2fe;--sx-ok:#047857;--sx-ok-bg:#ecfdf5;--sx-err:#b91c1c;--sx-err-bg:#fef2f2;--sx-err-bd:#fecaca;--sx-tk:#7c3aed;--sx-ts:#047857;--sx-code-bg:#0d1117;--sx-code-fg:#e6edf3;--sx-code-bd:#1f2630;--sx-gut:#6e7681;--sx-k:#ff7b72;--sx-s:#a5d6ff;--sx-n:#79c0ff;--sx-c:#8b949e;--sx-r:#7ee787;--sx-f:#d2a8ff;--sx-hit:rgba(250,204,21,.14);--sx-cur:rgba(250,204,21,.32);--sx-shadow:0 1px 2px rgba(15,2\
-3,42,.04),0 1px 3px rgba(15,23,42,.06);--sx-mono:var(--font-family-mono,ui-monospace),SFMono-Regular,Menlo,Consolas,monospace;font-family:var(--font-family-body,ui-sans-serif),system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.55;color:var(--sx-text);margin:12px 0 28px;-webkit-font-smoothing:antialiased}.sdkx[data-theme=dark]{--sx-bg:var(--color-bg-pa\
-ge,#0b0d12);--sx-panel:#11151c;--sx-panel2:#181d27;--sx-bd:var(--color-border-default,#262c38);--sx-bd2:#363d4b;--sx-text:var(--color-text-default,#e6e8ec);--sx-muted:var(--color-text-minimum,#9aa3b2);--sx-link:var(--color-link-primary,#8ab4ff);--sx-accent:#818cf8;--sx-accent-bg:#1e1b4b;--sx-accent-bd:#3730a3;--sx-ok:#6ee7b7;--sx-ok-bg:#052e22;--sx-err:#fca5a5;--sx-err-bg:#3a1414;--sx-err-bd:#7f1d\
-1d;--sx-tk:#c4b5fd;--sx-ts:#6ee7b7;--sx-code-bg:#080a0e;--sx-code-bd:#1b2029;--sx-shadow:0 1px 2px rgba(0,0,0,.5)}.sdkx *,.sdkx *:before,.sdkx *:after{box-sizing:border-box}.sdkx a{color:var(--sx-link);text-decoration:none}.sdkx a:hover{text-decoration:underline}.sdkx button{font:inherit}.sdkx code,.sdkx pre{font-family:var(--sx-mono)}.sdkx-hero{display:flex;gap:16px;align-items:flex-start;padding\
-:20px 22px;border:1px solid var(--sx-bd);border-radius:14px;background:linear-gradient(180deg,var(--sx-panel),var(--sx-bg));box-shadow:var(--sx-shadow)}.sdkx-logo{flex:none;width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font:700 15px/1 var(--sx-mono);color:#fff;background:linear-gradient(135deg,#4f46e5,#06b6d4)}.sdkx-logo.is-js{background:linear-gradient(135deg,#ca8a04,#\
-f59e0b)}.sdkx-head{flex:1;min-width:0}.sdkx-titlerow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.sdkx .sdkx-title{margin:0;padding:0;border:0;font-size:21px;line-height:1.25;font-weight:700;letter-spacing:-.01em;color:var(--sx-text);word-break:break-word}.sdkx-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;border:1\
-px solid var(--sx-bd);background:var(--sx-bg);color:var(--sx-muted);white-space:nowrap}.sdkx-pill--ver{font-family:var(--sx-mono);color:var(--sx-text)}.sdkx-pill--ok{color:var(--sx-ok);background:var(--sx-ok-bg);border-color:transparent}.sdkx-desc{margin:6px 0 0;color:var(--sx-muted)}.sdkx-meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:13px;color:var(--sx-muted)}.sdkx-meta\
- b{color:var(--sx-text);font-weight:600}.sdkx-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;align-items:center}.sdkx-btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--sx-bd2);background:var(--sx-bg);color:var(--sx-text);cursor:pointer;font-size:13px;font-weight:600;white-space:nowrap;text-decoration:none!important}.\
-sdkx-btn:hover{background:var(--sx-panel2)}.sdkx-btn--pri{background:var(--sx-accent);border-color:var(--sx-accent);color:#fff!important}.sdkx-btn--pri:hover{background:var(--sx-accent);filter:brightness(1.08)}.sdkx-btn--sm{height:26px;padding:0 9px;font-size:12px;border-radius:6px}.sdkx-btn:disabled{opacity:.5;cursor:default}.sdkx-select{height:32px;max-width:100%;padding:0 8px;border-radius:8px;\
-border:1px solid var(--sx-bd2);background:var(--sx-bg);color:var(--sx-text);font:600 13px var(--sx-mono);cursor:pointer}.sdkx-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}.sdkx-stat{min-width:0;padding:12px 14px;border:1px solid var(--sx-bd);border-radius:10px;background:var(--sx-bg)}.sdkx-stat-l{font-size:11px;font-weight:700;letter-spacing:.0\
-6em;text-transform:uppercase;color:var(--sx-muted)}.sdkx-stat-v{margin-top:3px;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sdkx-stat-s{font-size:12px;color:var(--sx-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sdkx-card{margin-top:14px;border:1px solid var(--sx-bd);border-radius:14px;background:var(--sx-bg);box-shadow:var(--sx-shad\
-ow);overflow:hidden}.sdkx-cardhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--sx-bd);background:var(--sx-panel)}.sdkx-cardtitle{font-weight:700;font-size:14px}.sdkx-chips{display:flex;flex-wrap:wrap;gap:6px}.sdkx-chip{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--sx-bd);background:var\
-(--sx-bg);color:var(--sx-muted);cursor:pointer;font-size:12.5px;font-weight:600}.sdkx-chip:hover{color:var(--sx-text)}.sdkx-chip.is-on{color:var(--sx-accent);background:var(--sx-accent-bg);border-color:var(--sx-accent-bd)}.sdkx-tabs{display:flex;gap:2px;overflow-x:auto;padding:0 10px;border-bottom:1px solid var(--sx-bd);background:var(--sx-panel);scrollbar-width:none}.sdkx-tab{position:relative;fl\
-ex:none;padding:12px;border:0;background:none;color:var(--sx-muted);cursor:pointer;font-size:13px;font-weight:600}.sdkx-tab:hover,.sdkx-tab.is-on{color:var(--sx-text)}.sdkx-tab.is-on:after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;background:var(--sx-accent)}.sdkx-tab small{margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--sx-pane\
-l2);font-size:11px;color:var(--sx-muted)}.sdkx-body{padding:18px 20px}.sdkx-code{position:relative;border-radius:10px;background:var(--sx-code-bg);border:1px solid var(--sx-code-bd);color:var(--sx-code-fg)}.sdkx .sdkx-code pre{margin:0;padding:14px 16px;overflow:auto;font-size:12.5px;line-height:1.6;background:none;color:inherit;border:0;border-radius:0;white-space:pre}.sdkx .sdkx-code code{backgr\
-ound:none;border:0;padding:0;color:inherit;font-size:inherit;white-space:inherit}.sdkx-copy{position:absolute;top:8px;right:8px;height:24px;padding:0 8px;border-radius:6px;border:1px solid rgba(255,255,255,.16);background:#161b22e6;color:#e6edf3;font-size:11.5px;font-weight:600;cursor:pointer;opacity:0;transition:opacity .15s}.sdkx-code:hover .sdkx-copy,.sdkx-copy:focus{opacity:1}@media(hover:none\
-){.sdkx-copy{opacity:1}}.sdkx-k{color:var(--sx-k)}.sdkx-s{color:var(--sx-s)}.sdkx-n{color:var(--sx-n)}.sdkx-c{color:var(--sx-c);font-style:italic}.sdkx-r{color:var(--sx-r)}.sdkx-f{color:var(--sx-f)}.sdkx-note{margin:10px 0 0;font-size:12.5px;color:var(--sx-muted)}.sdkx-md{font-size:14.5px;line-height:1.65;overflow-wrap:anywhere}.sdkx-md>:first-child{margin-top:0}.sdkx .sdkx-md h1,.sdkx .sdkx-md h2\
-,.sdkx .sdkx-md h3,.sdkx .sdkx-md h4,.sdkx .sdkx-md h5,.sdkx .sdkx-md h6{margin:1.5em 0 .5em;padding:0;border:0;line-height:1.3;font-weight:700;color:var(--sx-text)}.sdkx .sdkx-md h1{font-size:1.5em;padding-bottom:.3em;border-bottom:1px solid var(--sx-bd)}.sdkx .sdkx-md h2{font-size:1.25em;padding-bottom:.25em;border-bottom:1px solid var(--sx-bd)}.sdkx .sdkx-md h3{font-size:1.08em}.sdkx .sdkx-md h\
-4,.sdkx .sdkx-md h5,.sdkx .sdkx-md h6{font-size:1em}.sdkx .sdkx-md p{margin:.7em 0}.sdkx .sdkx-md ul,.sdkx .sdkx-md ol{margin:.6em 0;padding-left:1.5em}.sdkx .sdkx-md li{margin:.3em 0}.sdkx .sdkx-md li>ul,.sdkx .sdkx-md li>ol{margin:.25em 0}.sdkx .sdkx-md blockquote{margin:.8em 0;padding:.4em 1em;border:0;border-left:3px solid var(--sx-accent-bd);border-radius:0 8px 8px 0;background:var(--sx-panel\
-);color:var(--sx-muted)}.sdkx .sdkx-md blockquote p{margin:.3em 0}.sdkx .sdkx-md :not(pre)>code,.sdkx .sdkx-ic{padding:.12em .4em;border-radius:5px;background:var(--sx-panel2);border:1px solid var(--sx-bd);font-size:.88em;color:var(--sx-text)}.sdkx .sdkx-md .sdkx-code{margin:.9em 0}.sdkx .sdkx-md table{display:block;overflow-x:auto;border-collapse:collapse;margin:.9em 0;font-size:13.5px}.sdkx .sdk\
-x-md th,.sdkx .sdkx-md td{padding:7px 12px;border:1px solid var(--sx-bd);text-align:left}.sdkx .sdkx-md th{background:var(--sx-panel)}.sdkx .sdkx-md img{max-width:100%;vertical-align:middle}.sdkx .sdkx-md hr{border:0;border-top:1px solid var(--sx-bd);margin:1.5em 0}.sdkx-index{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}.sdkx-index-g{width:100%;margin-top:4px;font-size:11px;font-weight:\
-700;letter-spacing:.06em;text-transform:uppercase;color:var(--sx-muted)}.sdkx-ichip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border:1px solid var(--sx-bd);border-radius:7px;background:var(--sx-bg);color:var(--sx-text)!important;cursor:pointer;font:600 12.5px var(--sx-mono);text-decoration:none!important}.sdkx-ichip:hover{border-color:var(--sx-accent-bd);background:\
-var(--sx-accent-bg)}.sdkx-dot{width:7px;height:7px;border-radius:2px;background:var(--sx-muted)}.sdkx-dot.k-function{background:#8b5cf6}.sdkx-dot.k-type{background:#06b6d4}.sdkx-dot.k-interface{background:#10b981}.sdkx-dot.k-class{background:#f59e0b}.sdkx-dot.k-const,.sdkx-dot.k-enum{background:#ec4899}.sdkx-sec{margin:22px 0 10px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:\
-uppercase;color:var(--sx-muted)}.sdkx-decl{margin:0 0 14px;border:1px solid var(--sx-bd);border-radius:10px;overflow:hidden;scroll-margin-top:90px;transition:box-shadow .3s}.sdkx-decl.is-flash{box-shadow:0 0 0 3px var(--sx-accent-bd)}.sdkx-declhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--sx-bd);background:var(--sx-panel)}.sdkx-declname\
-{font:700 14.5px var(--sx-mono)}.sdkx-kind{padding:1px 7px;border-radius:5px;font:700 10.5px/1.6 var(--sx-mono);text-transform:uppercase;letter-spacing:.04em}.sdkx-kind--function{color:#7c3aed;background:#f5f3ff}.sdkx-kind--type{color:#0e7490;background:#ecfeff}.sdkx-kind--interface{color:#047857;background:#ecfdf5}.sdkx-kind--class{color:#b45309;background:#fffbeb}.sdkx-kind--const,.sdkx-kind--en\
-um{color:#be185d;background:#fdf2f8}.sdkx[data-theme=dark] .sdkx-kind{background:var(--sx-panel2)}.sdkx[data-theme=dark] .sdkx-kind--function{color:#c4b5fd}.sdkx[data-theme=dark] .sdkx-kind--type{color:#67e8f9}.sdkx[data-theme=dark] .sdkx-kind--interface{color:#6ee7b7}.sdkx[data-theme=dark] .sdkx-kind--class{color:#fcd34d}.sdkx[data-theme=dark] .sdkx-kind--const,.sdkx[data-theme=dark] .sdkx-kind--\
-enum{color:#f9a8d4}.sdkx-declbody{padding:12px 14px}.sdkx-doc{margin:0 0 10px;color:var(--sx-muted)}.sdkx-sig{margin:0 0 10px;padding:10px 12px;border:1px solid var(--sx-bd);border-radius:8px;background:var(--sx-panel);font:12.5px/1.6 var(--sx-mono);overflow-x:auto;white-space:pre-wrap;word-break:break-word}.sdkx-tf{color:var(--sx-tk);font-weight:700}.sdkx-sub{margin:12px 0 6px;font-size:11px;font\
--weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sx-muted)}.sdkx-sub:first-child{margin-top:0}.sdkx-ovl+.sdkx-ovl{margin-top:18px}.sdkx-tblwrap{overflow-x:auto;border:1px solid var(--sx-bd);border-radius:8px}.sdkx .sdkx-tblwrap>table.sdkx-tbl{display:table!important;width:100%!important;margin:0;border-collapse:collapse;font-size:13px}.sdkx .sdkx-tbl tr{background:none!importa\
-nt}.sdkx .sdkx-tbl thead tr{background:var(--sx-panel)!important}.sdkx .sdkx-tbl th,.sdkx .sdkx-tbl td{padding:8px 10px;border:0;border-top:1px solid var(--sx-bd);background:none;text-align:left;vertical-align:top}.sdkx .sdkx-tbl th{border-top:0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--sx-muted)}.sdkx .sdkx-tbl td p{margin:0}.sdkx-pname{font:600 12.5\
-px var(--sx-mono);white-space:nowrap}.sdkx-opt,.sdkx-req{display:block;margin-top:2px;font:600 10px var(--sx-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--sx-muted)}.sdkx-req{color:var(--sx-err)}.sdkx-ty{font:12.5px/1.55 var(--sx-mono);color:var(--sx-text);word-break:normal;overflow-wrap:anywhere}.sdkx .sdkx-tbl td.sdkx-tcell{min-width:210px;max-width:340px}.sdkx-tk{color:var(--s\
-x-tk)}.sdkx-ts{color:var(--sx-ts)}.sdkx .sdkx-tref{font-weight:600;color:var(--sx-link);cursor:pointer;border-bottom:1px dashed currentColor;text-decoration:none}.sdkx-vals{display:flex;flex-wrap:wrap;gap:6px}.sdkx .sdkx-val{padding:2px 8px;border:1px solid var(--sx-bd);border-radius:6px;background:var(--sx-panel);font:12.5px var(--sx-mono);color:var(--sx-ts)}.sdkx .sdkx-oneof{margin:0;padding-lef\
-t:1.2em}.sdkx .sdkx-oneof li{margin:4px 0}.sdkx-incl{margin:0 0 10px;font-size:13px;color:var(--sx-muted)}.sdkx-def{margin-top:10px}.sdkx-def summary{cursor:pointer;font-size:12px;font-weight:600;color:var(--sx-muted)}.sdkx-def .sdkx-code{margin-top:8px}.sdkx-srcbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px}.sdkx-srcname{max-width:100%;padding:4px 8px;border-radius:\
-6px;background:var(--sx-panel2);font:600 12.5px var(--sx-mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sdkx-grow{flex:1}.sdkx-find{width:190px;max-width:100%;height:28px;padding:0 10px;border:1px solid var(--sx-bd2);border-radius:7px;background:var(--sx-bg);color:var(--sx-text);font:12.5px var(--sx-mono)}.sdkx-count{min-width:60px;font-size:12px;color:var(--sx-muted)}.sdkx-toggl\
-e{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--sx-muted);cursor:pointer;user-select:none}.sdkx-viewer{position:relative;max-height:560px;overflow:auto;padding:8px 0;border:1px solid var(--sx-code-bd);border-radius:10px;background:var(--sx-code-bg);color:var(--sx-code-fg);font:12.5px/1.6 var(--sx-mono)}.sdkx-ln{display:flex;min-width:max-content}.sdkx-\
-ln.is-hit{background:var(--sx-hit)}.sdkx-ln.is-cur{background:var(--sx-cur)}.sdkx-gut{position:sticky;left:0;flex:none;width:58px;padding-right:14px;text-align:right;color:var(--sx-gut);background:var(--sx-code-bg);user-select:none}.sdkx-lc{padding-right:16px;white-space:pre}.sdkx-wrap .sdkx-ln{min-width:0}.sdkx-wrap .sdkx-lc{white-space:pre-wrap;word-break:break-all}.sdkx-more{display:flex;justif\
-y-content:center;padding:10px}.sdkx-fsize{font:12px var(--sx-mono);color:var(--sx-muted);white-space:nowrap}.sdkx-fact{white-space:nowrap;text-align:right}.sdkx-err{padding:12px 14px;border:1px solid var(--sx-err-bd);border-radius:10px;background:var(--sx-err-bg);color:var(--sx-err);font-size:13.5px}.sdkx-err b{display:block;margin-bottom:2px}.sdkx-empty{padding:28px 16px;text-align:center;color:v\
-ar(--sx-muted)}.sdkx-skel{height:14px;margin:8px 0;border-radius:6px;background:linear-gradient(90deg,var(--sx-panel2),var(--sx-panel),var(--sx-panel2));background-size:200% 100%;animation:sdkx-sh 1.2s ease-in-out infinite}@keyframes sdkx-sh{0%{background-position:100% 0}to{background-position:-100% 0}}@media(prefers-reduced-motion:reduce){.sdkx-skel{animation:none}}@media(max-width:640px){.sdkx-h\
-ero{flex-direction:column;padding:16px}.sdkx-body{padding:14px}.sdkx-find{width:100%}.sdkx-logo{width:40px;height:40px}}`;
+export const SDKX_CSS=`.sdkx{--sx-text:var(--color-text-default,#32343a);--sx-muted:var(--color-text-minimum,#666b79);--sx-muted2:var(--color-text-muted,#484c58);--sx-bd:var(--color-border-default,rgba(0,0,0,.1));--sx-bg:var(--color-bg-page,#fff);--sx-link:var(--color-link-primary,#0045c5);--sx-code-bg:var(--md-code-background,#f2f3f4);--sx-code\
+-fg:var(--md-code-text,#32343a);--sx-hover:rgba(0,0,0,.04);--sx-req:#c8102e;--sx-ok:#12805c;--sx-mono:var(--font-family-mono,"SF Mono",SFMono-Regular,ui-monospace,Menlo,Consolas,monospace);--sx-k:#cf222e;--sx-s:#0a3069;--sx-n:#0550ae;--sx-c:#6e7781;--sx-r:#116329;--sx-f:#8250df;--sx-hit:rgba(234,179,8,.16);--sx-cur:rgba(234,179,8,.36);--sx-r4:var(--border-radius,4px);margin:6px 0 24px;color:var(--\
+sx-text);font-family:inherit;font-size:15px;line-height:1.5}.sdkx[data-theme=dark]{--sx-code-bg:var(--md-code-background,#1c1f24);--sx-code-fg:var(--md-code-text,#e6e8ec);--sx-hover:rgba(255,255,255,.06);--sx-req:#ff8a80;--sx-ok:#3fb950;--sx-k:#ff7b72;--sx-s:#a5d6ff;--sx-n:#79c0ff;--sx-c:#8b949e;--sx-r:#7ee787;--sx-f:#d2a8ff;--sx-hit:rgba(250,204,21,.12);--sx-cur:rgba(250,204,21,.28)}.sdkx *,.sdkx\
+ *:before,.sdkx *:after{box-sizing:border-box}.sdkx button,.sdkx input,.sdkx select{font-family:inherit}.sdkx-mono{font-family:var(--sx-mono);font-size:13px;font-weight:500}.sdkx-grow{flex:1}.sdkx-head{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 16px}.sdkx-id{min-width:0}.sdkx-name{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.sdkx .sdkx-titl\
+e{margin:0;padding:0;border:0;font-family:var(--sx-mono);font-size:17px;font-weight:600;line-height:1.35;color:var(--sx-text);word-break:break-word}.sdkx-ver{font-family:var(--sx-mono);font-size:12.5px;color:var(--sx-muted)}.sdkx-verwrap{position:relative;display:inline-flex}.sdkx-verwrap:after{content:"";position:absolute;right:9px;top:50%;width:5px;height:5px;border-right:1.5px solid var(--sx-mu\
+ted);border-bottom:1.5px solid var(--sx-muted);transform:translateY(-70%) rotate(45deg);pointer-events:none}.sdkx .sdkx-select{appearance:none;-webkit-appearance:none;height:24px;margin:0;padding:0 22px 0 9px;border:1px solid var(--sx-bd);border-radius:999px;background:transparent;color:var(--sx-text);font-family:var(--sx-mono);font-size:12.5px;cursor:pointer}.sdkx-tag{font-size:12.5px;color:var(-\
+-sx-muted)}.sdkx-tag--ok{color:var(--sx-ok);font-weight:600}.sdkx .sdkx-desc{margin:4px 0 0;color:var(--sx-muted2);font-size:14.5px}.sdkx-by{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:3px;font-size:13.5px;color:var(--sx-muted)}.sdkx-by a{color:var(--sx-link)}.sdkx-actions{display:flex;flex-wrap:wrap;gap:6px}.sdkx-btn{display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10p\
+x;border:1px solid var(--sx-bd);border-radius:var(--sx-r4);background:transparent;color:var(--sx-text)!important;font-size:13px;font-weight:500;line-height:1;cursor:pointer;white-space:nowrap;text-decoration:none!important}.sdkx-btn:hover{background:var(--sx-hover)}.sdkx-btn:disabled{opacity:.5;cursor:default}.sdkx-btn--sm{height:26px;padding:0 8px;font-size:12.5px}.sdkx-linkbtn{padding:0;border:0\
+;background:none;color:var(--sx-link);font-size:inherit;cursor:pointer}.sdkx-linkbtn:hover{text-decoration:underline}.sdkx-facts{display:flex;flex-wrap:wrap;gap:8px 28px;margin:14px 0 18px;padding:10px 0;border-top:1px solid var(--sx-bd);border-bottom:1px solid var(--sx-bd)}.sdkx-fact{display:flex;flex-direction:column;min-width:0}.sdkx-fact span{font-size:12px;color:var(--sx-muted)}.sdkx-fact b{f\
+ont-size:14px;font-weight:600;color:var(--sx-text)}.sdkx-fact b.sdkx-mono{font-size:13px}.sdkx-code{position:relative;margin:0 0 14px;border-radius:var(--sx-r4);background:var(--sx-code-bg);color:var(--sx-code-fg)}.sdkx-codebar{display:flex;align-items:center;gap:2px;min-height:36px;padding:0 6px 0 4px;border-bottom:1px solid var(--sx-bd)}.sdkx-ctab{position:relative;padding:9px 10px;border:0;back\
+ground:none;color:var(--sx-muted);font-size:13px;cursor:pointer}.sdkx-ctab:hover{color:var(--sx-text)}.sdkx-ctab.is-on{color:var(--sx-text);font-weight:600}.sdkx-ctab.is-on:after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;background:var(--sx-link)}.sdkx .sdkx-code pre{margin:0;padding:12px 14px;border:0;border-radius:0;background:none;color:inherit;font-family:var(--s\
+x-mono);font-size:13px;line-height:1.55;overflow:auto;white-space:pre}.sdkx .sdkx-code pre code{padding:0;border:0;background:none;color:inherit;font:inherit;white-space:inherit}.sdkx-copy{position:absolute;top:6px;right:6px;height:24px;padding:0 8px;border:1px solid var(--sx-bd);border-radius:var(--sx-r4);background:var(--sx-bg);color:var(--sx-muted);font-size:12px;cursor:pointer;opacity:0;transi\
+tion:opacity .15s}.sdkx-code:hover .sdkx-copy,.sdkx-copy:focus{opacity:1}.sdkx .sdkx-copy--bar{position:static;opacity:1;background:transparent;border-color:transparent}.sdkx .sdkx-copy--bar:hover{color:var(--sx-text);background:var(--sx-hover)}@media(hover:none){.sdkx-copy{opacity:1}}.sdkx-k{color:var(--sx-k)}.sdkx-s{color:var(--sx-s)}.sdkx-n{color:var(--sx-n)}.sdkx-c{color:var(--sx-c);font-style\
+:italic}.sdkx-r{color:var(--sx-r)}.sdkx-f{color:var(--sx-f)}.sdkx .sdkx-note{margin:-6px 0 0;font-size:13px;color:var(--sx-muted)}.sdkx-tabs{display:flex;gap:20px;margin:24px 0 18px;border-bottom:1px solid var(--sx-bd);overflow-x:auto;scrollbar-width:none}.sdkx-tab{position:relative;flex:none;padding:8px 0;border:0;background:none;color:var(--sx-muted);font-size:14.5px;font-weight:500;cursor:point\
+er;white-space:nowrap}.sdkx-tab:hover,.sdkx-tab.is-on{color:var(--sx-text)}.sdkx-tab.is-on:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px;background:var(--sx-link)}.sdkx-tab small{margin-left:5px;font-size:12px;font-weight:400;color:var(--sx-muted)}.sdkx-md>:first-child{margin-top:0!important}.sdkx-md img{max-width:100%}.sdkx-index{margin:0 0 6px;font-si\
+ze:13.5px;line-height:2}.sdkx-index b{margin-right:10px;font-weight:600}.sdkx-index a{margin-right:12px;font-family:var(--sx-mono);font-size:13px;color:var(--sx-link)}.sdkx .sdkx-label{margin:14px 0 6px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--sx-muted)}.sdkx-decl{padding:20px 0 8px;border-top:1px solid var(--sx-bd);scroll-margin-top:90px}.sdkx-dh{di\
+splay:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 6px;border-radius:4px;transition:background .5s}.sdkx-decl.is-flash .sdkx-dh{background:var(--sx-hit)}.sdkx .sdkx-dname{margin:0;padding:0;border:0;font-family:var(--sx-mono);font-size:16px;font-weight:600;line-height:1.4;color:var(--sx-text)}.sdkx-kind{font-size:12.5px;color:var(--sx-muted)}.sdkx-exp{padding:0 6px;border:1px s\
+olid currentColor;border-radius:999px;font-size:11px;font-weight:600;line-height:16px;color:var(--sx-ok)}.sdkx .sdkx-doc,.sdkx .sdkx-txt{margin:0 0 10px;color:var(--sx-muted2);font-size:14.5px}.sdkx-sig{margin:0 0 12px;padding:10px 14px;border-radius:var(--sx-r4);background:var(--sx-code-bg);color:var(--sx-code-fg);font-family:var(--sx-mono);font-size:13px;line-height:1.6;overflow-x:auto;white-spa\
+ce:pre-wrap;word-break:break-word}.sdkx-tf{color:var(--sx-f);font-weight:600}.sdkx-ovl+.sdkx-ovl{margin-top:16px}.sdkx-params{margin:0 0 12px;border:1px solid var(--sx-bd);border-radius:var(--sx-r4)}.sdkx-param{padding:10px 14px;border-top:1px solid var(--sx-bd)}.sdkx-param:first-child{border-top:0}.sdkx-pline{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}.sdkx-pname{font-family:var\
+(--sx-mono);font-size:13.5px;font-weight:600;color:var(--sx-text)}.sdkx-ty,.sdkx-ptype{font-family:var(--sx-mono);font-size:12.5px;color:var(--sx-muted);overflow-wrap:anywhere}.sdkx-preq{font-size:12px;font-weight:600;color:var(--sx-req)}.sdkx-popt{font-size:12px;color:var(--sx-muted)}.sdkx-pdesc{margin-top:3px;font-size:14px;line-height:1.5;color:var(--sx-muted2)}.sdkx-tk{color:var(--sx-f)}.sdkx-\
+ts{color:var(--sx-r)}.sdkx .sdkx-tref{color:var(--sx-link);font-weight:500;cursor:pointer;text-decoration:none}.sdkx .sdkx-tref:hover{text-decoration:underline}.sdkx-def{margin:2px 0 6px}.sdkx-def summary{font-size:13px;color:var(--sx-muted);cursor:pointer}.sdkx-def .sdkx-code{margin-top:8px}.sdkx-srcbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 8px;font-size:13px}.sdkx-src\
+name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--sx-mono);font-size:13px;color:var(--sx-muted)}.sdkx .sdkx-find{width:170px;max-width:100%;height:26px;margin:0;padding:0 8px;border:1px solid var(--sx-bd);border-radius:var(--sx-r4);background:transparent;color:var(--sx-text);font-size:13px}.sdkx-count{min-width:56px;font-size:12.5px;color:var(--sx-mute\
+d)}.sdkx-toggle{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--sx-muted);cursor:pointer;user-select:none}.sdkx-viewer{position:relative;max-height:520px;overflow:auto;padding:8px 0;border-radius:var(--sx-r4);background:var(--sx-code-bg);color:var(--sx-code-fg);font-family:var(--sx-mono);font-size:12.5px;line-height:1.6}.sdkx-ln{display:flex;min-width:max-content}.sdkx-ln\
+.is-hit{background:var(--sx-hit)}.sdkx-ln.is-cur{background:var(--sx-cur)}.sdkx-gut{position:sticky;left:0;flex:none;width:52px;padding-right:12px;text-align:right;color:var(--sx-muted);opacity:.75;background:var(--sx-code-bg);user-select:none}.sdkx-lc{padding-right:16px;white-space:pre}.sdkx-wrap .sdkx-ln{min-width:0}.sdkx-wrap .sdkx-lc{white-space:pre-wrap;word-break:break-all}.sdkx-more{display\
+:flex;justify-content:center;padding:8px}.sdkx-fsize{font-family:var(--sx-mono);font-size:12.5px;color:var(--sx-muted);white-space:nowrap}.sdkx-fnote{margin-left:8px;font-size:12px;color:var(--sx-muted)}.sdkx-err{margin:12px 0;padding:12px 14px;border-left:3px solid var(--sx-req);border-radius:var(--sx-r4);background:#c8102e0f;font-size:14px}.sdkx-err b{display:block;margin-bottom:2px}.sdkx-empty{\
+padding:24px 0;color:var(--sx-muted)}.sdkx-skel{height:12px;margin:8px 0;border-radius:4px;background:var(--sx-hover)}@media(max-width:640px){.sdkx-actions,.sdkx .sdkx-find{width:100%}}`;
 
-export const SDKX_KW=new Set("as async await break case catch class const continue debugger declare default delete do else enum export extends false finally for from function if implements import in infer instanceof interface keyof let namespace new null of readonly return stat\
-ic super switch this throw true try type typeof undefined unique var void while with yield abstract".split(" "));
+export const SDKX_KW=new Set("as async await break case catch class const continue debugger declare default delete do else enum export extends false finally for from function if implements import in infer instance\
+of interface keyof let namespace new null of readonly return static super switch this throw true try type typeof undefined unique var void while with yield abstract".split(" "));
 
 export const SDKX_RE_AFTER=new Set("return typeof case do else in of new delete void throw instanceof yield await".split(" "));
 
-export const SDKX_PUNCT=[">>>=","...","===","!==","**=","<<=",">>=",">>>","&&=","||=","??=","=>","==","!=","<=",">=","&&","||","??","?.","++","--","+=","-=","*=",
-"/=","%=","&=","|=","^=","**","<<",">>"];
+export const SDKX_PUNCT=[">>>=","...","===","!==","**=","<<=",">>=",">>>","&&=","||=","??=","=>",
+"==","!=","<=",">=","&&","||","??","?.","++","--","+=","-=","*=","/=","%=","&=","|=","^=","**","<<",">>"];
 
-export const sdkxTokenize=src=>{const out=[];const n=src.length;let i=0;let prev=null;const idStart=c=>/[A-Za-z_$ -￿]/.test(c);const idPart=c=>/[\w$ -￿]/.test(c);const regexOk=()=>{if(!prev)return true;if(prev.t==="kw")return SDKX_RE_AFTER.has(prev.v);if(prev.t==="p")return!/^(\)|\]|\}|\+\+|--)$/.test(prev.v);return false};const skipStr=(j,q)=>{j++;while(j<
-n){const c=src[j];if(c==="\\"){j+=2;continue}if(c===q||c==="\n")return c===q?j+1:j;j++}return n};const skipTpl=j=>{j++;while(j<n){const c=src[j];if(c==="\\"){j+=2;continue}if(c==="`")return j+1;if(c==="$"&&src[j+1]==="{"){j+=2;let d=1;while(j<n&&d>0){const e=src[j];if(e==="'"||e==='"'){j=skipStr(j,e);continue}if(e==="`"){j=skipTpl(j);continue}if(e==="{")d++;else if(e==="}")d--;j++}continue}j++}return n};
-const push=(t,v,s)=>{const tok={t,v,s};out.push(tok);if(t!=="ws"&&t!=="cm")prev=tok};while(i<n){const c=src[i];const s=i;if(c===" "||c==="	"||c==="\n"||c==="\r"||c==="\f"||c==="\v"||c==="\xA0"||c==="\uFEFF"){while(i<n&&/\s/.test(src[i]))i++;push("ws",src.slice(s,i),s);continue}if(c==="/"&&src[i+1]==="/"){while(i<n&&src[i]!=="\n")i++;push("cm",src.slice(s,i),s);continue}if(c==="/"&&src[i+1]==="*"){
-const e=src.indexOf("*/",i+2);i=e===-1?n:e+2;push("cm",src.slice(s,i),s);continue}if(c==="'"||c==='"'){i=skipStr(i,c);push("str",src.slice(s,i),s);continue}if(c==="`"){i=skipTpl(i);push("tpl",src.slice(s,i),s);continue}if(c==="/"&&regexOk()){let j=i+1;let cls=false;let ok=false;while(j<n){const e=src[j];if(e==="\n")break;if(e==="\\"){j+=2;continue}if(e==="[")cls=true;else if(e==="]")cls=false;else if(e===
-"/"&&!cls){ok=true;break}j++}if(ok){j++;while(j<n&&/[a-z]/i.test(src[j]))j++;i=j;push("re",src.slice(s,i),s);continue}}if(/[0-9]/.test(c)||c==="."&&/[0-9]/.test(src[i+1]||"")){const m=/^(?:0[xXbBoO][0-9a-fA-F_]+n?|(?:[0-9][0-9_]*\.?[0-9_]*|\.[0-9][0-9_]*)(?:[eE][+-]?[0-9]+)?n?)/.exec(src.slice(i,i+64));i+=m?m[0].length:1;push("num",src.slice(s,i),s);continue}if(idStart(c)){while(i<n&&idPart(src[i]))
-i++;const v=src.slice(s,i);const afterDot=prev&&prev.t==="p"&&(prev.v==="."||prev.v==="?.");push(SDKX_KW.has(v)&&!afterDot?"kw":"id",v,s);continue}let p=c;for(let k=0;k<SDKX_PUNCT.length;k++){const q=SDKX_PUNCT[k];if(src.startsWith(q,i)){p=q;break}}i+=p.length;push("p",p,s)}for(let k=0;k<out.length;k++){if(out[k].t!=="id")continue;let j=k+1;while(j<out.length&&out[j].t==="ws")j++;if(out[j]&&out[j].
-t==="p"&&out[j].v==="(")out[k].fn=true}return out};
+export const sdkxTokenize=src=>{const out=[];const n=src.length;let i=0;let prev=null;const idStart=c=>/[A-Za-z_$ -￿]/.test(c);const idPart=c=>/[\w$ -￿]/.test(c);const regexOk=()=>{if(!prev)return true;if(prev.t==="kw")return SDKX_RE_AFTER.has(prev.v);if(prev.t==="p")return!/^(\)|\]|\}|\+\+|--)$/.
+test(prev.v);return false};const skipStr=(j,q)=>{j++;while(j<n){const c=src[j];if(c==="\\"){j+=2;continue}if(c===q||c==="\n")return c===q?j+1:j;j++}return n};const skipTpl=j=>{j++;while(j<n){const c=src[j];if(c==="\\"){j+=2;continue}if(c==="`")return j+1;if(c==="$"&&src[j+1]==="{"){j+=2;let d=1;while(j<n&&d>0){const e=src[j];if(e==="'"||e==='"'){j=skipStr(j,e);continue}if(e==="`"){j=skipTpl(j);continue}
+if(e==="{")d++;else if(e==="}")d--;j++}continue}j++}return n};const push=(t,v,s)=>{const tok={t,v,s};out.push(tok);if(t!=="ws"&&t!=="cm")prev=tok};while(i<n){const c=src[i];const s=i;if(c===" "||c==="	"||c==="\n"||c==="\r"||c==="\f"||c==="\v"||c==="\xA0"||c==="\uFEFF"){while(i<n&&/\s/.test(src[i]))i++;push("ws",src.slice(s,i),s);continue}if(c==="/"&&src[i+1]==="/"){while(i<n&&src[i]!=="\n")i++;push(
+"cm",src.slice(s,i),s);continue}if(c==="/"&&src[i+1]==="*"){const e=src.indexOf("*/",i+2);i=e===-1?n:e+2;push("cm",src.slice(s,i),s);continue}if(c==="'"||c==='"'){i=skipStr(i,c);push("str",src.slice(s,i),s);continue}if(c==="`"){i=skipTpl(i);push("tpl",src.slice(s,i),s);continue}if(c==="/"&&regexOk()){let j=i+1;let cls=false;let ok=false;while(j<n){const e=src[j];if(e==="\n")break;if(e==="\\"){j+=2;
+continue}if(e==="[")cls=true;else if(e==="]")cls=false;else if(e==="/"&&!cls){ok=true;break}j++}if(ok){j++;while(j<n&&/[a-z]/i.test(src[j]))j++;i=j;push("re",src.slice(s,i),s);continue}}if(/[0-9]/.test(c)||c==="."&&/[0-9]/.test(src[i+1]||"")){const m=/^(?:0[xXbBoO][0-9a-fA-F_]+n?|(?:[0-9][0-9_]*\.?[0-9_]*|\.[0-9][0-9_]*)(?:[eE][+-]?[0-9]+)?n?)/.exec(src.slice(i,i+64));i+=m?m[0].length:1;push("num",
+src.slice(s,i),s);continue}if(idStart(c)){while(i<n&&idPart(src[i]))i++;const v=src.slice(s,i);const afterDot=prev&&prev.t==="p"&&(prev.v==="."||prev.v==="?.");push(SDKX_KW.has(v)&&!afterDot?"kw":"id",v,s);continue}let p=c;for(let k=0;k<SDKX_PUNCT.length;k++){const q=SDKX_PUNCT[k];if(src.startsWith(q,i)){p=q;break}}i+=p.length;push("p",p,s)}for(let k=0;k<out.length;k++){if(out[k].t!=="id")continue;
+let j=k+1;while(j<out.length&&out[j].t==="ws")j++;if(out[j]&&out[j].t==="p"&&out[j].v==="(")out[k].fn=true}return out};
 
 export const SDKX_TOK_CLASS={kw:"sdkx-k",str:"sdkx-s",tpl:"sdkx-s",num:"sdkx-n",cm:"sdkx-c",re:"sdkx-r"};
 
 export const sdkxTokSpan=(t,i)=>{const c=t.t==="id"&&t.fn?"sdkx-f":SDKX_TOK_CLASS[t.t];return c?<span key={i}className={c}>{t.v}</span>:t.v};
 
-export const sdkxLines=toks=>{const lines=[[]];for(let k=0;k<toks.length;k++){const t=toks[k];if(t.v.indexOf(
-"\n")===-1){lines[lines.length-1].push(t);continue}const parts=t.v.split("\n");for(let j=0;j<parts.length;j++){if(j>0)lines.push([]);const p=parts[j].replace(/\r$/,"");if(p)lines[lines.length-1].push({t:t.t,v:p,fn:t.fn})}}return lines};
+export const sdkxLines=toks=>{const lines=[
+[]];for(let k=0;k<toks.length;k++){const t=toks[k];if(t.v.indexOf("\n")===-1){lines[lines.length-1].push(t);continue}const parts=t.v.split("\n");for(let j=0;j<parts.length;j++){if(j>0)lines.push([]);const p=parts[j].replace(/\r$/,"");if(p)lines[lines.length-1].push({t:t.t,v:p,fn:t.fn})}}return lines};
 
-export const SDKX_SPACED=new Set(["=","==","===","!=","!==","=>","&&","||","??","?","+=","-=","*=","/=","%=","&=","|=","^=","**=","<<=",">>=",">>>=","&&=","||=","??\
-=","<",">","<=",">=","*","/","%","**","|","&","^","<<",">>",">>>"]);
+export const SDKX_SPACED=new Set(["=","==","===","!=","!==","=>","&&","||","??","?","+=","-=","*=",
+"/=","%=","&=","|=","^=","**=","<<=",">>=",">>>=","&&=","||=","??=","<",">","<=",">=","*","/","%","**","|","&","^","<<",">>",">>>"]);
 
-export const sdkxGap=(a,b,a2)=>{if(!a)return false;const av=a.v;const bv=b.v;const ap=a.t==="p";const bp=b.t==="p";const word=t=>t.t==="id"||t.t==="kw"||t.t==="num";const valueLike=t=>!!t&&(t.t==="id"||t.t==="num"||t.t==="str"||t.t==="tpl"||t.t==="re"||t.t==="kw"&&/^(this|null|true|false|undefined|super)$/.test(t.v)||t.t==="p"&&/^[)\]]$/.
-test(t.v));if(word(a)&&word(b))return true;if(a.t==="kw"&&!bp)return true;if(a.t==="kw"&&bp&&/^(\(|\{|\[|!|-|\+|~|\.\.\.)$/.test(bv))return!/^(function|super|this|import|null|true|false|undefined)$/.test(av);if(bp&&/^(,|;|\)|\]|\.|\?\.|:)$/.test(bv))return false;if(ap&&/^(,|;|:)$/.test(av))return true;if(ap&&/^(\(|\[|\.|\?\.|!|~|\.\.\.)$/.test(av))return false;if(ap&&av==="{")return bv!=="}";if(bp&&
-bv==="}")return true;if(bp&&bv==="{")return true;if(b.t==="kw"&&ap&&/^[)}\]]$/.test(av))return true;if(ap&&av===")"&&word(b))return true;if(bp&&(bv==="("||bv==="["))return ap&&SDKX_SPACED.has(av);if(ap&&(av==="++"||av==="--"))return word(b);if(bp&&(bv==="++"||bv==="--"))return false;if(ap&&(av==="+"||av==="-"))return valueLike(a2);if(bp&&(bv==="+"||bv==="-"))return valueLike(a);if(ap&&SDKX_SPACED.
-has(av))return true;if(bp&&SDKX_SPACED.has(bv))return true;if(word(a)&&(b.t==="str"||b.t==="tpl"))return a.t==="kw";if((a.t==="str"||a.t==="tpl"||a.t==="re")&&word(b))return true;return false};
+export const sdkxGap=(a,b,a2)=>{if(!a)return false;const av=a.v;const bv=b.v;const ap=a.t==="p";const bp=b.t==="p";const word=t=>t.t==="id"||t.t==="kw"||t.t==="num";const valueLike=t=>!!t&&(t.t==="id"||t.t==="num"||t.t==="str"||t.t==="tpl"||t.t==="re"||t.t==="kw"&&/^(this|null|true|false|undefined|super)$/.
+test(t.v)||t.t==="p"&&/^[)\]]$/.test(t.v));if(word(a)&&word(b))return true;if(a.t==="kw"&&!bp)return true;if(a.t==="kw"&&bp&&/^(\(|\{|\[|!|-|\+|~|\.\.\.)$/.test(bv))return!/^(function|super|this|import|null|true|false|undefined)$/.test(av);if(bp&&/^(,|;|\)|\]|\.|\?\.|:)$/.test(bv))return false;if(ap&&/^(,|;|:)$/.test(av))return true;if(ap&&/^(\(|\[|\.|\?\.|!|~|\.\.\.)$/.test(av))return false;if(ap&&
+av==="{")return bv!=="}";if(bp&&bv==="}")return true;if(bp&&bv==="{")return true;if(b.t==="kw"&&ap&&/^[)}\]]$/.test(av))return true;if(ap&&av===")"&&word(b))return true;if(bp&&(bv==="("||bv==="["))return ap&&SDKX_SPACED.has(av);if(ap&&(av==="++"||av==="--"))return word(b);if(bp&&(bv==="++"||bv==="--"))return false;if(ap&&(av==="+"||av==="-"))return valueLike(a2);if(bp&&(bv==="+"||bv==="-"))return valueLike(
+a);if(ap&&SDKX_SPACED.has(av))return true;if(bp&&SDKX_SPACED.has(bv))return true;if(word(a)&&(b.t==="str"||b.t==="tpl"))return a.t==="kw";if((a.t==="str"||a.t==="tpl"||a.t==="re")&&word(b))return true;return false};
 
-export const sdkxBeautify=toks=>{const sig=toks.filter(t=>t.t!=="ws");const lines=[];const stack=[];let cur=[];let curLen=0;let ind=0;let lineInd=0;let last=null;let last2=null;const nl=()=>{if(cur.length)lines.
-push(lineInd?[{t:"ws",v:"  ".repeat(Math.min(lineInd,30))}].concat(cur):cur);cur=[];curLen=0};const put=t=>{if(!cur.length)lineInd=ind;else if(sdkxGap(last,t,last2)){cur.push({t:"ws",v:" "});curLen++}cur.push(t);curLen+=t.v.length;last2=last;last=t};for(let k=0;k<sig.length;k++){const t=sig[k];const nx=sig[k+1];if(t.t==="cm"){if(t.v.indexOf("\n")!==-1){nl();t.v.split("\n").forEach(l=>{lineInd=ind;
-cur=[{t:"cm",v:l.trim()}];nl()});last=null}else{put(t);if(t.v.slice(0,2)==="//"){nl();last=null}}continue}if(t.t==="p"){if(t.v==="{"){if(nx&&nx.v==="}"){put(t);put(nx);k++;continue}put(t);stack.push("{");ind++;nl();continue}if(t.v==="}"){stack.pop();ind=Math.max(0,ind-1);nl();put(t);const keep=nx&&(nx.t==="p"&&/^(\)|\]|,|;|\.|\?\.|:|\?)$/.test(nx.v)||nx.t==="kw"&&/^(else|catch|finally|while)$/.test(
-nx.v));if(!keep)nl();continue}if(t.v==="("||t.v==="["){stack.push(t.v);put(t);continue}if(t.v===")"||t.v==="]"){stack.pop();put(t);continue}if(t.v===";"){put(t);if(stack[stack.length-1]!=="(")nl();continue}if(t.v===","){put(t);if(curLen>100)nl();continue}}put(t)}nl();return lines};
+export const sdkxBeautify=toks=>{const sig=toks.filter(t=>t.t!=="ws");const lines=[];const stack=[];let cur=[];let curLen=0;let ind=0;let lineInd=0;let last=null;let last2=null;const nl=()=>{
+if(cur.length)lines.push(lineInd?[{t:"ws",v:"  ".repeat(Math.min(lineInd,30))}].concat(cur):cur);cur=[];curLen=0};const put=t=>{if(!cur.length)lineInd=ind;else if(sdkxGap(last,t,last2)){cur.push({t:"ws",v:" "});curLen++}cur.push(t);curLen+=t.v.length;last2=last;last=t};for(let k=0;k<sig.length;k++){const t=sig[k];const nx=sig[k+1];if(t.t==="cm"){if(t.v.indexOf("\n")!==-1){nl();t.v.split("\n").forEach(
+l=>{lineInd=ind;cur=[{t:"cm",v:l.trim()}];nl()});last=null}else{put(t);if(t.v.slice(0,2)==="//"){nl();last=null}}continue}if(t.t==="p"){if(t.v==="{"){if(nx&&nx.v==="}"){put(t);put(nx);k++;continue}put(t);stack.push("{");ind++;nl();continue}if(t.v==="}"){stack.pop();ind=Math.max(0,ind-1);nl();put(t);const keep=nx&&(nx.t==="p"&&/^(\)|\]|,|;|\.|\?\.|:|\?)$/.test(nx.v)||nx.t==="kw"&&/^(else|catch|finally|while)$/.
+test(nx.v));if(!keep)nl();continue}if(t.v==="("||t.v==="["){stack.push(t.v);put(t);continue}if(t.v===")"||t.v==="]"){stack.pop();put(t);continue}if(t.v===";"){put(t);if(stack[stack.length-1]!=="(")nl();continue}if(t.v===","){put(t);if(curLen>100)nl();continue}}put(t)}nl();return lines};
 
-export const SDKX_TS_PRIM=new Set("string number boolean any unknown never object symbol bigint void undefined null tr\
-ue false".split(" "));
+export const SDKX_TS_PRIM=new Set("string number boolean any unknown never object symbol bigint void undefined nu\
+ll true false".split(" "));
 
 export const sdkxTidy=toks=>(toks||[]).filter((t,k,a)=>!(t.t==="p"&&(t.v===";"||t.v===",")&&a[k+1]&&a[k+1].v==="}"));
 
@@ -150,70 +137,71 @@ export const SdkxCopyBtn=({text,label,className})=>{const[done,setDone]=useState
       {done||label||"Copy"}
     </button>};
 
-export const SdkxCode=({code,lang})=>{const js=/^(js|jsx|ts|tsx|javascript|typescript|mjs|cjs|json|json5|html|vue)$/i.test(lang||"");const body=useMemo(()=>js&&code.length<2e5?sdkxTokenize(code).map(sdkxTokSpan):code,[code,js]);return<div className="sdkx-code">
+export const SdkxCode=({code,lang,bar})=>{const js=/^(js|jsx|ts|tsx|javascript|typescript|mjs|cjs|json|json5|html|vue)$/i.test(lang||"");const body=useMemo(()=>js&&code.length<2e5?sdkxTokenize(code).map(sdkxTokSpan):code,[code,js]);return<div className="sdkx-code">
+      {bar?<div className="sdkx-codebar">{bar}<span className="sdkx-grow"/><SdkxCopyBtn className="sdkx-copy sdkx-copy--bar"text={code}/></div>:null}
       <pre><code>{body}</code></pre>
-      <SdkxCopyBtn text={code}/>
+      {bar?null:<SdkxCopyBtn text={code}/>}
     </div>};
 
-export const sdkxMd=(src,base,inlineOnly)=>{let key=0;const k=()=>"m"+key++;const resolve=u=>{const s=String(u||"").trim().replace(/^<|>$/g,"");if(/^(https?:|mailto:)/i.test(s)||s[0]==="#")return s;if(/^[a-z][a-z0-9+.-]*:/i.test(s)||!base)return"";try{return new URL(s.replace(/^\.\//,""),base).href}catch(e){return""}};const link=(u,kids)=>{const href=resolve(u);if(!href)return<span key={k()}>{kids}</span>;
-return<a key={k()}href={href}target={href[0]==="#"?void 0:"_blank"}rel="noopener noreferrer">{kids}</a>};const inline=s=>{const out=[];let buf="";let i=0;const flush=()=>{if(buf){out.push(buf);buf=""}};while(i<s.length){const c=s[i];const rest=s.slice(i);let m;if(c==="\\"&&/[\\`*_{}[\]()#+\-.!<>|~]/.test(s[i+1]||"")){buf+=s[i+1];i+=2;continue}if(c==="`"&&(m=/^(`+)([\s\S]*?[^`]|[^`])\1(?!`)/.exec(rest))){
-flush();out.push(<code key={k()}>{m[2].trim()||m[2]}</code>);i+=m[0].length;continue}if(c==="!"&&(m=/^!\[([^\]]*)\]\(\s*<?([^)\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/.exec(rest))){flush();const u=resolve(m[2]);if(u)out.push(<img key={k()}src={u}alt={m[1]}loading="lazy"/>);i+=m[0].length;continue}if(c==="["&&(m=/^\[((?:[^[\]\\]|\\.|\[[^\]]*\])*)\]\(\s*<?([^)\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/.exec(rest))){
-flush();out.push(link(m[2],inline(m[1])));i+=m[0].length;continue}if(c==="<"){if(m=/^<(https?:\/\/[^>\s]+)>/.exec(rest)){flush();out.push(link(m[1],m[1]));i+=m[0].length;continue}if(m=/^<br\s*\/?>/i.exec(rest)){flush();out.push(<br key={k()}/>);i+=m[0].length;continue}if(m=/^<(b|strong|i|em|code|kbd|sub|sup|s|del|mark)>([\s\S]*?)<\/\1>/i.exec(rest)){flush();const tag=m[1].toLowerCase();const Tag=tag===
-"b"?"strong":tag==="i"?"em":tag;out.push(<Tag key={k()}>{inline(m[2])}</Tag>);i+=m[0].length;continue}if(m=/^<a\s[^>]*?href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/i.exec(rest)){flush();out.push(link(m[1],inline(m[2])));i+=m[0].length;continue}if(m=/^<img\b[^>]*>/i.exec(rest)){flush();const sm=/\bsrc=["']([^"']+)["']/i.exec(m[0]);const am=/\balt=["']([^"']*)["']/i.exec(m[0]);const u=sm&&resolve(sm[1]);
-if(u)out.push(<img key={k()}src={u}alt={am?am[1]:""}loading="lazy"/>);i+=m[0].length;continue}if((m=/^<!--[\s\S]*?-->/.exec(rest))||(m=/^<\/?[a-zA-Z][\w-]*(?:\s[^<>]*)?\/?>/.exec(rest))){i+=m[0].length;continue}}if(c==="*"||c==="_"){const before=s[i-1]||"";if(c==="*"||!/\w/.test(before)){if(s[i+1]===c&&(m=(c==="*"?/^\*\*(?=\S)([\s\S]*?\S)\*\*/:/^__(?=\S)([\s\S]*?\S)__(?!\w)/).exec(rest))){flush();
-out.push(<strong key={k()}>{inline(m[1])}</strong>);i+=m[0].length;continue}if(s[i+1]!==c&&(m=(c==="*"?/^\*(?=\S)([^*]*?\S)\*(?!\*)/:/^_(?=\S)([^_]*?\S)_(?!\w)/).exec(rest))){flush();out.push(<em key={k()}>{inline(m[1])}</em>);i+=m[0].length;continue}}}if(c==="~"&&(m=/^~~(?=\S)([\s\S]*?\S)~~/.exec(rest))){flush();out.push(<del key={k()}>{inline(m[1])}</del>);i+=m[0].length;continue}if(c==="h"&&!/[\w/]/.
-test(s[i-1]||"")&&(m=/^https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"]/.exec(rest))){flush();out.push(link(m[0],m[0]));i+=m[0].length;continue}buf+=c;i++}flush();return out};if(inlineOnly)return inline(String(src||""));const LI=/^( *)([-*+]|\d{1,9}[.)])( +|$)/;const FENCE=/^ {0,3}(`{3,}|~{3,})/;const TABLE_SEP=/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;const isStart=(l,next)=>FENCE.test(l)||/^ {0,3}#{1,6}\s/.
-test(l)||/^ {0,3}>/.test(l)||LI.test(l)||/^ {0,3}([-*_])(\s*\1){2,}\s*$/.test(l)||/^ {0,3}<\/?[a-zA-Z!]/.test(l)||l.indexOf("|")!==-1&&next!==void 0&&TABLE_SEP.test(next);const cells=row=>{let r=row.trim();if(r[0]==="|")r=r.slice(1);if(r.slice(-1)==="|"&&r.slice(-2)!=="\\|")r=r.slice(0,-1);const out=[];let cur="";let code=false;for(let i=0;i<r.length;i++){const c=r[i];if(c==="\\"&&r[i+1]==="|"){cur+=
-"|";i++;continue}if(c==="`")code=!code;if(c==="|"&&!code){out.push(cur.trim());cur="";continue}cur+=c}out.push(cur.trim());return out};const blocks=ls=>{const out=[];let i=0;while(i<ls.length){const l=ls[i];if(!l.trim()){i++;continue}let m;if(m=FENCE.exec(l)){const fence=m[1];const lang=l.slice(m[0].length).trim().split(/\s+/)[0]||"";const ind=l.match(/^ */)[0].length;const close=new RegExp("^ {0,\
-3}"+(fence[0]==="`"?"`":"~")+"{"+fence.length+",}\\s*$");const body=[];i++;while(i<ls.length&&!close.test(ls[i])){body.push(ls[i].slice(Math.min(ind,ls[i].match(/^ */)[0].length)));i++}i++;out.push(<SdkxCode key={k()}code={body.join("\n")}lang={lang}/>);continue}if(m=/^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$/.exec(l)){const H="h"+m[1].length;out.push(<H key={k()}>{inline(m[2])}</H>);i++;continue}if(/^ {0,3}([-*_])(\s*\1){2,}\s*$/.
-test(l)){out.push(<hr key={k()}/>);i++;continue}if(/^ {0,3}>/.test(l)){const q=[];while(i<ls.length&&ls[i].trim()&&(/^ {0,3}>/.test(ls[i])||!isStart(ls[i]))){q.push(ls[i].replace(/^ {0,3}> ?/,""));i++}out.push(<blockquote key={k()}>{blocks(q)}</blockquote>);continue}if(l.indexOf("|")!==-1&&i+1<ls.length&&TABLE_SEP.test(ls[i+1])){const head=cells(l);const aligns=cells(ls[i+1]).map(c=>/^:-+:$/.test(
-c)?"center":/-:$/.test(c)?"right":void 0);const rows=[];i+=2;while(i<ls.length&&ls[i].trim()&&ls[i].indexOf("|")!==-1){rows.push(cells(ls[i]));i++}out.push(<table key={k()}>
+export const sdkxMd=(src,base,inlineOnly,opts)=>{const shift=opts&&opts.shift||0;let dropTitle=!!(opts&&opts.dropTitle);let key=0;const k=()=>"m"+key++;const resolve=u=>{const s=String(u||"").trim().replace(/^<|>$/g,"");if(/^(https?:|mailto:)/i.test(s)||s[0]==="#")return s;if(/^[a-z][a-z0-9+.-]*:/i.test(s)||!base)return"";try{return new URL(s.replace(/^\.\//,""),base).href}catch(e){return""}};
+const link=(u,kids)=>{const href=resolve(u);if(!href)return<span key={k()}>{kids}</span>;return<a key={k()}href={href}target={href[0]==="#"?void 0:"_blank"}rel="noopener noreferrer">{kids}</a>};const inline=s=>{const out=[];let buf="";let i=0;const flush=()=>{if(buf){out.push(buf);buf=""}};while(i<s.length){const c=s[i];const rest=s.slice(i);let m;if(c==="\\"&&/[\\`*_{}[\]()#+\-.!<>|~]/.test(s[i+1]||
+"")){buf+=s[i+1];i+=2;continue}if(c==="`"&&(m=/^(`+)([\s\S]*?[^`]|[^`])\1(?!`)/.exec(rest))){flush();out.push(<code key={k()}>{m[2].trim()||m[2]}</code>);i+=m[0].length;continue}if(c==="!"&&(m=/^!\[([^\]]*)\]\(\s*<?([^)\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/.exec(rest))){flush();const u=resolve(m[2]);if(u)out.push(<img key={k()}src={u}alt={m[1]}loading="lazy"/>);i+=m[0].length;continue}if(c==="["&&(m=
+/^\[((?:[^[\]\\]|\\.|\[[^\]]*\])*)\]\(\s*<?([^)\s>]+)>?(?:\s+["'][^"']*["'])?\s*\)/.exec(rest))){flush();out.push(link(m[2],inline(m[1])));i+=m[0].length;continue}if(c==="<"){if(m=/^<(https?:\/\/[^>\s]+)>/.exec(rest)){flush();out.push(link(m[1],m[1]));i+=m[0].length;continue}if(m=/^<br\s*\/?>/i.exec(rest)){flush();out.push(<br key={k()}/>);i+=m[0].length;continue}if(m=/^<(b|strong|i|em|code|kbd|sub|sup|s|del|mark)>([\s\S]*?)<\/\1>/i.
+exec(rest)){flush();const tag=m[1].toLowerCase();const Tag=tag==="b"?"strong":tag==="i"?"em":tag;out.push(<Tag key={k()}>{inline(m[2])}</Tag>);i+=m[0].length;continue}if(m=/^<a\s[^>]*?href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/i.exec(rest)){flush();out.push(link(m[1],inline(m[2])));i+=m[0].length;continue}if(m=/^<img\b[^>]*>/i.exec(rest)){flush();const sm=/\bsrc=["']([^"']+)["']/i.exec(m[0]);const am=/\balt=["']([^"']*)["']/i.
+exec(m[0]);const u=sm&&resolve(sm[1]);if(u)out.push(<img key={k()}src={u}alt={am?am[1]:""}loading="lazy"/>);i+=m[0].length;continue}if((m=/^<!--[\s\S]*?-->/.exec(rest))||(m=/^<\/?[a-zA-Z][\w-]*(?:\s[^<>]*)?\/?>/.exec(rest))){i+=m[0].length;continue}}if(c==="*"||c==="_"){const before=s[i-1]||"";if(c==="*"||!/\w/.test(before)){if(s[i+1]===c&&(m=(c==="*"?/^\*\*(?=\S)([\s\S]*?\S)\*\*/:/^__(?=\S)([\s\S]*?\S)__(?!\w)/).
+exec(rest))){flush();out.push(<strong key={k()}>{inline(m[1])}</strong>);i+=m[0].length;continue}if(s[i+1]!==c&&(m=(c==="*"?/^\*(?=\S)([^*]*?\S)\*(?!\*)/:/^_(?=\S)([^_]*?\S)_(?!\w)/).exec(rest))){flush();out.push(<em key={k()}>{inline(m[1])}</em>);i+=m[0].length;continue}}}if(c==="~"&&(m=/^~~(?=\S)([\s\S]*?\S)~~/.exec(rest))){flush();out.push(<del key={k()}>{inline(m[1])}</del>);i+=m[0].length;continue}
+if(c==="h"&&!/[\w/]/.test(s[i-1]||"")&&(m=/^https?:\/\/[^\s<>()]*[^\s<>().,;:!?'"]/.exec(rest))){flush();out.push(link(m[0],m[0]));i+=m[0].length;continue}buf+=c;i++}flush();return out};if(inlineOnly)return inline(String(src||""));const LI=/^( *)([-*+]|\d{1,9}[.)])( +|$)/;const FENCE=/^ {0,3}(`{3,}|~{3,})/;const TABLE_SEP=/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;const isStart=(l,next)=>FENCE.
+test(l)||/^ {0,3}#{1,6}\s/.test(l)||/^ {0,3}>/.test(l)||LI.test(l)||/^ {0,3}([-*_])(\s*\1){2,}\s*$/.test(l)||/^ {0,3}<\/?[a-zA-Z!]/.test(l)||l.indexOf("|")!==-1&&next!==void 0&&TABLE_SEP.test(next);const cells=row=>{let r=row.trim();if(r[0]==="|")r=r.slice(1);if(r.slice(-1)==="|"&&r.slice(-2)!=="\\|")r=r.slice(0,-1);const out=[];let cur="";let code=false;for(let i=0;i<r.length;i++){const c=r[i];if(c===
+"\\"&&r[i+1]==="|"){cur+="|";i++;continue}if(c==="`")code=!code;if(c==="|"&&!code){out.push(cur.trim());cur="";continue}cur+=c}out.push(cur.trim());return out};const blocks=ls=>{const out=[];let i=0;while(i<ls.length){const l=ls[i];if(!l.trim()){i++;continue}const first=dropTitle;dropTitle=false;let m;if(m=FENCE.exec(l)){const fence=m[1];const lang=l.slice(m[0].length).trim().split(/\s+/)[0]||"";const ind=l.
+match(/^ */)[0].length;const close=new RegExp("^ {0,3}"+(fence[0]==="`"?"`":"~")+"{"+fence.length+",}\\s*$");const body=[];i++;while(i<ls.length&&!close.test(ls[i])){body.push(ls[i].slice(Math.min(ind,ls[i].match(/^ */)[0].length)));i++}i++;out.push(<SdkxCode key={k()}code={body.join("\n")}lang={lang}/>);continue}if(m=/^ {0,3}(#{1,6})\s+(.*?)\s*#*\s*$/.exec(l)){if(first&&m[1].length===1){i++;continue}
+const H="h"+Math.min(6,m[1].length+shift);out.push(<H key={k()}>{inline(m[2])}</H>);i++;continue}if(/^ {0,3}([-*_])(\s*\1){2,}\s*$/.test(l)){out.push(<hr key={k()}/>);i++;continue}if(/^ {0,3}>/.test(l)){const q=[];while(i<ls.length&&ls[i].trim()&&(/^ {0,3}>/.test(ls[i])||!isStart(ls[i]))){q.push(ls[i].replace(/^ {0,3}> ?/,""));i++}out.push(<blockquote key={k()}>{blocks(q)}</blockquote>);continue}if(l.
+indexOf("|")!==-1&&i+1<ls.length&&TABLE_SEP.test(ls[i+1])){const head=cells(l);const aligns=cells(ls[i+1]).map(c=>/^:-+:$/.test(c)?"center":/-:$/.test(c)?"right":void 0);const rows=[];i+=2;while(i<ls.length&&ls[i].trim()&&ls[i].indexOf("|")!==-1){rows.push(cells(ls[i]));i++}out.push(<div key={k()}className="rdmd-table"><div className="rdmd-table-inner"><table>
             <thead><tr>{head.map((c,j)=><th key={j}style={aligns[j]?{textAlign:aligns[j]}:void 0}>{inline(c)}</th>)}</tr></thead>
             <tbody>{rows.map((r,ri)=><tr key={ri}>{head.map((_,j)=><td key={j}style={aligns[j]?{textAlign:aligns[j]}:void 0}>{inline(r[j]||"")}</td>)}</tr>)}</tbody>
-          </table>);continue}if(m=LI.exec(l)){const base0=m[1].length;const ordered=/\d/.test(m[2]);const start=ordered?parseInt(m[2],10):1;const items=[];let cur=null;while(i<ls.length){const s=ls[i];const mm=LI.exec(s);if(mm&&mm[1].length<base0+2&&/\d/.test(mm[2])===ordered){cur={lines:[s.slice(mm[0].length)],off:mm[3]?mm[0].length:mm[0].length+1};items.push(cur);i++;continue}if(!s.trim()){let j=i+
-1;while(j<ls.length&&!ls[j].trim())j++;if(j>=ls.length)break;const nm=LI.exec(ls[j]);if(nm&&nm[1].length<base0+2&&/\d/.test(nm[2])===ordered||ls[j].match(/^ */)[0].length>=cur.off){cur.lines.push("");i++;continue}break}const ind=s.match(/^ */)[0].length;if(ind>=cur.off){cur.lines.push(s.slice(cur.off));i++;continue}if(ind>base0||!isStart(s)){cur.lines.push(s.trim());i++;continue}break}const Tag=ordered?
+          </table></div></div>);continue}if(m=LI.exec(l)){const base0=m[1].length;const ordered=/\d/.test(m[2]);const start=ordered?parseInt(m[2],10):1;const items=[];let cur=null;while(i<ls.length){const s=ls[i];const mm=LI.exec(s);if(mm&&mm[1].length<base0+2&&/\d/.test(mm[2])===ordered){cur={lines:[s.slice(mm[0].length)],off:mm[3]?mm[0].length:mm[0].length+1};items.push(cur);i++;continue}if(!s.trim()){
+let j=i+1;while(j<ls.length&&!ls[j].trim())j++;if(j>=ls.length)break;const nm=LI.exec(ls[j]);if(nm&&nm[1].length<base0+2&&/\d/.test(nm[2])===ordered||ls[j].match(/^ */)[0].length>=cur.off){cur.lines.push("");i++;continue}break}const ind=s.match(/^ */)[0].length;if(ind>=cur.off){cur.lines.push(s.slice(cur.off));i++;continue}if(ind>base0||!isStart(s)){cur.lines.push(s.trim());i++;continue}break}const Tag=ordered?
 "ol":"ul";out.push(<Tag key={k()}start={ordered&&start!==1?start:void 0}>
             {items.map(it=>{const kids=blocks(it.lines);if(kids[0]&&kids[0].type==="p")kids[0]=<span key={k()}>{kids[0].props.children}</span>;return<li key={k()}>{kids}</li>})}
           </Tag>);continue}if(/^ {0,3}<\/?[a-zA-Z!]/.test(l)){const h=[];while(i<ls.length&&ls[i].trim()){h.push(ls[i].trim());i++}const kids=inline(h.join(" "));if(kids.some(x=>typeof x!=="string"||x.trim()))out.push(<div key={k()}className="sdkx-html">{kids}</div>);continue}const p=[];let setext=0;while(i<ls.length&&ls[i].trim()){if(p.length&&/^ {0,3}=+\s*$/.test(ls[i])){setext=1;i++;break}if(p.
-length&&/^ {0,3}-+\s*$/.test(ls[i])){setext=2;i++;break}if(p.length&&isStart(ls[i],ls[i+1]))break;p.push(ls[i].trim());i++}if(setext){const H="h"+setext;out.push(<H key={k()}>{inline(p.join(" "))}</H>)}else out.push(<p key={k()}>{inline(p.join("\n"))}</p>)}return out};return blocks(String(src||"").replace(/\r\n?/g,"\n").replace(/\t/g,"    ").split("\n"))};
+length&&/^ {0,3}-+\s*$/.test(ls[i])){setext=2;i++;break}if(p.length&&isStart(ls[i],ls[i+1]))break;p.push(ls[i].trim());i++}if(setext){const H="h"+Math.min(6,setext+shift);out.push(<H key={k()}>{inline(p.join(" "))}</H>)}else out.push(<p key={k()}>{inline(p.join("\n"))}</p>)}return out};return blocks(String(src||"").replace(/\r\n?/g,"\n").replace(/\t/g,"    ").split("\n"))};
 
-export const sdkxCopy=text=>{try{if(navigator.
-clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text).then(()=>true,()=>false)}catch(e){}try{const ta=document.createElement("textarea");ta.value=text;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");document.body.removeChild(ta);return Promise.resolve(ok)}catch(e){return Promise.
-resolve(false)}};
+export const sdkxCopy=text=>{
+try{if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(text).then(()=>true,()=>false)}catch(e){}try{const ta=document.createElement("textarea");ta.value=text;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");document.body.removeChild(ta);return Promise.resolve(
+ok)}catch(e){return Promise.resolve(false)}};
 
 export const sdkxSave=(text,name,type)=>{const url=URL.createObjectURL(new Blob([text],{type:type||"text/plain"}));const a=document.createElement("a");a.href=url;a.download=name||"download.txt";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4e3)};
 
-export const sdkxBytes=n=>{if(n===null||n===void 0||isNaN(n))return"\u2014";if(n<1024)return n+
-" B";if(n<1048576)return(n/1024).toFixed(n<102400?1:0)+" KB";return(n/1048576).toFixed(2)+" MB"};
+export const sdkxBytes=n=>{if(n===null||n===void 0||isNaN(n))return"\
+\u2014";if(n<1024)return n+" B";if(n<1048576)return(n/1024).toFixed(n<102400?1:0)+" KB";return(n/1048576).toFixed(2)+" MB"};
 
-export const sdkxFetch=async(url,as)=>{const ctl=typeof AbortController!=="undefined"?new AbortController:null;const timer=ctl?setTimeout(()=>ctl.abort(),25e3):null;try{const res=await fetch(url,ctl?{signal:ctl.signal}:void 0);if(!res.ok)throw new Error("HTTP "+res.status+" for "+url);if(as==="json")return await res.
-json();if(as==="buf")return await res.arrayBuffer();return await res.text()}finally{if(timer)clearTimeout(timer)}};
+export const sdkxFetch=async(url,as)=>{const ctl=typeof AbortController!=="undefined"?new AbortController:null;const timer=ctl?setTimeout(()=>ctl.abort(),25e3):null;try{const res=await fetch(url,ctl?{signal:ctl.signal}:void 0);if(!res.ok)throw new Error("HTTP "+res.status+" f\
+or "+url);if(as==="json")return await res.json();if(as==="buf")return await res.arrayBuffer();return await res.text()}finally{if(timer)clearTimeout(timer)}};
 
-export const sdkxSri=async buf=>{try{if(!window.crypto||!window.crypto.subtle)return"";const b=new Uint8Array(await window.crypto.subtle.digest("SHA-384",buf));let s="";for(let i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return"sha384-"+btoa(s)}catch(e){return""}};
+export const sdkxSri=async buf=>{try{if(!window.crypto||!window.crypto.subtle)return"";const b=new Uint8Array(await window.crypto.subtle.digest("SHA-384",buf));let s="";for(let i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return"sha384-"+btoa(
+s)}catch(e){return""}};
 
-export const sdkxGzip=async buf=>{
-try{if(typeof CompressionStream==="undefined")return null;const out=await new Response(new Blob([buf]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer();return out.byteLength}catch(e){return null}};
+export const sdkxGzip=async buf=>{try{if(typeof CompressionStream==="undefined")return null;const out=await new Response(new Blob([buf]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer();return out.byteLength}catch(e){return null}};
 
-export const sdkxParseUrl=u=>{const s=String(u||"").trim();let m=/^https?:\/\/cdn\.jsdelivr\.net\/npm\/((?:@[^/@]+\/)?[^/@?#]+)(?:@([^/?#]+))?(\/[^?#]*)?/i.exec(s);if(m)return{cdn:"http\
-s://cdn.jsdelivr.net/npm/",pkg:m[1],spec:m[2]||"",path:m[3]&&m[3]!=="/"?m[3]:"",url:s};m=/^https?:\/\/unpkg\.com\/((?:@[^/@]+\/)?[^/@?#]+)(?:@([^/?#]+))?(\/[^?#]*)?/i.exec(s);if(m)return{cdn:"https://unpkg.com/",pkg:m[1],spec:m[2]||"",path:m[3]&&m[3]!=="/"?m[3]:"",url:s};return{cdn:"",pkg:"",spec:"",path:"",url:s}};
+export const sdkxParseUrl=u=>{const s=String(u||"").trim();let m=/^https?:\/\/cdn\.jsdelivr\.net\/npm\/((?:@[^/@]+\/)?[^/@?#]+)(?:@([^/?#]+))?(\/[^?#]*)?/i.
+exec(s);if(m)return{cdn:"https://cdn.jsdelivr.net/npm/",pkg:m[1],spec:m[2]||"",path:m[3]&&m[3]!=="/"?m[3]:"",url:s};m=/^https?:\/\/unpkg\.com\/((?:@[^/@]+\/)?[^/@?#]+)(?:@([^/?#]+))?(\/[^?#]*)?/i.exec(s);if(m)return{cdn:"https://unpkg.com/",pkg:m[1],spec:m[2]||"",path:m[3]&&m[3]!=="/"?m[3]:"",url:s};return{cdn:"",pkg:"",spec:"",path:"",url:s}};
 
-export const sdkxEntry=pj=>{if(!pj)return"";const pick=v=>typeof v==="string"&&v?v:
-"";let p=pick(pj.jsdelivr)||pick(pj.unpkg)||pick(pj.browser)||pick(pj.main)||"index.js";p="/"+p.replace(/^\.?\//,"");if(!/\.[a-z0-9]+$/i.test(p))p+=".js";return p};
+export const sdkxEntry=pj=>{if(!pj)return"";const pick=v=>typeof v===
+"string"&&v?v:"";let p=pick(pj.jsdelivr)||pick(pj.unpkg)||pick(pj.browser)||pick(pj.main)||"index.js";p="/"+p.replace(/^\.?\//,"");if(!/\.[a-z0-9]+$/i.test(p))p+=".js";return p};
 
-export const sdkxTypesPath=(pj,files,path)=>{const norm=p2=>"/"+String(p2).replace(/^\.?\//,"");const has=p2=>!files||files.some(f=>f.name===p2);let p=pj&&(pj.types||pj.typings);if(!p&&pj&&pj.exports&&typeof pj.exports==="object"){const dot=pj.
-exports["."]||pj.exports;const t=dot&&typeof dot==="object"?dot.types||dot.import&&dot.import.types||dot.require&&dot.require.types:"";if(typeof t==="string")p=t}if(p){p=norm(p);if(!/\.d\.[cm]?ts$/.test(p))p=p.replace(/\.[cm]?js$/,"")+".d.ts";if(has(p))return p}if(!files)return"";const cands=[path?path.replace(/(\.min)?\.[cm]?js$/,".d.ts"):"","/index.d.ts","/dist/index.d.ts","/types/index.d.ts","/\
-lib/index.d.ts"];for(let i=0;i<cands.length;i++)if(cands[i]&&has(cands[i]))return cands[i];const any=files.find(f=>/\.d\.ts$/.test(f.name));return any?any.name:""};
+export const sdkxTypesPath=(pj,files,path)=>{const norm=p2=>"/"+String(p2).replace(/^\.?\//,"");const has=p2=>!files||files.some(f=>f.name===p2);let p=pj&&(pj.types||pj.typings);if(!p&&pj&&pj.exports&&typeof pj.exports==="\
+object"){const dot=pj.exports["."]||pj.exports;const t=dot&&typeof dot==="object"?dot.types||dot.import&&dot.import.types||dot.require&&dot.require.types:"";if(typeof t==="string")p=t}if(p){p=norm(p);if(!/\.d\.[cm]?ts$/.test(p))p=p.replace(/\.[cm]?js$/,"")+".d.ts";if(has(p))return p}if(!files)return"";const cands=[path?path.replace(/(\.min)?\.[cm]?js$/,".d.ts"):"","/index.d.ts","/dist/index.d.ts",
+"/types/index.d.ts","/lib/index.d.ts"];for(let i=0;i<cands.length;i++)if(cands[i]&&has(cands[i]))return cands[i];const any=files.find(f=>/\.d\.ts$/.test(f.name));return any?any.name:""};
 
-export const sdkxRepoUrl=pj=>{const r=pj&&pj.repository;let u=typeof r==="string"?r:r&&r.url;if(!u)return"";if(/^github:|^[\w-]+\/[\w.-]+$/.test(u))u="https://github.com/"+u.replace(/^github:/,"");return u.replace(/^git\+/,"").replace(/^git:\/\//,
-"https://").replace(/^ssh:\/\/git@/,"https://").replace(/\.git$/,"")};
+export const sdkxRepoUrl=pj=>{const r=pj&&pj.repository;let u=typeof r==="string"?r:r&&r.url;if(!u)return"";if(/^github:|^[\w-]+\/[\w.-]+$/.test(u))u="https://github.com/"+u.replace(/^github:/,"");return u.replace(
+/^git\+/,"").replace(/^git:\/\//,"https://").replace(/^ssh:\/\/git@/,"https://").replace(/\.git$/,"")};
 
 export const sdkxIsText=name=>/\.(m?js|cjs|ts|mts|cts|tsx|jsx|json|md|markdown|txt|css|scss|map|ya?ml|html?|svg|flow|d\.ts)$/i.test(name)||!/\.[a-z0-9]+$/i.test(name.split("/").pop());
 
-export const SdkxSource=({file,onBack,onSave})=>{const[pretty,setPretty]=useState(!!file.minified);const[q,setQ]=useState("");const[cur,setCur]=useState(
-0);const[all,setAll]=useState(false);const box=useRef(null);useEffect(()=>{setPretty(!!file.minified);setQ("");setAll(false)},[file.path]);useEffect(()=>{setCur(0)},[q]);const code=/\.(m?js|cjs|ts|mts|cts|tsx|jsx|json)$/i.test(file.path)||/^(js|ts)$/.test(file.lang||"");const lines=useMemo(()=>{const text=file.text||"";if(code&&pretty&&text.length<=3e6)return sdkxBeautify(sdkxTokenize(text));const out=!code||
-text.length>4e5?text.split("\n").map(l=>[{t:"ws",v:l}]):sdkxLines(sdkxTokenize(text));if(out.length>1&&!out[out.length-1].some(t=>t.v))out.pop();return out},[file.text,pretty,code]);const texts=useMemo(()=>lines.map(l=>l.map(t=>t.v).join("")),[lines]);const hits=useMemo(()=>{const s=q.trim().toLowerCase();if(!s)return[];const r=[];for(let i=0;i<texts.length;i++)if(texts[i].toLowerCase().indexOf(s)!==
--1)r.push(i);return r},[texts,q]);const LIMIT=2500;const shown=all?lines.length:Math.min(lines.length,LIMIT);const hitSet=useMemo(()=>new Set(hits),[hits]);const curLine=hits.length?hits[Math.min(cur,hits.length-1)]:-1;useEffect(()=>{if(curLine<0)return;if(curLine>=shown){setAll(true);return}const el=box.current&&box.current.querySelector('[data-ln="'+curLine+'"]');if(el)box.current.scrollTop=Math.
-max(0,el.offsetTop-box.current.clientHeight/2)},[curLine,shown]);const step=d=>{if(hits.length)setCur((cur+d+hits.length)%hits.length)};const wrap=!pretty&&!!file.minified;return<div>
+export const SdkxSource=({file,onBack,onSave})=>{const[pretty,setPretty]=useState(!!file.minified);const[q,setQ]=useState(
+"");const[cur,setCur]=useState(0);const[all,setAll]=useState(false);const box=useRef(null);useEffect(()=>{setPretty(!!file.minified);setQ("");setAll(false)},[file.path]);useEffect(()=>{setCur(0)},[q]);const code=/\.(m?js|cjs|ts|mts|cts|tsx|jsx|json)$/i.test(file.path)||/^(js|ts)$/.test(file.lang||"");const lines=useMemo(()=>{const text=file.text||"";if(code&&pretty&&text.length<=3e6)return sdkxBeautify(
+sdkxTokenize(text));const out=!code||text.length>4e5?text.split("\n").map(l=>[{t:"ws",v:l}]):sdkxLines(sdkxTokenize(text));if(out.length>1&&!out[out.length-1].some(t=>t.v))out.pop();return out},[file.text,pretty,code]);const texts=useMemo(()=>lines.map(l=>l.map(t=>t.v).join("")),[lines]);const hits=useMemo(()=>{const s=q.trim().toLowerCase();if(!s)return[];const r=[];for(let i=0;i<texts.length;i++)
+if(texts[i].toLowerCase().indexOf(s)!==-1)r.push(i);return r},[texts,q]);const LIMIT=2500;const shown=all?lines.length:Math.min(lines.length,LIMIT);const hitSet=useMemo(()=>new Set(hits),[hits]);const curLine=hits.length?hits[Math.min(cur,hits.length-1)]:-1;useEffect(()=>{if(curLine<0)return;if(curLine>=shown){setAll(true);return}const el=box.current&&box.current.querySelector('[data-ln="'+curLine+
+'"]');if(el)box.current.scrollTop=Math.max(0,el.offsetTop-box.current.clientHeight/2)},[curLine,shown]);const step=d=>{if(hits.length)setCur((cur+d+hits.length)%hits.length)};const wrap=!pretty&&!!file.minified;return<div>
       <div className="sdkx-srcbar">
         <span className="sdkx-srcname"title={file.path}>{file.path}</span>
         {onBack?<button type="button"className="sdkx-btn sdkx-btn--sm"onClick={onBack}>Back to SDK file</button>:null}
@@ -236,23 +224,17 @@ max(0,el.offsetTop-box.current.clientHeight/2)},[curLine,shown]);const step=d=>{
       {pretty&&file.minified?<p className="sdkx-note">Pretty-printed for reading. Download gives you the original, byte-for-byte.</p>:null}
     </div>};
 
-export const SdkxMembers=({rows,names,go,descs})=><div className="sdkx-tblwrap">
-    <table className="sdkx-tbl">
-      <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
-      <tbody>
-        {rows.map((m,i)=>{const desc=m.doc||descs&&descs[m.name]||"";let type;if(m.method){type=[<span key="o">(</span>];(m.params||[]).forEach((p,j)=>{if(j)type.push(", ");type.push(<span key={"p"+j}>{p.rest?"...":""}{p.name}{p.optional?"?":""}: {sdkxTypeNodes(p.type,names,go)}</span>)});type.push(<span key="c">) {"=>"} </span>);type.push(<span key="r">{m.ret?sdkxTypeNodes(m.ret,names,go):"void"}</span>)}else
-type=sdkxTypeNodes(m.type,names,go);return<tr key={i}>
-              <td><span className="sdkx-pname">{m.rest?"...":""}{m.name}</span>{m.optional?<span className="sdkx-opt">optional</span>:m.index||m.name==="(call)"||m.name==="new"?null:<span className="sdkx-req">required</span>}</td>
-              <td className="sdkx-tcell"><span className="sdkx-ty">{type}</span></td>
-              <td>{desc?sdkxMd(desc,"",true):<span style={{color:"var(--sx-muted)"}}>{"\u2014"}</span>}</td>
-            </tr>})}
-      </tbody>
-    </table>
+export const SdkxMembers=({rows,names,go,descs})=><div className="sdkx-params">
+    {rows.map((m,i)=>{const desc=m.doc||descs&&descs[m.name]||"";let type;if(m.method){type=[<span key="o">(</span>];(m.params||[]).forEach((p,j)=>{if(j)type.push(", ");type.push(<span key={"p"+j}>{p.rest?"...":""}{p.name}{p.optional?"?":""}: {sdkxTypeNodes(p.type,names,go)}</span>)});type.push(<span key="c">) {"=>"} </span>);type.push(<span key="r">{m.ret?sdkxTypeNodes(m.ret,names,go):"void"}</span>)}else
+type=sdkxTypeNodes(m.type,names,go);const flag=m.optional?<span className="sdkx-popt">optional</span>:m.index||m.name==="(call)"||m.name==="new"?null:<span className="sdkx-preq">required</span>;return<div key={i}className="sdkx-param">
+          <div className="sdkx-pline"><span className="sdkx-pname">{m.rest?"...":""}{m.name}</span><span className="sdkx-ptype">{type}</span>{flag}</div>
+          {desc?<div className="sdkx-pdesc">{sdkxMd(desc,"",true)}</div>:null}
+        </div>})}
   </div>;
 
-export const SdkxDecl=({d,names,go,descs})=>{const T=toks=>sdkxTypeNodes(toks,names,go);const incl=list=>list.length?<p className="sdkx-incl">Includes every field of {list.map((x,j)=><span key={j}>{j?", ":""}{names.has(x.name)?<a className="sdkx-tref"href={"#"+x.name}onClick={e=>{e.preventDefault();go(x.name)}}>{x.name}</a>:<code className="sdkx-ic">{x.name}</code>}{x.mode==="partial"?" (\
-all optional)":""}</span>)}</p>:null;let body=null;if(d.kind==="function"){body=d.overloads.map((o,i)=><div key={i}className="sdkx-ovl">
-        {d.overloads.length>1?<div className="sdkx-sub">Overload {i+1} of {d.overloads.length}</div>:null}
+export const SdkxDecl=({d,names,go,descs})=>{const T=toks=>sdkxTypeNodes(toks,names,go);const ref=(name,j)=>names.has(name)?<a key={j}className="sdkx-tref"href={"#"+name}onClick={e=>{e.preventDefault();go(name)}}>{name}</a>:<code key={j}>{name}</code>;const list=(items,render)=>items.map((x,j)=>[j?j===items.length-1?" and ":", ":"",render(x,j)]);const incl=(items,own)=>items.length?<p className="sdkx-txt sdkx-incl">{own?
+"Also accepts":"Accepts"} every field of {list(items,(x,j)=><span key={j}>{ref(x.name,j)}{x.mode==="partial"?" (all optional)":""}</span>)}.</p>:null;let body=null;if(d.kind==="function"){body=d.overloads.map((o,i)=><div key={i}className="sdkx-ovl">
+        {d.overloads.length>1?<div className="sdkx-label">Overload {i+1} of {d.overloads.length}</div>:null}
         {o.doc&&o.doc!==d.doc?<p className="sdkx-doc">{sdkxMd(o.doc,"",true)}</p>:null}
         <div className="sdkx-sig">
           <span className="sdkx-tf">{d.name}</span>{o.tparams?T(o.tparams):null}(
@@ -260,47 +242,36 @@ all optional)":""}</span>)}</p>:null;let body=null;if(d.kind==="function"){body=
           ){o.ret?<span>: {T(o.ret)}</span>:null}
         </div>
         {o.params.length?<SdkxMembers rows={o.params}names={names}go={go}descs={descs}/>:null}
-      </div>)}else if(d.kind==="type"){const parts=sdkxTop(d.expr,["|"]);const lit=p=>p.length===1&&(p[0].t==="str"||p[0].t==="num"||/^(true|false|null|undefined)$/.test(p[0].v));const fnType=d.expr[0]&&(d.expr[0].v==="("||d.expr[0].v==="<")&&d.expr.some(x=>x.v==="=>");if(parts.length>1&&parts.every(lit)){body=<div><div className="sdkx-sub">Allowed values</div><div className="sdkx-vals">{parts.map(
-(p,j)=><code key={j}className="sdkx-val">{p[0].v}</code>)}</div></div>}else if(parts.length>1){body=<div><div className="sdkx-sub">One of</div><ul className="sdkx-oneof">{parts.map((p,j)=><li key={j}><span className="sdkx-ty">{T(p)}</span></li>)}</ul></div>}else if(fnType){body=<div className="sdkx-sig">{T(d.expr)}</div>}else{const f=sdkxFlatten(d.expr);body=f.members.length||f.includes.length?<div>
-          {incl(f.includes)}
+        {o.ret?<p className="sdkx-txt">Returns <span className="sdkx-ty">{T(o.ret)}</span>.</p>:null}
+      </div>)}else if(d.kind==="type"){const parts=sdkxTop(d.expr,["|"]);const lit=p=>p.length===1&&(p[0].t==="str"||p[0].t==="num"||/^(true|false|null|undefined)$/.test(p[0].v));const fnType=d.expr[0]&&(d.expr[0].v==="("||d.expr[0].v==="<")&&d.expr.some(x=>x.v==="=>");if(parts.length>1&&parts.every(lit)){body=<p className="sdkx-txt">One of: {parts.map((p,j)=><span key={j}>{j?" ":""}<code className="sdkx-val">{p[0].
+v}</code></span>)}</p>}else if(parts.length>1){body=<p className="sdkx-txt sdkx-oneof">One of {parts.map((p,j)=><span key={j}>{j?j===parts.length-1?" or ":", ":""}<span className="sdkx-ty">{T(p)}</span></span>)}.</p>}else if(fnType){body=<div className="sdkx-sig">{T(d.expr)}</div>}else{const f=sdkxFlatten(d.expr);body=f.members.length||f.includes.length?<div>
+          {incl(f.includes,f.members.length>0)}
           {f.members.length?<SdkxMembers rows={f.members}names={names}go={go}descs={descs}/>:null}
           {f.other.map((o,j)=><div key={j}className="sdkx-sig">{T(o)}</div>)}
         </div>:<div className="sdkx-sig">{T(d.expr)}</div>}}else if(d.kind==="interface"||d.kind==="class"){body=<div>
-        {incl(d.ext.map(e=>({name:sdkxTypeText(e)})))}
-        {d.members.length?<SdkxMembers rows={d.members}names={names}go={go}descs={descs}/>:<p className="sdkx-doc">No members.</p>}
-      </div>}else if(d.kind==="const"){body=<div className="sdkx-sig"><span className="sdkx-tk">const</span> <span className="sdkx-tf">{d.name}</span>{d.type?<span>: {T(d.type)}</span>:null}</div>}else if(d.kind==="enum"){body=<div className="sdkx-tblwrap">
-        <table className="sdkx-tbl">
-          <thead><tr><th>Member</th><th>Value</th></tr></thead>
-          <tbody>{d.values.map((v,j)=><tr key={j}><td><span className="sdkx-pname">{v.name}</span></td><td><span className="sdkx-ty">{v.value||"\u2014"}</span></td></tr>)}</tbody>
-        </table>
-      </div>}return<div className="sdkx-decl"data-decl={d.name}>
-      <div className="sdkx-declhead">
-        <span className={"sdkx-kind sdkx-kind--"+d.kind}>{d.kind}</span>
-        <span className="sdkx-declname">{d.name}</span>
-        {d.exported?<span className="sdkx-pill sdkx-pill--ok">exported</span>:null}
+        {incl(d.ext.map(e=>({name:sdkxTypeText(e)})),d.members.length>0)}
+        {d.members.length?<SdkxMembers rows={d.members}names={names}go={go}descs={descs}/>:null}
+      </div>}else if(d.kind==="const"){body=<div className="sdkx-sig"><span className="sdkx-tk">const</span> <span className="sdkx-tf">{d.name}</span>{d.type?<span>: {T(d.type)}</span>:null}</div>}else if(d.kind==="enum"){body=<SdkxMembers rows={d.values.map(v=>({name:v.name,type:v.value?sdkxTokenize(v.value).filter(t=>t.t!=="ws"):[],doc:v.doc,index:true}))}names={names}go={go}descs={descs}/>}return<div className="sdkx-decl"data-decl={d.
+name}>
+      <div className="sdkx-dh">
+        <h3 className="sdkx-dname">{d.name}{d.kind==="function"?"()":""}</h3>
+        <span className="sdkx-kind">{d.kind}</span>
+        {d.exported?<span className="sdkx-exp">exported</span>:null}
       </div>
-      <div className="sdkx-declbody">
-        {d.doc?<p className="sdkx-doc">{sdkxMd(d.doc,"",true)}</p>:null}
-        {body}
-        <details className="sdkx-def">
-          <summary>TypeScript definition</summary>
-          <SdkxCode code={d.src}lang="ts"/>
-        </details>
-      </div>
+      {d.doc?<p className="sdkx-doc">{sdkxMd(d.doc,"",true)}</p>:null}
+      {body}
+      <details className="sdkx-def">
+        <summary>TypeScript definition</summary>
+        <SdkxCode code={d.src}lang="ts"/>
+      </details>
     </div>};
 
-export const SdkxApi=({api,go})=>{const order={function:0,class:1,const:2,enum:3,interface:4,type:5};const sorted=list=>list.slice().sort((a,b)=>order[a.kind]-order[b.kind]);const exp=sorted(api.decls.filter(d=>d.exported));const rest=api.decls.filter(d=>!d.exported);const chip=d=><a key={d.name}className="sdkx-ichip"href={"#"+d.name}onClick={e=>{e.preventDefault();go(d.name)}}>
-      <span className={"sdkx-dot k-"+d.kind}/>{d.name}
-    </a>;return<div>
+export const SdkxApi=({api,go})=>{const order={function:0,class:1,const:2,enum:3,interface:4,type:5};const exp=api.decls.filter(d=>d.exported).slice().sort((a,b)=>order[a.kind]-order[b.kind]);const rest=api.decls.filter(d=>!d.exported);const link=d=><a key={d.name}href={"#"+d.name}onClick={e=>{e.preventDefault();go(d.name)}}>{d.name}</a>;return<div>
       <div className="sdkx-index">
-        {exp.length?<div className="sdkx-index-g">Exports</div>:null}
-        {exp.map(chip)}
-        {rest.length?<div className="sdkx-index-g">Types</div>:null}
-        {rest.map(chip)}
+        {exp.length?<div><b>Exports</b>{exp.map(link)}</div>:null}
+        {rest.length?<div><b>Types</b>{rest.map(link)}</div>:null}
       </div>
-      {exp.length?<div className="sdkx-sec">Exports</div>:null}
       {exp.map(d=><SdkxDecl key={d.name}d={d}names={api.names}go={go}descs={api.descs}/>)}
-      {rest.length?<div className="sdkx-sec">Types</div>:null}
       {rest.map(d=><SdkxDecl key={d.name}d={d}names={api.names}go={go}descs={api.descs}/>)}
     </div>};
 
@@ -331,91 +302,78 @@ split("/").pop(),/\.json$/.test(f.path)?"application/json":"text/javascript");co
 s.error==="missing"){return<div className="sdkx"data-theme={dark?"dark":"light"}>
         <style>{SDKX_CSS}</style>
         <div className="sdkx-err"><b>No SDK URL</b>Add a <code>url</code> prop, for example <code>{'<SdkExplorer url="https://cdn.jsdelivr.net/npm/<package>/dist/sdk.min.js" />'}</code></div>
-      </div>}const loading=s.status==="loading";const stats=[];if(!loading){stats.push({l:"Size",v:s.bytes!==void 0?sdkxBytes(s.bytes):"\u2014",s:a.minified?"minified":s.bytes!==void 0?(a.lines||0).toLocaleString()+" lines":""});stats.push({l:"Gzipped",v:s.gzip?sdkxBytes(s.gzip):"\u2014",s:s.gzip&&s.bytes?Math.round(100*s.gzip/s.bytes)+"% of original":"over the wire"});if(a.format)stats.push({l:"F\
-ormat",v:a.format,s:a.format==="UMD"?"script tag, CommonJS, AMD":a.format==="ES module"?"import / <script type=module>":""});if(a.global)stats.push({l:"Browser global",v:"window."+a.global,s:"after the script loads"});if(apiExports.length||a.exports&&a.exports.length){const ex=apiExports.length?apiExports:a.exports;stats.push({l:"Exports",v:String(ex.length),s:ex.slice(0,4).join(", ")})}if(deps)stats.
-push({l:"Dependencies",v:String(deps.length),s:deps.length?deps.slice(0,3).join(", "):"none"});if(s.pkg)stats.push({l:"Types",v:api?"Included":s.dts?"None":"\u2026",s:s.dtsPath||""})}return<div className="sdkx"data-theme={dark?"dark":"light"}ref={rootRef}>
+      </div>}const loading=s.status==="loading";const facts=[];if(!loading){const ex=apiExports.length?apiExports:a.exports||[];if(s.bytes!==void 0)facts.push({l:"Size",v:sdkxBytes(s.bytes)+(a.minified?" min":"")});if(s.gzip)facts.push({l:"Gzipped",v:sdkxBytes(s.gzip)});if(a.format)facts.push({l:"Format",v:a.format});if(a.global)facts.push({l:"Global",v:"window."+a.global,mono:1});if(ex.length)facts.
+push({l:ex.length===1?"Export":"Exports",v:ex.length<=2?ex.join(", "):ex.length+" exports",mono:ex.length<=2,t:ex.join(", ")});if(deps)facts.push({l:"Dependencies",v:String(deps.length),t:deps.join(", ")});if(s.pkg)facts.push({l:"Types",v:api?"Included":s.dts?"None":"\u2026"})}const license=pj&&pj.license?typeof pj.license==="string"?pj.license:pj.license.type:"";const qsBar=snippets.map(x=><button key={x.
+id}type="button"className={"sdkx-ctab"+(snip&&x.id===snip.id?" is-on":"")}onClick={()=>setQs(x.id)}>{x.label}</button>);return<div className="sdkx"data-theme={dark?"dark":"light"}ref={rootRef}>
       <style>{SDKX_CSS}</style>
-      <div className="sdkx-hero">
-        <div className={"sdkx-logo"+(api?"":" is-js")}>{api?"TS":"JS"}</div>
-        <div className="sdkx-head">
-          <div className="sdkx-titlerow">
+      <div className="sdkx-head">
+        <div className="sdkx-id">
+          <div className="sdkx-name">
             <h3 className="sdkx-title">{title}</h3>
-            {s.version?<span className="sdkx-pill sdkx-pill--ver">v{s.version}</span>:null}
-            {isLatest?<span className="sdkx-pill sdkx-pill--ok">latest</span>:null}
-            {pj&&pj.license?<span className="sdkx-pill">{typeof pj.license==="string"?pj.license:pj.license.type}</span>:null}
+            {s.versions&&s.versions.length>1?<span className="sdkx-verwrap">
+                <select className="sdkx-select"aria-label="Version"value={s.version||""}onChange={e=>setPicked(e.target.value)}>
+                  {s.versions.slice(0,150).map(v=><option key={v}value={v}>v{v}{s.tags&&s.tags.latest===v?" (latest)":""}</option>)}
+                </select>
+              </span>:s.version?<span className="sdkx-ver">v{s.version}</span>:null}
+            {isLatest?<span className="sdkx-tag sdkx-tag--ok">latest</span>:null}
           </div>
           {desc?<p className="sdkx-desc">{desc}</p>:null}
-          {loading?<div style={{maxWidth:360}}><div className="sdkx-skel"/><div className="sdkx-skel"style={{width:"60%"}}/></div>:<div className="sdkx-meta">
-              {author?<span>by <b>{author}</b></span>:null}
+          {loading?null:<div className="sdkx-by">
+              {author?<span>by {author}</span>:null}
+              {license?<span>{license} license</span>:null}
               {s.pkg?<a href={"https://www.npmjs.com/package/"+s.pkg}target="_blank"rel="noopener noreferrer">npm {"\u2197"}</a>:null}
               {s.pkg?<a href={"https://www.jsdelivr.com/package/npm/"+s.pkg}target="_blank"rel="noopener noreferrer">jsDelivr {"\u2197"}</a>:null}
               {repo?<a href={repo}target="_blank"rel="noopener noreferrer">Repository {"\u2197"}</a>:null}
               {pj&&pj.homepage&&pj.homepage!==repo?<a href={pj.homepage}target="_blank"rel="noopener noreferrer">Homepage {"\u2197"}</a>:null}
-              {!s.pkg&&pinned?<span className="sdkx-mono">{pinned.replace(/^https?:\/\//,"").split("/")[0]}</span>:null}
+              {!s.pkg&&pinned?<span>{pinned.replace(/^https?:\/\//,"").split("/")[0]}</span>:null}
             </div>}
-          <div className="sdkx-actions">
-            {docsProp?<a className="sdkx-btn sdkx-btn--pri"href={docsProp}target="_blank"rel="noopener noreferrer">Documentation {"\u2197"}</a>:null}
-            <button type="button"className={"sdkx-btn"+(docsProp?"":" sdkx-btn--pri")}disabled={s.code===void 0}onClick={()=>save({text:s.code,path:fileName})}>{"\u2193"} Download {fileName}</button>
-            <SdkxCopyBtn className="sdkx-btn"text={pinned}label="Copy URL"/>
-            {s.versions&&s.versions.length>1?<select className="sdkx-select"aria-label="Version"value={s.version||""}onChange={e=>setPicked(e.target.value)}>
-                {s.versions.slice(0,150).map(v=>{const tag=Object.keys(s.tags||{}).filter(t=>s.tags[t]===v);return<option key={v}value={v}>{v}{tag.length?"  ("+tag.join(", ")+")":""}</option>})}
-              </select>:null}
-          </div>
+        </div>
+        <div className="sdkx-actions">
+          {docsProp?<a className="sdkx-btn"href={docsProp}target="_blank"rel="noopener noreferrer">Documentation {"\u2197"}</a>:null}
+          <button type="button"className="sdkx-btn"disabled={s.code===void 0}onClick={()=>save({text:s.code,path:fileName})}>{"\u2193"} Download</button>
+          <SdkxCopyBtn className="sdkx-btn"text={pinned}label="Copy URL"/>
         </div>
       </div>
 
-      {stats.length?<div className="sdkx-stats">
-          {stats.map(x=><div key={x.l}className="sdkx-stat"title={x.v+(x.s?" \u2014 "+x.s:"")}>
-              <div className="sdkx-stat-l">{x.l}</div>
-              <div className="sdkx-stat-v">{x.v}</div>
-              {x.s?<div className="sdkx-stat-s">{x.s}</div>:null}
-            </div>)}
+      {loading?<div className="sdkx-facts"><div className="sdkx-skel"style={{width:320}}/></div>:facts.length?<div className="sdkx-facts">
+          {facts.map(f=><div key={f.l}className="sdkx-fact"title={f.t||void 0}><span>{f.l}</span><b className={f.mono?"sdkx-mono":void 0}>{f.v}</b></div>)}
         </div>:null}
 
-      {s.fileError?<div className="sdkx-err"style={{marginTop:14}}>
+      {s.fileError?<div className="sdkx-err">
           <b>Couldn't load the SDK file</b>
           {s.fileError}. The server has to allow cross-origin requests (CORS) for a docs page to read it; jsDelivr and unpkg both do.
         </div>:null}
 
-      {snip?<div className="sdkx-card">
-          <div className="sdkx-cardhead">
-            <span className="sdkx-cardtitle">Quick start</span>
-            <div className="sdkx-chips">
-              {snippets.map(x=><button key={x.id}type="button"className={"sdkx-chip"+(x.id===snip.id?" is-on":"")}onClick={()=>setQs(x.id)}>{x.label}</button>)}
-            </div>
-          </div>
-          <div className="sdkx-body">
-            <SdkxCode code={snip.code}lang={snip.lang||"bash"}/>
-            {snip.id==="cdn"&&s.sri&&a.format!=="ES module"?<p className="sdkx-note">Pinned to {s.version?"v"+s.version:"this exact file"} with a Subresource Integrity hash, so browsers refuse the script if its bytes ever change.</p>:null}
-          </div>
+      {snip?<div className="sdkx-qs">
+          <SdkxCode code={snip.code}lang={snip.lang||"bash"}bar={qsBar}/>
+          {snip.id==="cdn"&&s.sri&&a.format!=="ES module"?<p className="sdkx-note">Pinned to {s.version?"v"+s.version:"this exact file"} with a Subresource Integrity hash, so browsers refuse the script if its bytes ever change.</p>:null}
         </div>:null}
 
-      {loading?<div className="sdkx-card"><div className="sdkx-body"><div className="sdkx-skel"/><div className="sdkx-skel"style={{width:"80%"}}/><div className="sdkx-skel"style={{width:"65%"}}/></div></div>:shownTabs.length?<div className="sdkx-card">
+      {loading?<div><div className="sdkx-skel"/><div className="sdkx-skel"style={{width:"80%"}}/><div className="sdkx-skel"style={{width:"60%"}}/></div>:shownTabs.length?<div>
           <div className="sdkx-tabs"role="tablist">
             {shownTabs.map(t=><button key={t.id}type="button"role="tab"aria-selected={t.id===active}className={"sdkx-tab"+(t.id===active?" is-on":"")}onClick={()=>setTab(t.id)}>
                 {t.label}{t.n?<small>{t.n}</small>:null}
               </button>)}
           </div>
-          <div className="sdkx-body">
-            {active==="readme"?<div className="sdkx-md">{sdkxMd(s.readme,s.base?s.base+"/":"")}</div>:null}
-            {active==="api"&&api?<SdkxApi api={api}go={go}/>:null}
-            {active==="source"?view?view.loading?<div className="sdkx-empty">Loading {view.path}{"\u2026"}</div>:view.error?<div className="sdkx-err"><b>Couldn't load {view.path}</b>{view.error}</div>:<SdkxSource file={view}onBack={()=>setView(null)}onSave={save}/>:s.code!==void 0?<SdkxSource file={{path:s.path||fileName,text:s.code,minified:a.minified}}onSave={save}/>:<div className="sdkx-empty">The SDK file couldn't be loaded.</div>:
+          {active==="readme"?<div className="sdkx-md">{sdkxMd(s.readme,s.base?s.base+"/":"",false,{shift:1,dropTitle:true})}</div>:null}
+          {active==="api"&&api?<SdkxApi api={api}go={go}/>:null}
+          {active==="source"?view?view.loading?<div className="sdkx-empty">Loading {view.path}{"\u2026"}</div>:view.error?<div className="sdkx-err"><b>Couldn't load {view.path}</b>{view.error}</div>:<SdkxSource file={view}onBack={()=>setView(null)}onSave={save}/>:s.code!==void 0?<SdkxSource file={{path:s.path||fileName,text:s.code,minified:a.minified}}onSave={save}/>:<div className="sdkx-empty">The SDK file couldn't be loaded.</div>:
 null}
-            {active==="files"&&s.files?<div className="sdkx-tblwrap">
-                <table className="sdkx-tbl">
-                  <thead><tr><th>File</th><th>Size</th><th/></tr></thead>
-                  <tbody>
-                    {s.files.map(f=><tr key={f.name}>
-                        <td><span className="sdkx-pname">{f.name.slice(1)}</span>{f.name===s.path?<span className="sdkx-opt">this SDK file</span>:f.name===s.dtsPath?<span className="sdkx-opt">type definitions</span>:null}</td>
-                        <td><span className="sdkx-fsize">{sdkxBytes(f.size)}</span></td>
-                        <td className="sdkx-fact">
-                          {sdkxIsText(f.name)&&f.size<5e6?<button type="button"className="sdkx-btn sdkx-btn--sm"onClick={()=>openFile(f)}>View</button>:null}{" "}
-                          <a className="sdkx-btn sdkx-btn--sm"href={s.base+f.name}target="_blank"rel="noopener noreferrer">Open {"\u2197"}</a>
-                        </td>
-                      </tr>)}
-                  </tbody>
-                </table>
-              </div>:null}
-          </div>
+          {active==="files"&&s.files?<div className="rdmd-table sdkx-files"><div className="rdmd-table-inner">
+              <table>
+                <thead><tr><th style={{textAlign:"left"}}>File</th><th style={{textAlign:"right"}}>Size</th><th/></tr></thead>
+                <tbody>
+                  {s.files.map(f=><tr key={f.name}>
+                      <td style={{textAlign:"left"}}><code>{f.name.slice(1)}</code>{f.name===s.path?<span className="sdkx-fnote">SDK file</span>:f.name===s.dtsPath?<span className="sdkx-fnote">types</span>:null}</td>
+                      <td style={{textAlign:"right"}}><span className="sdkx-fsize">{sdkxBytes(f.size)}</span></td>
+                      <td style={{textAlign:"right",whiteSpace:"nowrap"}}>
+                        {sdkxIsText(f.name)&&f.size<5e6?<button type="button"className="sdkx-linkbtn"onClick={()=>openFile(f)}>View</button>:null}
+                        {sdkxIsText(f.name)&&f.size<5e6?" \xB7 ":null}
+                        <a href={s.base+f.name}target="_blank"rel="noopener noreferrer">Open {"\u2197"}</a>
+                      </td>
+                    </tr>)}
+                </tbody>
+              </table>
+            </div></div>:null}
         </div>:null}
     </div>};
