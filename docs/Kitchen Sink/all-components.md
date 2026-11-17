@@ -226,7 +226,7 @@ The box below is one snippet shared by several pages. Edit it once and every pag
 
 <OrbitHelp />
 
-## Footnotes
+## Fine print
 
 Orbital velocity in low Earth orbit is about 7.8 km/s[^1].
 
