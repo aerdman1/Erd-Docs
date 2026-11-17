@@ -7,7 +7,7 @@ icon: fad fa-list-tree
 metadata:
   robots: index
 ---
-Pick any endpoint in the hub’s API definitions to see its parameters and a sample request. It finds the definitions on its own, so new endpoints show up here without editing the page.
+Pick any endpoint in the hub’s API definitions, or search by path, method or summary. You get a link to its reference page, a ready-to-paste Markdown link, and the full definition one click away. It finds the definitions on its own, so new endpoints show up here without editing the page.
 
 <EndpointPicker />
 

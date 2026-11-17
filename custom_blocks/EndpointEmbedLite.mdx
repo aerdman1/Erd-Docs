@@ -46,7 +46,9 @@ export const EndpointEmbedLite = rawProps => {
   const method = String(props.method || (op && op.method) || "GET").toUpperCase();
   const path = props.endpoint || (op && op.path) || "";
   const title = props.title || (op && op.summary) || path || opId || "Endpoint";
-  const description = props.description || (op && op.description ? String(op.description).split("\n")[0] : "");
+  const plain = t => String(t || "").replace(/\[([^\]]+)\]\([^)]*\)/g, "$1").replace(/\*+|`/g, "").replace(/\s+/g, " ").trim();
+  const firstSentence = t => { const m = plain(t).match(/^.{20,220}?[.!?](\s|$)/); return m ? m[0].trim() : plain(t).slice(0, 200); };
+  const description = props.description || (op && op.description ? firstSentence(op.description) : "");
   const slug = props.docslug || (opId ? opId.toLowerCase() : String(path).replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "")) || "";
   const href = props.href || (slug ? "/reference/" + slug : "#");
   const mode = props.displaymode || "popup";
@@ -71,6 +73,7 @@ export const EndpointEmbedLite = rawProps => {
 .eo-ep-foot{display:block;margin-top:10px;font-size:13px;font-weight:600;color:var(--eo-accent)}
 .eo-ep-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:4px;margin-left:6px}
 .eo-ep-pop{position:absolute;left:0;top:calc(100% + 8px);z-index:1000;animation:eo-ep-in .14s ease both}
+.eo-ep-pop .eo-ep-card{width:340px;max-width:calc(100vw - 32px);box-sizing:border-box;white-space:normal}
 @keyframes eo-ep-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 `;
   const RGB = { GET: "37,99,235", POST: "22,163,74", PUT: "202,138,4", PATCH: "217,119,6", DELETE: "220,38,38", HEAD: "14,116,144", OPTIONS: "107,114,128" };
