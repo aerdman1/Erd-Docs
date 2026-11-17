@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-excerpt: Set up the welcome page for your API to help users make their first call.
+excerpt: Your Orbit base URL, your API key and your first request, all in one place.
 api_config: getting-started
-hidden: true
+hidden: false
 ---

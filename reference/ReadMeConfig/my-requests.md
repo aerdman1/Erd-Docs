@@ -1,6 +1,6 @@
 ---
 title: My Requests
-excerpt: Set up My Requests to enable your users to debug their requests.
+excerpt: Every request you’ve sent to Orbit, with the full request and response.
 api_config: my-requests
-hidden: true
+hidden: false
 ---

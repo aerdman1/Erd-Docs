@@ -1,6 +1,6 @@
 ---
 title: Authentication
-excerpt: Set up the authentication for your API to help users manage their credentials.
+excerpt: How Orbit authenticates requests, with your own key filled in when you’re logged in.
 api_config: authentication
-hidden: true
+hidden: false
 ---

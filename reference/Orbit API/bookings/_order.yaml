@@ -1,0 +1,7 @@
+- listbookings
+- createbooking
+- getbooking
+- updatebooking
+- cancelbooking
+- uploadmanifest
+- bookingconfirmed
