@@ -1,0 +1,795 @@
+openapi: 3.1.0
+info:
+  title: Orbit API
+  version: 1.4.0
+  summary: Book cargo space on reusable rockets, track payloads, and stream telemetry.
+  description: |
+    The **Orbit API** from Erdman Industries lets you find upcoming launches, book payload
+    slots, upload cargo manifests and follow your payload all the way to orbit.
+
+    > 📘 Orbit and Erdman Industries are made up
+    >
+    > This API exists to show off what ReadMe can do. The **Sandbox** server echoes your
+    > request back, so **Try It!** always works.
+  contact:
+    name: Orbit Developer Relations
+    url: https://erdman.readme.io/discuss
+  license:
+    name: MIT
+    identifier: MIT
+servers:
+  - url: https://httpbin.org/anything/orbit/v1
+    description: Sandbox (echoes your request back)
+  - url: https://api.{region}.orbit.erdman.example/v1
+    description: Production
+    variables:
+      region:
+        default: us-east
+        enum: [us-east, eu-central, ap-south]
+        description: The launch region closest to your systems.
+security:
+  - OrbitKey: []
+  - OAuth2: [bookings:read, bookings:write, telemetry:read]
+tags:
+  - name: Launches
+    description: Scheduled launches and their remaining cargo capacity.
+  - name: Bookings
+    description: Reserve, change and cancel payload slots on a launch.
+  - name: Payloads
+    description: Follow a booked payload from the pad to its target orbit.
+  - name: Account
+    description: Usage, quotas and plan limits for your Orbit account.
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true
+  samples-languages: [shell, node, python, go, ruby]
+paths:
+  /launches:
+    get:
+      operationId: listLaunches
+      summary: List launches
+      description: |
+        Returns upcoming launches, soonest first. Filter by status, vehicle or launch window
+        to find a slot with enough capacity for your payload.
+      tags: [Launches]
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - name: status
+          in: query
+          description: Only return launches in this state.
+          schema:
+            $ref: '#/components/schemas/LaunchStatus'
+        - name: vehicle
+          in: query
+          description: Only return launches on this vehicle.
+          schema:
+            $ref: '#/components/schemas/Vehicle'
+        - name: window_start
+          in: query
+          description: Earliest launch window to include (ISO 8601).
+          schema:
+            type: string
+            format: date-time
+            examples: ['2026-12-01T00:00:00Z']
+        - name: min_capacity_kg
+          in: query
+          description: Only return launches with at least this much free cargo capacity.
+          schema:
+            type: integer
+            minimum: 1
+            examples: [250]
+      responses:
+        '200':
+          description: A page of launches.
+          headers:
+            X-RateLimit-Remaining:
+              $ref: '#/components/headers/RateLimitRemaining'
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, has_more]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Launch'
+                  has_more:
+                    type: boolean
+                  next_cursor:
+                    type: [string, 'null']
+              examples:
+                upcoming:
+                  summary: Two upcoming launches
+                  value:
+                    data:
+                      - id: lch_7Hq2Zr
+                        name: Starhopper 14
+                        vehicle: kestrel-heavy
+                        status: scheduled
+                        window: { opens_at: '2026-12-03T14:05:00Z', closes_at: '2026-12-03T16:05:00Z' }
+                        pad: LC-39X
+                        capacity: { total_kg: 6400, available_kg: 1850 }
+                        target_orbit: leo
+                      - id: lch_9Kd4Mw
+                        name: Polaris Run
+                        vehicle: wren
+                        status: go
+                        window: { opens_at: '2026-12-09T03:30:00Z', closes_at: '2026-12-09T04:00:00Z' }
+                        pad: SLC-7E
+                        capacity: { total_kg: 900, available_kg: 120 }
+                        target_orbit: sso
+                    has_more: true
+                    next_cursor: Y3Vyc29yOjI=
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /launches/{launchId}:
+    parameters:
+      - $ref: '#/components/parameters/LaunchId'
+    get:
+      operationId: getLaunch
+      summary: Get a launch
+      description: Returns one launch, including its weather outlook and live countdown.
+      tags: [Launches]
+      responses:
+        '200':
+          description: The launch.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Launch'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /launches/{launchId}/weather:
+    parameters:
+      - $ref: '#/components/parameters/LaunchId'
+    get:
+      operationId: getLaunchWeather
+      summary: Get launch weather
+      deprecated: true
+      description: |
+        **Deprecated.** Read the `weather` object on [Get a launch](getlaunch) instead.
+        This endpoint stops responding on 2027-03-01.
+      tags: [Launches]
+      responses:
+        '200':
+          description: The weather outlook for the launch window.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Weather'
+  /bookings:
+    get:
+      operationId: listBookings
+      summary: List bookings
+      description: Returns your bookings, newest first.
+      tags: [Bookings]
+      security:
+        - OrbitKey: []
+        - OAuth2: [bookings:read]
+      parameters:
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/BookingStatus'
+      responses:
+        '200':
+          description: A page of bookings.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Booking'
+                  has_more:
+                    type: boolean
+                  next_cursor:
+                    type: [string, 'null']
+    post:
+      operationId: createBooking
+      summary: Book a payload slot
+      description: |
+        Reserves cargo space on a launch. The booking starts as `pending` and moves to
+        `confirmed` once Orbit checks your manifest. You get a `booking.confirmed` webhook
+        when that happens.
+
+        Send an `Idempotency-Key` header so a retried request never books twice.
+      tags: [Bookings]
+      security:
+        - OrbitKey: []
+        - OAuth2: [bookings:write]
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          description: A unique value (a UUID works) that makes retries safe.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+            examples:
+              cubesat:
+                summary: A 3U CubeSat to sun-synchronous orbit
+                value:
+                  launch_id: lch_9Kd4Mw
+                  payload:
+                    type: satellite
+                    name: Pixel Owl 3U
+                    mass_kg: 4
+                    target_orbit: sso
+                    deploy_altitude_km: 525
+                  insurance: standard
+                  notify_url: https://example.com/hooks/orbit
+              bulk:
+                summary: Bulk cargo to the station
+                value:
+                  launch_id: lch_7Hq2Zr
+                  payload:
+                    type: bulk_cargo
+                    name: Hydroponics resupply
+                    mass_kg: 820
+                    pressurized: true
+                    hazmat_class: none
+                  insurance: premium
+      responses:
+        '201':
+          description: The booking was created and is pending manifest review.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+              examples:
+                pending:
+                  value:
+                    id: bkg_4Fh8Qp
+                    launch_id: lch_9Kd4Mw
+                    status: pending
+                    payload: { type: satellite, name: Pixel Owl 3U, mass_kg: 4, target_orbit: sso, deploy_altitude_km: 525 }
+                    price: { amount: 245000, currency: USD }
+                    created_at: '2026-11-17T15:02:11Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: The launch has no room left for this payload.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: https://erdman.readme.io/docs/errors-and-rate-limits#launch-full
+                title: Launch is full
+                status: 409
+                detail: Polaris Run has 120 kg free and this payload is 820 kg.
+        '422':
+          description: The payload can't reach its target orbit on this vehicle.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              example:
+                type: https://erdman.readme.io/docs/errors-and-rate-limits#delta-v-exceeded
+                title: Delta-v budget exceeded
+                status: 422
+                detail: A wren can't lift 820 kg to GEO. Try a kestrel-heavy launch.
+  /bookings/{bookingId}:
+    parameters:
+      - $ref: '#/components/parameters/BookingId'
+    get:
+      operationId: getBooking
+      summary: Get a booking
+      tags: [Bookings]
+      responses:
+        '200':
+          description: The booking.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: updateBooking
+      summary: Update a booking
+      description: Change the insurance tier or webhook URL. Payload changes need a new booking.
+      tags: [Bookings]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                insurance:
+                  $ref: '#/components/schemas/Insurance'
+                notify_url:
+                  type: string
+                  format: uri
+      responses:
+        '200':
+          description: The updated booking.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+    delete:
+      operationId: cancelBooking
+      summary: Cancel a booking
+      description: |
+        Cancels a booking. Cancelling more than 30 days before the window opens is free.
+        After that, Orbit keeps 25% of the price.
+      tags: [Bookings]
+      responses:
+        '204':
+          description: The booking was cancelled.
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /bookings/{bookingId}/manifest:
+    parameters:
+      - $ref: '#/components/parameters/BookingId'
+    post:
+      operationId: uploadManifest
+      summary: Upload a cargo manifest
+      description: Attach the signed cargo manifest (PDF, up to 10 MB). Orbit reviews it within one business day.
+      tags: [Bookings]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The signed manifest as a PDF.
+                signed_by:
+                  type: string
+                  description: Name of the person who signed the manifest.
+      responses:
+        '202':
+          description: The manifest was received and is queued for review.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  booking_id:
+                    type: string
+                  review_status:
+                    type: string
+                    enum: [queued, in_review, approved, rejected]
+  /payloads/{payloadId}/telemetry:
+    parameters:
+      - name: payloadId
+        in: path
+        required: true
+        schema:
+          type: string
+          examples: [pld_2Xc9Lb]
+    get:
+      operationId: getTelemetry
+      summary: Get payload telemetry
+      description: Returns telemetry samples for a payload in flight.
+      tags: [Payloads]
+      security:
+        - OrbitKey: []
+        - OAuth2: [telemetry:read]
+      parameters:
+        - name: interval
+          in: query
+          description: How far apart the samples are.
+          schema:
+            type: string
+            enum: [1s, 10s, 1m, 5m]
+            default: 10s
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Telemetry samples, oldest first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TelemetrySample'
+              example:
+                - at: '2026-12-09T03:41:00Z'
+                  altitude_km: 212.4
+                  velocity_mps: 7466
+                  temperature_c: -18.5
+                  phase: ascent
+                - at: '2026-12-09T03:41:10Z'
+                  altitude_km: 219.9
+                  velocity_mps: 7512
+                  temperature_c: -19.1
+                  phase: ascent
+  /account/usage:
+    get:
+      operationId: getUsage
+      summary: Get account usage
+      description: Returns how much of your monthly quota you've used.
+      tags: [Account]
+      responses:
+        '200':
+          description: Usage for the current billing period.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan:
+                    type: string
+                    enum: [hobby, mission, fleet]
+                  period_ends_at:
+                    type: string
+                    format: date-time
+                  requests:
+                    type: object
+                    properties:
+                      used: { type: integer }
+                      limit: { type: integer }
+                  kg_booked:
+                    type: object
+                    properties:
+                      used: { type: integer }
+                      limit: { type: integer }
+webhooks:
+  booking.confirmed:
+    post:
+      operationId: bookingConfirmed
+      summary: Booking confirmed
+      description: Sent when Orbit approves a manifest and the booking is final.
+      tags: [Bookings]
+      parameters:
+        - $ref: '#/components/parameters/OrbitSignature'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookEvent'
+            example:
+              id: evt_1Lr7Ns
+              type: booking.confirmed
+              created_at: '2026-11-18T09:12:44Z'
+              data: { booking_id: bkg_4Fh8Qp, launch_id: lch_9Kd4Mw, status: confirmed }
+      responses:
+        '200':
+          description: Return any 2xx to acknowledge the event.
+  launch.status_changed:
+    post:
+      operationId: launchStatusChanged
+      summary: Launch status changed
+      description: Sent whenever a launch you have a booking on changes state, such as `go` to `scrubbed`.
+      tags: [Launches]
+      parameters:
+        - $ref: '#/components/parameters/OrbitSignature'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookEvent'
+            example:
+              id: evt_8Wq2Hd
+              type: launch.status_changed
+              created_at: '2026-12-09T03:12:00Z'
+              data: { launch_id: lch_9Kd4Mw, from: go, to: scrubbed, reason: Upper-level winds }
+      responses:
+        '200':
+          description: Return any 2xx to acknowledge the event.
+components:
+  securitySchemes:
+    OrbitKey:
+      type: apiKey
+      in: header
+      name: X-Orbit-Key
+      description: Your secret key from **Account → API keys**. It starts with `ok_live_` or `ok_test_`.
+    OAuth2:
+      type: oauth2
+      description: For server-to-server integrations that act on behalf of a team.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.orbit.erdman.example/oauth/token
+          scopes:
+            bookings:read: Read bookings
+            bookings:write: Create, change and cancel bookings
+            telemetry:read: Read payload telemetry
+  parameters:
+    LaunchId:
+      name: launchId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^lch_[A-Za-z0-9]{6}$'
+        examples: [lch_9Kd4Mw]
+    BookingId:
+      name: bookingId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: '^bkg_[A-Za-z0-9]{6}$'
+        examples: [bkg_4Fh8Qp]
+    Cursor:
+      name: cursor
+      in: query
+      description: The `next_cursor` from the previous page.
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      description: How many results to return.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    OrbitSignature:
+      name: Orbit-Signature
+      in: header
+      required: true
+      description: HMAC-SHA256 of the raw body, signed with your webhook secret. See [Webhooks](/docs/webhooks).
+      schema:
+        type: string
+        examples: ['t=1765271520,v1=5f2c9a…']
+  headers:
+    RateLimitRemaining:
+      description: Requests left in the current one-minute window.
+      schema:
+        type: integer
+        examples: [118]
+  responses:
+    BadRequest:
+      description: The request was malformed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthorized:
+      description: The API key is missing or invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+          example:
+            type: https://erdman.readme.io/docs/errors-and-rate-limits#unauthorized
+            title: Missing or invalid API key
+            status: 401
+    NotFound:
+      description: Nothing exists with that ID.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    RateLimited:
+      description: Too many requests. Wait until the window resets.
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying.
+          schema:
+            type: integer
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    LaunchStatus:
+      type: string
+      enum: [scheduled, go, hold, scrubbed, launched]
+      description: |
+        - `scheduled`: on the manifest, more than 48 hours out
+        - `go`: cleared for launch
+        - `hold`: countdown paused
+        - `scrubbed`: will not fly in this window
+        - `launched`: off the pad
+    Vehicle:
+      type: string
+      enum: [wren, kestrel, kestrel-heavy]
+      description: '`wren` lifts up to 900 kg to LEO, `kestrel` 4,000 kg and `kestrel-heavy` 6,400 kg.'
+    Orbit:
+      type: string
+      enum: [leo, sso, meo, geo]
+    Insurance:
+      type: string
+      enum: [none, standard, premium]
+      default: standard
+    BookingStatus:
+      type: string
+      enum: [pending, confirmed, loaded, delivered, cancelled]
+    Launch:
+      type: object
+      required: [id, name, vehicle, status, window, capacity]
+      properties:
+        id:
+          type: string
+          examples: [lch_9Kd4Mw]
+        name:
+          type: string
+          examples: [Polaris Run]
+        vehicle:
+          $ref: '#/components/schemas/Vehicle'
+        status:
+          $ref: '#/components/schemas/LaunchStatus'
+        window:
+          type: object
+          properties:
+            opens_at:
+              type: string
+              format: date-time
+            closes_at:
+              type: string
+              format: date-time
+        pad:
+          type: string
+          examples: [SLC-7E]
+        capacity:
+          type: object
+          properties:
+            total_kg:
+              type: integer
+            available_kg:
+              type: integer
+        target_orbit:
+          $ref: '#/components/schemas/Orbit'
+        weather:
+          $ref: '#/components/schemas/Weather'
+    Weather:
+      type: object
+      properties:
+        go_probability:
+          type: number
+          minimum: 0
+          maximum: 1
+          examples: [0.85]
+        concerns:
+          type: array
+          items:
+            type: string
+            enum: [cumulus_clouds, upper_level_winds, lightning, solar_activity]
+    Satellite:
+      type: object
+      required: [type, name, mass_kg, target_orbit]
+      properties:
+        type:
+          const: satellite
+        name:
+          type: string
+        mass_kg:
+          type: number
+          exclusiveMinimum: 0
+        target_orbit:
+          $ref: '#/components/schemas/Orbit'
+        deploy_altitude_km:
+          type: integer
+          minimum: 160
+          maximum: 36000
+    BulkCargo:
+      type: object
+      required: [type, name, mass_kg]
+      properties:
+        type:
+          const: bulk_cargo
+        name:
+          type: string
+        mass_kg:
+          type: number
+          exclusiveMinimum: 0
+        pressurized:
+          type: boolean
+          default: false
+        hazmat_class:
+          type: string
+          enum: [none, class_2, class_3, class_9]
+          default: none
+    Payload:
+      oneOf:
+        - $ref: '#/components/schemas/Satellite'
+        - $ref: '#/components/schemas/BulkCargo'
+      discriminator:
+        propertyName: type
+        mapping:
+          satellite: '#/components/schemas/Satellite'
+          bulk_cargo: '#/components/schemas/BulkCargo'
+    BookingCreate:
+      type: object
+      required: [launch_id, payload]
+      properties:
+        launch_id:
+          type: string
+          examples: [lch_9Kd4Mw]
+        payload:
+          $ref: '#/components/schemas/Payload'
+        insurance:
+          $ref: '#/components/schemas/Insurance'
+        notify_url:
+          type: string
+          format: uri
+          description: Where Orbit sends webhooks for this booking. Overrides your account default.
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Up to 20 key/value pairs of your own data.
+    Booking:
+      allOf:
+        - $ref: '#/components/schemas/BookingCreate'
+        - type: object
+          required: [id, status, created_at]
+          properties:
+            id:
+              type: string
+              examples: [bkg_4Fh8Qp]
+            status:
+              $ref: '#/components/schemas/BookingStatus'
+            price:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  description: Price in the smallest currency unit (cents).
+                currency:
+                  type: string
+                  examples: [USD]
+            created_at:
+              type: string
+              format: date-time
+    TelemetrySample:
+      type: object
+      properties:
+        at:
+          type: string
+          format: date-time
+        altitude_km:
+          type: number
+        velocity_mps:
+          type: number
+        temperature_c:
+          type: number
+        phase:
+          type: string
+          enum: [pad, ascent, coast, deploy, orbit]
+    WebhookEvent:
+      type: object
+      required: [id, type, created_at, data]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [booking.confirmed, launch.status_changed]
+        created_at:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: true
+    Problem:
+      type: object
+      description: An [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details object.
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
