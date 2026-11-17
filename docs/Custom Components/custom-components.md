@@ -12,7 +12,7 @@ Built-in blocks cover most pages. When you need something they can’t do, write
 Every component in this section is one of those files. Each page shows it live, then how to use it.
 
 <Cards columns="3">
-  <Card title="Launch Countdown" href="/docs/launch-countdown" icon="fa-timer" iconColor="#7B3FF2" badge="New">
+  <Card title="Countdown" href="/docs/launch-countdown" icon="fa-timer" iconColor="#7B3FF2" badge="New">
     A live T-minus clock in the reader’s time zone.
   </Card>
 

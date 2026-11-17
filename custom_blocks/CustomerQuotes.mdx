@@ -49,11 +49,12 @@ export const CustomerQuotes = rawProps => {
 @keyframes eo-quote-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.eo-quotes-slide{animation:none}}
 .eo-quote{margin:0}
-.eo-quote-text{margin:0;padding:0 0 0 44px;border:0;position:relative;font-size:1.25em;line-height:1.5;font-weight:500;color:inherit}
-.eo-quote-text::before{content:"“";position:absolute;left:0;top:-14px;font-size:64px;line-height:1;color:var(--eo-accent);font-family:Georgia,serif}
+.eo-quotes .eo-quote-text{margin:0!important;padding:0 0 0 44px!important;border:0!important;background:none!important;position:relative;font-size:1.25em;line-height:1.5;font-weight:500;font-style:normal!important;color:var(--color-text-default,inherit)!important;quotes:none}
+.eo-quotes .eo-quote-text::after{content:none!important}
+.eo-quotes .eo-quote-text::before{display:block;content:"“";position:absolute;left:0;top:-14px;font-size:64px;line-height:1;color:var(--eo-accent);font-family:Georgia,serif}
 .eo-quote-text p{margin:0}
-.eo-quote-who{display:flex;align-items:center;gap:12px;margin:18px 0 0 44px}
-.eo-quote-avatar{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;object-fit:cover;
+.eo-quotes .eo-quote-who{display:flex!important;align-items:center;gap:12px;margin:18px 0 0 44px!important;padding:0!important;font-style:normal!important;text-align:left!important;color:inherit!important;font-size:15px}
+.eo-quotes .eo-quote-avatar{font-style:normal;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;object-fit:cover;
   background:linear-gradient(135deg,#19C3F5,#2F7BF5 55%,#7B3FF2);color:#fff;font-weight:700;font-size:14px;flex:none}
 .eo-quote-role{display:block;color:var(--eo-muted);font-size:13px}
 .eo-quotes-nav{display:flex;align-items:center;justify-content:space-between;margin-top:18px}
