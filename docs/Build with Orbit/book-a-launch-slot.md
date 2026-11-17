@@ -9,7 +9,7 @@ metadata:
 ---
 Booking takes four steps. Click through them, then read the details below.
 
-<SimpleStepperComponent>
+<SimpleStepper>
   <SimpleStep header="1. Find a launch">
     List launches with enough free capacity for your payload.
   </SimpleStep>
@@ -25,7 +25,7 @@ Booking takes four steps. Click through them, then read the details below.
   <SimpleStep header="4. Wait for confirmation">
     A booking.confirmed webhook tells you it’s final.
   </SimpleStep>
-</SimpleStepperComponent>
+</SimpleStepper>
 
 ## Before you start
 
@@ -105,7 +105,7 @@ await fetch(`https://api.us-east.orbit.erdman.example/v1/bookings/${bookingId}/m
 Orbit reviews manifests within one business day. When it approves yours, the booking moves to `confirmed` and you get a [booking.confirmed](/reference/bookingconfirmed) webhook.
 
 <Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
-  * A **custom component**: `SimpleStepperComponent`, written in MDX and stored with the project
+  * A **custom component**: `SimpleStepper`, written in MDX and stored with the project
   * A **checklist** using Markdown task-list syntax
   * **Tabs** holding JSON examples for each `oneOf` payload type
   * A **code block with a file name** as its title
