@@ -9,6 +9,10 @@ metadata:
 ---
 Every Orbit request is authenticated. Pick the method that fits how your integration runs.
 
+Signed in? Your key is right here:
+
+<ApiKeyCard />
+
 <Tabs>
   <Tab title="API key" icon="fa-key">
     Send your secret key in the `X-Orbit-Key` header. This is the quickest way to start, and it suits scripts and back-end services.
@@ -61,6 +65,7 @@ OAuth tokens only reach what their scopes allow. API keys have every scope.
   * **Tabs** with Font Awesome icons, each holding code and a table
   * Two Markdown **tables**
   * An **error** Callout
+  * The [API Key Card](/docs/api-key-card), a **custom component** that reads the signed-in reader’s own key
   * The help box at the bottom is **reusable content**: one snippet, edited in one place, shown on many pages
   * The API Reference reads the same two auth methods from the OpenAPI file’s `securitySchemes`
 </Accordion>

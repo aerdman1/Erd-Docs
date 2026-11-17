@@ -48,7 +48,9 @@ sequenceDiagram
 
 ## Where we fly
 
-Orbit flies payloads to <Glossary>LEO</Glossary>, <Glossary>SSO</Glossary>, <Glossary>MEO</Glossary> and <Glossary>GEO</Glossary>. How much mass a vehicle can lift to each one comes down to <Glossary>delta-v</Glossary>. Hover any underlined term to see what it means.
+Orbit flies payloads to <Glossary>LEO</Glossary>, <Glossary>SSO</Glossary>, <Glossary>MEO</Glossary> and <Glossary>GEO</Glossary>. How much mass a vehicle can lift to each one comes down to <Glossary>delta-v</Glossary>. Hover any underlined term to see what it means. Click an orbit below to compare them.
+
+<OrbitViz highlight="sso" />
 
 ## Launch windows
 
@@ -72,6 +74,7 @@ Every launch has a <Glossary>launch window</Glossary>: the span of time when the
   * A Markdown **table** with bold text and inline code
   * Two **Mermaid** diagrams written as text: a state diagram and a sequence diagram
   * **Glossary** terms: hover one for its definition. Each term is defined once, in the project’s glossary
+  * [Orbit Viz](/docs/orbit-viz), an animated SVG **custom component**
   * **Accordions** with Font Awesome icons, used as an FAQ
   * Links straight to API Reference endpoints
 </Accordion>

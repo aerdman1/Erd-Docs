@@ -63,6 +63,10 @@ Orbit is the launch-logistics API from **Erdman Industries**. Find a launch with
   </Column>
 </Columns>
 
+## Next launch
+
+<LaunchCountdown mission="Polaris Run" vehicle="kestrel" orbit="SSO" pad="LC-39X" />
+
 ## Pick a vehicle
 
 | Vehicle         | Payload to LEO | Typical use                    |
@@ -71,11 +75,26 @@ Orbit is the launch-logistics API from **Erdman Industries**. Find a launch with
 | `kestrel`       |       4,000 kg | Constellation batches          |
 | `kestrel-heavy` |       6,400 kg | Station resupply, heavy cargo  |
 
+## Latest changes
+
+<RSS compact="true" limit="3" />
+
+<CustomerQuotes title="What launch partners say">
+  <CustomerQuote author="Dana Whitfield" role="Mission lead" company="Pixel Owl">
+    We booked our first CubeSat in an afternoon. The sandbox meant our tests never touched a real rocket.
+  </CustomerQuote>
+
+  <CustomerQuote author="Ravi Menon" role="CTO" company="Hydroponics Orbital">
+    Webhooks told us our cargo was loaded before our own ops team did.
+  </CustomerQuote>
+</CustomerQuotes>
+
 <Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
   * **Callout** with a custom emoji icon and a title
   * **Cards** in three columns, with Font Awesome icons, links and a badge
   * **Columns** holding regular Markdown lists
   * A Markdown **table** with left- and right-aligned columns
+  * Three **custom components**: a live [launch countdown](/docs/launch-countdown), a [changelog feed](/docs/changelog-feed) that reads the hub’s RSS, and [testimonials](/docs/quotes)
   * This **Accordion**
   * The sidebar icon and the summary under the title come from the page’s frontmatter (`icon`, `excerpt`)
 </Accordion>

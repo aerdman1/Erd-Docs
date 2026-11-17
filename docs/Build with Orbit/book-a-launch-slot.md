@@ -36,13 +36,19 @@ Booking takes four steps. Click through them, then read the details below. If yo
 * [ ] Your <Glossary>manifest</Glossary> is signed and saved as a PDF
 * [ ] You have a webhook endpoint ready ([Webhooks](/docs/webhooks))
 
+## Price it first
+
+See which vehicles can carry your payload and what it costs. The calculator writes the booking request for you:
+
+<PayloadCalculator />
+
 ## 1. Find a launch
 
-Call [List launches](/reference/listlaunches) with `min_capacity_kg` set to your payload’s mass. Filter by `vehicle` if your payload needs a specific one.
+Call <EndpointEmbedLite operationId="listLaunches" /> with `min_capacity_kg` set to your payload’s mass. Filter by `vehicle` if your payload needs a specific one.
 
 ## 2. Book the slot
 
-Call [Book a payload slot](/reference/createbooking). The `payload.type` field decides which other fields are required:
+Call <EndpointEmbedLite operationId="createBooking" />. The `payload.type` field decides which other fields are required:
 
 <Tabs>
   <Tab title="Satellite" icon="fa-satellite">
@@ -109,6 +115,7 @@ Orbit reviews manifests within one business day. When it approves yours, the boo
 <Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
   * A **custom component**: `SimpleStepper`, written in MDX and stored with the project
   * A **Recipe** embed: a step-by-step code walkthrough that opens in place
+  * The [Payload Calculator](/docs/payload-calculator) and [Endpoint Chips](/docs/endpoint-embedding-lite), two more **custom components**
   * A **Glossary** term in the checklist
   * A **checklist** using Markdown task-list syntax
   * **Tabs** holding JSON examples for each `oneOf` payload type

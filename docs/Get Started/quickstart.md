@@ -103,6 +103,12 @@ console.log(await res.json()); // status: "pending"
 
 The booking comes back as `pending`. It moves to `confirmed` once Orbit reviews your cargo manifest.
 
+## Prefer the command line?
+
+The same booking with the Orbit CLI:
+
+<Terminal title="orbit — zsh" script="$ npm install -g @erdman/orbit-cli\nadded 1 package in 2s\n$ orbit launches list --min-capacity 4\n→ lch_9Kd4Mw  Polaris Run  kestrel  SSO  120 kg free\n$ orbit book lch_9Kd4Mw --payload ./pixel-owl.json\n✔ Booked bkg_4Fh8Qp (pending manifest review)" />
+
 <Callout icon="🎉" theme="okay">
   ### You booked your first launch
 
@@ -115,4 +121,5 @@ The booking comes back as `pending`. It moves to `confirmed` once Orbit reviews 
   * A plain **code block** with JSON syntax highlighting
   * **Callouts** in the warning and success themes
   * Links to other guides and to the **API Reference**
+  * A [Terminal](/docs/terminal) **custom component** that types out a CLI session
 </Accordion>
