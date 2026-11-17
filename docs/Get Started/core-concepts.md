@@ -46,9 +46,13 @@ sequenceDiagram
   Orbit-)App: booking.confirmed webhook
 ```
 
+## Where we fly
+
+Orbit flies payloads to <Glossary>LEO</Glossary>, <Glossary>SSO</Glossary>, <Glossary>MEO</Glossary> and <Glossary>GEO</Glossary>. How much mass a vehicle can lift to each one comes down to <Glossary>delta-v</Glossary>. Hover any underlined term to see what it means.
+
 ## Launch windows
 
-Every launch has a **window**: the span of time when the vehicle can fly to its target orbit. If weather or a technical issue gets in the way, the launch goes to `hold` or `scrubbed`. A scrubbed booking rolls to the next launch on the same vehicle for free.
+Every launch has a <Glossary>launch window</Glossary>: the span of time when the vehicle can fly to its target orbit. If weather or a technical issue gets in the way, the launch goes to `hold` or `scrubbed`. A scrubbed booking rolls to the next launch on the same vehicle for free.
 
 ## FAQ
 
@@ -67,6 +71,7 @@ Every launch has a **window**: the span of time when the vehicle can fly to its 
 <Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
   * A Markdown **table** with bold text and inline code
   * Two **Mermaid** diagrams written as text: a state diagram and a sequence diagram
+  * **Glossary** terms: hover one for its definition. Each term is defined once, in the project’s glossary
   * **Accordions** with Font Awesome icons, used as an FAQ
   * Links straight to API Reference endpoints
 </Accordion>

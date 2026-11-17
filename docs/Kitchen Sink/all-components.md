@@ -109,7 +109,7 @@ launches = Orbit::Launch.list(min_capacity_kg: 4)
 
 ## Images
 
-<Image align="center" width="70%" border="true" src="https://files.readme.io/37cb006440784bfafda1fb8b3ba62b8e2196055285ddc90e99f082bdf9937ccc-5647793d-6fa1-450f-a30c-1716a863f7cf.png" alt="Erdman Industries logo" caption="Images can be aligned, resized, bordered and captioned. Click to zoom." />
+<Image align="center" width="240px" border="true" src="https://files.readme.io/9abb7424e8472cd8547d1c7bc15f856dedbef1124b8beec31e5ced61914c9659-erdman-mark.png" alt="The Erdman Industries swoosh" caption="Images can be aligned, resized, bordered and captioned. Click to zoom." />
 
 ## Mermaid diagrams
 
@@ -219,6 +219,16 @@ A link preview:
   </div>
 </div>
 `}</HTMLBlock>
+
+## Recipes
+
+A Recipe is a step-by-step code walkthrough. Embed one and it opens in place:
+
+<Recipe slug="book-your-first-launch-slot" title="Book your first launch slot" />
+
+## Glossary
+
+Terms from the project glossary show their definition on hover: <Glossary>LEO</Glossary>, <Glossary>delta-v</Glossary> and <Glossary>idempotency key</Glossary>.
 
 ## Reusable content
 

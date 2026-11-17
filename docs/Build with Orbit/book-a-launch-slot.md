@@ -7,7 +7,9 @@ icon: fad fa-box-taped
 metadata:
   robots: index
 ---
-Booking takes four steps. Click through them, then read the details below.
+Booking takes four steps. Click through them, then read the details below. If you’d rather read code, follow the recipe:
+
+<Recipe slug="book-your-first-launch-slot" title="Book your first launch slot" />
 
 <SimpleStepper>
   <SimpleStep header="1. Find a launch">
@@ -31,7 +33,7 @@ Booking takes four steps. Click through them, then read the details below.
 
 * [x] You have an API key ([Authentication](/docs/authentication))
 * [x] You know your payload’s mass and target orbit
-* [ ] Your manifest is signed and saved as a PDF
+* [ ] Your <Glossary>manifest</Glossary> is signed and saved as a PDF
 * [ ] You have a webhook endpoint ready ([Webhooks](/docs/webhooks))
 
 ## 1. Find a launch
@@ -106,6 +108,8 @@ Orbit reviews manifests within one business day. When it approves yours, the boo
 
 <Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
   * A **custom component**: `SimpleStepper`, written in MDX and stored with the project
+  * A **Recipe** embed: a step-by-step code walkthrough that opens in place
+  * A **Glossary** term in the checklist
   * A **checklist** using Markdown task-list syntax
   * **Tabs** holding JSON examples for each `oneOf` payload type
   * A **code block with a file name** as its title

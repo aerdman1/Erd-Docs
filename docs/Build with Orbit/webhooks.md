@@ -31,6 +31,10 @@ Every event has the same envelope:
 
 Each request carries an `Orbit-Signature` header: a timestamp and an HMAC-SHA256 of `timestamp.body`, signed with your webhook secret. Reject anything that doesn’t match, or that is more than five minutes old.
 
+The recipe walks through a complete Express handler line by line:
+
+<Recipe slug="verify-webhook-signatures" title="Verify webhook signatures" />
+
 ```javascript Node.js
 import crypto from 'node:crypto';
 
@@ -97,6 +101,7 @@ After five failed retries the event is marked failed. You can resend it from **A
 <Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
   * A **table** whose cells link to webhook pages in the API Reference. Those pages come from the `webhooks` section of the OpenAPI 3.1 file.
   * **Code tabs** in three languages
+  * A **Recipe** embed for the full handler
   * A **warning** Callout
   * A **Mermaid** sequence diagram with notes and failed calls
 </Accordion>
