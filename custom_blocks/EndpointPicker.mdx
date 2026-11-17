@@ -1,13 +1,6 @@
 ---
 name: EndpointPicker
 ---
----
-title: "EndpointPicker"
-description: "Auto-detect ReadMe OpenAPI specs from /openapi, select an endpoint, or browse the complete specification."
-author: "@andrewerdman"
-version: "2.0.1"
----
-
 import React, { useEffect, useMemo, useState } from "react";
 
 export const EndpointPicker = props => {
@@ -1229,7 +1222,7 @@ export const EndpointPicker = props => {
         }
 
         @media (prefers-color-scheme: dark) {
-          [data-ee-picker] {
+          html:not([data-color-mode="light"]) [data-ee-picker] {
             --ee-modal-surface: #111827;
             --ee-modal-subtle: #182233;
             --ee-modal-text: #f3f6fb;

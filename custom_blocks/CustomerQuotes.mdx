@@ -1,141 +1,96 @@
 ---
 name: CustomerQuotes
 ---
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useState, Children, isValidElement } from "react";
 
-export const CustomerQuotes = ({ children, title = "What Our Customers Say" }) => {
-  const quotes = useMemo(() => (Array.isArray(children) ? children : [children]), [children]);
-  const [currentQuote, setCurrentQuote] = useState(0);
-
-  const containerStyle = {
-    width: "100%",
-    minHeight: "50vh",
-    padding: "40px 20px",
-    // Combine a gradient overlay and a background image.
-    // backgroundImage: `linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(232,243,255,0.5) 100%), url("//files.readme.io/9dbe441-footer-owls.png")`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    textAlign: "center",
-    boxSizing: "border-box",
-  };
-
-  const quotesCardStyle = {
-    maxWidth: "700px",
-    margin: "40px auto 0 auto",
-    padding: "30px",
-    borderRadius: "12px",
-    border: "2px solid #3B89FF",
-    backgroundColor: "#fff",
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.08)",
-  };
-
-  const titleStyle = {
-    fontSize: "2em",
-    fontWeight: "bold",
-    marginBottom: "30px",
-    color: "#3B89FF",
-  };
-
-  const quoteBoxStyle = {
-    padding: "30px",
-    margin: "20px auto",
-    borderRadius: "10px",
-    border: "2px dashed #3B89FF",
-    backgroundColor: "#FAFAFA",
-    boxShadow: "0px 3px 10px rgba(0, 0, 0, 0.05)",
-    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-    cursor: "pointer",
-    fontSize: "1.4em",
-    color: "#333",
-  };
-
-  const buttonStyle = {
-    padding: "12px 24px",
-    border: "none",
-    borderRadius: "6px",
-    backgroundColor: "#3B89FF",
-    color: "white",
-    cursor: "pointer",
-    fontSize: "1.2em",
-    marginTop: "20px",
-    transition: "background-color 0.3s ease",
-  };
-
-  const handleMouseOverButton = (e) => {
-    e.currentTarget.style.backgroundColor = "#2C68C1";
-  };
-
-  const handleMouseOutButton = (e) => {
-    e.currentTarget.style.backgroundColor = "#3B89FF";
-  };
-
-  const handleNextQuote = () => setCurrentQuote((prev) => (prev + 1) % quotes.length);
-
+export const CustomerQuote = ({ author, role, company, avatar, children }) => {
+  const initials = String(author || "?").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
   return (
-    <div style={containerStyle}>
-      <div style={quotesCardStyle}>
-        {title && <div style={titleStyle}>{title}</div>}
-        <div
-          style={quoteBoxStyle}
-          onClick={handleNextQuote}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = "scale(1.02)";
-            e.currentTarget.style.boxShadow = "0px 5px 15px rgba(59, 137, 255, 0.3)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = "scale(1)";
-            e.currentTarget.style.boxShadow = "0px 3px 10px rgba(0, 0, 0, 0.05)";
-          }}
-        >
-          {quotes[currentQuote]}
-        </div>
-        <button
-          type="button"
-          onClick={handleNextQuote}
-          onMouseOver={handleMouseOverButton}
-          onMouseOut={handleMouseOutButton}
-          style={buttonStyle}
-          aria-label="Show next customer quote"
-        >
-          Next Quote
-        </button>
-      </div>
-    </div>
+    <figure className="eo-quote">
+      <blockquote className="eo-quote-text">{children}</blockquote>
+      <figcaption className="eo-quote-who">
+        {avatar ? <img className="eo-quote-avatar" src={avatar} alt="" /> : <span className="eo-quote-avatar" aria-hidden="true">{initials}</span>}
+        <span>
+          <strong>{author}</strong>
+          {role || company ? <span className="eo-quote-role">{[role, company].filter(Boolean).join(", ")}</span> : null}
+        </span>
+      </figcaption>
+    </figure>
   );
 };
 
-export const CustomerQuote = ({ author, children }) => (
-  <div style={{ marginBottom: "40px" }}>
-    <blockquote
-      style={{
-        fontStyle: "italic",
-        margin: "20px 0",
-        paddingLeft: "25px",
-        borderLeft: "6px solid #3B89FF",
-        fontSize: "1.4em",
-        lineHeight: "1.4em",
-        color: "#555",
-      }}
-    >
-      {children}
-    </blockquote>
-    {author && (
-      <p style={{ textAlign: "right", margin: "0 15px", fontWeight: "bold", fontSize: "1.1em", color: "#333" }}>
-        – {author}
-      </p>
-    )}
-  </div>
-);
+export const CustomerQuotes = props => {
+  const quotes = Children.toArray(props.children).filter(c => isValidElement(c));
+  const autoplay = !(props.autoplay === false || props.autoplay === "false");
+  const seconds = Number(props.interval) > 0 ? Number(props.interval) : 7;
+  const [i, setI] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const n = quotes.length;
+  const go = k => setI(((k % n) + n) % n);
 
+  useEffect(() => {
+    if (!autoplay || paused || n < 2 || typeof window === "undefined") return undefined;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const t = window.setTimeout(() => setI(x => (x + 1) % n), seconds * 1000);
+    return () => window.clearTimeout(t);
+  }, [i, autoplay, paused, n, seconds]);
 
-<CustomerQuotes title="Customer Quotes!">
-  <CustomerQuote author="Alice">
-    ReadMe.io made our documentation sparkle with creativity!
-  </CustomerQuote> 
-  <CustomerQuote author="Bob">
-    The support and experience are as bold as our ideas!
+  if (!n) return null;
+  const css = `
+.eo-quotes{--eo-accent:var(--color-link-primary,#2F7BF5);--eo-border:var(--color-border-default,rgba(0,0,0,.12));--eo-muted:var(--color-text-minimum,#6b7280);
+  position:relative;margin:28px 0;padding:28px 28px 20px;border:1px solid var(--eo-border);border-radius:16px;overflow:hidden;
+  background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--eo-accent) 10%,transparent) 0%,transparent 60%)}
+.eo-quotes-title{margin:0 0 14px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--eo-muted);font-weight:700}
+.eo-quotes-stage{position:relative;min-height:150px}
+.eo-quotes-slide{animation:eo-quote-in .45s ease both}
+@keyframes eo-quote-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.eo-quotes-slide{animation:none}}
+.eo-quote{margin:0}
+.eo-quote-text{margin:0;padding:0 0 0 44px;border:0;position:relative;font-size:1.25em;line-height:1.5;font-weight:500;color:inherit}
+.eo-quote-text::before{content:"“";position:absolute;left:0;top:-14px;font-size:64px;line-height:1;color:var(--eo-accent);font-family:Georgia,serif}
+.eo-quote-text p{margin:0}
+.eo-quote-who{display:flex;align-items:center;gap:12px;margin:18px 0 0 44px}
+.eo-quote-avatar{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;object-fit:cover;
+  background:linear-gradient(135deg,#19C3F5,#2F7BF5 55%,#7B3FF2);color:#fff;font-weight:700;font-size:14px;flex:none}
+.eo-quote-role{display:block;color:var(--eo-muted);font-size:13px}
+.eo-quotes-nav{display:flex;align-items:center;justify-content:space-between;margin-top:18px}
+.eo-quotes-dots{display:flex;gap:8px}
+.eo-quotes-dot{width:9px;height:9px;border-radius:50%;border:0;padding:0;background:var(--eo-border);cursor:pointer}
+.eo-quotes-dot[aria-current="true"]{background:var(--eo-accent);width:22px;border-radius:9px;transition:width .2s}
+.eo-quotes-arrows button{border:1px solid var(--eo-border);background:transparent;color:inherit;width:34px;height:34px;border-radius:50%;cursor:pointer;margin-left:6px;font-size:15px}
+.eo-quotes-arrows button:hover{border-color:var(--eo-accent);color:var(--eo-accent)}
+`;
+  return (
+    <section className="eo-quotes" aria-roledescription="carousel" aria-label={props.title || "Testimonials"}
+      onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
+      <style>{css}</style>
+      {props.title ? <p className="eo-quotes-title">{props.title}</p> : null}
+      <div className="eo-quotes-stage" aria-live={paused ? "polite" : "off"}>
+        <div key={i} className="eo-quotes-slide">{quotes[i]}</div>
+      </div>
+      {n > 1 ? (
+        <div className="eo-quotes-nav">
+          <div className="eo-quotes-dots">
+            {quotes.map((q, k) => (
+              <button key={k} type="button" className="eo-quotes-dot" aria-label={"Show quote " + (k + 1)} aria-current={k === i ? "true" : "false"} onClick={() => go(k)} />
+            ))}
+          </div>
+          <div className="eo-quotes-arrows">
+            <button type="button" aria-label="Previous quote" onClick={() => go(i - 1)}>←</button>
+            <button type="button" aria-label="Next quote" onClick={() => go(i + 1)}>→</button>
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+};
+
+<CustomerQuotes title="What launch partners say">
+  <CustomerQuote author="Dana Whitfield" role="Mission lead" company="Pixel Owl">
+    We booked our first CubeSat in an afternoon.
   </CustomerQuote>
-  <CustomerQuote author="Charlie">
-    Every time I click, I get a fresh dose of inspiration!
+  <CustomerQuote author="Ravi Menon" role="CTO" company="Hydroponics Orbital">
+    Webhooks told us our cargo was loaded before our ops team did.
   </CustomerQuote>
 </CustomerQuotes>

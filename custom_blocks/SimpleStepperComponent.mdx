@@ -1,103 +1,91 @@
 ---
 name: SimpleStepperComponent
 ---
-import React, { useState, useMemo } from "react";
+import React, { useState, Children, isValidElement } from "react";
 
-export const SimpleStepper = ({ children }) => {
-  console.log("Children received:", children);
+export const SimpleStep = ({ header, children }) => (
+  <div className="eo-step-body">
+    {header ? <h3 className="eo-step-title">{header}</h3> : null}
+    <div>{children}</div>
+  </div>
+);
 
-  const steps = useMemo(() => (Array.isArray(children) ? children : [children]), [children]);
-  const [currentStep, setCurrentStep] = useState(0);
-
-  const containerStyle = {
-    maxWidth: "600px",
-    margin: "40px auto",
-    padding: "20px",
-    border: "1px solid #ccc",
-    borderRadius: "8px",
-    textAlign: "center",
+export const SimpleStepper = props => {
+  const vertical = props.vertical === true || props.vertical === "true";
+  const steps = Children.toArray(props.children).filter(c => isValidElement(c));
+  const [current, setCurrent] = useState(0);
+  const last = Math.max(steps.length - 1, 0);
+  const go = i => setCurrent(Math.min(Math.max(i, 0), last));
+  const css = `
+.eo-stepper{--eo-accent:var(--color-link-primary,#2F7BF5);--eo-border:var(--color-border-default,rgba(0,0,0,.12));--eo-muted:var(--color-text-minimum,#6b7280);
+  border:1px solid var(--eo-border);border-radius:12px;padding:22px 24px;margin:24px 0;color:var(--color-text-default,inherit)}
+.eo-stepper .eo-step-title{margin:0 0 6px;font-size:1.1em}
+.eo-stepper-dots{display:flex;align-items:center;gap:0;margin-bottom:18px}
+.eo-stepper-dot{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--eo-border);background:transparent;color:var(--eo-muted);font-family:inherit;font-weight:600;font-size:14px;line-height:28px;text-align:center;cursor:pointer;padding:0;transition:all .2s}
+.eo-stepper-dot[data-state="done"]{background:var(--eo-accent);border-color:var(--eo-accent);color:#fff}
+.eo-stepper-dot[data-state="current"]{border-color:var(--eo-accent);color:var(--eo-accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--eo-accent) 18%,transparent)}
+.eo-stepper-dot:focus-visible{outline:2px solid var(--eo-accent);outline-offset:2px}
+.eo-stepper-line{flex:1;height:2px;background:var(--eo-border);margin:0 6px;border-radius:2px;overflow:hidden}
+.eo-stepper-line>i{display:block;height:100%;background:var(--eo-accent);transition:width .3s}
+.eo-stepper-nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:12px}
+.eo-stepper-count{color:var(--eo-muted);font-size:13px}
+.eo-stepper-btn{border:1px solid var(--eo-border);background:transparent;color:inherit;border-radius:8px;padding:8px 16px;font-family:inherit;font-weight:600;font-size:14px;cursor:pointer}
+.eo-stepper-btn[data-primary]{background:var(--eo-accent);border-color:var(--eo-accent);color:#fff}
+.eo-stepper-btn:disabled{opacity:.4;cursor:default}
+.eo-stepper-v{list-style:none;margin:0;padding:0}
+.eo-stepper-v>li{position:relative;padding:0 0 22px 48px}
+.eo-stepper-v>li:last-child{padding-bottom:0}
+.eo-stepper-v>li::before{content:attr(data-n);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:var(--eo-accent);color:#fff;font-family:inherit;font-weight:600;font-size:14px;line-height:30px;text-align:center}
+.eo-stepper-v>li::after{content:"";position:absolute;left:14px;top:34px;bottom:4px;width:2px;background:var(--eo-border)}
+.eo-stepper-v>li:last-child::after{display:none}
+`;
+  if (!steps.length) return null;
+  if (vertical) {
+    return (
+      <div className="eo-stepper">
+        <style>{css}</style>
+        <ol className="eo-stepper-v">
+          {steps.map((s, i) => <li key={i} data-n={i + 1}>{s}</li>)}
+        </ol>
+      </div>
+    );
+  }
+  const onKey = e => {
+    if (e.key === "ArrowRight") { e.preventDefault(); go(current + 1); }
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(current - 1); }
   };
-
-  const indicatorContainerStyle = { marginBottom: "20px" };
-
-  const indicatorStyle = (active) => ({
-    display: "inline-block",
-    width: "30px",
-    height: "30px",
-    lineHeight: "30px",
-    borderRadius: "50%",
-    backgroundColor: active ? "#5A3E8B" : "#ddd", // Updated active color for better contrast
-    color: active ? "white" : "black",
-    margin: "0 5px",
-    fontWeight: "bold",
-    boxShadow: active ? "0px 0px 10px rgba(90, 62, 139, 0.6)" : "none", // Reflects new active color
-    transition: "all 0.3s ease-in-out",
-  });
-
-  const buttonStyle = {
-    padding: "8px 16px",
-    margin: "10px",
-    border: "none",
-    borderRadius: "4px",
-    backgroundColor: "#5A3E8B", // Updated button background for better contrast
-    color: "white",
-    cursor: "pointer",
-  };
-
-  const handlePrev = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
-  const handleNext = () => setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
-
   return (
-    <div style={containerStyle}>
-      <div style={indicatorContainerStyle}>
-        {steps.map((_, index) => (
-          <span key={index} style={indicatorStyle(index === currentStep)}>
-            {index + 1}
-          </span>
-        ))}
+    <div className="eo-stepper" onKeyDown={onKey}>
+      <style>{css}</style>
+      <div className="eo-stepper-dots" role="tablist" aria-label="Steps">
+        {steps.map((s, i) => {
+          const state = i < current ? "done" : i === current ? "current" : "todo";
+          const dot = (
+            <button key={"d" + i} type="button" role="tab" aria-selected={i === current} className="eo-stepper-dot"
+              data-state={state} title={s.props && s.props.header ? String(s.props.header) : "Step " + (i + 1)}
+              onClick={() => go(i)}>
+              {i < current ? "✓" : i + 1}
+            </button>
+          );
+          if (i === 0) return dot;
+          return [
+            <span key={"l" + i} className="eo-stepper-line"><i style={{ width: i <= current ? "100%" : "0%" }} /></span>,
+            dot,
+          ];
+        })}
       </div>
-      <div aria-live="polite">
-        {steps.length > 0 ? <>{steps[currentStep]}</> : <></>}
-      </div>
-      <div>
-        <button
-          type="button"
-          style={buttonStyle}
-          onClick={handlePrev}
-          disabled={currentStep === 0}
-          aria-label="Previous Step"
-        >
-          Back
-        </button>
-        <button
-          type="button"
-          style={buttonStyle}
-          onClick={handleNext}
-          disabled={currentStep === steps.length - 1}
-          aria-label="Next Step"
-        >
-          Next
-        </button>
+      <div aria-live="polite">{steps[current]}</div>
+      <div className="eo-stepper-nav">
+        <button type="button" className="eo-stepper-btn" onClick={() => go(current - 1)} disabled={current === 0}>← Back</button>
+        <span className="eo-stepper-count">Step {current + 1} of {steps.length}</span>
+        <button type="button" className="eo-stepper-btn" data-primary="" onClick={() => go(current + 1)} disabled={current === last}>Next →</button>
       </div>
     </div>
   );
 };
 
-export const SimpleStep = ({ header, children }) => (
-  <div>
-    <h2>{header}</h2>
-    <div>{children}</div>
-  </div>
-);
-
 <SimpleStepper>
-  <SimpleStep header="Step 1: Plan">
-    Plan your documentation and gather resources.
-  </SimpleStep>
-  <SimpleStep header="Step 2: Write">
-    Write effective and clear documentation.
-  </SimpleStep>
-  <SimpleStep header="Step 3: Review">
-    Review and refine your content.
-  </SimpleStep>
+  <SimpleStep header="Plan">Pick a launch and a vehicle.</SimpleStep>
+  <SimpleStep header="Book">Reserve space and upload the manifest.</SimpleStep>
+  <SimpleStep header="Fly">Follow telemetry all the way to orbit.</SimpleStep>
 </SimpleStepper>

@@ -1,208 +1,93 @@
 ---
 name: ContentModal
 ---
----
-title: "ContentModal"
-description: "A lightweight, theme-aware modal component for embedding custom content (like tables, code blocks, or HTML) inside ReadMe documentation."
-author: "@andrewerdman"
-version: "1.0.0"
----
-
 import React, { useEffect, useRef, useState } from "react";
 
 export const ContentModal = props => {
   const label = props.label || "Open";
-  const title = props.title || "Modal";
-  const content = props.content;
-  const size = props.size === undefined ? "lg" : props.size;
-  const buttonClassName = props.buttonClassName || "";
-  const closeOnBackdrop =
-    props.closeOnBackdrop === undefined ? true : !!props.closeOnBackdrop;
-  const showIcon = props.showIcon === undefined ? true : !!props.showIcon;
-
-  const buttonColor = props.buttonColor || "#fe8d53";
-  const buttonPadding = props.buttonPadding || "17px 19px";
-
-  const autoIdRef = useRef(
-    (typeof crypto !== "undefined" && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : "cm-" + Math.random().toString(36).slice(2)
-  );
-  const modalId = props.modalId || autoIdRef.current;
-
+  const title = props.title || "";
+  const size = { sm: "480px", md: "720px", lg: "960px", xl: "1200px" }[props.size || "md"] || "720px";
+  const closeOnBackdrop = !(props.closeOnBackdrop === false || props.closeOnBackdrop === "false");
+  const showIcon = !(props.showIcon === false || props.showIcon === "false");
+  const variant = props.variant || "primary";
   const [open, setOpen] = useState(false);
   const dialogRef = useRef(null);
   const btnRef = useRef(null);
-  const didMountRef = useRef(false);
+  const wasOpen = useRef(false);
+  const idRef = useRef("eo-modal-" + Math.random().toString(36).slice(2, 9));
 
-  const css = [
-    ".cm-Backdrop{position:fixed;top:0;right:0;bottom:0;left:0;display:none;z-index:999998!important;}",
-    '.cm-Backdrop[aria-hidden="false"]{display:block;}',
-    '.cm-Backdrop::before{content:\"\";position:absolute;inset:0;background:rgba(0,0,0,.45);-webkit-backdrop-filter:saturate(1.1) blur(2px);backdrop-filter:saturate(1.1) blur(2px);}',
-    ".cm-DialogWrap{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:24px;z-index:999999!important;}",
-    '.cm-DialogWrap[aria-hidden=\"false\"]{display:flex;}',
-    `.cm-Dialog{width:100%;max-height:86vh;overflow:hidden;
-      background:var(--color-bg-page, #fff);
-      color:var(--color-text-default, #000);
-      border-radius:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,.25);
-      display:flex;flex-direction:column;outline:none;}`,
-    ".cm-size-sm{max-width:480px;}",
-    ".cm-size-md{max-width:720px;}",
-    ".cm-size-lg{max-width:960px;}",
-    ".cm-size-xl{max-width:1200px;}",
-    `.cm-Header{display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:14px 18px;
-      border-bottom:1px solid rgba(0,0,0,.08);
-      background:var(--color-bg-page, #fff);
-      color:var(--color-text-default, #000);
-      position:sticky;top:0;z-index:1;}`,
-    ".cm-Header h2{margin:0;font-size:16px;line-height:1.2;font-weight:600;}",
-    ".cm-CloseBtn{border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:inherit;opacity:.6;}",
-    ".cm-CloseBtn:hover{opacity:1;}",
-    `.cm-Body{overflow:auto;padding:16px 18px;
-      background:var(--color-bg-page, #fff);
-      color:var(--color-text-default, #000);
-      text-align:left;}`,
-    ".cm-Body .placeholder{padding:50px 0;color:#666;font-style:italic;text-align:center;}",
-    ".modal-button{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}",
-    `.cm-TriggerBtnDefault{line-height:20px;color:#fff;background-color:${buttonColor};
-      justify-content:space-evenly;display:inline-flex;box-sizing:border-box;
-      border:2px solid ${buttonColor};border-radius:6px;height:46px;
-      padding:${buttonPadding};align-items:center;cursor:pointer;transition:opacity .2s ease;}`,
-    ".cm-TriggerBtnDefault:hover{opacity:0.85;}",
-    ".modal{display:contents;}"
-  ].join("");
-
-  // Lock page scroll while open
   useEffect(() => {
-    if (typeof document === "undefined") return;
-    const html = document.documentElement;
-    const prev = html.style.overflow;
-    if (open) html.style.overflow = "hidden";
-    return () => { html.style.overflow = prev; };
-  }, [open]);
-
-  // Focus management
-  useEffect(() => {
-    if (!didMountRef.current) { didMountRef.current = true; return; }
+    if (typeof document === "undefined") return undefined;
     if (open) {
-      const el = dialogRef.current;
-      const firstFocusable = el
-        ? el.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-        : null;
-      if (firstFocusable && firstFocusable.focus) firstFocusable.focus();
-      else if (el && el.focus) el.focus();
-    } else {
-      if (btnRef.current && btnRef.current.focus) btnRef.current.focus();
+      wasOpen.current = true;
+      const html = document.documentElement;
+      const prev = html.style.overflow;
+      html.style.overflow = "hidden";
+      const onKey = e => {
+        if (e.key === "Escape") { e.stopPropagation(); setOpen(false); }
+        if (e.key === "Tab" && dialogRef.current) {
+          const f = dialogRef.current.querySelectorAll('a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])');
+          if (!f.length) return;
+          const first = f[0], last = f[f.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      };
+      document.addEventListener("keydown", onKey, true);
+      window.setTimeout(() => { if (dialogRef.current) dialogRef.current.focus(); }, 0);
+      return () => { html.style.overflow = prev; document.removeEventListener("keydown", onKey, true); };
     }
+    if (wasOpen.current && btnRef.current) btnRef.current.focus();
+    return undefined;
   }, [open]);
 
-  // ESC to close
-  useEffect(() => {
-    if (!open || typeof window === "undefined") return;
-    function onKey(e) { if (e.key === "Escape") setOpen(false); }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
-  function handleBackdropMouseDown(e) {
-    if (!closeOnBackdrop) return;
-    const target = e?.target;
-    const isBackdrop = target?.getAttribute?.("data-cm-backdrop") === "1";
-    if (isBackdrop) setOpen(false);
-  }
-
-  const sizeClass =
-    size === "sm" ? "cm-size-sm"
-    : size === "md" ? "cm-size-md"
-    : size === "xl" ? "cm-size-xl"
-    : "cm-size-lg";
-
-  const modalIdAttr = modalId || undefined;
-  const ariaLabelledBy = modalId ? modalId + "-title" : undefined;
-  const ariaExpanded = open ? "true" : "false";
-  const triggerClass = "modal-button " + (buttonClassName || "cm-TriggerBtnDefault");
-  const dialogClass = "cm-Dialog " + sizeClass;
-
+  const css = `
+.eo-modal{--eo-accent:var(--color-link-primary,#2F7BF5);--eo-border:var(--color-border-default,rgba(0,0,0,.12))}
+.eo-modal-btn{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:10px 16px;font-family:inherit;font-weight:600;font-size:15px;cursor:pointer;border:1px solid var(--eo-accent);transition:transform .1s,box-shadow .15s}
+.eo-modal-btn[data-variant="primary"]{background:var(--eo-accent);color:#fff}
+.eo-modal-btn[data-variant="outline"]{background:transparent;color:var(--eo-accent)}
+.eo-modal-btn[data-variant="link"]{background:transparent;border-color:transparent;color:var(--eo-accent);padding:0;text-decoration:underline}
+.eo-modal-btn:hover{box-shadow:0 4px 14px color-mix(in srgb,var(--eo-accent) 30%,transparent)}
+.eo-modal-btn:active{transform:translateY(1px)}
+.eo-modal-btn:focus-visible{outline:2px solid var(--eo-accent);outline-offset:2px}
+.eo-modal-wrap{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(5,8,20,.55);backdrop-filter:blur(3px);animation:eo-fade .15s ease both}
+.eo-modal-dialog{width:100%;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;outline:none;border-radius:14px;border:1px solid var(--eo-border);
+  background:var(--color-bg-page,#fff);color:var(--color-text-default,#111);box-shadow:0 24px 60px rgba(0,0,0,.35);animation:eo-pop .18s cubic-bezier(.2,.9,.3,1.2) both}
+.eo-modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--eo-border)}
+.eo-modal-head h2{margin:0!important;font-size:17px!important;border:0!important;padding:0!important}
+.eo-modal-x{border:0;background:transparent;color:inherit;font-size:22px;line-height:1;cursor:pointer;opacity:.6;padding:4px 8px;border-radius:6px}
+.eo-modal-x:hover{opacity:1;background:color-mix(in srgb,currentColor 8%,transparent)}
+.eo-modal-body{overflow:auto;padding:18px 20px;text-align:left}
+.eo-modal-body>:first-child{margin-top:0}
+@keyframes eo-fade{from{opacity:0}to{opacity:1}}
+@keyframes eo-pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.eo-modal-wrap,.eo-modal-dialog{animation:none}}
+@media (max-width:640px){.eo-modal-wrap{padding:0}.eo-modal-dialog{max-height:100vh;height:100%;border-radius:0}}
+`;
   return (
-    <div data-cm-root="">
-      <style id="content-modal-styles">{css}</style>
-
-      <button
-        ref={btnRef}
-        type="button"
-        className={triggerClass}
-        aria-haspopup="dialog"
-        aria-expanded={ariaExpanded}
-        onClick={() => setOpen(true)}
-        data-modal-id={modalIdAttr}
-        title={title}
-      >
+    <span className="eo-modal">
+      <style>{css}</style>
+      <button ref={btnRef} type="button" className="eo-modal-btn" data-variant={variant} aria-haspopup="dialog" aria-expanded={open ? "true" : "false"} onClick={() => setOpen(true)}>
+        {props.icon ? <span aria-hidden="true">{props.icon}</span> : null}
         {label}
-        {showIcon && <i className="fa-solid fa-up-right-from-square" aria-hidden="true" />}
+        {showIcon && variant !== "link" ? <span aria-hidden="true" style={{ opacity: .8 }}>↗</span> : null}
       </button>
-
-      <div
-        className="cm-Backdrop"
-        aria-hidden={open ? "false" : "true"}
-        style={{ display: open ? undefined : "none" }}
-      />
-
-      <div
-        className="cm-DialogWrap"
-        aria-hidden={open ? "false" : "true"}
-        data-cm-backdrop="1"
-        onMouseDown={handleBackdropMouseDown}
-        style={{ display: open ? undefined : "none" }}
-      >
-        <div
-          className={dialogClass}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={ariaLabelledBy}
-          ref={dialogRef}
-          tabIndex={-1}
-          id={modalIdAttr}
-        >
-          <div className="cm-Header modal-header">
-            <h2 id={ariaLabelledBy}>{title}</h2>
-            <button
-              className="cm-CloseBtn close"
-              type="button"
-              aria-label="Close"
-              onClick={() => setOpen(false)}
-            >
-              ×
-            </button>
-          </div>
-
-          <div className="cm-Body">
-            {props.children
-              ? props.children
-              : content || <div className="placeholder">Paste your content here</div>}
-          </div>
-        </div>
-      </div>
-    </div>
+      {open ? (
+        <span className="eo-modal-wrap" onMouseDown={e => { if (closeOnBackdrop && e.target === e.currentTarget) setOpen(false); }}>
+          <span className="eo-modal-dialog" role="dialog" aria-modal="true" aria-labelledby={title ? idRef.current : undefined} aria-label={title ? undefined : label}
+            ref={dialogRef} tabIndex={-1} style={{ maxWidth: size }}>
+            <span className="eo-modal-head" style={title ? undefined : { justifyContent: "flex-end", borderBottom: 0, paddingBottom: 0 }}>
+              {title ? <h2 id={idRef.current}>{title}</h2> : null}
+              <button type="button" className="eo-modal-x" aria-label="Close" onClick={() => setOpen(false)}>×</button>
+            </span>
+            <span className="eo-modal-body" style={{ display: "block" }}>{props.children || props.content}</span>
+          </span>
+        </span>
+      ) : null}
+    </span>
   );
 };
 
-<ContentModal
-  label="Open Example Modal"
-  title="Example Modal"
-  modalId="exampleModal"
-  buttonColor="#2B6CB0"
-  buttonPadding="12px 18px"
-  size="sm"
-  content={
-    <HTMLBlock>{`
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-    Fusce vel leo ut turpis feugiat commodo et in nunc. Phasellus imperdiet ut nunc vitae porta. 
-    Pellentesque sollicitudin, sapien sed dictum molestie, dolor enim vestibulum est, non facilisis libero nibh vel arcu. 
-    Fusce aliquam diam in velit vulputate luctus. Morbi sagittis erat eget est consectetur, a molestie dui sollicitudin. 
-    Mauris commodo lorem eros, a cursus tortor malesuada ac. Ut sit amet eros dictum, aliquet nisl rutrum, finibus nulla. 
-    Sed interdum commodo interdum. Quisque arcu diam, malesuada sit amet eros non, vulputate aliquet orci.
-    `}</HTMLBlock>
-  }
-/>
+<ContentModal label="See the payload schema" title="Payload">
+  A payload is a satellite or bulk cargo. Its type decides which booking fields are required.
+</ContentModal>

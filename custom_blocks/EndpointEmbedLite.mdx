@@ -1,211 +1,115 @@
 ---
 name: EndpointEmbedLite
 ---
----
-title: "EndpointEmbedLite"
-description: "A minimal endpoint embed card for ReadMe: no spec fetch, auto-links to the current project. Theme-aware for light/dark."
-author: "@andrewerdman"
-version: "1.0.1"
----
+import React, { useEffect, useRef, useState } from "react";
 
-import React, { useMemo, useState } from "react";
+export const eoEndpointSpecCache = {};
 
-export const EndpointEmbedLite = ({
-  endpoint,
-  method = "GET",
-  title,
-  description,
-  linkText,
-  displayMode = "popup",
-  websiteBaseUrl,
-  docSlug,
-  apiBaseUrl,
-  labels = true
-}) => {
-  const baseUrl = useMemo(() => {
-    if (websiteBaseUrl) return websiteBaseUrl.replace(/\/$/, "");
-    if (typeof window !== "undefined") return `${window.location.protocol}//${window.location.host}`;
-    return "";
-  }, [websiteBaseUrl]);
+export const EndpointEmbedLite = props => {
+  const specFile = props.spec || "orbit.yaml";
+  const opId = props.operationId || "";
+  const [op, setOp] = useState(null);
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef(null);
+  const closeTimer = useRef(0);
 
-  const derivedSlug = useMemo(() => {
-    if (docSlug) return docSlug;
-    const s = String(endpoint || "")
-      .replace(/[{}]/g, "")
-      .replace(/\//g, "-")
-      .replace(/^-+|-+$/g, "");
-    return s || "endpoint";
-  }, [endpoint, docSlug]);
+  useEffect(() => {
+    if (!opId || (props.method && props.endpoint && props.title) || typeof window === "undefined") return undefined;
+    let alive = true;
+    const url = "/openapi/" + specFile;
+    if (!eoEndpointSpecCache[url]) {
+      eoEndpointSpecCache[url] = fetch(url, { headers: { Accept: "application/json" } })
+        .then(r => (r.ok ? r.json() : null))
+        .catch(() => null);
+    }
+    eoEndpointSpecCache[url].then(spec => {
+      if (!alive || !spec) return;
+      const groups = [["path", spec.paths || {}], ["webhook", spec.webhooks || {}]];
+      for (const [kind, items] of groups) {
+        for (const p of Object.keys(items)) {
+          for (const m of ["get", "post", "put", "patch", "delete", "head", "options"]) {
+            const o = items[p] && items[p][m];
+            if (o && String(o.operationId || "").toLowerCase() === opId.toLowerCase()) {
+              setOp({ method: m.toUpperCase(), path: kind === "webhook" ? p : p, summary: o.summary, description: o.description, deprecated: !!o.deprecated, webhook: kind === "webhook" });
+              return;
+            }
+          }
+        }
+      }
+    });
+    return () => { alive = false; };
+  }, [opId, specFile]);
 
-  const readmeDocUrl = baseUrl ? `${baseUrl}/reference/${derivedSlug}` : "#";
-  const displayTitle = title || endpoint || "Endpoint";
-  const displayLinkText = linkText || displayTitle;
+  const method = String(props.method || (op && op.method) || "GET").toUpperCase();
+  const path = props.endpoint || (op && op.path) || "";
+  const title = props.title || (op && op.summary) || path || opId || "Endpoint";
+  const description = props.description || (op && op.description ? String(op.description).split("\n")[0] : "");
+  const slug = props.docSlug || (opId ? opId.toLowerCase() : String(path).replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "")) || "";
+  const href = props.href || (slug ? "/reference/" + slug : "#");
+  const mode = props.displayMode || "popup";
+  const isWebhook = (op && op.webhook) || props.webhook === "true";
+  const deprecated = (op && op.deprecated) || props.deprecated === "true";
 
-  const [hover, setHover] = useState(false);
-
-  const cardStyle = {
-    position: "relative",
-    background: "var(--color-bg-page, #fff)",
-    color: "var(--color-text-default, #000)",
-    padding: "14px 16px",
-    borderRadius: 8,
-    border: "1px solid var(--color-border-default, rgba(0,0,0,.12))",
-    boxShadow: "0 6px 16px rgba(0,0,0,.06)",
-    minWidth: 240,
-    maxWidth: "100%"
-  };
-
-  const dividerStyle = {
-    borderBottom: "1px solid var(--color-border-default, rgba(0,0,0,.08))",
-    paddingBottom: 6
-  };
-
-  const mono = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
-
-  const METHOD_RGB = {
-    GET: [37, 99, 235],
-    POST: [22, 163, 74],
-    PUT: [202, 138, 4],
-    PATCH: [217, 119, 6],
-    HEAD: [14, 116, 144],
-    OPTIONS: [107, 114, 128]
-  };
-
-  const MethodTag = ({ m }) => {
-    const M = String(m).toUpperCase();
-    const [r, g, b] = METHOD_RGB[M] || [99, 102, 241];
-    return (
-      <span
-        title={M}
-        style={{
-          display: "inline-block",
-          fontWeight: 800,
-          textTransform: "uppercase",
-          fontSize: ".72rem",
-          lineHeight: "1.4",
-          padding: "3px 8px",
-          borderRadius: 999,
-          color: `rgb(${r}, ${g}, ${b})`,
-          background: `rgba(${r}, ${g}, ${b}, 0.12)`,
-          border: `1px solid rgba(${r}, ${g}, ${b}, 0.35)`,
-          letterSpacing: ".02em"
-        }}
-      >
-        {M}
+  const css = `
+.eo-ep{--eo-accent:var(--color-link-primary,#2F7BF5);--eo-border:var(--color-border-default,rgba(0,0,0,.12));--eo-muted:var(--color-text-minimum,#6b7280)}
+.eo-ep-wrap{position:relative;display:inline-block;vertical-align:baseline}
+.eo-ep-chip{display:inline-flex;align-items:center;gap:6px;padding:1px 8px 1px 3px;border-radius:999px;border:1px solid var(--eo-border);
+  text-decoration:none!important;color:inherit!important;font-weight:600;font-size:.92em;line-height:1.6;white-space:nowrap;transition:border-color .15s,box-shadow .15s}
+.eo-ep-chip:hover,.eo-ep-chip:focus-visible{border-color:var(--eo-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--eo-accent) 15%,transparent);outline:none}
+.eo-ep-m{display:inline-block;font:700 10.5px/1.7 var(--font-family-mono,ui-monospace,Menlo,monospace);letter-spacing:.03em;padding:0 6px;border-radius:999px}
+.eo-ep-card{display:block;text-decoration:none!important;color:inherit!important;border:1px solid var(--eo-border);border-radius:12px;padding:14px 16px;
+  background:var(--color-bg-page,#fff);box-shadow:0 12px 28px rgba(0,0,0,.12);min-width:260px;max-width:min(420px,90vw);transition:border-color .15s}
+.eo-ep-card:hover{border-color:var(--eo-accent)}
+.eo-ep-inline .eo-ep-card{box-shadow:none;max-width:none;margin:12px 0}
+.eo-ep-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.eo-ep-title{font-weight:700;font-size:15px}
+.eo-ep-path{display:block;margin-top:8px;font:13px/1.5 var(--font-family-mono,ui-monospace,Menlo,monospace);color:var(--eo-muted);word-break:break-all}
+.eo-ep-desc{display:block;margin-top:6px;font-size:14px;line-height:1.5}
+.eo-ep-foot{display:block;margin-top:10px;font-size:13px;font-weight:600;color:var(--eo-accent)}
+.eo-ep-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:1px 6px;border-radius:4px;margin-left:6px}
+.eo-ep-pop{position:absolute;left:0;top:calc(100% + 8px);z-index:1000;animation:eo-ep-in .14s ease both}
+@keyframes eo-ep-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+`;
+  const RGB = { GET: "37,99,235", POST: "22,163,74", PUT: "202,138,4", PATCH: "217,119,6", DELETE: "220,38,38", HEAD: "14,116,144", OPTIONS: "107,114,128" };
+  const rgb = RGB[method] || "99,102,241";
+  const badge = (
+    <span className="eo-ep-m" style={{ color: "rgb(" + rgb + ")", background: "rgba(" + rgb + ",.13)" }}>
+      {isWebhook ? "HOOK" : method}
+    </span>
+  );
+  const card = (
+    <a className="eo-ep-card" href={href}>
+      <span className="eo-ep-head">
+        <span className="eo-ep-title">
+          {title}
+          {deprecated ? <span className="eo-ep-tag" style={{ background: "rgba(247,144,9,.15)", color: "#B54708" }}>Deprecated</span> : null}
+        </span>
+        {badge}
       </span>
-    );
-  };
-
-  const Label = ({ children }) => (labels ? <strong>{children}: </strong> : null);
-
-  const CardContent = (
-    <a
-      href={readmeDocUrl}
-      style={{
-        textDecoration: "none",
-        color: "var(--color-text-default, #000)",
-        display: "block"
-      }}
-    >
-      <div style={cardStyle}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", ...dividerStyle }}>
-          <h3 style={{ margin: 0, fontSize: "1rem", fontWeight: 600 }}>{displayTitle}</h3>
-          <MethodTag m={String(method).toUpperCase()} />
-        </div>
-        <div style={{ paddingTop: 8 }}>
-          {endpoint && (
-            <div style={{ fontFamily: mono, fontSize: ".9rem", opacity: .8 }}>
-              {endpoint}
-            </div>
-          )}
-          {description && (
-            <p style={{ margin: "8px 0 0", fontSize: ".95rem", opacity: .9 }}>{description}</p>
-          )}
-          {apiBaseUrl && endpoint && (
-            <div style={{ marginTop: 8, fontFamily: mono, fontSize: ".9rem", opacity: .85 }}>
-              <Label>API</Label>{String(method).toUpperCase()} {apiBaseUrl}{endpoint}
-            </div>
-          )}
-        </div>
-      </div>
+      {path ? <span className="eo-ep-path">{isWebhook ? "event: " + path : method + " " + (props.apiBaseUrl || "") + path}</span> : null}
+      {description ? <span className="eo-ep-desc">{description}</span> : null}
+      <span className="eo-ep-foot">Open in API Reference →</span>
     </a>
   );
 
-  if (displayMode === "popup") {
-    return (
-      <span
-        style={{ display: "inline-block", position: "relative" }}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-      >
-        <a
-          href={readmeDocUrl}
-          style={{
-            textDecoration: "none",
-            fontWeight: 700,
-            borderRadius: 4,
-            padding: "2px 6px",
-            background: "var(--color-bg-muted, rgba(0,0,0,.06))",
-            color: "var(--color-text-default, #000)"
-          }}
-        >
-          {displayLinkText}
-        </a>
-        {hover && (
-          <div style={{ position: "absolute", left: 0, top: "calc(100% + 6px)", zIndex: 1000 }}>
-            {CardContent}
-          </div>
-        )}
-      </span>
-    );
+  if (mode === "card" || mode === "inline") {
+    return <div className="eo-ep eo-ep-inline"><style>{css}</style>{card}</div>;
   }
 
-  return CardContent;
+  const show = () => { window.clearTimeout(closeTimer.current); setOpen(true); };
+  const hide = () => { closeTimer.current = window.setTimeout(() => setOpen(false), 120); };
+
+  return (
+    <span className="eo-ep eo-ep-wrap" ref={wrapRef} onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide}
+      onKeyDown={e => { if (e.key === "Escape") setOpen(false); }}>
+      <style>{css}</style>
+      <a className="eo-ep-chip" href={href}>
+        {badge}
+        <span>{props.linkText || title}</span>
+      </a>
+      {open && mode === "popup" ? <span className="eo-ep-pop" role="tooltip">{card}</span> : null}
+    </span>
+  );
 };
 
-<EndpointEmbedLite
-  endpoint="/pet"
-  method="POST"
-  title="Create Pet"
-  displayMode="inline"
-  apiBaseUrl="https://api.example.com"
-/>
-
-<EndpointEmbedLite
-  endpoint="/user/{username}"
-  method="GET"
-  title="Get User"
-  description="Retrieve a user by username."
-/>
-
-<EndpointEmbedLite
-  endpoint="/pet/{id}"
-  method="PUT"
-  title="Update Pet"
-  description="Update an existing pet’s information."
-  apiBaseUrl="https://api.example.com"
-/>
-
-<EndpointEmbedLite
-  endpoint="/pet/{id}"
-  method="PATCH"
-  title="Partially Update Pet"
-  description="Update part of a pet record."
-  apiBaseUrl="https://api.example.com"
-/>
-
-<EndpointEmbedLite
-  endpoint="/pet/{id}"
-  method="DELETE"
-  title="Delete Pet"
-  description="Remove a pet from the database."
-  apiBaseUrl="https://api.example.com"
-/>
-
-<EndpointEmbedLite
-  endpoint="/options"
-  method="OPTIONS"
-  title="Get Allowed Methods"
-  description="View supported HTTP methods for a resource."
-  apiBaseUrl="https://api.example.com"
-/>
+Find a launch with <EndpointEmbedLite operationId="listLaunches" />, then book it with <EndpointEmbedLite operationId="createBooking" />.

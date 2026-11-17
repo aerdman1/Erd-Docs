@@ -1,268 +1,153 @@
 ---
 name: KeywordSearch
 ---
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-export default function KeywordSearch() {
-  /* ───────────────  State  ─────────────── */
-  const [searchTerm, setSearchTerm] = useState("");
-  const [matchCount, setMatchCount] = useState(0);
-  const [keywords, setKeywords] = useState([]);
-  const [keywordCounts, setKeywordCounts] = useState({});
+export const KeywordSearch = props => {
+  const rootRef = useRef(null);
+  const inputRef = useRef(null);
+  const rangesRef = useRef([]);
+  const [term, setTerm] = useState("");
+  const [count, setCount] = useState(0);
+  const [cur, setCur] = useState(0);
+  const [chips, setChips] = useState([]);
+  const placeholder = props.placeholder || "Find on this page…";
+  const canHighlight = typeof window !== "undefined" && window.CSS && CSS.highlights && typeof window.Highlight === "function";
 
-  /* ─────────────  Refs / consts  ────────── */
-  const markRef = useRef(null);                 // will hold the mark.js instance
-  const contentRef = useRef(null);              // cache .content-body root
+  const scope = () => {
+    const me = rootRef.current;
+    if (!me) return null;
+    return me.closest(".markdown-body") || me.closest("article") || document.querySelector(".rm-Article") || document.body;
+  };
 
-  const searchSelector =
-    ".content-body p, .content-body li, .content-body ul, .content-body ol, .content-body details, .content-body code, .content-body table, .content-body th, .content-body td, .content-body pre, .content-body blockquote, .content-body h1, .content-body h2, .content-body h3, .content-body h4, .content-body h5, .content-body h6";
-
-  /* ───────  Helper: lazy‑load mark.js  ───── */
-  const loadMarkJs = () =>
-    new Promise((resolve) => {
-      if (window.Mark) return resolve(window.Mark);          // already present
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/mark.js/dist/mark.min.js";
-      script.onload = () => resolve(window.Mark);
-      document.head.appendChild(script);
+  const textNodes = () => {
+    const root = scope();
+    const me = rootRef.current;
+    if (!root) return [];
+    const out = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: n => {
+        const p = n.parentElement;
+        if (!p || !n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        if (me && me.contains(n)) return NodeFilter.FILTER_REJECT;
+        if (p.closest("style,script,noscript,[aria-hidden='true']")) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
     });
+    while (walker.nextNode()) out.push(walker.currentNode);
+    return out;
+  };
 
-  /* ───────────  One‑time setup  ─────────── */
+  const findRanges = q => {
+    const needle = q.toLowerCase();
+    const ranges = [];
+    if (needle.length < 2) return ranges;
+    for (const node of textNodes()) {
+      const hay = node.nodeValue.toLowerCase();
+      let i = hay.indexOf(needle);
+      while (i !== -1 && ranges.length < 500) {
+        const r = document.createRange();
+        r.setStart(node, i);
+        r.setEnd(node, i + needle.length);
+        ranges.push(r);
+        i = hay.indexOf(needle, i + needle.length);
+      }
+    }
+    return ranges;
+  };
+
+  const paint = (ranges, idx) => {
+    if (!canHighlight) return;
+    CSS.highlights.delete("eo-find");
+    CSS.highlights.delete("eo-find-current");
+    if (!ranges.length) return;
+    CSS.highlights.set("eo-find", new window.Highlight(...ranges.filter((r, k) => k !== idx)));
+    if (ranges[idx]) CSS.highlights.set("eo-find-current", new window.Highlight(ranges[idx]));
+  };
+
+  const reveal = (ranges, idx) => {
+    const r = ranges[idx];
+    if (!r) return;
+    const el = r.startContainer.parentElement;
+    const details = el && el.closest("details:not([open])");
+    if (details) details.open = true;
+    const box = r.getBoundingClientRect ? r.getBoundingClientRect() : null;
+    if (box && (box.top < 90 || box.bottom > window.innerHeight - 40)) {
+      window.scrollTo({ top: window.scrollY + box.top - window.innerHeight / 3, behavior: "smooth" });
+    }
+  };
+
   useEffect(() => {
-    // 1. cache the root element
-    contentRef.current = document.querySelector(".content-body");
+    const t = window.setTimeout(() => {
+      const ranges = findRanges(term.trim());
+      rangesRef.current = ranges;
+      setCount(ranges.length);
+      setCur(0);
+      paint(ranges, 0);
+      if (ranges.length) reveal(ranges, 0);
+    }, 140);
+    return () => window.clearTimeout(t);
+  }, [term]);
 
-    // 2. inject highlight CSS once
-    const style = document.createElement("style");
-    style.textContent =
-      ".highlighted-match{background-color:#e1e8ff;font-weight:600;border-radius:4px;padding:2px 3px;}";
-    document.head.appendChild(style);
-
-    // 3. load mark.js, then create the instance
-    let markInstance;
-    loadMarkJs().then((Mark) => {
-      if (!contentRef.current) return;
-      markInstance = new Mark(contentRef.current);
-      markRef.current = markInstance;
-    });
-
-    // cleanup on unmount
+  useEffect(() => {
+    const words = String(props.keywords || (document.querySelector('meta[name="keywords"],meta[property="keywords"]') || {}).content || "")
+      .split(",").map(s => s.trim()).filter(Boolean).slice(0, 12);
+    const t = window.setTimeout(() => setChips(words.map(w => ({ w, n: findRanges(w).length }))), 300);
     return () => {
-      markInstance && markInstance.unmark();
-      document.head.removeChild(style);
+      window.clearTimeout(t);
+      if (canHighlight) { CSS.highlights.delete("eo-find"); CSS.highlights.delete("eo-find-current"); }
     };
-  }, []);
+  }, [props.keywords]);
 
-  /* ──────  Keywords from <meta keywords>  ───── */
-  const updateKeywords = () => {
-    const metaTag = document.querySelector('meta[property="keywords"]');
-    if (metaTag && metaTag.content.trim()) {
-      const extracted = metaTag.content.split(",").map((kw) => kw.trim());
-      setKeywords(extracted);
-      console.log("📌 Extracted Keywords:", extracted);
-    }
+  const step = d => {
+    const ranges = rangesRef.current;
+    if (!ranges.length) return;
+    const next = (cur + d + ranges.length) % ranges.length;
+    setCur(next);
+    paint(ranges, next);
+    reveal(ranges, next);
   };
 
-  const pollForMetaTagContent = (attempt = 0) => {
-    const maxAttempts = 30;
-    const metaTag = document.querySelector('meta[property="keywords"]');
-    if (metaTag && metaTag.content.trim()) {
-      updateKeywords();
-    } else if (attempt < maxAttempts) {
-      setTimeout(() => pollForMetaTagContent(attempt + 1), 100);
-    }
-  };
-
-  const initializeSearchComponent = () => {
-    console.log("🔍 Initializing Search Component for route:", window.location.pathname);
-    pollForMetaTagContent();
-    markRef.current && markRef.current.unmark();
-    setMatchCount(0);
-  };
-
-  /* ─────  Observe meta changes & navigation  ───── */
-  useEffect(() => {
-    initializeSearchComponent();
-
-    /* watch <meta property="keywords"> */
-    const metaTag = document.querySelector('meta[property="keywords"]');
-    let observer;
-    if (metaTag) {
-      observer = new MutationObserver(updateKeywords);
-      observer.observe(metaTag, { attributes: true, attributeFilter: ["content"] });
-    }
-
-    /* SPA navigation hooks */
-    const handleUrlChange = () => {
-      setTimeout(() => {
-        setSearchTerm("");
-        initializeSearchComponent();
-      }, 500);
-    };
-
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-    history.pushState = function () {
-      originalPushState.apply(history, arguments);
-      window.dispatchEvent(new Event("pushState"));
-    };
-    history.replaceState = function () {
-      originalReplaceState.apply(history, arguments);
-      window.dispatchEvent(new Event("replaceState"));
-    };
-
-    window.addEventListener("popstate", handleUrlChange);
-    window.addEventListener("pushState", handleUrlChange);
-    window.addEventListener("replaceState", handleUrlChange);
-    window.addEventListener("hashchange", handleUrlChange);
-
-    return () => {
-      observer && observer.disconnect();
-      window.removeEventListener("popstate", handleUrlChange);
-      window.removeEventListener("pushState", handleUrlChange);
-      window.removeEventListener("replaceState", handleUrlChange);
-      window.removeEventListener("hashchange", handleUrlChange);
-    };
-  }, []);
-
-  /* ──────────  Highlight on searchTerm  ───────── */
-  useEffect(() => {
-    const mark = markRef.current;
-    if (!mark || !contentRef.current) return;
-
-    if (searchTerm.length < 3) {
-      mark.unmark();
-      setMatchCount(0);
-      return;
-    }
-
-    mark.unmark({
-      done: () =>
-        mark.mark(searchTerm, {
-          separateWordSearch: false,
-          className: "highlighted-match",
-          done: (cnt) => {
-            setMatchCount(cnt);
-            if (cnt > 0) setTimeout(scrollToFirstMatch, 300);
-            console.log(`✅ Total matches found: ${cnt}`);
-          },
-        }),
-    });
-  }, [searchTerm]);
-
-  /* ────────  Count keyword occurrences  ──────── */
-  useEffect(() => {
-    if (!keywords.length) return;
-    const counts = {};
-
-    document.querySelectorAll(searchSelector).forEach((el) => {
-      const text = el.textContent || "";
-      keywords.forEach((kw) => {
-        const regex = new RegExp(`\\b${kw}\\b`, "gi");
-        const matches = text.match(regex);
-        if (matches) counts[kw] = (counts[kw] || 0) + matches.length;
-      });
-    });
-
-    setKeywordCounts(counts);
-    console.log("📊 Keyword Counts:", counts);
-  }, [keywords]);
-
-  /* ────────────────  Helpers  ──────────────── */
-  const scrollToFirstMatch = () => {
-    const match = document.querySelector(".highlighted-match");
-    match && match.scrollIntoView({ behavior: "smooth", block: "center" });
-  };
-
-  const handleKeywordClick = (kw) => setSearchTerm(kw);
-
-  /* ────────────────  Inline styles  ──────────── */
-  const containerStyle = {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  };
-  const searchContainerStyle = {
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-    gap: "30px",
-    position: "relative",
-  };
-  const inputContainerStyle = {
-    flex: "1 1 25%",
-    maxWidth: "25%",
-    position: "relative",
-  };
-  const inputStyle = {
-    width: "100%",
-    padding: "8px",
-    fontSize: "14px",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-  };
-  const matchCountStyle = {
-    position: "absolute",
-    top: "-18px",
-    left: "5px",
-    fontSize: "12px",
-    color: "#555",
-    opacity: 0.8,
-  };
-  const keywordContainerStyle = {
-    flex: "1 1 75%",
-    maxWidth: "75%",
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "5px",
-    justifyContent: "flex-start",
-    overflow: "hidden",
-    whiteSpace: "nowrap",
-  };
-  const keywordButtonStyle = (active) => ({
-    backgroundColor: active ? "#e1e8ff" : "#f0f0f0",
-    padding: "5px 10px",
-    borderRadius: "15px",
-    border: "1px solid #ccc",
-    cursor: "pointer",
-    fontSize: "12px",
-    color: "#333",
-  });
-
-  /* ─────────────────  Render  ───────────────── */
+  const css = `
+.eo-find{--eo-accent:var(--color-link-primary,#2F7BF5);--eo-border:var(--color-border-default,rgba(0,0,0,.12));--eo-muted:var(--color-text-minimum,#6b7280);margin:20px 0}
+.eo-find-bar{display:flex;align-items:center;gap:8px;border:1px solid var(--eo-border);border-radius:12px;padding:6px 8px 6px 12px;background:var(--color-bg-page,transparent);transition:border-color .15s,box-shadow .15s}
+.eo-find-bar:focus-within{border-color:var(--eo-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--eo-accent) 15%,transparent)}
+.eo-find-bar input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:inherit;font:inherit;font-size:15px;padding:6px 0}
+.eo-find-count{font-size:13px;color:var(--eo-muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.eo-find-btn{border:1px solid var(--eo-border);background:transparent;color:inherit;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:13px}
+.eo-find-btn:disabled{opacity:.35;cursor:default}
+.eo-find-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.eo-find-chip{border:1px solid var(--eo-border);background:transparent;color:inherit;border-radius:999px;padding:3px 10px;font-size:13px;cursor:pointer}
+.eo-find-chip[aria-pressed="true"]{background:var(--eo-accent);border-color:var(--eo-accent);color:#fff}
+.eo-find-chip b{font-weight:600;opacity:.65;margin-left:4px}
+::highlight(eo-find){background-color:rgba(250,204,21,.45);color:inherit}
+::highlight(eo-find-current){background-color:#f59e0b;color:#000}
+`;
+  const q = term.trim();
   return (
-    <div style={containerStyle}>
-      <div style={searchContainerStyle}>
-        <div style={inputContainerStyle}>
-          {matchCount > 0 && (
-            <span style={matchCountStyle}>
-              {matchCount} {matchCount === 1 ? "result" : "results"}
-            </span>
-          )}
-          <input
-            type="text"
-            placeholder="Search Page..."
-            style={inputStyle}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div style={keywordContainerStyle}>
-          {keywords.map((kw) => (
-            <button
-              key={kw}
-              onClick={() => handleKeywordClick(kw)}
-              style={keywordButtonStyle(searchTerm === kw)}
-            >
-              {kw} ({keywordCounts[kw] || 0})
+    <div className="eo-find" ref={rootRef}>
+      <style>{css}</style>
+      <div className="eo-find-bar">
+        <span aria-hidden="true">🔎</span>
+        <input ref={inputRef} type="search" value={term} placeholder={placeholder} aria-label={placeholder}
+          onChange={e => setTerm(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); step(e.shiftKey ? -1 : 1); } if (e.key === "Escape") setTerm(""); }} />
+        <span className="eo-find-count" aria-live="polite">{q.length < 2 ? "" : count ? (cur + 1) + " of " + count : "No matches"}</span>
+        <button type="button" className="eo-find-btn" aria-label="Previous match" disabled={!count} onClick={() => step(-1)}>↑</button>
+        <button type="button" className="eo-find-btn" aria-label="Next match" disabled={!count} onClick={() => step(1)}>↓</button>
+      </div>
+      {chips.length ? (
+        <div className="eo-find-chips">
+          {chips.map(c => (
+            <button key={c.w} type="button" className="eo-find-chip" aria-pressed={q.toLowerCase() === c.w.toLowerCase() ? "true" : "false"}
+              onClick={() => setTerm(q.toLowerCase() === c.w.toLowerCase() ? "" : c.w)}>
+              {c.w}<b>{c.n}</b>
             </button>
           ))}
         </div>
-      </div>
+      ) : null}
     </div>
   );
-}
+};
 
-<KeywordSearch />
+<KeywordSearch keywords="launch, booking, manifest" />

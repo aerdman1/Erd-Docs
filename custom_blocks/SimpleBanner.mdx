@@ -3,140 +3,101 @@ name: SimpleBanner
 ---
 import React, { useEffect, useState } from "react";
 
-export const SimpleBanner = ({
-  isHeader = false,
-  message,
-  bannerColor,
-  bannerTextColor,
-  fontSize,
-  fontWeight
-}) => {
-  const [bannerContainer, setBannerContainer] = useState(null);
+export const SimpleBanner = props => {
+  const truthy = v => v === true || v === "true" || v === "yes" || v === "1";
+  const placement = truthy(props.isHeader) ? "header" : (props.placement || "inline");
+  const variant = props.variant || (props.bannerColor ? "custom" : "info");
+  const message = props.message || "";
+  const icon = props.icon !== undefined ? props.icon : ({ info: "📣", success: "✅", warn: "⚠️", error: "⛔", launch: "🚀" })[variant] || "";
+  const dismissible = truthy(props.dismissible);
+  const key = "eo-banner:" + (props.id || message).slice(0, 80);
+  const [hidden, setHidden] = useState(false);
 
-  // Function to remove the banner element from the DOM
-  const removeBanner = () => {
-    const container = document.getElementById("simple-banner-container");
-    if (container) {
-      container.remove();
-    }
+  const palette = {
+    info: { bg: "color-mix(in srgb, var(--color-link-primary, #2F7BF5) 12%, transparent)", fg: "inherit", edge: "var(--color-link-primary, #2F7BF5)" },
+    success: { bg: "rgba(18,183,106,.12)", fg: "inherit", edge: "#12B76A" },
+    warn: { bg: "rgba(247,144,9,.14)", fg: "inherit", edge: "#F79009" },
+    error: { bg: "rgba(240,68,56,.12)", fg: "inherit", edge: "#F04438" },
+    launch: { bg: "linear-gradient(100deg,#19C3F5 0%,#2F7BF5 50%,#7B3FF2 100%)", fg: "#fff", edge: "transparent" },
+    custom: { bg: props.bannerColor || "#2F7BF5", fg: props.bannerTextColor || "#fff", edge: "transparent" },
+  }[variant] || { bg: "#2F7BF5", fg: "#fff", edge: "transparent" };
+
+  useEffect(() => {
+    try { if (dismissible && window.sessionStorage.getItem(key) === "1") setHidden(true); } catch (e) {}
+  }, [dismissible, key]);
+
+  const dismiss = () => {
+    setHidden(true);
+    try { window.sessionStorage.setItem(key, "1"); } catch (e) {}
   };
 
-  // Effect to handle header-based banner creation and cleanup
   useEffect(() => {
-    if (isHeader) {
-      const header = document.querySelector("header.rm-Header");
-      if (header) {
-        let container = document.getElementById("simple-banner-container");
-        if (!container) {
-          container = document.createElement("div");
-          container.id = "simple-banner-container";
-          // Append container to the bottom of the header
-          header.appendChild(container);
-        }
-        setBannerContainer(container);
-      }
-    } else {
-      // If switching from header to inline, ensure any header banner is removed.
-      removeBanner();
-      setBannerContainer(null);
+    if (placement !== "header" || hidden || typeof document === "undefined") return undefined;
+    const header = document.querySelector("header.rm-Header") || document.querySelector(".rm-Header");
+    if (!header) return undefined;
+    const bar = document.createElement("div");
+    bar.setAttribute("data-eo-banner", "");
+    bar.setAttribute("role", "status");
+    Object.assign(bar.style, {
+      display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", flexWrap: "wrap",
+      padding: "8px 44px", position: "relative", textAlign: "center",
+      background: palette.bg, color: palette.fg === "inherit" ? "" : palette.fg,
+      fontSize: props.fontSize || "14px", fontWeight: props.fontWeight || "600",
+      borderBottom: palette.edge !== "transparent" ? "2px solid " + palette.edge : "0",
+    });
+    const text = document.createElement("span");
+    text.textContent = (icon ? icon + " " : "") + message;
+    bar.appendChild(text);
+    if (props.link) {
+      const a = document.createElement("a");
+      a.href = props.link;
+      a.textContent = (props.linkText || "Learn more") + " →";
+      Object.assign(a.style, { color: "inherit", textDecoration: "underline", fontWeight: "700" });
+      bar.appendChild(a);
     }
-
-    // Cleanup: always remove the banner when the component unmounts.
-    return () => {
-      removeBanner();
-    };
-  }, [isHeader]);
-
-  // Update the banner container's styles and content when props change.
-  useEffect(() => {
-    if (bannerContainer) {
-      bannerContainer.style.background = bannerColor;
-      bannerContainer.style.color = bannerTextColor;
-      bannerContainer.style.fontSize = fontSize;
-      bannerContainer.style.fontWeight = fontWeight;
-      bannerContainer.style.padding = "8px";
-      bannerContainer.style.textAlign = "center";
-      bannerContainer.style.borderRadius = "6px";
-      bannerContainer.textContent = message;
+    let btn = null;
+    const onClick = () => dismiss();
+    if (dismissible) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.setAttribute("aria-label", "Dismiss");
+      btn.textContent = "×";
+      Object.assign(btn.style, { position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", background: "transparent", border: "0", color: "inherit", fontSize: "20px", lineHeight: "1", cursor: "pointer", opacity: ".8" });
+      btn.addEventListener("click", onClick);
+      bar.appendChild(btn);
     }
-  }, [bannerContainer, message, bannerColor, bannerTextColor, fontSize, fontWeight]);
-
-  // Ensure the banner is removed on route change (for SPAs)
-  useEffect(() => {
-    let lastPath = window.location.pathname;
-
-    const checkRouteChange = () => {
-      if (window.location.pathname !== lastPath) {
-        lastPath = window.location.pathname;
-        removeBanner();
-      }
-    };
-
-    // Override history methods to catch route changes.
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-
-    history.pushState = function () {
-      originalPushState.apply(history, arguments);
-      removeBanner();
-    };
-
-    history.replaceState = function () {
-      originalReplaceState.apply(history, arguments);
-      removeBanner();
-    };
-
-    // Backup interval to check for route changes
-    const routeCheckInterval = setInterval(checkRouteChange, 500);
-    window.addEventListener("popstate", removeBanner);
-
-    // Cleanup on effect teardown.
+    header.appendChild(bar);
     return () => {
-      clearInterval(routeCheckInterval);
-      history.pushState = originalPushState;
-      history.replaceState = originalReplaceState;
-      window.removeEventListener("popstate", removeBanner);
+      if (btn) btn.removeEventListener("click", onClick);
+      bar.remove();
     };
-  }, []);
+  }, [placement, hidden, message, variant, props.link, props.linkText, dismissible]);
 
-  // Render inline banner if not in header mode.
-  if (!isHeader) {
-    return (
-      <div
-        style={{
-          background: bannerColor,
-          color: bannerTextColor,
-          fontSize: fontSize,
-          fontWeight: fontWeight,
-          padding: "8px",
-          textAlign: "center",
-          borderRadius: "6px",
-          marginBottom: "20px"
-        }}
-      >
+  if (placement === "header" || hidden) return null;
+
+  return (
+    <div role="status" style={{
+      display: "flex", alignItems: "center", gap: "12px", margin: "20px 0", padding: "12px 16px",
+      borderRadius: "10px", background: palette.bg, color: palette.fg,
+      borderLeft: palette.edge !== "transparent" ? "4px solid " + palette.edge : "0",
+      fontSize: props.fontSize || "15px", fontWeight: props.fontWeight || "500",
+    }}>
+      {icon ? <span aria-hidden="true" style={{ fontSize: "1.2em" }}>{icon}</span> : null}
+      <div style={{ flex: 1 }}>
         {message}
+        {props.children}
+        {props.link ? (
+          <a href={props.link} style={{ marginLeft: "8px", color: "inherit", fontWeight: 700, textDecoration: "underline" }}>
+            {(props.linkText || "Learn more") + " →"}
+          </a>
+        ) : null}
       </div>
-    );
-  }
-
-  // If isHeader is true, nothing is rendered inline since the banner is injected.
-  return null;
+      {dismissible ? (
+        <button type="button" aria-label="Dismiss" onClick={dismiss}
+          style={{ background: "transparent", border: 0, color: "inherit", fontSize: "20px", lineHeight: 1, cursor: "pointer", opacity: .7 }}>×</button>
+      ) : null}
+    </div>
+  );
 };
 
-<SimpleBanner
-  isHeader={false} 
-  message="This banner is displayed inline. Set isHeader to true to move it seamlessly into your site's header!" 
-  bannerColor="#00bcff" 
-  bannerTextColor="#ffffff" 
-  fontSize="14px" 
-  fontWeight="bold" 
-/>
-
-<SimpleBanner
-  isHeader={true} 
-  message="isHeader is set to true, so this banner is now integrated into your site's header!" 
-  bannerColor="#00bcff" 
-  bannerTextColor="#ffffff" 
-  fontSize="14px" 
-  fontWeight="bold" 
-/>
+<SimpleBanner variant="launch" message="Bulk cargo bookings are live." link="/changelog" linkText="Read the changelog" />
