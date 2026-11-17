@@ -62,4 +62,4 @@ Sign `t.body` with your webhook secret and compare in constant time.
 
 <!-- javascript@20-22 -->
 
-Reply with any `2xx` within 10 seconds. Orbit retries anything else for 24 hours.
+Reply with any `2xx` within ten seconds. Otherwise Orbit retries with backoff, up to five times.
