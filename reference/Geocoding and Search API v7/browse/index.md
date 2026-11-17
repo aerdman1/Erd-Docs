@@ -1,4 +1,0 @@
----
-title: /browse
-hidden: false
----

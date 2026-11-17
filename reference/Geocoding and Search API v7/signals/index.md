@@ -1,4 +1,0 @@
----
-title: /signals
-hidden: false
----
