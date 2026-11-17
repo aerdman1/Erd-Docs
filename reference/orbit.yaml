@@ -341,6 +341,7 @@ paths:
                 title: Delta-v budget exceeded
                 status: 422
                 detail: A wren can't lift 820 kg to GEO. Try a kestrel-heavy launch.
+      x-internal: false
   /bookings/{bookingId}:
     parameters:
       - $ref: '#/components/parameters/BookingId'
