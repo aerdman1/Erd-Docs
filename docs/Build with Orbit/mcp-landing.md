@@ -17,9 +17,48 @@ Click **Ask AI** in the header and ask something like *“How do I book a CubeSa
 
 Every ReadMe hub can run an **MCP server**. Connect it to Claude, Cursor or another MCP client, and the client can search these docs and read the Orbit API definition while it writes your integration.
 
-<MCPIntro url="https://erdman.readme.io/mcp" />
+Pick your client:
 
-Alongside the standard tools, this server has a **custom tool**, `plan-orbit-booking`. It hands an agent the booking steps in order, and it was written in the dashboard with no code.
+<Tabs>
+  <Tab title="Claude Code" icon="fa-terminal">
+    ```shell
+    claude mcp add --transport http orbit https://erdman.readme.io/mcp
+    ```
+  </Tab>
+
+  <Tab title="Cursor" icon="fa-arrow-pointer">
+    ```json ~/.cursor/mcp.json
+    {
+      "mcpServers": {
+        "orbit": { "url": "https://erdman.readme.io/mcp" }
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="VS Code" icon="fa-code">
+    ```json .vscode/mcp.json
+    {
+      "servers": {
+        "orbit": { "type": "http", "url": "https://erdman.readme.io/mcp" }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+The **Copy Page** menu at the top of every page has the same options, one click each.
+
+### What the server can do
+
+| Tool                 | What it does                                                              |
+| :------------------- | :------------------------------------------------------------------------ |
+| `search`, `fetch`    | Search these guides and read any page                                     |
+| `list-endpoints`     | List every Orbit endpoint                                                 |
+| `search-endpoints`   | Find endpoints by keyword, parameter or field                             |
+| `get-endpoint`       | Read one endpoint’s parameters, schemas and auth                          |
+| `execute-request`    | Call the API for real, with the user’s key                                |
+| `plan-orbit-booking` | A **custom tool**: the booking steps in order, written in the dashboard with no code |
 
 ## Docs for LLMs
 
@@ -34,8 +73,8 @@ Alongside the standard tools, this server has a **custom tool**, `plan-orbit-boo
 </Callout>
 
 <Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
-  * `MCPIntro`, a **built-in ReadMe component** that shows this hub’s MCP server and how to connect to it
-  * A **custom MCP tool**, added in the dashboard
+  * **Tabs** with a code block per MCP client
+  * The hub’s **MCP server**, turned on in settings, plus a **custom MCP tool** added in the dashboard
   * **Ask AI**, `llms.txt` and the `.md` page export are hub features, turned on in settings
   * A **table** and an **info** Callout
 </Accordion>
