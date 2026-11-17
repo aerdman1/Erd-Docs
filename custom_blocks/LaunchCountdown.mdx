@@ -1,0 +1,99 @@
+---
+name: LaunchCountdown
+---
+import React, { useEffect, useState } from "react";
+
+export const LaunchCountdown = props => {
+  const mission = props.mission || "Polaris Run";
+  const vehicle = props.vehicle || "kestrel";
+  const orbit = props.orbit || "SSO";
+  const status = String(props.status || "go").toLowerCase();
+  const [now, setNow] = useState(null);
+
+  useEffect(() => {
+    setNow(Date.now());
+    const t = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, []);
+
+  const target = (() => {
+    const fixed = props.at ? Date.parse(props.at) : NaN;
+    if (!isNaN(fixed)) return fixed;
+    const week = 7 * 86400000;
+    let t = Date.parse("2026-12-09T03:41:00Z");
+    const base = now || Date.now();
+    while (t < base) t += week;
+    return t;
+  })();
+
+  const left = now === null ? null : Math.max(0, target - now);
+  const parts = left === null ? ["--", "--", "--", "--"] : [
+    Math.floor(left / 86400000),
+    Math.floor(left / 3600000) % 24,
+    Math.floor(left / 60000) % 60,
+    Math.floor(left / 1000) % 60,
+  ].map(n => String(n).padStart(2, "0"));
+  const launched = left === 0;
+  const S = {
+    go: { label: "GO for launch", color: "#12B76A" },
+    hold: { label: "HOLD", color: "#F79009" },
+    scrubbed: { label: "SCRUBBED", color: "#F04438" },
+  }[status] || { label: status.toUpperCase(), color: "#667085" };
+  const when = new Date(target);
+  const local = now === null || isNaN(when.getTime()) ? "…" : when.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" });
+
+  const css = `
+.eo-cd{position:relative;overflow:hidden;margin:24px 0;padding:24px 26px;border-radius:16px;color:#E6EDF7;
+  background:radial-gradient(120% 140% at 100% 0%,rgba(123,63,242,.45) 0%,transparent 55%),radial-gradient(90% 120% at 0% 100%,rgba(25,195,245,.35) 0%,transparent 60%),#0B0F1E}
+.eo-cd::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background-image:radial-gradient(1px 1px at 20% 30%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 70% 20%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 85% 70%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 40% 80%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 55% 45%,#fff 50%,transparent 51%),radial-gradient(1px 1px at 10% 75%,#fff 50%,transparent 51%)}
+.eo-cd-top{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.eo-cd-mission{font-size:20px;font-weight:800;letter-spacing:.01em}
+.eo-cd-sub{font-size:13px;opacity:.75;margin-top:2px}
+.eo-cd-status{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.08em;padding:5px 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.eo-cd-status i{width:8px;height:8px;border-radius:50%;animation:eo-cd-pulse 1.6s ease-in-out infinite}
+@keyframes eo-cd-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.eo-cd-clock{position:relative;display:flex;align-items:flex-end;gap:10px;margin:20px 0 6px;font-variant-numeric:tabular-nums}
+.eo-cd-tminus{font:800 15px/1 var(--font-family-mono,ui-monospace,Menlo,monospace);opacity:.7;padding-bottom:16px}
+.eo-cd-unit{text-align:center}
+.eo-cd-num{display:block;min-width:64px;padding:10px 8px;border-radius:12px;font:800 38px/1 var(--font-family-mono,ui-monospace,Menlo,monospace);
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.14);box-shadow:inset 0 -2px 0 rgba(0,0,0,.25)}
+.eo-cd-lbl{display:block;margin-top:6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.6}
+.eo-cd-sep{font:800 30px/1 var(--font-family-mono,ui-monospace,Menlo,monospace);opacity:.4;padding-bottom:26px}
+.eo-cd-rocket{position:absolute;right:26px;bottom:18px;font-size:44px;animation:eo-cd-bob 3s ease-in-out infinite;filter:drop-shadow(0 6px 14px rgba(25,195,245,.45))}
+@keyframes eo-cd-bob{0%,100%{transform:translateY(0) rotate(-8deg)}50%{transform:translateY(-8px) rotate(-8deg)}}
+.eo-cd-launched .eo-cd-rocket{animation:eo-cd-lift 2.4s ease-in forwards}
+@keyframes eo-cd-lift{to{transform:translateY(-220px) rotate(-8deg);opacity:0}}
+.eo-cd-foot{position:relative;font-size:13px;opacity:.8;margin-top:8px}
+@media (prefers-reduced-motion:reduce){.eo-cd-rocket,.eo-cd-status i{animation:none}}
+@media (max-width:560px){.eo-cd-num{min-width:48px;font-size:28px}.eo-cd-sep{font-size:22px;padding-bottom:22px}.eo-cd-rocket{display:none}.eo-cd-tminus{display:none}}
+`;
+  const units = ["Days", "Hours", "Min", "Sec"];
+  return (
+    <div className={"eo-cd" + (launched ? " eo-cd-launched" : "")} role="timer" aria-label={"Countdown to " + mission}>
+      <style>{css}</style>
+      <div className="eo-cd-top">
+        <div>
+          <div className="eo-cd-mission">{mission}</div>
+          <div className="eo-cd-sub">{vehicle} → {orbit}{props.pad ? " · " + props.pad : ""}</div>
+        </div>
+        <span className="eo-cd-status"><i style={{ background: S.color }} />{launched ? "LIFTOFF" : S.label}</span>
+      </div>
+      {launched ? (
+        <div className="eo-cd-clock" style={{ fontSize: "34px", fontWeight: 800 }}>🚀 Liftoff! Tracking to orbit.</div>
+      ) : (
+        <div className="eo-cd-clock" aria-live="off">
+          <span className="eo-cd-tminus">T−</span>
+          {parts.map((p, i) => [
+            i ? <span key={"s" + i} className="eo-cd-sep">:</span> : null,
+            <span key={"u" + i} className="eo-cd-unit"><span className="eo-cd-num">{p}</span><span className="eo-cd-lbl">{units[i]}</span></span>,
+          ])}
+        </div>
+      )}
+      <div className="eo-cd-foot">Window opens {local}</div>
+      <span className="eo-cd-rocket" aria-hidden="true">🚀</span>
+    </div>
+  );
+};
+
+<LaunchCountdown mission="Polaris Run" vehicle="kestrel" orbit="SSO" />

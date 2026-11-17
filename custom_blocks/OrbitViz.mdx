@@ -1,0 +1,106 @@
+---
+name: OrbitViz
+---
+import React, { useEffect, useRef, useState } from "react";
+
+export const OrbitViz = props => {
+  const ORBITS = [
+    { id: "leo", name: "LEO", color: "#19C3F5", rx: 82, ry: 30, tilt: 0, dur: 5, alt: "160–2,000 km", period: "about 90 minutes", use: "CubeSats, Earth imaging and station resupply", rate: "$6,000/kg", reach: "wren, kestrel, kestrel-heavy" },
+    { id: "sso", name: "SSO", color: "#12B76A", rx: 92, ry: 22, tilt: 68, dur: 6, alt: "500–800 km, near-polar", period: "about 95 minutes", use: "Imaging that passes over each spot at the same local time", rate: "$6,800/kg", reach: "wren, kestrel, kestrel-heavy" },
+    { id: "meo", name: "MEO", color: "#F79009", rx: 178, ry: 64, tilt: 0, dur: 13, alt: "2,000–35,786 km", period: "2 to 12 hours", use: "Navigation constellations", rate: "$11,000/kg", reach: "wren (300 kg), kestrel, kestrel-heavy" },
+    { id: "geo", name: "GEO", color: "#A78BFA", rx: 300, ry: 112, tilt: 0, dur: 26, alt: "35,786 km above the equator", period: "24 hours: it seems to stand still", use: "Weather and communications satellites", rate: "$19,500/kg", reach: "wren (150 kg), kestrel, kestrel-heavy" },
+  ];
+  const start = ORBITS.some(o => o.id === props.highlight) ? props.highlight : "leo";
+  const [sel, setSel] = useState(start);
+  const [playing, setPlaying] = useState(!(props.animate === "false"));
+  const svgRef = useRef(null);
+  const uid = useRef("eo" + Math.random().toString(36).slice(2, 8)).current;
+  const cx = 360, cy = 196, R = 48;
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPlaying(false);
+  }, []);
+  useEffect(() => {
+    const s = svgRef.current;
+    if (!s || !s.pauseAnimations) return;
+    if (playing) s.unpauseAnimations(); else s.pauseAnimations();
+  }, [playing]);
+
+  const ring = o => "M " + (cx - o.rx) + " " + cy + " a " + o.rx + " " + o.ry + " 0 1 0 " + (2 * o.rx) + " 0 a " + o.rx + " " + o.ry + " 0 1 0 " + (-2 * o.rx) + " 0";
+  const cur = ORBITS.find(o => o.id === sel) || ORBITS[0];
+  const stars = [[40, 40], [120, 300], [200, 70], [600, 60], [680, 280], [520, 340], [90, 180], [650, 150], [300, 30], [430, 350], [700, 20], [20, 350], [560, 200], [250, 330]];
+
+  const css = `
+.eo-orb{--eo-border:var(--color-border-default,rgba(0,0,0,.12));margin:24px 0;border-radius:16px;overflow:hidden;background:#0B0F1E;color:#E6EDF7;border:1px solid rgba(255,255,255,.06)}
+.eo-orb svg{display:block;width:100%;height:auto}
+.eo-orb-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.08)}
+.eo-orb-bar button{border:1px solid rgba(255,255,255,.16);background:transparent;color:inherit;border-radius:999px;padding:4px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.eo-orb-bar button i{width:8px;height:8px;border-radius:50%}
+.eo-orb-bar button[aria-pressed="true"]{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+.eo-orb-play{margin-left:auto}
+.eo-orb-info{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:14px 16px 16px;border-top:1px solid rgba(255,255,255,.08)}
+.eo-orb-info div{font-size:13px;line-height:1.45}
+.eo-orb-info span{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-bottom:2px}
+.eo-orb-hit{cursor:pointer}
+@media (max-width:640px){.eo-orb-info{grid-template-columns:1fr 1fr}}
+`;
+  return (
+    <figure className="eo-orb" style={{ margin: "24px 0" }}>
+      <style>{css}</style>
+      <svg ref={svgRef} viewBox="0 0 720 380" role="img" aria-label={"Orbit diagram. Selected: " + cur.name + ", " + cur.alt}>
+        <defs>
+          <radialGradient id={uid + "-earth"} cx="38%" cy="35%" r="70%">
+            <stop offset="0%" stopColor="#7DD3FC" />
+            <stop offset="45%" stopColor="#2F7BF5" />
+            <stop offset="100%" stopColor="#0B2A6B" />
+          </radialGradient>
+          <radialGradient id={uid + "-glow"} cx="50%" cy="50%" r="50%">
+            <stop offset="70%" stopColor="#19C3F5" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#19C3F5" stopOpacity="0" />
+          </radialGradient>
+          <mask id={uid + "-front"} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="380">
+            <rect x="0" y="0" width="720" height="380" fill="#fff" />
+            <path d={"M " + (cx - R) + " " + cy + " A " + R + " " + R + " 0 0 1 " + (cx + R) + " " + cy + " Z"} fill="#000" />
+          </mask>
+        </defs>
+        {stars.map((s, i) => <circle key={i} cx={s[0]} cy={s[1]} r={i % 3 ? 1 : 1.6} fill="#fff" opacity={i % 2 ? 0.5 : 0.8} />)}
+        <circle cx={cx} cy={cy} r={R + 14} fill={"url(#" + uid + "-glow)"} />
+        <circle cx={cx} cy={cy} r={R} fill={"url(#" + uid + "-earth)"} />
+        <path d={"M " + (cx - 30) + " " + (cy - 18) + " q 14 -10 26 0 t 18 10 q -10 14 -24 8 z"} fill="#12B76A" opacity="0.55" />
+        <path d={"M " + (cx + 6) + " " + (cy + 14) + " q 12 -6 22 2 q -4 12 -18 12 z"} fill="#12B76A" opacity="0.5" />
+        <g mask={"url(#" + uid + "-front)"}>
+          {ORBITS.map(o => (
+            <g key={o.id} transform={o.tilt ? "rotate(" + o.tilt + " " + cx + " " + cy + ")" : undefined}
+              opacity={sel === o.id ? 1 : 0.45} style={{ transition: "opacity .25s" }}>
+              <path d={ring(o)} fill="none" stroke={o.color} strokeWidth={sel === o.id ? 2.4 : 1.2} strokeDasharray={o.id === "geo" ? "6 6" : undefined} />
+              <path className="eo-orb-hit" d={ring(o)} fill="none" stroke="transparent" strokeWidth="14" onMouseEnter={() => setSel(o.id)} onClick={() => setSel(o.id)} />
+              <g>
+                <circle r={sel === o.id ? 9 : 6} fill={o.color} opacity="0.25" />
+                <circle r={sel === o.id ? 4.5 : 3.5} fill={o.color} />
+                <animateMotion dur={o.dur + "s"} repeatCount="indefinite" path={ring(o)} />
+              </g>
+            </g>
+          ))}
+        </g>
+        {ORBITS.map(o => {
+          if (o.tilt) return <text key={o.id} x={cx + 26} y={cy - o.rx + 6} fill={o.color} fontSize="12" fontWeight="700" opacity={sel === o.id ? 1 : 0.6}>{o.name}</text>;
+          return <text key={o.id} x={cx + o.rx + 8} y={cy + 4} fill={o.color} fontSize="12" fontWeight="700" opacity={sel === o.id ? 1 : 0.6}>{o.name}</text>;
+        })}
+      </svg>
+      <div className="eo-orb-bar">
+        {ORBITS.map(o => (
+          <button key={o.id} type="button" aria-pressed={sel === o.id} onClick={() => setSel(o.id)}><i style={{ background: o.color }} />{o.name}</button>
+        ))}
+        <button type="button" className="eo-orb-play" onClick={() => setPlaying(p => !p)} aria-label={playing ? "Pause animation" : "Play animation"}>{playing ? "❚❚ Pause" : "▶ Play"}</button>
+      </div>
+      <div className="eo-orb-info" aria-live="polite">
+        <div><span>Altitude</span>{cur.alt}</div>
+        <div><span>One orbit</span>{cur.period}</div>
+        <div><span>Good for</span>{cur.use}</div>
+        <div><span>Orbit price · vehicles</span>{cur.rate} · {cur.reach}</div>
+      </div>
+    </figure>
+  );
+};
+
+<OrbitViz highlight="leo" />

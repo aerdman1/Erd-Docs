@@ -1,0 +1,104 @@
+---
+name: Terminal
+---
+import React, { useEffect, useRef, useState } from "react";
+
+export const Terminal = props => {
+  const lines = String(props.script || "$ orbit --version\\norbit-cli 1.4.0").split("\\n");
+  const title = props.title || "orbit — zsh";
+  const speed = Number(props.speed) > 0 ? Number(props.speed) : 28;
+  const [shown, setShown] = useState(0);
+  const [typed, setTyped] = useState(0);
+  const [run, setRun] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const boxRef = useRef(null);
+  const started = useRef(false);
+
+  const isCmd = l => l.indexOf("$ ") === 0;
+  const done = shown >= lines.length;
+
+  useEffect(() => {
+    const reduce = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || props.animate === "false") { setShown(lines.length); return undefined; }
+    const el = boxRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") { started.current = true; setRun(r => r + 1); return undefined; }
+    const io = new IntersectionObserver(es => {
+      if (es.some(e => e.isIntersecting) && !started.current) { started.current = true; setRun(r => r + 1); io.disconnect(); }
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!run || done) return undefined;
+    const line = lines[shown] || "";
+    let t;
+    if (isCmd(line) && typed < line.length) {
+      t = window.setTimeout(() => setTyped(n => n + 1), typed < 2 ? 0 : speed + Math.random() * speed);
+    } else {
+      t = window.setTimeout(() => { setShown(s => s + 1); setTyped(0); }, isCmd(line) ? 380 : 110);
+    }
+    return () => window.clearTimeout(t);
+  }, [run, shown, typed]);
+
+  const replay = () => { setShown(0); setTyped(0); setRun(r => r + 1); };
+  const copy = () => {
+    const text = lines.filter(isCmd).map(l => l.slice(2)).join("\n");
+    let ok = false;
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); ta.remove();
+    } catch (e) {}
+    if (!ok && navigator.clipboard) navigator.clipboard.writeText(text).catch(() => {});
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1400);
+  };
+
+  const tone = l => {
+    if (isCmd(l)) return null;
+    if (/^(✔|✓|ok\b)/i.test(l)) return "#86EFAC";
+    if (/^(✖|✗|error|err\b)/i.test(l)) return "#FCA5A5";
+    if (/^(⚠|warn)/i.test(l)) return "#FCD34D";
+    if (/^#/.test(l)) return "#64748B";
+    if (/^(→|↳|>)/.test(l)) return "#5EC8FF";
+    return "#CBD5E1";
+  };
+  const renderLine = (l, i, partial) => {
+    if (isCmd(l)) {
+      const body = partial === undefined ? l.slice(2) : l.slice(2, Math.max(0, partial - 2));
+      return <div key={i}><span style={{ color: "#A78BFA" }}>❯</span> <span style={{ color: "#F8FAFC" }}>{body}</span>{partial !== undefined ? <span className="eo-term-caret" /> : null}</div>;
+    }
+    return <div key={i} style={{ color: tone(l) }}>{l || " "}</div>;
+  };
+
+  const css = `
+.eo-term{margin:24px 0;border-radius:12px;overflow:hidden;background:#0B0F1E;box-shadow:0 18px 40px rgba(11,15,30,.28);border:1px solid rgba(255,255,255,.08)}
+.eo-term-top{display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.07)}
+.eo-term-top i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.eo-term-title{flex:1;text-align:center;font-size:12.5px;color:#94A3B8;font-family:var(--font-family-mono,ui-monospace,Menlo,monospace)}
+.eo-term-top button{border:1px solid rgba(255,255,255,.14);background:transparent;color:#CBD5E1;border-radius:6px;padding:3px 9px;font:inherit;font-size:12px;cursor:pointer}
+.eo-term-top button:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.eo-term-body{padding:14px 16px 16px;min-height:120px;font:13px/1.65 var(--font-family-mono,ui-monospace,SFMono-Regular,Menlo,monospace);color:#CBD5E1;white-space:pre-wrap;word-break:break-word}
+.eo-term-caret{display:inline-block;width:8px;height:15px;margin-left:1px;vertical-align:-2px;background:#5EC8FF;animation:eo-blink 1s steps(1) infinite}
+@keyframes eo-blink{50%{opacity:0}}
+`;
+  return (
+    <div className="eo-term" ref={boxRef}>
+      <style>{css}</style>
+      <div className="eo-term-top">
+        <i style={{ background: "#FF5F57" }} /><i style={{ background: "#FEBC2E" }} /><i style={{ background: "#28C840" }} />
+        <span className="eo-term-title">{title}</span>
+        <button type="button" onClick={copy} aria-label="Copy commands">{copied ? "✓ Copied" : "Copy"}</button>
+        <button type="button" onClick={replay} aria-label="Replay">↻</button>
+      </div>
+      <div className="eo-term-body" aria-label={lines.join("\n")} role="log">
+        {lines.slice(0, shown).map((l, i) => renderLine(l, i))}
+        {!done && run ? (isCmd(lines[shown]) ? renderLine(lines[shown], shown, typed) : null) : null}
+        {done ? <div><span style={{ color: "#A78BFA" }}>❯</span> <span className="eo-term-caret" /></div> : null}
+      </div>
+    </div>
+  );
+};
+
+<Terminal title="orbit — zsh" script="$ npm install -g @erdman/orbit-cli\nadded 1 package in 2s\n$ orbit launches list --min-capacity 4\n→ lch_9Kd4Mw  Polaris Run  kestrel  SSO  120 kg free\n$ orbit book lch_9Kd4Mw --payload ./pixel-owl.json\n✔ Booked bkg_4Fh8Qp (pending manifest review)" />

@@ -1,0 +1,90 @@
+---
+name: ApiKeyCard
+---
+import React, { useState } from "react";
+
+export const ApiKeyCard = props => {
+  const field = props.field || "apiKey";
+  const read = k => {
+    try {
+      if (typeof user === "undefined" || !user || !(k in user)) return "";
+      const v = user[k];
+      return typeof v === "string" || typeof v === "number" ? String(v) : "";
+    } catch (e) { return ""; }
+  };
+  const name = read("name");
+  const email = read("email");
+  const realKey = read(field);
+  const signedIn = !!(name || email);
+  const [demo, setDemo] = useState(false);
+  const [reveal, setReveal] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const key = realKey || (demo ? "ok_test_7c41f2a9d0b84e1e9f3a5b6c3f9c" : "");
+  const masked = key ? key.slice(0, 8) + "•".repeat(Math.max(4, key.length - 12)) + key.slice(-4) : "";
+  const here = typeof window !== "undefined" ? window.location.pathname : "/docs/authentication";
+
+  const copy = () => {
+    let ok = false;
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = key; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand("copy"); ta.remove();
+    } catch (e) {}
+    if (!ok && navigator.clipboard) navigator.clipboard.writeText(key).catch(() => {});
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1400);
+  };
+
+  const css = `
+.eo-key{--eo-accent:var(--color-link-primary,#2F7BF5);--eo-border:var(--color-border-default,rgba(0,0,0,.12));--eo-muted:var(--color-text-minimum,#6b7280);
+  margin:24px 0;border:1px solid var(--eo-border);border-radius:16px;overflow:hidden}
+.eo-key-head{display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(100deg,rgba(25,195,245,.14),rgba(47,123,245,.12) 50%,rgba(123,63,242,.14))}
+.eo-key-avatar{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;background:linear-gradient(135deg,#19C3F5,#2F7BF5 55%,#7B3FF2)}
+.eo-key-who b{display:block;font-size:15px}
+.eo-key-who span{font-size:13px;color:var(--eo-muted)}
+.eo-key-badge{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:999px;background:rgba(18,183,106,.15);color:#0E9384}
+.eo-key-badge[data-demo]{background:rgba(247,144,9,.16);color:#B54708}
+.eo-key-body{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.eo-key-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.eo-key-val{flex:1;min-width:220px;font:14px/1.4 var(--font-family-mono,ui-monospace,Menlo,monospace);padding:10px 12px;border-radius:10px;border:1px dashed var(--eo-border);background:var(--md-code-background,rgba(0,0,0,.03));word-break:break-all}
+.eo-key-btn{border:1px solid var(--eo-border);background:transparent;color:inherit;border-radius:8px;padding:8px 12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none!important;display:inline-flex;align-items:center;gap:6px}
+.eo-key-btn[data-primary]{background:var(--eo-accent);border-color:var(--eo-accent);color:#fff!important}
+.eo-key-note{font-size:13px;color:var(--eo-muted);margin:0}
+`;
+  const who = signedIn ? (name || email) : demo ? "Dana Whitfield (demo)" : "You’re not signed in";
+  const initials = signedIn || demo ? String(who).split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() : "?";
+  return (
+    <div className="eo-key">
+      <style>{css}</style>
+      <div className="eo-key-head">
+        <span className="eo-key-avatar" aria-hidden="true">{initials}</span>
+        <span className="eo-key-who"><b>{who}</b><span>{signedIn ? email || "Signed in" : demo ? "Showing a made-up test key" : "Log in and your own key appears here"}</span></span>
+        {key ? <span className="eo-key-badge" data-demo={realKey ? undefined : ""}>{realKey ? "Your key" : "Demo"}</span> : null}
+      </div>
+      <div className="eo-key-body">
+        {key ? (
+          <div className="eo-key-row">
+            <code className="eo-key-val">{reveal ? key : masked}</code>
+            <button type="button" className="eo-key-btn" onClick={() => setReveal(r => !r)}>{reveal ? "🙈 Hide" : "👁 Reveal"}</button>
+            <button type="button" className="eo-key-btn" data-primary="" onClick={copy}>{copied ? "✓ Copied" : "Copy"}</button>
+          </div>
+        ) : (
+          <div className="eo-key-row">
+            {!signedIn ? <a className="eo-key-btn" data-primary="" href={"/login?redirect_uri=" + encodeURIComponent(here)}>Log in</a> : null}
+            <button type="button" className="eo-key-btn" onClick={() => setDemo(true)}>Preview with a demo key</button>
+          </div>
+        )}
+        <p className="eo-key-note">
+          {realKey
+            ? "This key comes from your login. ReadMe passes it to the page, and the API Reference fills it into Try It for you."
+            : signedIn
+              ? "Your account has no Orbit key yet. When login data includes one, it shows up here and in Try It."
+              : "Custom components can read the signed-in reader’s login data, so docs can show each developer their own key."}
+          {demo && !realKey ? <button type="button" className="eo-key-btn" style={{ marginLeft: "8px", padding: "2px 8px", fontSize: "12px" }} onClick={() => { setDemo(false); setReveal(false); }}>Reset</button> : null}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+<ApiKeyCard />
