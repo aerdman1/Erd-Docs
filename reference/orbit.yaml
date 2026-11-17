@@ -3,13 +3,20 @@ info:
   title: Orbit API
   version: 1.4.0
   summary: Book cargo space on reusable rockets, track payloads, and stream telemetry.
-  description: |
-    The **Orbit API** from Erdman Industries lets you find upcoming launches, book payload
+  description: >
+    The **Orbit API** from Erdman Industries lets you find upcoming launches,
+    book payload
+
     slots, upload cargo manifests and follow your payload all the way to orbit.
 
+
     > 📘 Orbit and Erdman Industries are made up
+
     >
-    > This API exists to show off what ReadMe can do. The **Sandbox** server echoes your
+
+    > This API exists to show off what ReadMe can do. The **Sandbox** server
+    echoes your
+
     > request back, so **Try It!** always works.
   contact:
     name: Orbit Developer Relations
@@ -25,11 +32,17 @@ servers:
     variables:
       region:
         default: us-east
-        enum: [us-east, eu-central, ap-south]
+        enum:
+          - us-east
+          - eu-central
+          - ap-south
         description: The launch region closest to your systems.
 security:
   - OrbitKey: []
-  - OAuth2: [bookings:read, bookings:write, telemetry:read]
+  - OAuth2:
+      - bookings:read
+      - bookings:write
+      - telemetry:read
 tags:
   - name: Launches
     description: Scheduled launches and their remaining cargo capacity.
@@ -42,16 +55,24 @@ tags:
 x-readme:
   explorer-enabled: true
   proxy-enabled: true
-  samples-languages: [shell, node, python, go, ruby]
+  samples-languages:
+    - shell
+    - node
+    - python
+    - go
+    - ruby
 paths:
   /launches:
     get:
       operationId: listLaunches
       summary: List launches
-      description: |
-        Returns upcoming launches, soonest first. Filter by status, vehicle or launch window
+      description: >
+        Returns upcoming launches, soonest first. Filter by status, vehicle or
+        launch window
+
         to find a slot with enough capacity for your payload.
-      tags: [Launches]
+      tags:
+        - Launches
       parameters:
         - $ref: '#/components/parameters/Cursor'
         - $ref: '#/components/parameters/Limit'
@@ -71,14 +92,16 @@ paths:
           schema:
             type: string
             format: date-time
-            examples: ['2026-12-01T00:00:00Z']
+            examples:
+              - '2026-12-01T00:00:00Z'
         - name: min_capacity_kg
           in: query
           description: Only return launches with at least this much free cargo capacity.
           schema:
             type: integer
             minimum: 1
-            examples: [250]
+            examples:
+              - 250
       responses:
         '200':
           description: A page of launches.
@@ -89,7 +112,9 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, has_more]
+                required:
+                  - data
+                  - has_more
                 properties:
                   data:
                     type: array
@@ -98,7 +123,9 @@ paths:
                   has_more:
                     type: boolean
                   next_cursor:
-                    type: [string, 'null']
+                    type:
+                      - string
+                      - 'null'
               examples:
                 upcoming:
                   summary: Two upcoming launches
@@ -108,17 +135,25 @@ paths:
                         name: Starhopper 14
                         vehicle: kestrel-heavy
                         status: scheduled
-                        window: { opens_at: '2026-12-03T14:05:00Z', closes_at: '2026-12-03T16:05:00Z' }
+                        window:
+                          opens_at: '2026-12-03T14:05:00Z'
+                          closes_at: '2026-12-03T16:05:00Z'
                         pad: LC-39X
-                        capacity: { total_kg: 6400, available_kg: 1850 }
+                        capacity:
+                          total_kg: 6400
+                          available_kg: 1850
                         target_orbit: leo
                       - id: lch_9Kd4Mw
                         name: Polaris Run
                         vehicle: wren
                         status: go
-                        window: { opens_at: '2026-12-09T03:30:00Z', closes_at: '2026-12-09T04:00:00Z' }
+                        window:
+                          opens_at: '2026-12-09T03:30:00Z'
+                          closes_at: '2026-12-09T04:00:00Z'
                         pad: SLC-7E
-                        capacity: { total_kg: 900, available_kg: 120 }
+                        capacity:
+                          total_kg: 900
+                          available_kg: 120
                         target_orbit: sso
                     has_more: true
                     next_cursor: Y3Vyc29yOjI=
@@ -126,6 +161,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '429':
           $ref: '#/components/responses/RateLimited'
+      x-internal: false
   /launches/{launchId}:
     parameters:
       - $ref: '#/components/parameters/LaunchId'
@@ -133,7 +169,8 @@ paths:
       operationId: getLaunch
       summary: Get a launch
       description: Returns one launch, including its weather outlook and live countdown.
-      tags: [Launches]
+      tags:
+        - Launches
       responses:
         '200':
           description: The launch.
@@ -150,10 +187,13 @@ paths:
       operationId: getLaunchWeather
       summary: Get launch weather
       deprecated: true
-      description: |
-        **Deprecated.** Read the `weather` object on [Get a launch](getlaunch) instead.
+      description: >
+        **Deprecated.** Read the `weather` object on [Get a launch](getlaunch)
+        instead.
+
         This endpoint stops responding on 2027-03-01.
-      tags: [Launches]
+      tags:
+        - Launches
       responses:
         '200':
           description: The weather outlook for the launch window.
@@ -166,10 +206,12 @@ paths:
       operationId: listBookings
       summary: List bookings
       description: Returns your bookings, newest first.
-      tags: [Bookings]
+      tags:
+        - Bookings
       security:
         - OrbitKey: []
-        - OAuth2: [bookings:read]
+        - OAuth2:
+            - bookings:read
       parameters:
         - $ref: '#/components/parameters/Cursor'
         - $ref: '#/components/parameters/Limit'
@@ -192,20 +234,29 @@ paths:
                   has_more:
                     type: boolean
                   next_cursor:
-                    type: [string, 'null']
+                    type:
+                      - string
+                      - 'null'
     post:
       operationId: createBooking
       summary: Book a payload slot
-      description: |
-        Reserves cargo space on a launch. The booking starts as `pending` and moves to
-        `confirmed` once Orbit checks your manifest. You get a `booking.confirmed` webhook
+      description: >
+        Reserves cargo space on a launch. The booking starts as `pending` and
+        moves to
+
+        `confirmed` once Orbit checks your manifest. You get a
+        `booking.confirmed` webhook
+
         when that happens.
 
+
         Send an `Idempotency-Key` header so a retried request never books twice.
-      tags: [Bookings]
+      tags:
+        - Bookings
       security:
         - OrbitKey: []
-        - OAuth2: [bookings:write]
+        - OAuth2:
+            - bookings:write
       parameters:
         - name: Idempotency-Key
           in: header
@@ -256,8 +307,15 @@ paths:
                     id: bkg_4Fh8Qp
                     launch_id: lch_9Kd4Mw
                     status: pending
-                    payload: { type: satellite, name: Pixel Owl 3U, mass_kg: 4, target_orbit: sso, deploy_altitude_km: 525 }
-                    price: { amount: 245000, currency: USD }
+                    payload:
+                      type: satellite
+                      name: Pixel Owl 3U
+                      mass_kg: 4
+                      target_orbit: sso
+                      deploy_altitude_km: 525
+                    price:
+                      amount: 245000
+                      currency: USD
                     created_at: '2026-11-17T15:02:11Z'
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -289,7 +347,8 @@ paths:
     get:
       operationId: getBooking
       summary: Get a booking
-      tags: [Bookings]
+      tags:
+        - Bookings
       responses:
         '200':
           description: The booking.
@@ -302,8 +361,11 @@ paths:
     patch:
       operationId: updateBooking
       summary: Update a booking
-      description: Change the insurance tier or webhook URL. Payload changes need a new booking.
-      tags: [Bookings]
+      description: >-
+        Change the insurance tier or webhook URL. Payload changes need a new
+        booking.
+      tags:
+        - Bookings
       requestBody:
         content:
           application/json:
@@ -325,10 +387,13 @@ paths:
     delete:
       operationId: cancelBooking
       summary: Cancel a booking
-      description: |
-        Cancels a booking. Cancelling more than 30 days before the window opens is free.
+      description: >
+        Cancels a booking. Cancelling more than 30 days before the window opens
+        is free.
+
         After that, Orbit keeps 25% of the price.
-      tags: [Bookings]
+      tags:
+        - Bookings
       responses:
         '204':
           description: The booking was cancelled.
@@ -340,15 +405,19 @@ paths:
     post:
       operationId: uploadManifest
       summary: Upload a cargo manifest
-      description: Attach the signed cargo manifest (PDF, up to 10 MB). Orbit reviews it within one business day.
-      tags: [Bookings]
+      description: >-
+        Attach the signed cargo manifest (PDF, up to 10 MB). Orbit reviews it
+        within one business day.
+      tags:
+        - Bookings
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
               type: object
-              required: [file]
+              required:
+                - file
               properties:
                 file:
                   type: string
@@ -369,7 +438,11 @@ paths:
                     type: string
                   review_status:
                     type: string
-                    enum: [queued, in_review, approved, rejected]
+                    enum:
+                      - queued
+                      - in_review
+                      - approved
+                      - rejected
   /payloads/{payloadId}/telemetry:
     parameters:
       - name: payloadId
@@ -377,22 +450,29 @@ paths:
         required: true
         schema:
           type: string
-          examples: [pld_2Xc9Lb]
+          examples:
+            - pld_2Xc9Lb
     get:
       operationId: getTelemetry
       summary: Get payload telemetry
       description: Returns telemetry samples for a payload in flight.
-      tags: [Payloads]
+      tags:
+        - Payloads
       security:
         - OrbitKey: []
-        - OAuth2: [telemetry:read]
+        - OAuth2:
+            - telemetry:read
       parameters:
         - name: interval
           in: query
           description: How far apart the samples are.
           schema:
             type: string
-            enum: [1s, 10s, 1m, 5m]
+            enum:
+              - 1s
+              - 10s
+              - 1m
+              - 5m
             default: 10s
         - name: from
           in: query
@@ -424,7 +504,8 @@ paths:
       operationId: getUsage
       summary: Get account usage
       description: Returns how much of your monthly quota you've used.
-      tags: [Account]
+      tags:
+        - Account
       responses:
         '200':
           description: Usage for the current billing period.
@@ -435,27 +516,35 @@ paths:
                 properties:
                   plan:
                     type: string
-                    enum: [hobby, mission, fleet]
+                    enum:
+                      - hobby
+                      - mission
+                      - fleet
                   period_ends_at:
                     type: string
                     format: date-time
                   requests:
                     type: object
                     properties:
-                      used: { type: integer }
-                      limit: { type: integer }
+                      used:
+                        type: integer
+                      limit:
+                        type: integer
                   kg_booked:
                     type: object
                     properties:
-                      used: { type: integer }
-                      limit: { type: integer }
+                      used:
+                        type: integer
+                      limit:
+                        type: integer
 webhooks:
   booking.confirmed:
     post:
       operationId: bookingConfirmed
       summary: Booking confirmed
       description: Sent when Orbit approves a manifest and the booking is final.
-      tags: [Bookings]
+      tags:
+        - Bookings
       parameters:
         - $ref: '#/components/parameters/OrbitSignature'
       requestBody:
@@ -467,7 +556,10 @@ webhooks:
               id: evt_1Lr7Ns
               type: booking.confirmed
               created_at: '2026-11-18T09:12:44Z'
-              data: { booking_id: bkg_4Fh8Qp, launch_id: lch_9Kd4Mw, status: confirmed }
+              data:
+                booking_id: bkg_4Fh8Qp
+                launch_id: lch_9Kd4Mw
+                status: confirmed
       responses:
         '200':
           description: Return any 2xx to acknowledge the event.
@@ -475,8 +567,11 @@ webhooks:
     post:
       operationId: launchStatusChanged
       summary: Launch status changed
-      description: Sent whenever a launch you have a booking on changes state, such as `go` to `scrubbed`.
-      tags: [Launches]
+      description: >-
+        Sent whenever a launch you have a booking on changes state, such as `go`
+        to `scrubbed`.
+      tags:
+        - Launches
       parameters:
         - $ref: '#/components/parameters/OrbitSignature'
       requestBody:
@@ -488,7 +583,11 @@ webhooks:
               id: evt_8Wq2Hd
               type: launch.status_changed
               created_at: '2026-12-09T03:12:00Z'
-              data: { launch_id: lch_9Kd4Mw, from: go, to: scrubbed, reason: Upper-level winds }
+              data:
+                launch_id: lch_9Kd4Mw
+                from: go
+                to: scrubbed
+                reason: Upper-level winds
       responses:
         '200':
           description: Return any 2xx to acknowledge the event.
@@ -498,7 +597,9 @@ components:
       type: apiKey
       in: header
       name: X-Orbit-Key
-      description: Your secret key from **Account → API keys**. It starts with `ok_live_` or `ok_test_`.
+      description: >-
+        Your secret key from **Account → API keys**. It starts with `ok_live_`
+        or `ok_test_`.
     OAuth2:
       type: oauth2
       description: For server-to-server integrations that act on behalf of a team.
@@ -516,16 +617,18 @@ components:
       required: true
       schema:
         type: string
-        pattern: '^lch_[A-Za-z0-9]{6}$'
-        examples: [lch_9Kd4Mw]
+        pattern: ^lch_[A-Za-z0-9]{6}$
+        examples:
+          - lch_9Kd4Mw
     BookingId:
       name: bookingId
       in: path
       required: true
       schema:
         type: string
-        pattern: '^bkg_[A-Za-z0-9]{6}$'
-        examples: [bkg_4Fh8Qp]
+        pattern: ^bkg_[A-Za-z0-9]{6}$
+        examples:
+          - bkg_4Fh8Qp
     Cursor:
       name: cursor
       in: query
@@ -545,16 +648,20 @@ components:
       name: Orbit-Signature
       in: header
       required: true
-      description: HMAC-SHA256 of the raw body, signed with your webhook secret. See [Webhooks](/docs/webhooks).
+      description: >-
+        HMAC-SHA256 of the raw body, signed with your webhook secret. See
+        [Webhooks](/docs/webhooks).
       schema:
         type: string
-        examples: ['t=1765271520,v1=5f2c9a…']
+        examples:
+          - t=1765271520,v1=5f2c9a…
   headers:
     RateLimitRemaining:
       description: Requests left in the current one-minute window.
       schema:
         type: integer
-        examples: [118]
+        examples:
+          - 118
   responses:
     BadRequest:
       description: The request was malformed.
@@ -592,7 +699,12 @@ components:
   schemas:
     LaunchStatus:
       type: string
-      enum: [scheduled, go, hold, scrubbed, launched]
+      enum:
+        - scheduled
+        - go
+        - hold
+        - scrubbed
+        - launched
       description: |
         - `scheduled`: on the manifest, more than 48 hours out
         - `go`: cleared for launch
@@ -601,28 +713,53 @@ components:
         - `launched`: off the pad
     Vehicle:
       type: string
-      enum: [wren, kestrel, kestrel-heavy]
-      description: '`wren` lifts up to 900 kg to LEO, `kestrel` 4,000 kg and `kestrel-heavy` 6,400 kg.'
+      enum:
+        - wren
+        - kestrel
+        - kestrel-heavy
+      description: >-
+        `wren` lifts up to 900 kg to LEO, `kestrel` 4,000 kg and `kestrel-heavy`
+        6,400 kg.
     Orbit:
       type: string
-      enum: [leo, sso, meo, geo]
+      enum:
+        - leo
+        - sso
+        - meo
+        - geo
     Insurance:
       type: string
-      enum: [none, standard, premium]
+      enum:
+        - none
+        - standard
+        - premium
       default: standard
     BookingStatus:
       type: string
-      enum: [pending, confirmed, loaded, delivered, cancelled]
+      enum:
+        - pending
+        - confirmed
+        - loaded
+        - delivered
+        - cancelled
     Launch:
       type: object
-      required: [id, name, vehicle, status, window, capacity]
+      required:
+        - id
+        - name
+        - vehicle
+        - status
+        - window
+        - capacity
       properties:
         id:
           type: string
-          examples: [lch_9Kd4Mw]
+          examples:
+            - lch_9Kd4Mw
         name:
           type: string
-          examples: [Polaris Run]
+          examples:
+            - Polaris Run
         vehicle:
           $ref: '#/components/schemas/Vehicle'
         status:
@@ -638,7 +775,8 @@ components:
               format: date-time
         pad:
           type: string
-          examples: [SLC-7E]
+          examples:
+            - SLC-7E
         capacity:
           type: object
           properties:
@@ -657,15 +795,24 @@ components:
           type: number
           minimum: 0
           maximum: 1
-          examples: [0.85]
+          examples:
+            - 0.85
         concerns:
           type: array
           items:
             type: string
-            enum: [cumulus_clouds, upper_level_winds, lightning, solar_activity]
+            enum:
+              - cumulus_clouds
+              - upper_level_winds
+              - lightning
+              - solar_activity
     Satellite:
       type: object
-      required: [type, name, mass_kg, target_orbit]
+      required:
+        - type
+        - name
+        - mass_kg
+        - target_orbit
       properties:
         type:
           const: satellite
@@ -682,7 +829,10 @@ components:
           maximum: 36000
     BulkCargo:
       type: object
-      required: [type, name, mass_kg]
+      required:
+        - type
+        - name
+        - mass_kg
       properties:
         type:
           const: bulk_cargo
@@ -696,7 +846,11 @@ components:
           default: false
         hazmat_class:
           type: string
-          enum: [none, class_2, class_3, class_9]
+          enum:
+            - none
+            - class_2
+            - class_3
+            - class_9
           default: none
     Payload:
       oneOf:
@@ -709,11 +863,14 @@ components:
           bulk_cargo: '#/components/schemas/BulkCargo'
     BookingCreate:
       type: object
-      required: [launch_id, payload]
+      required:
+        - launch_id
+        - payload
       properties:
         launch_id:
           type: string
-          examples: [lch_9Kd4Mw]
+          examples:
+            - lch_9Kd4Mw
         payload:
           $ref: '#/components/schemas/Payload'
         insurance:
@@ -721,7 +878,9 @@ components:
         notify_url:
           type: string
           format: uri
-          description: Where Orbit sends webhooks for this booking. Overrides your account default.
+          description: >-
+            Where Orbit sends webhooks for this booking. Overrides your account
+            default.
         metadata:
           type: object
           additionalProperties:
@@ -731,11 +890,15 @@ components:
       allOf:
         - $ref: '#/components/schemas/BookingCreate'
         - type: object
-          required: [id, status, created_at]
+          required:
+            - id
+            - status
+            - created_at
           properties:
             id:
               type: string
-              examples: [bkg_4Fh8Qp]
+              examples:
+                - bkg_4Fh8Qp
             status:
               $ref: '#/components/schemas/BookingStatus'
             price:
@@ -746,7 +909,8 @@ components:
                   description: Price in the smallest currency unit (cents).
                 currency:
                   type: string
-                  examples: [USD]
+                  examples:
+                    - USD
             created_at:
               type: string
               format: date-time
@@ -764,16 +928,27 @@ components:
           type: number
         phase:
           type: string
-          enum: [pad, ascent, coast, deploy, orbit]
+          enum:
+            - pad
+            - ascent
+            - coast
+            - deploy
+            - orbit
     WebhookEvent:
       type: object
-      required: [id, type, created_at, data]
+      required:
+        - id
+        - type
+        - created_at
+        - data
       properties:
         id:
           type: string
         type:
           type: string
-          enum: [booking.confirmed, launch.status_changed]
+          enum:
+            - booking.confirmed
+            - launch.status_changed
         created_at:
           type: string
           format: date-time
@@ -782,7 +957,9 @@ components:
           additionalProperties: true
     Problem:
       type: object
-      description: An [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details object.
+      description: >-
+        An [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details
+        object.
       properties:
         type:
           type: string
