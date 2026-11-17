@@ -10,7 +10,10 @@ export const SimpleStep = ({ header, children }) => (
   </div>
 );
 
-export const SimpleStepper = props => {
+export const SimpleStepper = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const vertical = props.vertical === true || props.vertical === "true";
   const steps = Children.toArray(props.children).filter(c => isValidElement(c));
   const [current, setCurrent] = useState(0);

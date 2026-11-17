@@ -3,7 +3,10 @@ name: ApiKeyCard
 ---
 import React, { useState } from "react";
 
-export const ApiKeyCard = props => {
+export const ApiKeyCard = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const field = props.field || "apiKey";
   const read = k => {
     try {

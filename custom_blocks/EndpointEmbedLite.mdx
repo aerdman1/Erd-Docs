@@ -5,9 +5,12 @@ import React, { useEffect, useRef, useState } from "react";
 
 export const eoEndpointSpecCache = {};
 
-export const EndpointEmbedLite = props => {
+export const EndpointEmbedLite = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const specFile = props.spec || "orbit.yaml";
-  const opId = props.operationId || "";
+  const opId = props.operationid || "";
   const [op, setOp] = useState(null);
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
@@ -44,9 +47,9 @@ export const EndpointEmbedLite = props => {
   const path = props.endpoint || (op && op.path) || "";
   const title = props.title || (op && op.summary) || path || opId || "Endpoint";
   const description = props.description || (op && op.description ? String(op.description).split("\n")[0] : "");
-  const slug = props.docSlug || (opId ? opId.toLowerCase() : String(path).replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "")) || "";
+  const slug = props.docslug || (opId ? opId.toLowerCase() : String(path).replace(/[{}]/g, "").replace(/\//g, "-").replace(/^-+|-+$/g, "")) || "";
   const href = props.href || (slug ? "/reference/" + slug : "#");
-  const mode = props.displayMode || "popup";
+  const mode = props.displaymode || "popup";
   const isWebhook = (op && op.webhook) || props.webhook === "true";
   const deprecated = (op && op.deprecated) || props.deprecated === "true";
 
@@ -86,7 +89,7 @@ export const EndpointEmbedLite = props => {
         </span>
         {badge}
       </span>
-      {path ? <span className="eo-ep-path">{isWebhook ? "event: " + path : method + " " + (props.apiBaseUrl || "") + path}</span> : null}
+      {path ? <span className="eo-ep-path">{isWebhook ? "event: " + path : method + " " + (props.apibaseurl || "") + path}</span> : null}
       {description ? <span className="eo-ep-desc">{description}</span> : null}
       <span className="eo-ep-foot">Open in API Reference →</span>
     </a>
@@ -105,7 +108,7 @@ export const EndpointEmbedLite = props => {
       <style>{css}</style>
       <a className="eo-ep-chip" href={href}>
         {badge}
-        <span>{props.linkText || title}</span>
+        <span>{props.linktext || title}</span>
       </a>
       {open && mode === "popup" ? <span className="eo-ep-pop" role="tooltip">{card}</span> : null}
     </span>

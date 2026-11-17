@@ -19,7 +19,10 @@ export const CustomerQuote = ({ author, role, company, avatar, children }) => {
   );
 };
 
-export const CustomerQuotes = props => {
+export const CustomerQuotes = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const quotes = Children.toArray(props.children).filter(c => isValidElement(c));
   const autoplay = !(props.autoplay === false || props.autoplay === "false");
   const seconds = Number(props.interval) > 0 ? Number(props.interval) : 7;

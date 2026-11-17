@@ -3,12 +3,15 @@ name: ContentModal
 ---
 import React, { useEffect, useRef, useState } from "react";
 
-export const ContentModal = props => {
+export const ContentModal = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const label = props.label || "Open";
   const title = props.title || "";
   const size = { sm: "480px", md: "720px", lg: "960px", xl: "1200px" }[props.size || "md"] || "720px";
-  const closeOnBackdrop = !(props.closeOnBackdrop === false || props.closeOnBackdrop === "false");
-  const showIcon = !(props.showIcon === false || props.showIcon === "false");
+  const closeOnBackdrop = !(props.closeonbackdrop === false || props.closeonbackdrop === "false");
+  const showIcon = !(props.showicon === false || props.showicon === "false");
   const variant = props.variant || "primary";
   const [open, setOpen] = useState(false);
   const dialogRef = useRef(null);

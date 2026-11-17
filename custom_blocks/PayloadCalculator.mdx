@@ -3,7 +3,10 @@ name: PayloadCalculator
 ---
 import React, { useState } from "react";
 
-export const PayloadCalculator = props => {
+export const PayloadCalculator = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const [type, setType] = useState(props.type === "bulk_cargo" ? "bulk_cargo" : "satellite");
   const [mass, setMass] = useState(Number(props.mass) > 0 ? Number(props.mass) : 4);
   const [orbit, setOrbit] = useState(props.orbit || "sso");

@@ -3,11 +3,14 @@ name: RSS
 ---
 import React, { useEffect, useMemo, useState } from "react";
 
-export const RSS = props => {
-  const url = props.url || props.rssUrl || "/changelog.rss";
-  const limit = Number(props.limit || props.maxItems) > 0 ? Number(props.limit || props.maxItems) : 20;
+export const RSS = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
+  const url = props.url || props.rssurl || "/changelog.rss";
+  const limit = Number(props.limit || props.maxitems) > 0 ? Number(props.limit || props.maxitems) : 20;
   const compact = props.compact === true || props.compact === "true";
-  const showFilters = !(props.filters === false || props.filters === "false" || props.showSearch === false);
+  const showFilters = !(props.filters === false || props.filters === "false" || props.showsearch === false);
   const [items, setItems] = useState(null);
   const [error, setError] = useState("");
   const [type, setType] = useState(props.type || "all");

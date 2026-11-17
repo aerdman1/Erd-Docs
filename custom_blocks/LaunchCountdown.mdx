@@ -3,7 +3,10 @@ name: LaunchCountdown
 ---
 import React, { useEffect, useState } from "react";
 
-export const LaunchCountdown = props => {
+export const LaunchCountdown = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const mission = props.mission || "Polaris Run";
   const vehicle = props.vehicle || "kestrel";
   const orbit = props.orbit || "SSO";

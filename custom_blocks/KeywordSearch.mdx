@@ -3,7 +3,10 @@ name: KeywordSearch
 ---
 import React, { useEffect, useRef, useState } from "react";
 
-export const KeywordSearch = props => {
+export const KeywordSearch = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const rootRef = useRef(null);
   const inputRef = useRef(null);
   const rangesRef = useRef([]);

@@ -3,7 +3,10 @@ name: OrbitViz
 ---
 import React, { useEffect, useRef, useState } from "react";
 
-export const OrbitViz = props => {
+export const OrbitViz = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const ORBITS = [
     { id: "leo", name: "LEO", color: "#19C3F5", rx: 82, ry: 30, tilt: 0, dur: 5, alt: "160–2,000 km", period: "about 90 minutes", use: "CubeSats, Earth imaging and station resupply", rate: "$6,000/kg", reach: "wren, kestrel, kestrel-heavy" },
     { id: "sso", name: "SSO", color: "#12B76A", rx: 92, ry: 22, tilt: 68, dur: 6, alt: "500–800 km, near-polar", period: "about 95 minutes", use: "Imaging that passes over each spot at the same local time", rate: "$6,800/kg", reach: "wren, kestrel, kestrel-heavy" },

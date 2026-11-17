@@ -3,7 +3,10 @@ name: Terminal
 ---
 import React, { useEffect, useRef, useState } from "react";
 
-export const Terminal = props => {
+export const Terminal = rawProps => {
+  const props = {};
+  Object.keys(rawProps || {}).forEach(k => { props[k.toLowerCase()] = rawProps[k]; });
+  props.children = rawProps ? rawProps.children : undefined;
   const lines = String(props.script || "$ orbit --version\\norbit-cli 1.4.0").split("\\n");
   const title = props.title || "orbit — zsh";
   const speed = Number(props.speed) > 0 ? Number(props.speed) : 28;
