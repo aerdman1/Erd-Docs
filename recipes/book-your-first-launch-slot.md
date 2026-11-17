@@ -84,13 +84,13 @@ Every request needs your API key in the `X-Orbit-Key` header. Keep it in an envi
 # Book the slot
 
 <!-- javascript@9-17 -->
-<!-- python@10-17 -->
+<!-- python@10-18 -->
 
 [Book a payload slot](/reference/createbooking) on that launch. `payload.type` decides which fields are required: satellites need a `target_orbit`.
 
 # Check the result
 
 <!-- javascript@19 -->
-<!-- python@19 -->
+<!-- python@20 -->
 
 New bookings start as `pending`. Upload the manifest next, then wait for the `booking.confirmed` webhook.
