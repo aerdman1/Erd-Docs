@@ -60,7 +60,7 @@ export const SimpleStepper = rawProps => {
   return (
     <div className="eo-stepper" onKeyDown={onKey}>
       <style>{css}</style>
-      <div className="eo-stepper-dots" role="tablist" aria-label="Steps">
+      <div className="eo-stepper-dots" role="tablist" aria-label="步骤">
         {steps.map((s, i) => {
           const state = i < current ? "done" : i === current ? "current" : "todo";
           const dot = (
@@ -79,16 +79,24 @@ export const SimpleStepper = rawProps => {
       </div>
       <div aria-live="polite">{steps[current]}</div>
       <div className="eo-stepper-nav">
-        <button type="button" className="eo-stepper-btn" onClick={() => go(current - 1)} disabled={current === 0}>← Back</button>
-        <span className="eo-stepper-count">Step {current + 1} of {steps.length}</span>
-        <button type="button" className="eo-stepper-btn" data-primary="" onClick={() => go(current + 1)} disabled={current === last}>Next →</button>
+        <button type="button" className="eo-stepper-btn" onClick={() => go(current - 1)} disabled={current === 0}>← 上一步</button>
+        <span className="eo-stepper-count">步骤 {current + 1} 共 {steps.length}</span>
+        <button type="button" className="eo-stepper-btn" data-primary="" onClick={() => go(current + 1)} disabled={current === last}>下一步 →</button>
       </div>
     </div>
   );
 };
 
 <SimpleStepper>
-  <SimpleStep header="Plan">Pick a launch and a vehicle.</SimpleStep>
-  <SimpleStep header="Book">Reserve space and upload the manifest.</SimpleStep>
-  <SimpleStep header="Fly">Follow telemetry all the way to orbit.</SimpleStep>
+  <SimpleStep header="规划">
+    选择发射任务和运载工具。
+  </SimpleStep>
+
+  <SimpleStep header="预订">
+    预留舱位并上传舱单。
+  </SimpleStep>
+
+  <SimpleStep header="飞行">
+    全程跟踪遥测数据，直至进入轨道。
+  </SimpleStep>
 </SimpleStepper>
