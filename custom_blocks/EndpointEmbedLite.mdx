@@ -88,13 +88,13 @@ export const EndpointEmbedLite = rawProps => {
       <span className="eo-ep-head">
         <span className="eo-ep-title">
           {title}
-          {deprecated ? <span className="eo-ep-tag" style={{ background: "rgba(247,144,9,.15)", color: "#B54708" }}>Deprecated</span> : null}
+          {deprecated ? <span className="eo-ep-tag" style={{ background: "rgba(247,144,9,.15)", color: "#B54708" }}>已弃用</span> : null}
         </span>
         {badge}
       </span>
       {path ? <span className="eo-ep-path">{isWebhook ? "event: " + path : method + " " + (props.apibaseurl || "") + path}</span> : null}
       {description ? <span className="eo-ep-desc">{description}</span> : null}
-      <span className="eo-ep-foot">Open in API Reference →</span>
+      <span className="eo-ep-foot">在 API 参考中打开 →</span>
     </a>
   );
 
@@ -118,4 +118,4 @@ export const EndpointEmbedLite = rawProps => {
   );
 };
 
-Find a launch with <EndpointEmbedLite operationId="listLaunches" />, then book it with <EndpointEmbedLite operationId="createBooking" />.
+使用 <EndpointEmbedLite operationId="listLaunches" /> 查找发射，然后使用 <EndpointEmbedLite operationId="createBooking" /> 进行预订。
