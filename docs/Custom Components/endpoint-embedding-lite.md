@@ -1,25 +1,25 @@
 ---
-title: Endpoint Chips
-excerpt: Endpoint previews that read the API definition.
+title: Endpoint 标签
+excerpt: 读取 API 定义的 Endpoint 预览。
 deprecated: false
 hidden: false
 icon: fad fa-link
 metadata:
   robots: index
 ---
-Mention an endpoint in a sentence, and readers can hover over it or tab to it for a preview. Give it an `operationId` and it reads the method, title and description from the API definition, so it never goes stale.
+在句子中提及某个 endpoint，读者即可悬停其上或通过 Tab 键切换至该 endpoint 以查看预览。为其指定一个 `operationId`，它就会从 API 定义中读取方法、标题和描述，因此内容永远不会过时。
 
-Find a launch with <EndpointEmbedLite operationId="listLaunches" />, book it with <EndpointEmbedLite operationId="createBooking" />, then wait for <EndpointEmbedLite operationId="bookingConfirmed" />.
+使用 <EndpointEmbedLite operationId="listLaunches" /> 查找发射任务，使用 <EndpointEmbedLite operationId="createBooking" /> 进行预订，然后等待 <EndpointEmbedLite operationId="bookingConfirmed" />。
 
-## As a card
+## 以卡片形式 {#as-a-card}
 
 <EndpointEmbedLite operationId="uploadManifest" displayMode="card" />
 
 <EndpointEmbedLite operationId="getLaunchWeather" displayMode="card" />
 
-Deprecated endpoints are flagged automatically.
+已弃用的 endpoint 会自动被标记。
 
-## Use it
+## 使用方法 {#use-it}
 
 ```mdx
 Book it with <EndpointEmbedLite operationId="createBooking" />.
@@ -27,15 +27,15 @@ Book it with <EndpointEmbedLite operationId="createBooking" />.
 <EndpointEmbedLite operationId="uploadManifest" displayMode="card" />
 ```
 
-| Prop | Values | What it does |
-| :--- | :--- | :--- |
-| `operationId` | Text | The endpoint or webhook to show |
-| `displayMode` | `popup`, `chip`, `card` | A chip with a preview, a plain chip, or a full card |
-| `spec` | File name | Which API definition to read. Defaults to `orbit.yaml`. |
-| `linkText` | Text | Replaces the chip’s label |
-| `method`, `endpoint`, `title`, `description` | Text | Set these to skip the API definition |
+| 属性                                           | 取值                      | 说明                            |
+| :------------------------------------------- | :---------------------- | :---------------------------- |
+| `operationId`                                | 文本                      | 要显示的 endpoint 或 webhook       |
+| `displayMode`                                | `popup`, `chip`, `card` | 带预览的标签、普通标签或完整卡片              |
+| `spec`                                       | 文件名                     | 要读取的 API 定义。默认为 `orbit.yaml`。 |
+| `linkText`                                   | 文本                      | 替换标签的文本                       |
+| `method`, `endpoint`, `title`, `description` | 文本                      | 设置这些项以跳过 API 定义               |
 
-<Accordion title="How it works" icon="fa-wand-magic-sparkles">
-  * It reads the API definition from the hub at `/openapi/orbit.yaml`, once per page.
-  * Each chip links to the endpoint’s page in the API Reference.
+<Accordion title="工作原理" icon="fa-wand-magic-sparkles">
+  - 它会从 hub 的 `/openapi/orbit.yaml` 读取 API 定义，每个页面读取一次。
+  - 每个标签都会链接到 API Reference 中该 endpoint 的页面。
 </Accordion>
