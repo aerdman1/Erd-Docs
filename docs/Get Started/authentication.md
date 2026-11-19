@@ -1,35 +1,35 @@
 ---
-title: Authentication
-excerpt: Authenticate with an API key, or with OAuth 2.0 when you act for a team.
+title: 身份验证
+excerpt: 使用 API 密钥进行身份验证，或在代表团队操作时使用 OAuth 2.0。
 deprecated: false
 hidden: false
 icon: fad fa-key
 metadata:
   robots: index
 ---
-Every Orbit request is authenticated. Pick the method that fits how your integration runs.
+每个 Orbit 请求都经过身份验证。请选择适合您集成运行方式的方法。
 
-Signed in? Your key is right here:
+已登录？您的密钥就在这里：
 
 <ApiKeyCard />
 
 <Tabs>
-  <Tab title="API key" icon="fa-key">
-    Send your secret key in the `X-Orbit-Key` header. This is the quickest way to start, and it suits scripts and back-end services.
+  <Tab title="API 密钥" icon="fa-key">
+    在 `X-Orbit-Key` 请求头中发送您的密钥。这是最快的入门方式，适用于脚本和后端服务。
 
     ```shell
     curl "https://api.us-east.orbit.erdman.example/v1/account/usage" \
       -H "X-Orbit-Key: ok_test_4eC39HqLyjWDarjtT1zdp7dc"
     ```
 
-    | Prefix     | Mode | Charges your card |
-    | :--------- | :--- | :---------------- |
-    | `ok_test_` | Test | Never             |
-    | `ok_live_` | Live | Yes               |
+    | 前缀         | 模式 | 从您的银行卡扣款 |
+    | :--------- | :- | :------- |
+    | `ok_test_` | 测试 | 从不       |
+    | `ok_live_` | 实时 | 是        |
   </Tab>
 
   <Tab title="OAuth 2.0" icon="fa-shield-check">
-    Use the **client credentials** flow when your platform books launches for a team. Trade your client ID and secret for a short-lived token:
+    当您的平台为团队预订发射服务时，请使用**客户端凭据**流程。使用您的客户端 ID 和密钥换取短期令牌：
 
     ```shell
     curl -X POST "https://auth.orbit.erdman.example/oauth/token" \
@@ -39,33 +39,33 @@ Signed in? Your key is right here:
       -d scope="bookings:read bookings:write"
     ```
 
-    Then send it as a bearer token: `Authorization: Bearer <token>`. Tokens last one hour.
+    然后将其作为 Bearer 令牌发送：`Authorization: Bearer <token>`。令牌有效期为一小时。
   </Tab>
 </Tabs>
 
-## Scopes
+## 权限范围 {#scopes}
 
-OAuth tokens only reach what their scopes allow. API keys have every scope.
+OAuth 令牌只能访问其权限范围允许的内容。API 密钥则拥有所有权限范围。
 
-| Scope            | Lets you                                   |
-| :--------------- | :----------------------------------------- |
-| `bookings:read`  | List and read bookings                     |
-| `bookings:write` | Create, change and cancel bookings         |
-| `telemetry:read` | Read live telemetry for payloads in flight |
+| 权限范围             | 允许您              |
+| :--------------- | :--------------- |
+| `bookings:read`  | 列出并读取预订          |
+| `bookings:write` | 创建、修改和取消预订       |
+| `telemetry:read` | 读取飞行中有效载荷的实时遥测数据 |
 
 <Callout icon="❗️" theme="error">
-  ### Never ship a secret key to a browser or an app
+  ### 切勿将密钥发布到浏览器或应用程序中 {#never-ship-a-secret-key-to-a-browser-or-an-app}
 
-  Keys in front-end code can be read by anyone. If a key leaks, roll it under **Account → API keys**. The old key stops working right away.
+  前端代码中的密钥任何人都可以读取。如果密钥泄露，请在**账户 → API 密钥**中进行轮换。旧密钥将立即失效。
 </Callout>
 
 <OrbitHelp />
 
-<Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
-  * **Tabs** with Font Awesome icons, each holding code and a table
-  * Two Markdown **tables**
-  * An **error** Callout
-  * The [API Key Card](/docs/api-key-card), a **custom component** that reads the signed-in reader’s own key
-  * The help box at the bottom is **reusable content**: one snippet, edited in one place, shown on many pages
-  * The API Reference reads the same two auth methods from the OpenAPI file’s `securitySchemes`
+<Accordion title="本页面的构建方式" icon="fa-wand-magic-sparkles">
+  - 带有 Font Awesome 图标的**选项卡**，每个选项卡包含代码和一个表格
+  - 两个 Markdown **表格**
+  - 一个**错误**提示框
+  - [API 密钥卡片](/docs/api-key-card)，一个用于读取已登录读者自身密钥的**自定义组件**
+  - 底部的帮助框是**可复用内容**：同一个代码片段，在一处编辑，在多个页面中展示
+  - API 参考文档从 OpenAPI 文件的 `securitySchemes` 中读取相同的这两种身份验证方法
 </Accordion>
