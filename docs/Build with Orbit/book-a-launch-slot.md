@@ -1,57 +1,57 @@
 ---
-title: Book a Launch Slot
-excerpt: The full booking flow, from finding a launch to a confirmed slot.
+title: 预订发射档期
+excerpt: 完整的预订流程，从寻找发射到确认档期。
 deprecated: false
 hidden: false
 icon: fad fa-box-taped
 metadata:
   robots: index
 ---
-Booking takes four steps. Click through them, then read the details below. If you’d rather read code, follow the recipe:
+预订分为四个步骤。点击浏览各步骤，然后阅读下方的详细说明。如果您更倾向于查看代码，可以参考 Recipe：
 
-<Recipe slug="book-your-first-launch-slot" title="Book your first launch slot" />
+<Recipe slug="book-your-first-launch-slot" title="预订您的首个发射位" />
 
 <SimpleStepper>
-  <SimpleStep header="1. Find a launch">
-    List launches with enough free capacity for your payload.
+  <SimpleStep header="1. 寻找发射任务">
+    列出剩余运载能力足以承载您有效载荷的发射任务。
   </SimpleStep>
 
-  <SimpleStep header="2. Book the slot">
-    Create a booking. It starts as pending.
+  <SimpleStep header="2. 预订发射位">
+    创建预订。其初始状态为待处理。
   </SimpleStep>
 
-  <SimpleStep header="3. Upload the manifest">
-    Attach the signed cargo manifest as a PDF.
+  <SimpleStep header="3. 上传货物清单">
+    以 PDF 格式附上已签署的货物清单。
   </SimpleStep>
 
-  <SimpleStep header="4. Wait for confirmation">
-    A booking.confirmed webhook tells you it’s final.
+  <SimpleStep header="4. 等待确认">
+    booking.confirmed Webhook 会通知您预订已最终确认。
   </SimpleStep>
 </SimpleStepper>
 
-## Before you start
+## 开始之前 {#before-you-start}
 
-* [x] You have an API key ([Authentication](/docs/authentication))
-* [x] You know your payload’s mass and target orbit
-* [ ] Your <Glossary>manifest</Glossary> is signed and saved as a PDF
-* [ ] You have a webhook endpoint ready ([Webhooks](/docs/webhooks))
+- [x] 您已拥有 API 密钥（[身份验证](/docs/authentication)）
+- [x] 您已知晓有效载荷的质量与目标轨道
+- [ ] 您的 <Glossary>manifest</Glossary> 已签署并保存为 PDF
+- [ ] 您已准备好 Webhook 端点（[Webhooks](/docs/webhooks)）
 
-## Price it first
+## 先进行估价 {#price-it-first}
 
-See which vehicles can carry your payload and what it costs. The calculator writes the booking request for you:
+查看哪些运载工具可以承载您的有效载荷及其费用。计算器会自动为您生成预订请求：
 
 <PayloadCalculator />
 
-## 1. Find a launch
+## 1. 寻找发射任务 {#1-find-a-launch}
 
-Call <EndpointEmbedLite operationId="listLaunches" /> with `min_capacity_kg` set to your payload’s mass. Filter by `vehicle` if your payload needs a specific one.
+调用 <EndpointEmbedLite operationId="listLaunches" />，将 `min_capacity_kg` 设置为您有效载荷的质量。如果您的有效载荷需要特定运载工具，可按 `vehicle` 进行筛选。
 
-## 2. Book the slot
+## 2. 预订发射位 {#2-book-the-slot}
 
-Call <EndpointEmbedLite operationId="createBooking" />. The `payload.type` field decides which other fields are required:
+调用 <EndpointEmbedLite operationId="createBooking" />。`payload.type` 字段决定了哪些其他字段是必填项：
 
 <Tabs>
-  <Tab title="Satellite" icon="fa-satellite">
+  <Tab title="卫星" icon="fa-satellite">
     ```json
     {
       "launch_id": "lch_9Kd4Mw",
@@ -67,7 +67,7 @@ Call <EndpointEmbedLite operationId="createBooking" />. The `payload.type` field
     ```
   </Tab>
 
-  <Tab title="Bulk cargo" icon="fa-boxes-stacked">
+  <Tab title="散装货物" icon="fa-boxes-stacked">
     ```json
     {
       "launch_id": "lch_7Hq2Zr",
@@ -85,14 +85,14 @@ Call <EndpointEmbedLite operationId="createBooking" />. The `payload.type` field
 </Tabs>
 
 <Callout icon="📘" theme="info">
-  ### Retries are safe
+  ### 重试是安全的 {#retries-are-safe}
 
-  Send a fresh UUID in the `Idempotency-Key` header with each new booking. If the network drops and you retry with the same key, Orbit returns the original booking instead of booking twice.
+  每次发起新预订时，请在 `Idempotency-Key` 请求头中发送一个新的 UUID。如果网络中断且您使用相同的密钥进行重试，Orbit 将返回原始预订，而不会重复预订。
 </Callout>
 
-## 3. Upload the manifest
+## 3. 上传货物清单 {#3-upload-the-manifest}
 
-Send the signed PDF to [Upload a cargo manifest](/reference/uploadmanifest) as `multipart/form-data`:
+以 `multipart/form-data` 格式将已签署的 PDF 发送至[上传货物清单](/reference/uploadmanifest)：
 
 ```javascript upload-manifest.js
 import fs from 'node:fs';
@@ -108,17 +108,17 @@ await fetch(`https://api.us-east.orbit.erdman.example/v1/bookings/${bookingId}/m
 });
 ```
 
-## 4. Wait for confirmation
+## 4. 等待确认 {#4-wait-for-confirmation}
 
-Orbit reviews manifests within one business day. When it approves yours, the booking moves to `confirmed` and you get a [booking.confirmed](/reference/bookingconfirmed) webhook.
+Orbit 会在一个工作日内审核货物清单。审核通过后，预订状态将变更为 `confirmed`，并且您会收到一个 [booking.confirmed](/reference/bookingconfirmed) Webhook。
 
-<Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
-  * A **custom component**: `SimpleStepper`, written in MDX and stored with the project
-  * A **Recipe** embed: a step-by-step code walkthrough that opens in place
-  * The [Payload Calculator](/docs/payload-calculator) and [Endpoint Chips](/docs/endpoint-embedding-lite), two more **custom components**
-  * A **Glossary** term in the checklist
-  * A **checklist** using Markdown task-list syntax
-  * **Tabs** holding JSON examples for each `oneOf` payload type
-  * A **code block with a file name** as its title
-  * An **info** Callout
+<Accordion title="此页面的构建方式" icon="fa-wand-magic-sparkles">
+  - 一个**自定义组件**：`SimpleStepper`，使用 MDX 编写并随项目一同存储
+  - 一个 **Recipe** 嵌入组件：可在原位展开的分步代码演练
+  - [有效载荷计算器](/docs/payload-calculator)与[端点标签](/docs/endpoint-embedding-lite)，另外两个**自定义组件**
+  - 核对清单中的一个 **Glossary** 术语
+  - 使用 Markdown 任务列表语法的**核对清单**
+  - 包含每种 `oneOf` 有效载荷类型 JSON 示例的 **Tabs**
+  - 一个**带有文件名的代码块**作为其标题
+  - 一个 **info** 提示框
 </Accordion>
