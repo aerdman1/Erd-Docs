@@ -1344,25 +1344,26 @@ export const EndpointPicker = props => {
 
       <div className="picker-header">
         <div>
-          <h3 className="picker-title">Endpoint Picker</h3>
+          <h3 className="picker-title">端点选择器</h3>
           <p className="picker-description">
-            Select an OpenAPI file, find an endpoint, generate a direct reference link, or browse the complete specification.
+
+            选择 OpenAPI 文件、查找端点、生成直接引用链接，或浏览完整规范。
           </p>
         </div>
 
         {!loadingSpec && endpoints.length ? (
           <div className="picker-count">
-            {filtered.length} endpoint{filtered.length === 1 ? "" : "s"}
+            {filtered.length} 端点{filtered.length === 1 ? "" : "s"}
           </div>
         ) : null}
       </div>
 
       <div className="controls">
         <div className="field">
-          <label>OpenAPI file</label>
+          <label>OpenAPI 文件</label>
 
           {loadingIndex ? (
-            <div className="status">Loading OpenAPI files…</div>
+            <div className="status">正在加载 OpenAPI 文件…</div>
           ) : specs.length ? (
             <select value={specUrl} onChange={event => setSpecUrl(event.target.value)}>
               {specs.map(spec => (
@@ -1372,27 +1373,27 @@ export const EndpointPicker = props => {
               ))}
             </select>
           ) : (
-            <div className="status">No specs found</div>
+            <div className="status">未找到规范</div>
           )}
         </div>
 
         <div className="field">
-          <label>Find endpoint</label>
+          <label>查找端点</label>
           <input
             value={search}
             onChange={event => setSearch(event.target.value)}
-            placeholder="Filter by path, method, or summary"
+            placeholder="按路径、方法或摘要筛选"
           />
         </div>
 
         {loadingSpec ? (
           <div className="field field-full">
-            <div className="status">Loading endpoints…</div>
+            <div className="status">正在加载端点…</div>
           </div>
         ) : filtered.length ? (
           <>
             <div className="field">
-              <label>Endpoint</label>
+              <label>端点</label>
               <select value={selectedPath} onChange={event => setSelectedPath(event.target.value)}>
                 {[...new Set(filtered.map(endpoint => endpoint.path))].map(path => (
                   <option key={path}>{path}</option>
@@ -1401,7 +1402,7 @@ export const EndpointPicker = props => {
             </div>
 
             <div className="field">
-              <label>Method</label>
+              <label>方法</label>
               <select value={selectedMethod} onChange={event => setSelectedMethod(event.target.value)}>
                 {filtered
                   .filter(endpoint => endpoint.path === selectedPath)
@@ -1413,7 +1414,7 @@ export const EndpointPicker = props => {
           </>
         ) : (
           <div className="field field-full">
-            <div className="status">No matches.</div>
+            <div className="status">无匹配项。</div>
           </div>
         )}
       </div>
@@ -1439,7 +1440,7 @@ export const EndpointPicker = props => {
                 target="_blank"
                 rel="noreferrer"
               >
-                Open reference
+                打开参考文档
               </a>
 
               <button
@@ -1450,13 +1451,14 @@ export const EndpointPicker = props => {
                   setShowFullSpec(true);
                 }}
               >
-                View full spec
+                查看完整规范
               </button>
             </div>
 
             <div className="snippet-section">
-              <div className="snippet-label">MDX link snippet</div>
+              <div className="snippet-label">MDX 链接代码片段</div>
               <div className="code">
+
                 [{current?.summary || `${selectedMethod} ${selectedPath}`}]({referenceUrl})
               </div>
             </div>
@@ -1499,7 +1501,7 @@ export const EndpointPicker = props => {
                 <button
                   className="icon-button"
                   type="button"
-                  aria-label="Close full specification"
+                  aria-label="关闭完整规范"
                   onClick={() => setShowFullSpec(false)}
                 >
                   ×
@@ -1513,14 +1515,14 @@ export const EndpointPicker = props => {
                   <input
                     value={fullSpecSearch}
                     onChange={event => setFullSpecSearch(event.target.value)}
-                    placeholder="Search all endpoints"
-                    aria-label="Search all endpoints"
+                    placeholder="搜索所有端点"
+                    aria-label="搜索所有端点"
                   />
 
                   <select
                     value={fullSpecTag}
                     onChange={event => setFullSpecTag(event.target.value)}
-                    aria-label="Filter endpoints by tag"
+                    aria-label="按标签筛选端点"
                   >
                     {tags.map(tag => (
                       <option key={tag} value={tag}>{tag}</option>
@@ -1529,7 +1531,7 @@ export const EndpointPicker = props => {
                 </div>
 
                 <div className="sidebar-count">
-                  {fullSpecFiltered.length} endpoint{fullSpecFiltered.length === 1 ? "" : "s"}
+                  {fullSpecFiltered.length} 端点{fullSpecFiltered.length === 1 ? "" : "s"}
                 </div>
 
                 <div className="endpoint-list">
@@ -1566,7 +1568,7 @@ export const EndpointPicker = props => {
                       </div>
                     ))
                   ) : (
-                    <div className="empty-detail">No endpoints match your filters.</div>
+                    <div className="empty-detail">没有符合筛选条件的端点。</div>
                   )}
                 </div>
               </aside>
@@ -1580,17 +1582,17 @@ export const EndpointPicker = props => {
 
                 <div className="spec-stats">
                   <div className="spec-stat">
-                    <div className="spec-stat-label">Endpoints</div>
+                    <div className="spec-stat-label">端点</div>
                     <div className="spec-stat-value">{endpoints.length}</div>
                   </div>
 
                   <div className="spec-stat">
-                    <div className="spec-stat-label">Paths</div>
+                    <div className="spec-stat-label">路径</div>
                     <div className="spec-stat-value">{pathCount}</div>
                   </div>
 
                   <div className="spec-stat">
-                    <div className="spec-stat-label">Tags</div>
+                    <div className="spec-stat-label">标签</div>
                     <div className="spec-stat-value">{tagCount}</div>
                   </div>
                 </div>
@@ -1633,7 +1635,7 @@ export const EndpointPicker = props => {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Open reference
+                          打开参考文档
                         </a>
                       </div>
                     </div>
@@ -1653,16 +1655,17 @@ export const EndpointPicker = props => {
                     <div className="metadata-row">
                       {selectedFullSpecEndpoint.operationId ? (
                         <span className="metadata-pill">
-                          Operation ID: {selectedFullSpecEndpoint.operationId}
+
+                          操作 ID： {selectedFullSpecEndpoint.operationId}
                         </span>
                       ) : null}
 
                       <span className="metadata-pill">
-                        {selectedParameters.length} parameter{selectedParameters.length === 1 ? "" : "s"}
+                        {selectedParameters.length} 参数{selectedParameters.length === 1 ? "" : "s"}
                       </span>
 
                       <span className="metadata-pill">
-                        {responseEntries.length} response{responseEntries.length === 1 ? "" : "s"}
+                        {responseEntries.length} 响应{responseEntries.length === 1 ? "" : "s"}
                       </span>
 
                       {selectedFullSpecEndpoint.tags.map(tag => (
@@ -1671,15 +1674,15 @@ export const EndpointPicker = props => {
                     </div>
 
                     <section className="detail-section">
-                      <h3 className="detail-section-title">Parameters</h3>
+                      <h3 className="detail-section-title">参数</h3>
 
                       {selectedParameters.length ? (
                         <table className="detail-table">
                           <thead>
                             <tr>
-                              <th style={{ width: "24%" }}>Name</th>
-                              <th style={{ width: "18%" }}>Type</th>
-                              <th>Description</th>
+                              <th style={{ width: "24%" }}>名称</th>
+                              <th style={{ width: "18%" }}>类型</th>
+                              <th>描述</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1699,12 +1702,12 @@ export const EndpointPicker = props => {
                           </tbody>
                         </table>
                       ) : (
-                        <div className="empty-detail">This endpoint has no parameters.</div>
+                        <div className="empty-detail">此端点没有参数。</div>
                       )}
                     </section>
 
                     <section className="detail-section">
-                      <h3 className="detail-section-title">Request body</h3>
+                      <h3 className="detail-section-title">请求体</h3>
 
                       {requestBody?.content ? (
                         <div className="request-grid">
@@ -1736,12 +1739,12 @@ export const EndpointPicker = props => {
                           })}
                         </div>
                       ) : (
-                        <div className="empty-detail">This endpoint has no request body.</div>
+                        <div className="empty-detail">此端点没有请求体。</div>
                       )}
                     </section>
 
                     <section className="detail-section">
-                      <h3 className="detail-section-title">Responses</h3>
+                      <h3 className="detail-section-title">响应</h3>
 
                       {responseEntries.length ? (
                         <div className="response-list">
@@ -1772,13 +1775,13 @@ export const EndpointPicker = props => {
                                           {example !== undefined ? (
                                             <div className="code">{stringifyExample(example)}</div>
                                           ) : (
-                                            <div>No response example provided.</div>
+                                            <div>未提供响应示例。</div>
                                           )}
                                         </div>
                                       );
                                     })
                                   ) : (
-                                    <div>No response body documented.</div>
+                                    <div>未记录响应体。</div>
                                   )}
                                 </div>
                               </div>
@@ -1786,13 +1789,14 @@ export const EndpointPicker = props => {
                           })}
                         </div>
                       ) : (
-                        <div className="empty-detail">No responses are documented for this endpoint.</div>
+                        <div className="empty-detail">此端点未记录任何响应。</div>
                       )}
                     </section>
                   </div>
                 ) : (
                   <div className="empty-detail" style={{ marginTop: 28 }}>
-                    Select an endpoint from the sidebar to view its details.
+
+                    从侧边栏中选择一个端点以查看其详细信息。
                   </div>
                 )}
               </main>
@@ -1812,7 +1816,7 @@ export const EndpointPicker = props => {
                 type="button"
                 onClick={() => setShowFullSpec(false)}
               >
-                Close
+                关闭
               </button>
             </div>
           </div>
