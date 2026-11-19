@@ -140,13 +140,13 @@ define"&&sig[k+1]&&sig[k+1].v==="."&&sig[k+2]&&sig[k+2].v==="amd");let fi=-1;for
 []).map(s=>s.slice(1,-1)).filter(s=>!/^(exports|require|module)$/.test(s))));if(r.format==="CommonJS"){const re=/\brequire\(\s*["']([^"'./][^"']*)["']\s*\)/g;const scope=code.slice(0,4e5);let m;while(m=re.exec(scope))if(r.deps.indexOf(m[1])===-1)r.deps.push(m[1])}return r};
 
 export class SdkxBoundary extends Component{constructor(props){super(props);this.state={failed:false}}static getDerivedStateFromError(){
-return{failed:true}}componentDidCatch(){}render(){if(this.state.failed)return<div className="sdkx-err"><b>Couldn't display this section</b>{this.props.fallback||"Its content couldn't be rendered."}</div>;return this.props.children}}export const SdkxCopyBtn=({text,label,className})=>{const[done,setDone]=useState("");return<button type="button"className={className||"sdkx-copy"}onClick={()=>sdkxCopy(
+return{failed:true}}componentDidCatch(){}render(){if(this.state.failed)return<div className="sdkx-err"><b>无法显示此部分</b>{this.props.fallback||"Its content couldn't be rendered."}</div>;return this.props.children}}export const SdkxCopyBtn=({text,label,className})=>{const[done,setDone]=useState("");return<button type="button"className={className||"sdkx-copy"}onClick={()=>sdkxCopy(
 typeof text==="function"?text():text).then(ok=>{setDone(ok?"Copied":"Copy failed");setTimeout(()=>setDone(""),1400)})}>
       {done||label||"Copy"}
     </button>};
 
 export const SdkxCode=({code,lang,bar})=>{const js=/^(js|jsx|ts|tsx|javascript|typescript|mjs|cjs|json|json5|html|vue)$/i.test(lang||"");const body=useMemo(()=>{if(!js||code.length>=2e5)return code;try{return sdkxTokenize(code).map(sdkxTokSpan)}catch(e){return code}},[code,js]);return<div className="sdkx-code">
-      {bar?<div className="sdkx-codebar">{bar}<span className="sdkx-grow"/><SdkxCopyBtn className="sdkx-copy sdkx-copy--bar"text={code}/></div>:null}
+      {bar?<div className="sdkx-codebar">{bar}<span className="sdkx-grow"></span><SdkxCopyBtn className="sdkx-copy sdkx-copy--bar"text={code}/></div>:null}
       <pre><code>{body}</code></pre>
       {bar?null:<SdkxCopyBtn text={code}/>}
     </div>};
@@ -214,41 +214,41 @@ test(file.path)||/^(js|ts)$/.test(file.lang||"");const lines=useMemo(()=>{const 
 [file.text,pretty,code]);const texts=useMemo(()=>lines.map(l=>l.map(t=>t.v).join("")),[lines]);const hits=useMemo(()=>{const s=q.trim().toLowerCase();if(!s)return[];const r=[];for(let i=0;i<texts.length;i++)if(texts[i].toLowerCase().indexOf(s)!==-1)r.push(i);return r},[texts,q]);const LIMIT=2500;const shown=all?lines.length:Math.min(lines.length,LIMIT);const hitSet=useMemo(()=>new Set(hits),[hits]);
 const curLine=hits.length?hits[Math.min(cur,hits.length-1)]:-1;useEffect(()=>{if(curLine<0)return;if(curLine>=shown){setAll(true);return}const el=box.current&&box.current.querySelector('[data-ln="'+curLine+'"]');if(el)box.current.scrollTop=Math.max(0,el.offsetTop-box.current.clientHeight/2)},[curLine,shown]);const step=d=>{if(hits.length)setCur((cur+d+hits.length)%hits.length)};const wrap=!pretty&&
 !!file.minified;return<div>
-      {onBack?<p className="sdkx-back"><button type="button"className="sdkx-linkbtn"onClick={onBack}>{"\u2190"} Back to the SDK file</button></p>:null}
+      {onBack?<p className="sdkx-back"><button type="button"className="sdkx-linkbtn"onClick={onBack}>{"\u2190"} 返回 SDK 文件</button></p>:null}
       <div className="sdkx-code sdkx-src">
       <div className="sdkx-codebar sdkx-srcbar">
         <span className="sdkx-srcname"title={file.path}>{file.path.replace(/^\//,"")}</span>
-        <span className="sdkx-grow"/>
+        <span className="sdkx-grow"></span>
         <span className="sdkx-count">{q.trim()?hits.length?Math.min(cur,hits.length-1)+1+" of "+hits.length:"No matches":lines.length.toLocaleString()+" lines"}</span>
-        <input className="sdkx-find"type="search"placeholder="Find in file"aria-label="Find in file"value={q}onChange={e=>setQ(e.target.value)}onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();step(e.shiftKey?-1:1)}}}/>
-        <button type="button"className="sdkx-icon"disabled={!hits.length}onClick={()=>step(-1)}aria-label="Previous match">{"\u2191"}</button>
-        <button type="button"className="sdkx-icon"disabled={!hits.length}onClick={()=>step(1)}aria-label="Next match">{"\u2193"}</button>
-        {code&&file.minified?<label className="sdkx-toggle"><input type="checkbox"checked={pretty}onChange={e=>setPretty(e.target.checked)}/> Pretty print</label>:null}
-        <SdkxCopyBtn className="sdkx-copy sdkx-copy--bar"text={()=>file.text}label="Copy"/>
-        <button type="button"className="sdkx-copy sdkx-copy--bar"onClick={()=>onSave(file)}>Download</button>
+        <input className="sdkx-find"type="search"placeholder="在文件中查找"aria-label="在文件中查找"value={q}onChange={e=>setQ(e.target.value)}onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();step(e.shiftKey?-1:1)}}}/>
+        <button type="button"className="sdkx-icon"disabled={!hits.length}onClick={()=>step(-1)}aria-label="上一个匹配项">{"\u2191"}</button>
+        <button type="button"className="sdkx-icon"disabled={!hits.length}onClick={()=>step(1)}aria-label="下一个匹配项">{"\u2193"}</button>
+        {code&&file.minified?<label className="sdkx-toggle"><input type="checkbox"checked={pretty}onChange={e=>setPretty(e.target.checked)}/> 代码美化</label>:null}
+        <SdkxCopyBtn className="sdkx-copy sdkx-copy--bar"text={()=>file.text}label="复制"/>
+        <button type="button"className="sdkx-copy sdkx-copy--bar"onClick={()=>onSave(file)}>下载</button>
       </div>
       <div className={"sdkx-viewer"+(wrap?" sdkx-wrap":"")}ref={box}>
         {lines.slice(0,shown).map((l,i)=><div key={i}data-ln={i}className={"sdkx-ln"+(i===curLine?" is-cur":hitSet.has(i)?" is-hit":"")}>
             <span className="sdkx-gut">{i+1}</span>
             <span className="sdkx-lc">{l.map(sdkxTokSpan)}</span>
           </div>)}
-        {shown<lines.length?<div className="sdkx-more"><button type="button"className="sdkx-btn sdkx-btn--sm"onClick={()=>setAll(true)}>Show all {lines.length.toLocaleString()} lines</button></div>:null}
+        {shown<lines.length?<div className="sdkx-more"><button type="button"className="sdkx-btn sdkx-btn--sm"onClick={()=>setAll(true)}>显示全部 {lines.length.toLocaleString()} 行</button></div>:null}
       </div>
       </div>
-      {pretty&&file.minified?<p className="sdkx-note">Pretty-printed for reading. Copy and Download give you the original file.</p>:null}
+      {pretty&&file.minified?<p className="sdkx-note">已美化以便阅读。“复制”和“下载”将提供原始文件。</p>:null}
     </div>};
 
 export const SdkxMembers=({rows,names,go,descs})=><div className="sdkx-params">
     {rows.map((m,i)=>{const desc=m.doc||descs&&descs[m.name]||"";let type;if(m.method){type=[<span key="o">(</span>];(m.params||[]).forEach((p,j)=>{if(j)type.push(", ");type.push(<span key={"p"+j}>{p.rest?"...":""}{p.name}{p.optional?"?":""}: {sdkxTypeNodes(p.type,names,go)}</span>)});type.push(<span key="c">) {"=>"} </span>);type.push(<span key="r">{m.ret?sdkxTypeNodes(m.ret,names,go):"void"}</span>)}else
-type=sdkxTypeNodes(m.type,names,go);const sigOnly=m.name==="(call)"||m.name==="new";const flag=m.optional?<span className="sdkx-popt">optional</span>:m.index||m.method||sigOnly?null:<span className="sdkx-preq">required</span>;return<div key={i}className="sdkx-param">
+type=sdkxTypeNodes(m.type,names,go);const sigOnly=m.name==="(call)"||m.name==="new";const flag=m.optional?<span className="sdkx-popt">可选</span>:m.index||m.method||sigOnly?null:<span className="sdkx-preq">必需</span>;return<div key={i}className="sdkx-param">
           <div className="sdkx-pline"><span className={"sdkx-pname"+(sigOnly?" sdkx-anon":"")}>{sigOnly?m.name==="new"?"constructor":"callable":(m.rest?"...":"")+m.name}</span><span className="sdkx-ptype">{type}</span>{flag}</div>
           {desc?<div className="sdkx-pdesc">{sdkxMd(desc,"",true)}</div>:null}
         </div>})}
   </div>;
 
 export const SdkxDecl=({d,names,go,descs})=>{const T=toks=>sdkxTypeNodes(toks,names,go);const ref=(name,j)=>names.has(name)?<a key={j}className="sdkx-tref"href={"#"+name}onClick={e=>{e.preventDefault();go(name)}}>{name}</a>:<code key={j}>{name}</code>;const list=(items,render)=>items.map((x,j)=>[j?j===items.length-1?" and ":", ":"",render(x,j)]);const incl=(items,own)=>items.length?<p className="sdkx-txt sdkx-incl">{own?
-"Also accepts":"Accepts"} every field of {list(items,(x,j)=><span key={j}>{ref(x.name,j)}{x.mode==="partial"?" (all optional)":""}</span>)}.</p>:null;let body=null;if(d.kind==="function"){body=d.overloads.map((o,i)=><div key={i}className="sdkx-ovl">
-        {d.overloads.length>1?<div className="sdkx-label">Overload {i+1} of {d.overloads.length}</div>:null}
+"Also accepts":"Accepts"} 的每个字段 {list(items,(x,j)=><span key={j}>{ref(x.name,j)}{x.mode==="partial"?" (all optional)":""}</span>)}.</p>:null;let body=null;if(d.kind==="function"){body=d.overloads.map((o,i)=><div key={i}className="sdkx-ovl">
+        {d.overloads.length>1?<div className="sdkx-label">重载 {i+1} 的 {d.overloads.length}</div>:null}
         {o.doc&&o.doc!==d.doc?<p className="sdkx-doc">{sdkxMd(o.doc,"",true)}</p>:null}
         <div className="sdkx-sig">
           <span className="sdkx-tf">{d.name}</span>{o.tparams?T(o.tparams):null}(
@@ -256,9 +256,9 @@ export const SdkxDecl=({d,names,go,descs})=>{const T=toks=>sdkxTypeNodes(toks,na
           ){o.ret?<span>: {T(o.ret)}</span>:null}
         </div>
         {o.params.length?<SdkxMembers rows={o.params}names={names}go={go}descs={descs}/>:null}
-        {o.ret?<p className="sdkx-txt">Returns <span className="sdkx-ty">{T(o.ret)}</span>.</p>:null}
-      </div>)}else if(d.kind==="type"){const parts=sdkxTop(d.expr,["|"]);const lit=p=>p.length===1&&(p[0].t==="str"||p[0].t==="num"||/^(true|false|null|undefined)$/.test(p[0].v));const fnType=d.expr[0]&&(d.expr[0].v==="("||d.expr[0].v==="<")&&d.expr.some(x=>x.v==="=>");if(parts.length>1&&parts.every(lit)){body=<p className="sdkx-txt">One of: {parts.map((p,j)=><span key={j}>{j?" ":""}<code className="sdkx-val">{p[0].
-v}</code></span>)}</p>}else if(parts.length>1){body=<p className="sdkx-txt sdkx-oneof">One of {parts.map((p,j)=><span key={j}>{j?j===parts.length-1?" or ":", ":""}<span className="sdkx-ty">{T(p)}</span></span>)}.</p>}else if(fnType){body=<div className="sdkx-sig">{T(d.expr)}</div>}else{const f=sdkxFlatten(d.expr);body=f.members.length||f.includes.length?<div>
+        {o.ret?<p className="sdkx-txt">返回值 <span className="sdkx-ty">{T(o.ret)}</span>.</p>:null}
+      </div>)}else if(d.kind==="type"){const parts=sdkxTop(d.expr,["|"]);const lit=p=>p.length===1&&(p[0].t==="str"||p[0].t==="num"||/^(true|false|null|undefined)$/.test(p[0].v));const fnType=d.expr[0]&&(d.expr[0].v==="("||d.expr[0].v==="<")&&d.expr.some(x=>x.v==="=>");if(parts.length>1&&parts.every(lit)){body=<p className="sdkx-txt">以下之一： {parts.map((p,j)=><span key={j}>{j?" ":""}<code className="sdkx-val">{p[0].
+v}</code></span>)}</p>}else if(parts.length>1){body=<p className="sdkx-txt sdkx-oneof">以下之一 {parts.map((p,j)=><span key={j}>{j?j===parts.length-1?" or ":", ":""}<span className="sdkx-ty">{T(p)}</span></span>)}.</p>}else if(fnType){body=<div className="sdkx-sig">{T(d.expr)}</div>}else{const f=sdkxFlatten(d.expr);body=f.members.length||f.includes.length?<div>
           {incl(f.includes,f.members.length>0)}
           {f.members.length?<SdkxMembers rows={f.members}names={names}go={go}descs={descs}/>:null}
           {f.other.map((o,j)=><div key={j}className="sdkx-sig">{T(o)}</div>)}
@@ -267,19 +267,19 @@ v}</code></span>)}</p>}else if(parts.length>1){body=<p className="sdkx-txt sdkx-
         {d.members.length?<SdkxMembers rows={d.members}names={names}go={go}descs={descs}/>:null}
       </div>}else if(d.kind==="const"){body=<div className="sdkx-sig"><span className="sdkx-tk">const</span> <span className="sdkx-tf">{d.name}</span>{d.type?<span>: {T(d.type)}</span>:null}</div>}else if(d.kind==="enum"){body=<div className="rdmd-table sdkx-enum"><div className="rdmd-table-inner">
         <table>
-          <thead><tr><th style={{textAlign:"left"}}>Member</th><th style={{textAlign:"left"}}>Value</th></tr></thead>
+          <thead><tr><th style={{textAlign:"left"}}>成员</th><th style={{textAlign:"left"}}>值</th></tr></thead>
           <tbody>{d.values.map((v,j)=><tr key={j}><td style={{textAlign:"left"}}><code>{v.name}</code></td><td style={{textAlign:"left"}}>{v.value?<code>{v.value}</code>:"\u2014"}</td></tr>)}</tbody>
         </table>
       </div></div>}return<div className="sdkx-decl"data-decl={d.name}>
       <div className="sdkx-dh">
         <h3 className="sdkx-dname">{d.name}{d.kind==="function"?"()":""}</h3>
         <span className="sdkx-kind">{d.kind}</span>
-        {d.exported?<span className="sdkx-exp">exported</span>:null}
+        {d.exported?<span className="sdkx-exp">已导出</span>:null}
       </div>
       {d.doc?<p className="sdkx-doc">{sdkxMd(d.doc,"",true)}</p>:null}
       {body}
       <details className="sdkx-def">
-        <summary>TypeScript definition</summary>
+        <summary>TypeScript 定义</summary>
         <SdkxCode code={d.src}lang="ts"/>
       </details>
     </div>};
@@ -287,9 +287,9 @@ v}</code></span>)}</p>}else if(parts.length>1){body=<p className="sdkx-txt sdkx-
 export const SdkxApi=({api,go})=>{const[more,setMore]=useState(false);const LIM=18;const order={function:0,class:1,const:2,enum:3,interface:4,type:5};const exp=api.decls.filter(d=>d.exported).slice().sort((a,b)=>order[a.kind]-order[b.kind]);const rest=api.decls.filter(d=>!d.exported);const link=d=><a key={d.name}href={"#"+d.name}onClick={e=>{e.preventDefault();go(d.name)}}>{d.name}</a>;
 return<div>
       <div className="sdkx-index">
-        {exp.length?<div><b>Exports</b>{(more?exp:exp.slice(0,LIM)).map(link)}</div>:null}
-        {rest.length?<div><b>Types</b>{(more?rest:rest.slice(0,LIM)).map(link)}</div>:null}
-        {!more&&(exp.length>LIM||rest.length>LIM)?<button type="button"className="sdkx-linkbtn"onClick={()=>setMore(true)}>Show all {api.decls.length}</button>:null}
+        {exp.length?<div><b>导出</b>{(more?exp:exp.slice(0,LIM)).map(link)}</div>:null}
+        {rest.length?<div><b>类型</b>{(more?rest:rest.slice(0,LIM)).map(link)}</div>:null}
+        {!more&&(exp.length>LIM||rest.length>LIM)?<button type="button"className="sdkx-linkbtn"onClick={()=>setMore(true)}>显示全部 {api.decls.length}</button>:null}
       </div>
       {exp.map(d=><SdkxDecl key={d.name}d={d}names={api.names}go={go}descs={api.descs}/>)}
       {rest.map(d=><SdkxDecl key={d.name}d={d}names={api.names}go={go}descs={api.descs}/>)}
@@ -322,7 +322,7 @@ d "+s.pkg});snippets.push({id:"import",label:"Import",lang:"js",code:importLine+
 n/json":"text/javascript");const openFile=async f=>{const id=++viewRun.current;setTab("source");setView({path:f.name,loading:true});let next;try{const text=await sdkxFetch(s.base+f.name,"text");next={path:f.name,text,minified:text.length>3e3&&text.length/((text.match(/\n/g)||[]).length+1)>250}}catch(e){next={path:f.name,error:String(e&&e.message||e)}}if(id===viewRun.current)setView(next)};const closeView=()=>{
 viewRun.current++;setView(null)};if(s.status==="error"&&s.error==="missing"){return<div className="sdkx"data-theme={dark?"dark":"light"}>
         <style>{SDKX_CSS}</style>
-        <div className="sdkx-err"><b>No SDK URL</b>Add a <code>url</code> prop, for example <code>{'<SdkExplorer url="https://cdn.jsdelivr.net/npm/<package>/dist/sdk.min.js" />'}</code></div>
+        <div className="sdkx-err"><b>无 SDK URL</b>添加 <code>url</code> 属性，例如 <code>{'<SdkExplorer url="https://cdn.jsdelivr.net/npm/<package>/dist/sdk.min.js" />'}</code></div>
       </div>}const loading=s.status==="loading";const facts=[];if(!loading){const ex=apiExports.length?apiExports:a.exports||[];if(s.bytes!==void 0)facts.push({l:"Size",v:sdkxBytes(s.bytes)+(a.minified?" min":"")});if(s.gzip)facts.push({l:"Gzipped",v:sdkxBytes(s.gzip)});if(a.format)facts.push({l:"Format",v:a.format});if(a.global)facts.push({l:"Global",v:"window."+a.global,mono:1});if(ex.length)facts.
 push({l:ex.length===1?"Export":"Exports",v:ex.length<=2?ex.join(", "):ex.length+" exports",mono:ex.length<=2,t:ex.join(", ")});if(deps)facts.push({l:"Dependencies",v:String(deps.length),t:deps.join(", ")})}const license=pj&&pj.license?typeof pj.license==="string"?pj.license:pj.license.type:"";const qsBar=snippets.map(x=><button key={x.id}type="button"className={"sdkx-ctab"+(snip&&x.id===snip.id?" \
 is-on":"")}onClick={()=>setQs(x.id)}>{x.label}</button>);return<div className="sdkx"data-theme={dark?"dark":"light"}ref={rootRef}>
@@ -332,46 +332,46 @@ is-on":"")}onClick={()=>setQs(x.id)}>{x.label}</button>);return<div className="s
           <div className="sdkx-name">
             <h3 className="sdkx-title">{title}</h3>
             {s.versions&&s.versions.length>1?<span className="sdkx-verwrap">
-                <select className="sdkx-select"aria-label="Version"value={s.version||""}onChange={e=>setPicked(e.target.value)}>
+                <select className="sdkx-select"aria-label="版本"value={s.version||""}onChange={e=>setPicked(e.target.value)}>
                   {(s.versions.slice(0,150).indexOf(s.version)===-1&&s.version?[s.version].concat(s.versions.slice(0,150)):s.versions.slice(0,150)).map(v=><option key={v}value={v}>v{v}{s.tags&&s.tags.latest===v?" (latest)":""}</option>)}
                 </select>
               </span>:s.version?<span className="sdkx-ver">v{s.version}</span>:null}
-            {isLatest&&!(s.versions&&s.versions.length>1)?<span className="sdkx-tag sdkx-tag--ok">latest</span>:null}
-            {api?<span className="sdkx-tsb"title="Ships TypeScript type definitions">TS</span>:null}
+            {isLatest&&!(s.versions&&s.versions.length>1)?<span className="sdkx-tag sdkx-tag--ok">最新</span>:null}
+            {api?<span className="sdkx-tsb"title="包含 TypeScript 类型定义">TS</span>:null}
           </div>
           {desc?<p className="sdkx-desc">{desc}</p>:null}
           {loading?null:<div className="sdkx-by">
-              {author?<span>by {author}</span>:null}
-              {license?<span>{license} license</span>:null}
+              {author?<span>作者 {author}</span>:null}
+              {license?<span>{license} 许可证</span>:null}
               {s.pkg?<a href={"https://www.npmjs.com/package/"+s.pkg}target="_blank"rel="noopener noreferrer">npm {"\u2197"}</a>:null}
               {s.pkg?<a href={"https://www.jsdelivr.com/package/npm/"+s.pkg}target="_blank"rel="noopener noreferrer">jsDelivr {"\u2197"}</a>:null}
-              {repo?<a href={repo}target="_blank"rel="noopener noreferrer">Repository {"\u2197"}</a>:null}
-              {homepage&&homepage!==repo?<a href={homepage}target="_blank"rel="noopener noreferrer">Homepage {"\u2197"}</a>:null}
+              {repo?<a href={repo}target="_blank"rel="noopener noreferrer">代码仓库 {"\u2197"}</a>:null}
+              {homepage&&homepage!==repo?<a href={homepage}target="_blank"rel="noopener noreferrer">主页 {"\u2197"}</a>:null}
               {!s.pkg&&pinned?<span>{pinned.replace(/^https?:\/\//,"").split("/")[0]}</span>:null}
             </div>}
         </div>
         <div className="sdkx-actions">
-          {docsUrl?<a className="sdkx-btn"href={docsUrl}target="_blank"rel="noopener noreferrer">Documentation {"\u2197"}</a>:null}
-          <button type="button"className="sdkx-btn"disabled={s.code===void 0}onClick={()=>save({text:s.code,path:fileName})}>{"\u2193"} Download</button>
-          <SdkxCopyBtn className="sdkx-btn"text={pinned}label="Copy URL"/>
+          {docsUrl?<a className="sdkx-btn"href={docsUrl}target="_blank"rel="noopener noreferrer">文档 {"\u2197"}</a>:null}
+          <button type="button"className="sdkx-btn"disabled={s.code===void 0}onClick={()=>save({text:s.code,path:fileName})}>{"\u2193"} 下载</button>
+          <SdkxCopyBtn className="sdkx-btn"text={pinned}label="复制 URL"/>
         </div>
       </div>
 
-      {loading?<div className="sdkx-facts"><div className="sdkx-skel"style={{width:320}}/></div>:facts.length?<div className="sdkx-facts">
+      {loading?<div className="sdkx-facts"><div className="sdkx-skel"style={{width:320}}></div></div>:facts.length?<div className="sdkx-facts">
           {facts.map(f=><div key={f.l}className="sdkx-fact"title={f.t||void 0}><span>{f.l}</span><b className={f.mono?"sdkx-mono":void 0}>{f.v}</b></div>)}
         </div>:null}
 
       {s.fileError?<div className="sdkx-err">
-          <b>Couldn't load the SDK file</b>
-          {s.fileError}. The server has to allow cross-origin requests (CORS) for a docs page to read it; jsDelivr and unpkg both do.
+          <b>无法加载 SDK 文件</b>
+          {s.fileError}。服务器必须允许跨域请求（CORS）以便文档页面读取；jsDelivr 和 unpkg 均支持。
         </div>:null}
 
       {snip?<div className="sdkx-qs">
           <SdkxCode code={snip.code}lang={snip.lang||"bash"}bar={qsBar}/>
-          {snip.id==="cdn"&&s.sri&&a.format!=="ES module"?<p className="sdkx-note">Pinned to {s.version?"v"+s.version:"this exact file"} with a Subresource Integrity hash, so browsers refuse the script if its bytes ever change.</p>:null}
+          {snip.id==="cdn"&&s.sri&&a.format!=="ES module"?<p className="sdkx-note">固定至 {s.version?"v"+s.version:"this exact file"} 并带有子资源完整性哈希，因此如果其字节发生更改，浏览器将拒绝该脚本。</p>:null}
         </div>:null}
 
-      {loading?<div><div className="sdkx-skel"/><div className="sdkx-skel"style={{width:"80%"}}/><div className="sdkx-skel"style={{width:"60%"}}/></div>:shownTabs.length?<div>
+      {loading?<div><div className="sdkx-skel"></div><div className="sdkx-skel"style={{width:"80%"}}></div><div className="sdkx-skel"style={{width:"60%"}}></div></div>:shownTabs.length?<div>
           <div className="sdkx-tabs"role="tablist">
             {shownTabs.map(t=><button key={t.id}type="button"role="tab"aria-selected={t.id===active}className={"sdkx-tab"+(t.id===active?" is-on":"")}onClick={()=>setTab(t.id)}>
                 {t.label}{t.n?<small>{t.n}</small>:null}
@@ -380,24 +380,24 @@ is-on":"")}onClick={()=>setQs(x.id)}>{x.label}</button>);return<div className="s
           <SdkxBoundary key={active+"|"+(s.version||"")}fallback="Try another tab, or open the file from the Files tab.">
           {active==="readme"?<div className="sdkx-md">{sdkxMd(s.readme,s.base?s.base+"/":"",false,{shift:1,dropTitle:true})}</div>:null}
           {active==="api"&&api?<SdkxApi api={api}go={go}/>:null}
-          {active==="source"?view?view.loading?<div className="sdkx-empty">Loading {view.path}{"\u2026"}</div>:view.error?<div className="sdkx-err"><b>Couldn't load {view.path}</b>{view.error}</div>:<SdkxSource file={view}onBack={closeView}onSave={save}/>:s.code!==void 0?<SdkxSource file={{path:s.path||fileName,text:s.code,minified:a.minified}}onSave={save}/>:<div className="sdkx-empty">The SDK file couldn't be loaded.</div>:
+          {active==="source"?view?view.loading?<div className="sdkx-empty">正在加载 {view.path}{"\u2026"}</div>:view.error?<div className="sdkx-err"><b>无法加载 {view.path}</b>{view.error}</div>:<SdkxSource file={view}onBack={closeView}onSave={save}/>:s.code!==void 0?<SdkxSource file={{path:s.path||fileName,text:s.code,minified:a.minified}}onSave={save}/>:<div className="sdkx-empty">无法加载 SDK 文件。</div>:
 null}
           {active==="files"&&s.files?<div className="rdmd-table sdkx-files"><div className="rdmd-table-inner">
               <table>
-                <thead><tr><th style={{textAlign:"left"}}>File</th><th style={{textAlign:"right"}}>Size</th><th/></tr></thead>
+                <thead><tr><th style={{textAlign:"left"}}>文件</th><th style={{textAlign:"right"}}>大小</th><th></th></tr></thead>
                 <tbody>
                   {(allFiles?s.files:s.files.slice(0,150)).map(f=><tr key={f.name}>
-                      <td style={{textAlign:"left"}}><code>{f.name.slice(1)}</code>{f.name===s.path?<span className="sdkx-fnote">SDK file</span>:f.name===s.dtsPath?<span className="sdkx-fnote">types</span>:null}</td>
+                      <td style={{textAlign:"left"}}><code>{f.name.slice(1)}</code>{f.name===s.path?<span className="sdkx-fnote">SDK 文件</span>:f.name===s.dtsPath?<span className="sdkx-fnote">类型</span>:null}</td>
                       <td style={{textAlign:"right"}}><span className="sdkx-fsize">{sdkxBytes(f.size)}</span></td>
                       <td style={{textAlign:"right",whiteSpace:"nowrap"}}>
-                        {sdkxIsText(f.name)&&f.size<5e6?<button type="button"className="sdkx-linkbtn"onClick={()=>openFile(f)}>View</button>:null}
+                        {sdkxIsText(f.name)&&f.size<5e6?<button type="button"className="sdkx-linkbtn"onClick={()=>openFile(f)}>查看</button>:null}
                         {sdkxIsText(f.name)&&f.size<5e6?" \xB7 ":null}
-                        <a href={s.base+f.name}target="_blank"rel="noopener noreferrer">Open {"\u2197"}</a>
+                        <a href={s.base+f.name}target="_blank"rel="noopener noreferrer">打开 {"\u2197"}</a>
                       </td>
                     </tr>)}
                 </tbody>
               </table>
-            </div>{!allFiles&&s.files.length>150?<p className="sdkx-note"><button type="button"className="sdkx-linkbtn"onClick={()=>setAllFiles(true)}>Show all {s.files.length.toLocaleString()} files</button></p>:null}</div>:null}
+            </div>{!allFiles&&s.files.length>150?<p className="sdkx-note"><button type="button"className="sdkx-linkbtn"onClick={()=>setAllFiles(true)}>显示全部 {s.files.length.toLocaleString()} 个文件</button></p>:null}</div>:null}
           </SdkxBoundary>
         </div>:null}
     </div>};
