@@ -96,56 +96,56 @@ export const PayloadCalculator = rawProps => {
       <style>{css}</style>
       <div className="eo-calc-in">
         <div>
-          <span className="eo-calc-lbl">Payload</span>
-          <div className="eo-calc-seg" role="group" aria-label="Payload type">
-            <button type="button" aria-pressed={type === "satellite"} onClick={() => setType("satellite")}>🛰️ Satellite</button>
-            <button type="button" aria-pressed={type === "bulk_cargo"} onClick={() => setType("bulk_cargo")}>📦 Bulk cargo</button>
+          <span className="eo-calc-lbl">有效载荷</span>
+          <div className="eo-calc-seg" role="group" aria-label="有效载荷类型">
+            <button type="button" aria-pressed={type === "satellite"} onClick={() => setType("satellite")}>🛰️ 卫星</button>
+            <button type="button" aria-pressed={type === "bulk_cargo"} onClick={() => setType("bulk_cargo")}>📦 散装货物</button>
           </div>
         </div>
         <div>
-          <label htmlFor="eo-calc-mass">Mass</label>
+          <label htmlFor="eo-calc-mass">质量</label>
           <div className="eo-calc-mass">
-            <input id="eo-calc-mass" type="range" min="0" max="1000" value={toSlider(m)} onChange={e => setMass(fromSlider(Number(e.target.value)))} aria-label="Mass in kilograms" />
-            <span><input className="eo-calc-num" type="number" min="1" max={MAX} value={m} onChange={e => setMass(Number(e.target.value))} aria-label="Mass in kg" /> kg</span>
+            <input id="eo-calc-mass" type="range" min="0" max="1000" value={toSlider(m)} onChange={e => setMass(fromSlider(Number(e.target.value)))} aria-label="以千克为单位的质量" />
+            <span><input className="eo-calc-num" type="number" min="1" max={MAX} value={m} onChange={e => setMass(Number(e.target.value))} aria-label="质量（kg）" /> kg</span>
           </div>
         </div>
         <div>
-          <span className="eo-calc-lbl">Target orbit</span>
-          <div className="eo-calc-seg" role="group" aria-label="Target orbit">
+          <span className="eo-calc-lbl">目标轨道</span>
+          <div className="eo-calc-seg" role="group" aria-label="目标轨道">
             {Object.keys(ORBITS).map(o => (
               <button key={o} type="button" aria-pressed={effOrbit === o} disabled={type === "bulk_cargo" && o !== "leo"} onClick={() => setOrbit(o)}>{ORBITS[o][0]}</button>
             ))}
           </div>
-          {type === "bulk_cargo" ? <div className="eo-calc-fine" style={{ marginTop: "6px" }}>Bulk cargo flies to stations in LEO.</div> : null}
+          {type === "bulk_cargo" ? <div className="eo-calc-fine" style={{ marginTop: "6px" }}>散装货物将运往 LEO 空间站。</div> : null}
         </div>
         <div>
-          <span className="eo-calc-lbl">Insurance</span>
-          <div className="eo-calc-seg" role="group" aria-label="Insurance">
+          <span className="eo-calc-lbl">保险</span>
+          <div className="eo-calc-seg" role="group" aria-label="保险">
             {Object.keys(INS).map(k => (
               <button key={k} type="button" aria-pressed={insurance === k} onClick={() => setInsurance(k)}>{k[0].toUpperCase() + k.slice(1)}</button>
             ))}
           </div>
         </div>
         <div>
-          <label htmlFor="eo-calc-name">Name</label>
+          <label htmlFor="eo-calc-name">名称</label>
           <input id="eo-calc-name" className="eo-calc-text" type="text" value={name} placeholder={label} onChange={e => setName(e.target.value.slice(0, 60))} />
           {type === "bulk_cargo" ? (
-            <label className="eo-calc-check" style={{ marginTop: "10px" }}><input type="checkbox" checked={pressurized} onChange={e => setPressurized(e.target.checked)} /> Needs a pressurized hold</label>
+            <label className="eo-calc-check" style={{ marginTop: "10px" }}><input type="checkbox" checked={pressurized} onChange={e => setPressurized(e.target.checked)} /> 需要加压货舱</label>
           ) : null}
         </div>
       </div>
       <div className="eo-calc-out">
         <div>
-          <span className="eo-calc-lbl">Estimated price</span>
+          <span className="eo-calc-lbl">预估价格</span>
           <div className="eo-calc-price" aria-live="polite">{pick ? money(total) : "—"}</div>
-          <div className="eo-calc-break">{m.toLocaleString("en-US")} kg × {money(ORBITS[effOrbit][1])}/kg to {ORBITS[effOrbit][0]}{base === 25000 && m * ORBITS[effOrbit][1] < 25000 ? " (minimum charge)" : ""}{INS[insurance] ? " + " + Math.round(INS[insurance] * 100) + "% insurance" : ""}</div>
+          <div className="eo-calc-break">{m.toLocaleString("en-US")} kg × {money(ORBITS[effOrbit][1])}/kg 至 {ORBITS[effOrbit][0]}{base === 25000 && m * ORBITS[effOrbit][1] < 25000 ? " (minimum charge)" : ""}{INS[insurance] ? " + " + Math.round(INS[insurance] * 100) + "% insurance" : ""}</div>
         </div>
         <div className="eo-calc-veh">
           {fits.map(v => (
             <div key={v.id} className="eo-calc-v" data-ok={v.ok ? "true" : "false"} data-pick={pick && pick.id === v.id ? "true" : "false"}>
-              {pick && pick.id === v.id ? <em>BEST FIT</em> : null}
+              {pick && pick.id === v.id ? <em>最佳匹配</em> : null}
               <b>{v.ok ? "✓" : "✗"} {v.id}</b>
-              up to {v.cap[effOrbit].toLocaleString("en-US")} kg
+              最多 {v.cap[effOrbit].toLocaleString("en-US")} kg
             </div>
           ))}
         </div>
@@ -160,9 +160,9 @@ export const PayloadCalculator = rawProps => {
             <pre>{code}</pre>
           </div>
         ) : (
-          <div className="eo-calc-err"><b>422: delta-v exceeded.</b> No vehicle can lift {m.toLocaleString("en-US")} kg to {ORBITS[effOrbit][0]}. Split the payload or pick a lower orbit. <a href="/docs/errors-and-rate-limits#delta-v-exceeded">About this error</a></div>
+          <div className="eo-calc-err"><b>422: delta-v 超限。</b> 没有运载工具能将 {m.toLocaleString("en-US")} kg 运送至 {ORBITS[effOrbit][0]}。请拆分有效载荷或选择更低的轨道。 <a href="/docs/errors-and-rate-limits#delta-v-exceeded">关于此错误</a></div>
         )}
-        <div className="eo-calc-fine">Prices are made up, like the rest of Orbit. The request is exactly what <a href="/reference/createbooking">Book a payload slot</a> expects.</div>
+        <div className="eo-calc-fine">价格是虚构的，正如 Orbit 的其他部分一样。该请求正是 <a href="/reference/createbooking">预订有效载荷舱位</a> 所期望的。</div>
       </div>
     </div>
   );
