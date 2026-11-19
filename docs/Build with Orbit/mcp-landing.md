@@ -1,23 +1,23 @@
 ---
-title: AI & MCP
-excerpt: Ask questions about Orbit in plain English, or plug these docs into your AI tools.
+title: AI 与 MCP
+excerpt: 用通俗易懂的英语提出关于 Orbit 的问题，或将这些文档接入您的 AI 工具。
 deprecated: false
 hidden: false
 icon: fad fa-sparkles
 metadata:
   robots: index
 ---
-This hub is built to be read by people **and** by AI. Nothing on this page needed custom code: it’s all part of ReadMe.
+本文档中心专为人类**以及** AI 阅读而构建。此页面上的内容均无需自定义代码：一切都是 ReadMe 的一部分。
 
-## Ask AI
+## 询问 AI {#ask-ai}
 
-Click **Ask AI** in the header and ask something like *“How do I book a CubeSat to sun-synchronous orbit?”* The answer is drawn from these guides and the API Reference, with links back to the pages it used.
+点击页眉中的**询问 AI**并提出类似 _“如何预订前往太阳同步轨道的立方星？”_ 的问题。答案提取自这些指南和 API 参考，并附有指向所引用页面的链接。
 
-## Connect your AI tools with MCP
+## 通过 MCP 连接您的 AI 工具 {#connect-your-ai-tools-with-mcp}
 
-Every ReadMe hub can run an **MCP server**. Connect it to Claude, Cursor or another MCP client, and the client can search these docs and read the Orbit API definition while it writes your integration.
+每个 ReadMe 文档中心都可以运行**MCP 服务器**。将其连接至 Claude、Cursor 或其他 MCP 客户端，客户端便可在为您编写集成的同时搜索这些文档并读取 Orbit API 定义。
 
-Pick your client:
+选择您的客户端：
 
 <Tabs>
   <Tab title="Claude Code" icon="fa-terminal">
@@ -47,34 +47,34 @@ Pick your client:
   </Tab>
 </Tabs>
 
-The **Copy Page** menu at the top of every page has the same options, one click each.
+每个页面顶部的**复制页面**菜单都提供了相同的选项，均可一键完成。
 
-### What the server can do
+### 该服务器支持的功能 {#what-the-server-can-do}
 
-| Tool                 | What it does                                                              |
-| :------------------- | :------------------------------------------------------------------------ |
-| `search`, `fetch`    | Search these guides and read any page                                     |
-| `list-endpoints`     | List every Orbit endpoint                                                 |
-| `search-endpoints`   | Find endpoints by keyword, parameter or field                             |
-| `get-endpoint`       | Read one endpoint’s parameters, schemas and auth                          |
-| `execute-request`    | Call the API for real, with the user’s key                                |
-| `plan-orbit-booking` | A **custom tool**: the booking steps in order, written in the dashboard with no code |
+| 工具                   | 功能说明                                 |
+| :------------------- | :----------------------------------- |
+| `search`, `fetch`    | 搜索这些指南并阅读任意页面                        |
+| `list-endpoints`     | 列出所有 Orbit 端点                        |
+| `search-endpoints`   | 按关键词、参数或字段查找端点                       |
+| `get-endpoint`       | 读取单个端点的参数、模式与认证信息                    |
+| `execute-request`    | 使用用户的密钥实际调用 API                      |
+| `plan-orbit-booking` | 一个**自定义工具**：按顺序排列的预订步骤，在仪表盘中以零代码方式编写 |
 
-## Docs for LLMs
+## 面向 LLM 的文档 {#docs-for-llms}
 
-| What                     | Where                                                           |
-| :----------------------- | :-------------------------------------------------------------- |
-| An index of every page   | [`/llms.txt`](https://erdman.readme.io/llms.txt)                |
-| Any page as Markdown     | Add `.md` to the page URL, like `/docs/quickstart.md`           |
-| The Orbit API definition | Shown with each endpoint in the [API Reference](/reference/listlaunches) |
+| 内容                   | 位置                                               |
+| :------------------- | :----------------------------------------------- |
+| 所有页面的索引              | [`/llms.txt`](https://erdman.readme.io/llms.txt) |
+| 以 Markdown 格式呈现的任意页面 | 在页面 URL 后添加 `.md`，例如 `/docs/quickstart.md`       |
+| Orbit API 定义         | 显示在 [API 参考](/reference/listlaunches) 中的各个端点处    |
 
 <Callout icon="✨" theme="info">
-  Try it: paste `https://erdman.readme.io/docs/quickstart.md` into your AI tool and ask it to write a booking script in your language.
+  试一试：将 `https://erdman.readme.io/docs/quickstart.md` 粘贴到您的 AI 工具中，并让它用您的语言编写预订脚本。
 </Callout>
 
-<Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
-  * **Tabs** with a code block per MCP client
-  * The hub’s **MCP server**, turned on in settings, plus a **custom MCP tool** added in the dashboard
-  * **Ask AI**, `llms.txt` and the `.md` page export are hub features, turned on in settings
-  * A **table** and an **info** Callout
+<Accordion title="本页面的构建方式" icon="fa-wand-magic-sparkles">
+  - **选项卡**，包含针对每个 MCP 客户端的代码块
+  - 文档中心的**MCP 服务器**（在设置中开启），以及在仪表盘中添加的**自定义 MCP 工具**
+  - **询问 AI**、`llms.txt` 以及 `.md` 页面导出均为文档中心功能，可在设置中开启
+  - 一个**表格**和一个 **info** 标注框
 </Accordion>
