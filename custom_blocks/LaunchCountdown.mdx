@@ -80,10 +80,10 @@ export const LaunchCountdown = rawProps => {
           <div className="eo-cd-mission">{mission}</div>
           <div className="eo-cd-sub">{vehicle} → {orbit}{props.pad ? " · " + props.pad : ""}</div>
         </div>
-        <span className="eo-cd-status"><i style={{ background: S.color }} />{launched ? "LIFTOFF" : S.label}</span>
+        <span className="eo-cd-status"><i style={{ background: S.color }}></i>{launched ? "LIFTOFF" : S.label}</span>
       </div>
       {launched ? (
-        <div className="eo-cd-clock" style={{ fontSize: "34px", fontWeight: 800 }}>🚀 Liftoff! Tracking to orbit.</div>
+        <div className="eo-cd-clock" style={{ fontSize: "34px", fontWeight: 800 }}>🚀 发射升空！正在追踪入轨。</div>
       ) : (
         <div className="eo-cd-clock" aria-live="off">
           <span className="eo-cd-tminus">T−</span>
@@ -93,7 +93,7 @@ export const LaunchCountdown = rawProps => {
           ])}
         </div>
       )}
-      <div className="eo-cd-foot">Window opens {local}</div>
+      <div className="eo-cd-foot">窗口开启 {local}</div>
       <span className="eo-cd-rocket" aria-hidden="true">🚀</span>
     </div>
   );
