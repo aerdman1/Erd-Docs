@@ -1,6 +1,6 @@
 ---
-title: Book your first launch slot
-description: Find a launch with room for your payload and reserve it, in about 20 lines.
+title: 预订您的首个发射槽位
+description: 寻找有足够载荷空间的发射任务并进行预订，只需约 20 行代码。
 hidden: false
 recipe:
   color: '#2F7BF5'
@@ -67,30 +67,30 @@ print(booking["id"], booking["status"])  # bkg_4Fh8Qp pending
 }
 ```
 
-# Set up the client
+# 配置客户端
 
 <!-- javascript@1-2 -->
 <!-- python@1-4 -->
 
-Every request needs your API key in the `X-Orbit-Key` header. Keep it in an environment variable, never in code.
+每个请求都需要在 `X-Orbit-Key` 请求头中包含您的 API 密钥。请将其保存在环境变量中，切勿写在代码中。
 
-# Find a launch
+# 查找发射任务
 
 <!-- javascript@4-7 -->
 <!-- python@6-8 -->
 
-[List launches](/reference/listlaunches) with `min_capacity_kg` set to your payload’s mass. Only launches with enough free room come back.
+[列出发射任务](/reference/listlaunches)并将 `min_capacity_kg` 设置为您的载荷质量。系统仅会返回具有足够空闲空间的发射任务。
 
-# Book the slot
+# 预订槽位
 
 <!-- javascript@9-17 -->
 <!-- python@10-18 -->
 
-[Book a payload slot](/reference/createbooking) on that launch. `payload.type` decides which fields are required: satellites need a `target_orbit`.
+在该发射任务上[预订载荷槽位](/reference/createbooking)。`payload.type` 决定哪些字段为必填项：卫星需要提供 `target_orbit`。
 
-# Check the result
+# 检查结果
 
 <!-- javascript@19 -->
 <!-- python@20 -->
 
-New bookings start as `pending`. Upload the manifest next, then wait for the `booking.confirmed` webhook.
+新预订的初始状态为 `pending`。接下来上传载荷清单，然后等待 `booking.confirmed` webhook。
