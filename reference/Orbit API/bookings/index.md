@@ -1,5 +1,5 @@
 ---
-title: Bookings
+title: 预订
 hidden: false
 ---
-Reserve, change and cancel payload slots, and upload cargo manifests.
+预订、更改和取消有效载荷舱位，并上传货物舱单。
