@@ -111,10 +111,10 @@ export const RSS = rawProps => {
 `;
 
   if (error) {
-    return <div className="eo-feed"><style>{css}</style><p style={{ color: "var(--color-text-minimum)" }}>Couldn’t load the changelog feed ({error}). <a href="/changelog">Open the changelog →</a></p></div>;
+    return <div className="eo-feed"><style>{css}</style><p style={{ color: "var(--color-text-minimum)" }}>无法加载更新日志源 ({error}). <a href="/changelog">打开更新日志 →</a></p></div>;
   }
   if (!items) {
-    return <div className="eo-feed" aria-busy="true"><style>{css}</style><div className="eo-feed-skel" /><div className="eo-feed-skel" /></div>;
+    return <div className="eo-feed" aria-busy="true"><style>{css}</style><div className="eo-feed-skel"></div><div className="eo-feed-skel"></div></div>;
   }
 
   if (compact) {
@@ -141,13 +141,13 @@ export const RSS = rawProps => {
       <style>{css}</style>
       {showFilters ? (
         <div className="eo-feed-top">
-          <button type="button" className="eo-feed-pill" aria-pressed={type === "all" ? "true" : "false"} onClick={() => setType("all")}>All <b>{(items || []).length}</b></button>
+          <button type="button" className="eo-feed-pill" aria-pressed={type === "all" ? "true" : "false"} onClick={() => setType("all")}>全部 <b>{(items || []).length}</b></button>
           {types.map(t => (
             <button key={t} type="button" className="eo-feed-pill" aria-pressed={type === t ? "true" : "false"} onClick={() => setType(type === t ? "all" : t)}>
-              <i style={{ background: meta(t).color }} />{meta(t).label} <b>{counts[t]}</b>
+              <i style={{ background: meta(t).color }}></i>{meta(t).label} <b>{counts[t]}</b>
             </button>
           ))}
-          <input className="eo-feed-search" type="search" placeholder="Search updates…" aria-label="Search updates" value={q} onChange={e => setQ(e.target.value)} />
+          <input className="eo-feed-search" type="search" placeholder="搜索更新…" aria-label="搜索更新" value={q} onChange={e => setQ(e.target.value)} />
         </div>
       ) : null}
       {shown.length ? (
@@ -163,8 +163,8 @@ export const RSS = rawProps => {
             </li>
           ))}
         </ol>
-      ) : <p style={{ color: "var(--color-text-minimum)" }}>No updates match.</p>}
-      <p style={{ fontSize: "13px", margin: "6px 0 0" }}><a href={url}>Subscribe with RSS</a> · <a href="/changelog">Full changelog →</a></p>
+      ) : <p style={{ color: "var(--color-text-minimum)" }}>没有匹配的更新。</p>}
+      <p style={{ fontSize: "13px", margin: "6px 0 0" }}><a href={url}>通过 RSS 订阅</a> · <a href="/changelog">完整更新日志 →</a></p>
     </div>
   );
 };
