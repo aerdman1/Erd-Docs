@@ -1,5 +1,5 @@
 ---
-title: AI Importer Checklist
+title: AI 导入器检查清单
 fullscreen: false
 hidden: false
 ---
@@ -9,7 +9,7 @@ hidden: false
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Import QA</title>
+  <title>AI 导入 QA</title>
   <style>
 /* ReadMe overrides */
 .SuperHubCustomPage-content2y25YXtWEbiK { margin: 0 auto; max-width: 100%; padding: 0; }
@@ -272,12 +272,12 @@ body {
 }
 
 /* Critical: bold red when CHECKED */
-#section-critical .check:has(input:checked) { background: #fef2f2; }
-#section-critical .check:has(input:checked) .check-label {
+# section-critical .check:has(input:checked) { background: #fef2f2; }
+# section-critical .check:has(input:checked) .check-label {
   color: var(--red);
   font-weight: 600;
 }
-#section-critical .check input[type="checkbox"]:checked {
+# section-critical .check input[type="checkbox"]:checked {
   background: var(--red);
   border-color: var(--red);
 }
@@ -329,15 +329,15 @@ body {
 
 <!-- Top bar -->
 <div class="qa-topbar">
-  <span class="qa-logo">AI Import QA</span>
+  <span class="qa-logo">AI 导入 QA</span>
   <div class="qa-fields">
-    <input id="field-project" type="text" placeholder="Project / customer" autocomplete="off">
-    <input id="field-owner"   type="text" placeholder="QA Owner" autocomplete="off">
+    <input id="field-project" type="text" placeholder="项目 / 客户" autocomplete="off">
+    <input id="field-owner"   type="text" placeholder="QA 负责人" autocomplete="off">
     <input id="field-url"     type="url"  placeholder="https://docs.example.com" autocomplete="off">
   </div>
   <div class="qa-actions">
-    <button id="new-qa-btn"  class="btn btn-ghost">+ New QA</button>
-    <button id="export-btn"  class="btn btn-primary">Export &amp; Copy Link</button>
+    <button id="new-qa-btn"  class="btn btn-ghost">+ 新建 QA</button>
+    <button id="export-btn"  class="btn btn-primary">导出并复制链接</button>
   </div>
 </div>
 
@@ -346,49 +346,49 @@ body {
 
   <!-- Sidebar -->
   <nav class="qa-sidebar">
-    <div class="nav-group-label">Sections</div>
+    <div class="nav-group-label">章节</div>
 
     <div class="qa-nav-item active" data-target="critical">
       <span class="nav-icon">⚠️</span>
-      <span class="nav-label">Critical Failures</span>
+      <span class="nav-label">严重故障</span>
       <span class="nav-badge badge-none" id="badge-critical"></span>
     </div>
     <div class="qa-nav-item" data-target="completeness">
       <span class="nav-icon">📋</span>
-      <span class="nav-label">Completeness</span>
+      <span class="nav-label">完整性</span>
       <span class="nav-badge badge-none" id="badge-completeness"></span>
     </div>
     <div class="qa-nav-item" data-target="accuracy">
       <span class="nav-icon">🎯</span>
-      <span class="nav-label">Accuracy</span>
+      <span class="nav-label">准确性</span>
       <span class="nav-badge badge-none" id="badge-accuracy"></span>
     </div>
     <div class="qa-nav-item" data-target="rendering">
       <span class="nav-icon">🖼️</span>
-      <span class="nav-label">Rendering Fidelity</span>
+      <span class="nav-label">渲染保真度</span>
       <span class="nav-badge badge-none" id="badge-rendering"></span>
     </div>
     <div class="qa-nav-item" data-target="ia">
       <span class="nav-icon">🗂️</span>
-      <span class="nav-label">Info Architecture</span>
+      <span class="nav-label">信息架构</span>
       <span class="nav-badge badge-none" id="badge-ia"></span>
     </div>
     <div class="qa-nav-item" data-target="code">
       <span class="nav-icon">💻</span>
-      <span class="nav-label">Code Samples</span>
+      <span class="nav-label">代码示例</span>
       <span class="nav-badge badge-none" id="badge-code"></span>
     </div>
     <div class="qa-nav-item" data-target="performance">
       <span class="nav-icon">⚡</span>
-      <span class="nav-label">Performance</span>
+      <span class="nav-label">性能</span>
       <span class="nav-badge badge-none" id="badge-performance"></span>
     </div>
 
     <!-- Auto grade -->
     <div class="qa-grade-box">
-      <div class="grade-label">Auto Grade</div>
-      <div class="grade-value grade-pass" id="auto-grade">PASS</div>
-      <div class="grade-desc" id="grade-desc">No issues flagged</div>
+      <div class="grade-label">自动评分</div>
+      <div class="grade-value grade-pass" id="auto-grade">通过</div>
+      <div class="grade-desc" id="grade-desc">未标记任何问题</div>
     </div>
   </nav>
 
@@ -396,120 +396,120 @@ body {
   <main class="qa-content">
 
     <div class="qa-section active" id="section-critical">
-      <div class="section-title">⚠️ Critical Failure Conditions</div>
-      <div class="section-subtitle">Check anything that applies. Any checked item triggers a FAIL grade.</div>
+      <div class="section-title">⚠️ 严重故障条件</div>
+      <div class="section-subtitle">勾选所有适用项。勾选任意一项都将判定为不通过。</div>
       <div class="check-list">
-        <label class="check"><input type="checkbox"><span class="check-label">Entire major sections missing</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Large numbers of skipped pages</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Missing API references</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Broad image/rendering failures</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Empty generated pages</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Fake AI-generated content</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Incorrect endpoint details</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Broken internal routing</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Broken markdown rendering</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Destroyed callouts</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Code/table corruption</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Unusable navigation</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Massive duplication</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Invalid JSON/examples</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Fake endpoints/parameters</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Unusable code samples</span></label>
-        <label class="check"><input type="checkbox"><span class="check-label">Frequent rendering failures/crashes</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">主要章节全部缺失</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">大量页面被跳过</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">缺失 API 参考文档</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">大范围图像/渲染失败</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">生成的页面为空</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">AI 生成的虚假内容</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">端点详情错误</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">内部路由损坏</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">Markdown 渲染损坏</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">提示框损坏</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">代码/表格损坏</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">导航不可用</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">大量重复内容</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">无效的 JSON/示例</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">虚假端点/参数</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">代码示例不可用</span></label>
+        <label class="check"><input type="checkbox"><span class="check-label">频繁渲染失败/崩溃</span></label>
       </div>
     </div>
 
     <div class="qa-section" id="section-completeness">
-      <div class="section-title">📋 Completeness</div>
-      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="section-title">📋 完整性</div>
+      <div class="section-subtitle">取消勾选任何未通过或未验证的项。</div>
       <div class="check-list">
-        <label class="check"><input type="checkbox" checked><span class="check-label">Major sections/pages imported</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Subsections/pages not skipped</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">API refs imported correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No major navigation holes</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No empty categories/folders</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No obvious missing child pages</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Images/SVGs imported correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Code examples imported</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Tables imported/readable</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">PDFs/download links preserved or flagged</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Page count roughly matches source</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Major nav groups match source</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">已导入主要章节/页面</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">未跳过子章节/页面</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">API 参考文档导入正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无重大导航缺失</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无空分类/文件夹</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无明显缺失的子页面</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">图像/SVG 导入正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">已导入代码示例</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">表格已导入且可读</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">PDF/下载链接已保留或已标记</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">页面数量与源大致吻合</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">主要导航分组与源一致</span></label>
       </div>
     </div>
 
     <div class="qa-section" id="section-accuracy">
-      <div class="section-title">🎯 Accuracy</div>
-      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="section-title">🎯 准确性</div>
+      <div class="section-subtitle">取消勾选任何未通过或未验证的项。</div>
       <div class="check-list">
-        <label class="check"><input type="checkbox" checked><span class="check-label">Technical meaning preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No truncated content</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No hallucinated/generated filler</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No merged unrelated content</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No duplicated content blocks</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">HTTP methods correct</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">API paths correct</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Parameters/types correct</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Response codes correct</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Request/response examples preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Internal links rewritten correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">External links preserved correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">保留技术原意</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无内容截断</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无幻觉/生成的填充内容</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">未合并无关内容</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无重复内容块</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">HTTP 方法正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">API 路径正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">参数/类型正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">响应状态码正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">保留请求/响应示例</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">内部链接重写正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">外部链接保留正确</span></label>
       </div>
     </div>
 
     <div class="qa-section" id="section-rendering">
-      <div class="section-title">🖼️ Rendering Fidelity</div>
-      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="section-title">🖼️ 渲染保真度</div>
+      <div class="section-subtitle">取消勾选任何未通过或未验证的项。</div>
       <div class="check-list">
-        <label class="check"><input type="checkbox" checked><span class="check-label">Heading hierarchy logical</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">TOC generates correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Pages readable/scannable</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Callouts/admonitions preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Syntax highlighting works</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Code blocks readable</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Tables aligned/readable</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Nested lists preserved</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Images render correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Relative asset paths resolved</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">标题层级逻辑清晰</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">目录正确生成</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">页面可读且易于浏览</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">保留提示框/标注框</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">语法高亮正常生效</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">代码块清晰可读</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">表格对齐且可读</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">保留嵌套列表</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">图像渲染正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">相对资源路径已解析</span></label>
       </div>
     </div>
 
     <div class="qa-section" id="section-ia">
-      <div class="section-title">🗂️ Information Architecture</div>
-      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="section-title">🗂️ 信息架构</div>
+      <div class="section-subtitle">取消勾选任何未通过或未验证的项。</div>
       <div class="check-list">
-        <label class="check"><input type="checkbox" checked><span class="check-label">Navigation grouping logical</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Parent/child relationships make sense</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Ordering predictable</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Landing pages placed correctly</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Slugs/page names clean</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No orphan pages</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No duplicate sections/pages</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Versions separated correctly</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">导航分组逻辑合理</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">父子层级关系合理</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">排序符合预期</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">落地页位置正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">Slug/页面名称整洁规范</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无孤立页面</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无重复章节/页面</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">版本划分正确</span></label>
       </div>
     </div>
 
     <div class="qa-section" id="section-code">
-      <div class="section-title">💻 Code Sample Quality</div>
-      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="section-title">💻 代码示例质量</div>
+      <div class="section-subtitle">取消勾选任何未通过或未验证的项。</div>
       <div class="check-list">
-        <label class="check"><input type="checkbox" checked><span class="check-label">Code samples syntactically valid</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Correct language labels</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Request bodies plausible</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Auth examples reasonable</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">JSON/code readable/formatted</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">代码示例语法有效</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">语言标签正确</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">请求体合理</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">认证示例合理</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">JSON/代码格式化且可读</span></label>
       </div>
     </div>
 
     <div class="qa-section" id="section-performance">
-      <div class="section-title">⚡ Performance &amp; Stability</div>
-      <div class="section-subtitle">Uncheck anything that is failing or not verified.</div>
+      <div class="section-title">⚡ 性能与稳定性</div>
+      <div class="section-subtitle">取消勾选任何未通过或未验证的项。</div>
       <div class="check-list">
-        <label class="check"><input type="checkbox" checked><span class="check-label">Pages progressively appeared during import</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Sidebar responsive</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Pages load normally</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">No major lag/freezing</span></label>
-        <label class="check"><input type="checkbox" checked><span class="check-label">Navigation usable during import</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">导入过程中页面渐进式显示</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">侧边栏响应灵敏</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">页面加载正常</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">无严重卡顿/假死</span></label>
+        <label class="check"><input type="checkbox" checked><span class="check-label">导入过程中导航可用</span></label>
       </div>
     </div>
 
@@ -521,13 +521,13 @@ body {
   <div class="modal-overlay" id="modal-overlay"></div>
   <div class="modal-box">
     <div class="modal-icon">💾</div>
-    <h3>Starting a new QA?</h3>
-    <p>Make sure you've saved your work first — export your shareable link so you can come back to this one later.</p>
+    <h3>开始新的 QA？</h3>
+    <p>请确保先保存您的工作——导出可共享的链接，以便日后返回查看。</p>
     <div class="modal-btns">
-      <button id="modal-export-btn" class="btn btn-ghost">Export &amp; Copy Link First</button>
-      <button id="modal-open-btn"   class="btn btn-primary">Open New Tab Anyway</button>
+      <button id="modal-export-btn" class="btn btn-ghost">先导出并复制链接</button>
+      <button id="modal-open-btn"   class="btn btn-primary">仍然在新标签页打开</button>
     </div>
-    <span class="modal-cancel-link" id="modal-cancel-btn">Cancel</span>
+    <span class="modal-cancel-link" id="modal-cancel-btn">取消</span>
   </div>
 </div>
 
