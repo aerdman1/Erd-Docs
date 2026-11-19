@@ -136,8 +136,8 @@ export const KeywordSearch = rawProps => {
           onChange={e => setTerm(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); step(e.shiftKey ? -1 : 1); } if (e.key === "Escape") setTerm(""); }} />
         <span className="eo-find-count" aria-live="polite">{q.length < 2 ? "" : count ? (cur + 1) + " of " + count : "No matches"}</span>
-        <button type="button" className="eo-find-btn" aria-label="Previous match" disabled={!count} onClick={() => step(-1)}>↑</button>
-        <button type="button" className="eo-find-btn" aria-label="Next match" disabled={!count} onClick={() => step(1)}>↓</button>
+        <button type="button" className="eo-find-btn" aria-label="上一个匹配项" disabled={!count} onClick={() => step(-1)}>↑</button>
+        <button type="button" className="eo-find-btn" aria-label="下一个匹配项" disabled={!count} onClick={() => step(1)}>↓</button>
       </div>
       {chips.length ? (
         <div className="eo-find-chips">
