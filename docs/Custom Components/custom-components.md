@@ -1,96 +1,96 @@
 ---
-title: Custom Components
-excerpt: React components written in MDX, used on any page like a built-in block.
+title: 自定义组件
+excerpt: 用 MDX 编写的 React 组件，可像内置区块一样在任意页面中使用。
 deprecated: false
 hidden: false
 icon: fad fa-puzzle-piece
 metadata:
   robots: index
 ---
-Built-in blocks cover most pages. When you need something they can’t do, write a **custom component**: a React component in an MDX file, saved with the project under **Components** in the dashboard. Any page can then use it with a tag, the same way it uses a Callout or Tabs.
+内置区块适用于大多数页面。当你需要它们无法实现的功能时，可以编写**自定义组件**：即 MDX 文件中的 React 组件，保存在控制台项目下的 **Components** 中。之后，任何页面都可以像使用 Callout 或 Tabs 一样，通过标签来使用它。
 
-Every component in this section is one of those files. Each page shows it live, then how to use it.
+本节中的每个组件都是这样的文件。每个页面都会实时展示其效果，并介绍具体的使用方法。
 
 <Cards columns="3">
-  <Card title="Countdown" href="/docs/launch-countdown" icon="fa-timer" iconColor="#7B3FF2" badge="New">
-    A live T-minus clock in the reader’s time zone.
+  <Card title="倒计时" href="/docs/launch-countdown" icon="fa-timer" iconColor="#7B3FF2" badge="新">
+    以读者所在时区实时运行的倒计时时钟。
   </Card>
 
-  <Card title="Payload Calculator" href="/docs/payload-calculator" icon="fa-calculator" iconColor="#2F7BF5" badge="New">
-    Price a payload and get the exact API request.
+  <Card title="Payload 计算器" href="/docs/payload-calculator" icon="fa-calculator" iconColor="#2F7BF5" badge="新">
+    估算 payload 费用并获取精确的 API 请求。
   </Card>
 
-  <Card title="Orbit Viz" href="/docs/orbit-viz" icon="fa-earth-americas" iconColor="#19C3F5" badge="New">
-    An animated orbit diagram you can explore.
+  <Card title="Orbit 可视化" href="/docs/orbit-viz" icon="fa-earth-americas" iconColor="#19C3F5" badge="新">
+    一个可供探索的动态轨道图。
   </Card>
 
-  <Card title="Terminal" href="/docs/terminal" icon="fa-terminal" iconColor="#12B76A" badge="New">
-    A CLI session that types itself out.
+  <Card title="终端" href="/docs/terminal" icon="fa-terminal" iconColor="#12B76A" badge="新">
+    自动键入内容的 CLI 会话。
   </Card>
 
-  <Card title="API Key Card" href="/docs/api-key-card" icon="fa-key" iconColor="#F79009" badge="New">
-    Shows signed-in readers their own key.
+  <Card title="API Key 卡片" href="/docs/api-key-card" icon="fa-key" iconColor="#F79009" badge="新">
+    向已登录读者展示他们自己的密钥。
   </Card>
 
-  <Card title="Changelog Feed" href="/docs/changelog-feed" icon="fa-rss" iconColor="#F04438" badge="New">
-    The latest changelog posts on any page.
+  <Card title="更新日志 Feed" href="/docs/changelog-feed" icon="fa-rss" iconColor="#F04438" badge="新">
+    在任意页面展示最新的更新日志文章。
   </Card>
 
-  <Card title="Stepper" href="/docs/simple-stepper" icon="fa-list-ol">
-    Click-through steps, or a vertical timeline.
+  <Card title="步骤条" href="/docs/simple-stepper" icon="fa-list-ol">
+    可点击切换的步骤，或垂直时间线。
   </Card>
 
-  <Card title="Banners" href="/docs/simple-banner" icon="fa-flag">
-    Inline or site-wide announcements.
+  <Card title="横幅" href="/docs/simple-banner" icon="fa-flag">
+    内联或全站公告。
   </Card>
 
-  <Card title="Modal" href="/docs/content-modal" icon="fa-window-restore">
-    Optional detail, one click away.
+  <Card title="模态框" href="/docs/content-modal" icon="fa-window-restore">
+    点击即可查看可选详情。
   </Card>
 
-  <Card title="Endpoint Chips" href="/docs/endpoint-embedding-lite" icon="fa-link">
-    Endpoint previews that read the API definition.
+  <Card title="端点标签" href="/docs/endpoint-embedding-lite" icon="fa-link">
+    读取 API 定义的端点预览。
   </Card>
 
-  <Card title="Endpoint Picker" href="/docs/endpoint-picker" icon="fa-list-tree">
-    Browse every endpoint from one dropdown.
+  <Card title="端点选择器" href="/docs/endpoint-picker" icon="fa-list-tree">
+    通过一个下拉菜单浏览所有端点。
   </Card>
 
-  <Card title="Find on Page" href="/docs/page-searching" icon="fa-magnifying-glass">
-    Search and highlight as you type.
+  <Card title="页内查找" href="/docs/page-searching" icon="fa-magnifying-glass">
+    边输入边搜索并高亮显示。
   </Card>
 
-  <Card title="Testimonials" href="/docs/quotes" icon="fa-quote-left">
-    A rotating carousel of quotes.
+  <Card title="客户评价" href="/docs/quotes" icon="fa-quote-left">
+    轮播展示的引言。
   </Card>
 
-  <Card title="SDK Explorer" href="/docs/sdk-explorer" icon="fa-cube">
-    Browse a package’s API from its types.
+  <Card title="SDK 浏览器" href="/docs/sdk-explorer" icon="fa-cube">
+    通过类型定义浏览软件包的 API。
   </Card>
 </Cards>
 
-## How they’re built
+## 它们的构建方式 {#how-theyre-built}
 
 <Columns layout="auto">
   <Column>
-    **One file each**
+    **每个组件一个文件**
 
-    Each component is an MDX file that exports a React component with the same name as the file.
+    每个组件都是一个 MDX 文件，并导出一个与文件名同名的 React 组件。
   </Column>
 
   <Column>
-    **Plain string props**
+    **纯字符串 props**
 
-    Pages pass props as strings, like `vertical="true"`, so they’re easy to write in the editor.
+    页面以字符串形式传递 props，例如 `vertical="true"`，因此在编辑器中编写非常轻松。
   </Column>
 
   <Column>
-    **Themed by the hub**
+    **遵循 hub 主题**
 
-    Colors come from the hub’s own theme variables, so every component matches light and dark mode.
+    颜色来自 hub 自带的主题变量，因此每个组件都能适配浅色和深色模式。
   </Column>
 </Columns>
 
 <Callout icon="📘" theme="info">
-  Custom components run in the reader’s browser with React. They can read the signed-in reader’s login data, fetch from the hub, and use any browser API. See [API Key Card](/docs/api-key-card) for an example.
+  自定义组件使用 React 在读者的浏览器中运行。它们可以读取已登录读者的登录数据、从 hub 获取内容，并使用任何浏览器 API。有关示例，请参见 [API Key Card](/docs/api-key-card)。
 </Callout>
