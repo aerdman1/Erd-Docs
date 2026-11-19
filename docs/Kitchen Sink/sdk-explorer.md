@@ -1,5 +1,5 @@
 ---
-title: SDK Explorer
+title: SDK 资源管理器
 deprecated: false
 hidden: false
 icon: fad fa-box-open
