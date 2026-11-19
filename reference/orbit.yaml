@@ -2,22 +2,17 @@ openapi: 3.1.0
 info:
   title: Orbit API
   version: 1.4.0
-  summary: Book cargo space on reusable rockets, track payloads, and stream telemetry.
+  summary: 在可重复使用火箭上预订货运空间、追踪有效载荷并实时传输遥测数据。
   description: >
-    The **Orbit API** from Erdman Industries lets you find upcoming launches,
-    book payload
-
-    slots, upload cargo manifests and follow your payload all the way to orbit.
+    Erdman Industries 的 **Orbit API**
+    让您可以查找即将进行的发射任务、预订有效载荷舱位、上传货物清单，并全程追踪您的有效载荷直至进入轨道。
 
 
-    > 📘 Orbit and Erdman Industries are made up
+    > 📘 Orbit 和 Erdman Industries 均为虚构
 
     >
 
-    > This API exists to show off what ReadMe can do. The **Sandbox** server
-    echoes your
-
-    > request back, so **Try It!** always works.
+    > 此 API 旨在展示 ReadMe 的功能。**Sandbox** 服务器会回显您的请求，因此 **Try It!** 始终可用。
   contact:
     name: Orbit Developer Relations
     url: https://erdman.readme.io/discuss
@@ -26,9 +21,9 @@ info:
     identifier: MIT
 servers:
   - url: https://httpbin.org/anything/orbit/v1
-    description: Sandbox (echoes your request back)
+    description: Sandbox（回显您的请求）
   - url: https://api.{region}.orbit.erdman.example/v1
-    description: Production
+    description: 生产环境
     variables:
       region:
         default: us-east
@@ -36,7 +31,7 @@ servers:
           - us-east
           - eu-central
           - ap-south
-        description: The launch region closest to your systems.
+        description: 距离您的系统最近的发射区域。
 security:
   - OrbitKey: []
   - OAuth2:
@@ -45,13 +40,13 @@ security:
       - telemetry:read
 tags:
   - name: Launches
-    description: Scheduled launches and their remaining cargo capacity.
+    description: 已安排的发射任务及其剩余货运运力。
   - name: Bookings
-    description: Reserve, change and cancel payload slots on a launch.
+    description: 预订、更改和取消发射任务中的有效载荷舱位。
   - name: Payloads
-    description: Follow a booked payload from the pad to its target orbit.
+    description: 全程追踪已预订的有效载荷从发射台到达目标轨道。
   - name: Account
-    description: Usage, quotas and plan limits for your Orbit account.
+    description: 您的 Orbit 账户的使用量、配额和套餐限制。
 x-readme:
   explorer-enabled: true
   proxy-enabled: true
@@ -65,12 +60,10 @@ paths:
   /launches:
     get:
       operationId: listLaunches
-      summary: List launches
-      description: >
-        Returns upcoming launches, soonest first. Filter by status, vehicle or
-        launch window
-
-        to find a slot with enough capacity for your payload.
+      summary: 列出发射任务
+      description: |
+        返回即将进行的发射任务，按时间从近到远排序。按状态、运载火箭或发射窗口进行筛选，
+        以找到具有足够载运量容纳您有效载荷的舱位。
       tags:
         - Launches
       parameters:
@@ -78,17 +71,17 @@ paths:
         - $ref: '#/components/parameters/Limit'
         - name: status
           in: query
-          description: Only return launches in this state.
+          description: 仅返回处于此状态的发射任务。
           schema:
             $ref: '#/components/schemas/LaunchStatus'
         - name: vehicle
           in: query
-          description: Only return launches on this vehicle.
+          description: 仅返回使用此运载火箭的发射任务。
           schema:
             $ref: '#/components/schemas/Vehicle'
         - name: window_start
           in: query
-          description: Earliest launch window to include (ISO 8601).
+          description: 要包含的最早发射窗口（ISO 8601）。
           schema:
             type: string
             format: date-time
@@ -96,7 +89,7 @@ paths:
               - '2026-12-01T00:00:00Z'
         - name: min_capacity_kg
           in: query
-          description: Only return launches with at least this much free cargo capacity.
+          description: 仅返回剩余货运运力至少达到该数值的发射任务。
           schema:
             type: integer
             minimum: 1
@@ -104,7 +97,7 @@ paths:
               - 250
       responses:
         '200':
-          description: A page of launches.
+          description: 一页发射任务列表。
           headers:
             X-RateLimit-Remaining:
               $ref: '#/components/headers/RateLimitRemaining'
@@ -128,7 +121,7 @@ paths:
                       - 'null'
               examples:
                 upcoming:
-                  summary: Two upcoming launches
+                  summary: 两项即将进行的发射任务
                   value:
                     data:
                       - id: lch_7Hq2Zr
@@ -167,13 +160,13 @@ paths:
       - $ref: '#/components/parameters/LaunchId'
     get:
       operationId: getLaunch
-      summary: Get a launch
-      description: Returns one launch, including its weather outlook and live countdown.
+      summary: 获取发射任务
+      description: 返回单次发射任务的信息，包括其天气预报和实时倒计时。
       tags:
         - Launches
       responses:
         '200':
-          description: The launch.
+          description: 发射任务。
           content:
             application/json:
               schema:
@@ -185,18 +178,16 @@ paths:
       - $ref: '#/components/parameters/LaunchId'
     get:
       operationId: getLaunchWeather
-      summary: Get launch weather
+      summary: 获取发射天气
       deprecated: true
-      description: >
-        **Deprecated.** Read the `weather` object on [Get a launch](getlaunch)
-        instead.
-
-        This endpoint stops responding on 2027-03-01.
+      description: |
+        **已弃用。** 请改为读取 [获取发射任务](getlaunch) 中的 `weather` 对象。
+        此端点将于 2027-03-01 停止响应。
       tags:
         - Launches
       responses:
         '200':
-          description: The weather outlook for the launch window.
+          description: 发射窗口期的天气预报。
           content:
             application/json:
               schema:
@@ -204,8 +195,8 @@ paths:
   /bookings:
     get:
       operationId: listBookings
-      summary: List bookings
-      description: Returns your bookings, newest first.
+      summary: 列出预订
+      description: 返回您的预订，按最新优先排序。
       tags:
         - Bookings
       security:
@@ -221,7 +212,7 @@ paths:
             $ref: '#/components/schemas/BookingStatus'
       responses:
         '200':
-          description: A page of bookings.
+          description: 一页预订列表。
           content:
             application/json:
               schema:
@@ -239,18 +230,12 @@ paths:
                       - 'null'
     post:
       operationId: createBooking
-      summary: Book a payload slot
-      description: >
-        Reserves cargo space on a launch. The booking starts as `pending` and
-        moves to
+      summary: 预订有效载荷舱位
+      description: |
+        预留发射任务的货运空间。预订初始状态为 `pending`，在 Orbit 审核您的清单后将变为
+        `confirmed`。届时您将收到 `booking.confirmed` webhook 通知。
 
-        `confirmed` once Orbit checks your manifest. You get a
-        `booking.confirmed` webhook
-
-        when that happens.
-
-
-        Send an `Idempotency-Key` header so a retried request never books twice.
+        请发送 `Idempotency-Key` 请求头，确保重试的请求绝不会重复预订。
       tags:
         - Bookings
       security:
@@ -260,7 +245,7 @@ paths:
       parameters:
         - name: Idempotency-Key
           in: header
-          description: A unique value (a UUID works) that makes retries safe.
+          description: 用于确保重试安全的唯一值（可使用 UUID）。
           schema:
             type: string
             format: uuid
@@ -272,7 +257,7 @@ paths:
               $ref: '#/components/schemas/BookingCreate'
             examples:
               cubesat:
-                summary: A 3U CubeSat to sun-synchronous orbit
+                summary: 前往太阳同步轨道的 3U CubeSat
                 value:
                   launch_id: lch_9Kd4Mw
                   payload:
@@ -284,7 +269,7 @@ paths:
                   insurance: standard
                   notify_url: https://example.com/hooks/orbit
               bulk:
-                summary: Bulk cargo to the station
+                summary: 运往空间站的大宗货物
                 value:
                   launch_id: lch_7Hq2Zr
                   payload:
@@ -296,7 +281,7 @@ paths:
                   insurance: premium
       responses:
         '201':
-          description: The booking was created and is pending manifest review.
+          description: 预订已创建，正在等待清单审核。
           content:
             application/json:
               schema:
@@ -320,7 +305,7 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
         '409':
-          description: The launch has no room left for this payload.
+          description: 该发射任务已无多余空间容纳此有效载荷。
           content:
             application/problem+json:
               schema:
@@ -331,7 +316,7 @@ paths:
                 status: 409
                 detail: Polaris Run has 120 kg free and this payload is 820 kg.
         '422':
-          description: The payload can't reach its target orbit on this vehicle.
+          description: 此有效载荷无法通过该运载火箭送达其目标轨道。
           content:
             application/problem+json:
               schema:
@@ -347,12 +332,12 @@ paths:
       - $ref: '#/components/parameters/BookingId'
     get:
       operationId: getBooking
-      summary: Get a booking
+      summary: 获取预订
       tags:
         - Bookings
       responses:
         '200':
-          description: The booking.
+          description: 预订信息。
           content:
             application/json:
               schema:
@@ -361,10 +346,8 @@ paths:
           $ref: '#/components/responses/NotFound'
     patch:
       operationId: updateBooking
-      summary: Update a booking
-      description: >-
-        Change the insurance tier or webhook URL. Payload changes need a new
-        booking.
+      summary: 更新预订
+      description: 更改保险级别或 webhook URL。若要更改有效载荷，需要创建新的预订。
       tags:
         - Bookings
       requestBody:
@@ -380,24 +363,22 @@ paths:
                   format: uri
       responses:
         '200':
-          description: The updated booking.
+          description: 更新后的预订信息。
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Booking'
     delete:
       operationId: cancelBooking
-      summary: Cancel a booking
-      description: >
-        Cancels a booking. Cancelling more than 30 days before the window opens
-        is free.
-
-        After that, Orbit keeps 25% of the price.
+      summary: 取消预订
+      description: |
+        取消预订。在窗口开启前 30 天以上取消无需支付任何费用。
+        此后取消，Orbit 将扣留 25% 的费用。
       tags:
         - Bookings
       responses:
         '204':
-          description: The booking was cancelled.
+          description: 预订已取消。
         '404':
           $ref: '#/components/responses/NotFound'
   /bookings/{bookingId}/manifest:
@@ -405,10 +386,8 @@ paths:
       - $ref: '#/components/parameters/BookingId'
     post:
       operationId: uploadManifest
-      summary: Upload a cargo manifest
-      description: >-
-        Attach the signed cargo manifest (PDF, up to 10 MB). Orbit reviews it
-        within one business day.
+      summary: 上传货物清单
+      description: 附加已签署的货物清单（PDF 格式，最大 10 MB）。Orbit 将在一个工作日内完成审核。
       tags:
         - Bookings
       requestBody:
@@ -423,13 +402,13 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: The signed manifest as a PDF.
+                  description: PDF 格式的已签署清单。
                 signed_by:
                   type: string
-                  description: Name of the person who signed the manifest.
+                  description: 签署该清单的人员姓名。
       responses:
         '202':
-          description: The manifest was received and is queued for review.
+          description: 清单已收到，正在排队等待审核。
           content:
             application/json:
               schema:
@@ -455,8 +434,8 @@ paths:
             - pld_2Xc9Lb
     get:
       operationId: getTelemetry
-      summary: Get payload telemetry
-      description: Returns telemetry samples for a payload in flight.
+      summary: 获取有效载荷遥测数据
+      description: 返回飞行中有效载荷的遥测采样数据。
       tags:
         - Payloads
       security:
@@ -466,7 +445,7 @@ paths:
       parameters:
         - name: interval
           in: query
-          description: How far apart the samples are.
+          description: 各采样点之间的间隔。
           schema:
             type: string
             enum:
@@ -482,7 +461,7 @@ paths:
             format: date-time
       responses:
         '200':
-          description: Telemetry samples, oldest first.
+          description: 遥测样本，最早的排在最前。
           content:
             application/json:
               schema:
@@ -503,13 +482,13 @@ paths:
   /account/usage:
     get:
       operationId: getUsage
-      summary: Get account usage
-      description: Returns how much of your monthly quota you've used.
+      summary: 获取账户用量
+      description: 返回您已使用的每月配额量。
       tags:
         - Account
       responses:
         '200':
-          description: Usage for the current billing period.
+          description: 当前计费周期的用量。
           content:
             application/json:
               schema:
@@ -542,8 +521,8 @@ webhooks:
   booking.confirmed:
     post:
       operationId: bookingConfirmed
-      summary: Booking confirmed
-      description: Sent when Orbit approves a manifest and the booking is final.
+      summary: 预订已确认
+      description: 在 Orbit 批准舱单且预订最终确认时发送。
       tags:
         - Bookings
       parameters:
@@ -563,14 +542,12 @@ webhooks:
                 status: confirmed
       responses:
         '200':
-          description: Return any 2xx to acknowledge the event.
+          description: 返回任意 2xx 状态码以确认该事件。
   launch.status_changed:
     post:
       operationId: launchStatusChanged
-      summary: Launch status changed
-      description: >-
-        Sent whenever a launch you have a booking on changes state, such as `go`
-        to `scrubbed`.
+      summary: 发射状态已变更
+      description: 每当您已预订的发射任务状态发生变化（例如从 `go` 变为 `scrubbed`）时发送。
       tags:
         - Launches
       parameters:
@@ -591,19 +568,17 @@ webhooks:
                 reason: Upper-level winds
       responses:
         '200':
-          description: Return any 2xx to acknowledge the event.
+          description: 返回任意 2xx 状态码以确认该事件。
 components:
   securitySchemes:
     OrbitKey:
       type: apiKey
       in: header
       name: X-Orbit-Key
-      description: >-
-        Your secret key from **Account → API keys**. It starts with `ok_live_`
-        or `ok_test_`.
+      description: 来自 **账户 → API 密钥** 的私钥。它以 `ok_live_` 或 `ok_test_` 开头。
     OAuth2:
       type: oauth2
-      description: For server-to-server integrations that act on behalf of a team.
+      description: 适用于代表团队执行操作的服务器到服务器集成。
       flows:
         clientCredentials:
           tokenUrl: https://auth.orbit.erdman.example/oauth/token
@@ -633,13 +608,13 @@ components:
     Cursor:
       name: cursor
       in: query
-      description: The `next_cursor` from the previous page.
+      description: 上一页的 `next_cursor`。
       schema:
         type: string
     Limit:
       name: limit
       in: query
-      description: How many results to return.
+      description: 要返回的结果数量。
       schema:
         type: integer
         minimum: 1
@@ -649,29 +624,27 @@ components:
       name: Orbit-Signature
       in: header
       required: true
-      description: >-
-        HMAC-SHA256 of the raw body, signed with your webhook secret. See
-        [Webhooks](/docs/webhooks).
+      description: 使用您的 Webhook 密钥签名的原始请求体 HMAC-SHA256。请参阅 [Webhooks](/docs/webhooks)。
       schema:
         type: string
         examples:
           - t=1765271520,v1=5f2c9a…
   headers:
     RateLimitRemaining:
-      description: Requests left in the current one-minute window.
+      description: 当前一分钟窗口期内剩余的请求次数。
       schema:
         type: integer
         examples:
           - 118
   responses:
     BadRequest:
-      description: The request was malformed.
+      description: 请求格式错误。
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     Unauthorized:
-      description: The API key is missing or invalid.
+      description: API 密钥缺失或无效。
       content:
         application/problem+json:
           schema:
@@ -681,16 +654,16 @@ components:
             title: Missing or invalid API key
             status: 401
     NotFound:
-      description: Nothing exists with that ID.
+      description: 不存在具有该 ID 的对象。
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/Problem'
     RateLimited:
-      description: Too many requests. Wait until the window resets.
+      description: 请求过多。请等待窗口重置。
       headers:
         Retry-After:
-          description: Seconds to wait before retrying.
+          description: 重试前需要等待的秒数。
           schema:
             type: integer
       content:
@@ -707,11 +680,11 @@ components:
         - scrubbed
         - launched
       description: |
-        - `scheduled`: on the manifest, more than 48 hours out
-        - `go`: cleared for launch
-        - `hold`: countdown paused
-        - `scrubbed`: will not fly in this window
-        - `launched`: off the pad
+        - `scheduled`: 在舱单上，距发射超过 48 小时
+        - `go`: 准予发射
+        - `hold`: 倒计时暂停
+        - `scrubbed`: 不会在此窗口期内发射
+        - `launched`: 已离开发射台
     Vehicle:
       type: string
       enum:
@@ -719,8 +692,8 @@ components:
         - kestrel
         - kestrel-heavy
       description: >-
-        `wren` lifts up to 900 kg to LEO, `kestrel` 4,000 kg and `kestrel-heavy`
-        6,400 kg.
+        `wren` 最多可向 LEO 运送 900 kg，`kestrel` 为 4,000 kg，`kestrel-heavy` 为 6,400
+        kg。
     Orbit:
       type: string
       enum:
@@ -879,14 +852,12 @@ components:
         notify_url:
           type: string
           format: uri
-          description: >-
-            Where Orbit sends webhooks for this booking. Overrides your account
-            default.
+          description: Orbit 为此预订发送 Webhook 的目标地址。此项将覆盖您的账户默认设置。
         metadata:
           type: object
           additionalProperties:
             type: string
-          description: Up to 20 key/value pairs of your own data.
+          description: 最多 20 个自定义数据的键值对。
     Booking:
       allOf:
         - $ref: '#/components/schemas/BookingCreate'
@@ -907,7 +878,7 @@ components:
               properties:
                 amount:
                   type: integer
-                  description: Price in the smallest currency unit (cents).
+                  description: 以最小货币单位（分）表示的价格。
                 currency:
                   type: string
                   examples:
@@ -958,9 +929,7 @@ components:
           additionalProperties: true
     Problem:
       type: object
-      description: >-
-        An [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) problem details
-        object.
+      description: 一个 [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) 问题详情对象。
       properties:
         type:
           type: string
@@ -971,3 +940,5 @@ components:
           type: integer
         detail:
           type: string
+x-readme-ai-translation:
+  sourceHash: 1af652c5b1aa9c88
