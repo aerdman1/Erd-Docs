@@ -53,33 +53,33 @@ export const OrbitViz = rawProps => {
       <svg ref={svgRef} viewBox="0 0 720 380" role="img" aria-label={"Orbit diagram. Selected: " + cur.name + ", " + cur.alt}>
         <defs>
           <radialGradient id={uid + "-earth"} cx="38%" cy="35%" r="70%">
-            <stop offset="0%" stopColor="#7DD3FC" />
-            <stop offset="45%" stopColor="#2F7BF5" />
-            <stop offset="100%" stopColor="#0B2A6B" />
+            <stop offset="0%" stopColor="#7DD3FC"></stop>
+            <stop offset="45%" stopColor="#2F7BF5"></stop>
+            <stop offset="100%" stopColor="#0B2A6B"></stop>
           </radialGradient>
           <radialGradient id={uid + "-glow"} cx="50%" cy="50%" r="50%">
-            <stop offset="70%" stopColor="#19C3F5" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#19C3F5" stopOpacity="0" />
+            <stop offset="70%" stopColor="#19C3F5" stopOpacity="0.35"></stop>
+            <stop offset="100%" stopColor="#19C3F5" stopOpacity="0"></stop>
           </radialGradient>
           <mask id={uid + "-front"} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="380">
-            <rect x="0" y="0" width="720" height="380" fill="#fff" />
-            <path d={"M " + (cx - R) + " " + cy + " A " + R + " " + R + " 0 0 1 " + (cx + R) + " " + cy + " Z"} fill="#000" />
+            <rect x="0" y="0" width="720" height="380" fill="#fff"></rect>
+            <path d={"M " + (cx - R) + " " + cy + " A " + R + " " + R + " 0 0 1 " + (cx + R) + " " + cy + " Z"} fill="#000"></path>
           </mask>
         </defs>
-        {stars.map((s, i) => <circle key={i} cx={s[0]} cy={s[1]} r={i % 3 ? 1 : 1.6} fill="#fff" opacity={i % 2 ? 0.5 : 0.8} />)}
-        <circle cx={cx} cy={cy} r={R + 14} fill={"url(#" + uid + "-glow)"} />
-        <circle cx={cx} cy={cy} r={R} fill={"url(#" + uid + "-earth)"} />
-        <path d={"M " + (cx - 30) + " " + (cy - 18) + " q 14 -10 26 0 t 18 10 q -10 14 -24 8 z"} fill="#12B76A" opacity="0.55" />
-        <path d={"M " + (cx + 6) + " " + (cy + 14) + " q 12 -6 22 2 q -4 12 -18 12 z"} fill="#12B76A" opacity="0.5" />
+        {stars.map((s, i) => <circle key={i} cx={s[0]} cy={s[1]} r={i % 3 ? 1 : 1.6} fill="#fff" opacity={i % 2 ? 0.5 : 0.8}></circle>)}
+        <circle cx={cx} cy={cy} r={R + 14} fill={"url(#" + uid + "-glow)"}></circle>
+        <circle cx={cx} cy={cy} r={R} fill={"url(#" + uid + "-earth)"}></circle>
+        <path d={"M " + (cx - 30) + " " + (cy - 18) + " q 14 -10 26 0 t 18 10 q -10 14 -24 8 z"} fill="#12B76A" opacity="0.55"></path>
+        <path d={"M " + (cx + 6) + " " + (cy + 14) + " q 12 -6 22 2 q -4 12 -18 12 z"} fill="#12B76A" opacity="0.5"></path>
         <g mask={"url(#" + uid + "-front)"}>
           {ORBITS.map(o => (
             <g key={o.id} transform={o.tilt ? "rotate(" + o.tilt + " " + cx + " " + cy + ")" : undefined}
               opacity={sel === o.id ? 1 : 0.45} style={{ transition: "opacity .25s" }}>
-              <path d={ring(o)} fill="none" stroke={o.color} strokeWidth={sel === o.id ? 2.4 : 1.2} strokeDasharray={o.id === "geo" ? "6 6" : undefined} />
+              <path d={ring(o)} fill="none" stroke={o.color} strokeWidth={sel === o.id ? 2.4 : 1.2} strokeDasharray={o.id === "geo" ? "6 6" : undefined}></path>
               <path className="eo-orb-hit" d={ring(o)} fill="none" stroke="transparent" strokeWidth="14" onMouseEnter={() => setSel(o.id)} onClick={() => setSel(o.id)} />
               <g>
-                <circle r={sel === o.id ? 9 : 6} fill={o.color} opacity="0.25" />
-                <circle r={sel === o.id ? 4.5 : 3.5} fill={o.color} />
+                <circle r={sel === o.id ? 9 : 6} fill={o.color} opacity="0.25"></circle>
+                <circle r={sel === o.id ? 4.5 : 3.5} fill={o.color}></circle>
                 <animateMotion dur={o.dur + "s"} repeatCount="indefinite" path={ring(o)} />
               </g>
             </g>
@@ -92,15 +92,15 @@ export const OrbitViz = rawProps => {
       </svg>
       <div className="eo-orb-bar">
         {ORBITS.map(o => (
-          <button key={o.id} type="button" aria-pressed={sel === o.id} onClick={() => setSel(o.id)}><i style={{ background: o.color }} />{o.name}</button>
+          <button key={o.id} type="button" aria-pressed={sel === o.id} onClick={() => setSel(o.id)}><i style={{ background: o.color }}></i>{o.name}</button>
         ))}
         <button type="button" className="eo-orb-play" onClick={() => setPlaying(p => !p)} aria-label={playing ? "Pause animation" : "Play animation"}>{playing ? "❚❚ Pause" : "▶ Play"}</button>
       </div>
       <div className="eo-orb-info" aria-live="polite">
-        <div><span>Altitude</span>{cur.alt}</div>
-        <div><span>One orbit</span>{cur.period}</div>
-        <div><span>Good for</span>{cur.use}</div>
-        <div><span>Orbit price · vehicles</span>{cur.rate} · {cur.reach}</div>
+        <div><span>高度</span>{cur.alt}</div>
+        <div><span>绕轨一周</span>{cur.period}</div>
+        <div><span>适用场景</span>{cur.use}</div>
+        <div><span>轨道价格 · 运载工具</span>{cur.rate} · {cur.reach}</div>
       </div>
     </figure>
   );
