@@ -73,8 +73,8 @@ export const ApiKeyCard = rawProps => {
           </div>
         ) : (
           <div className="eo-key-row">
-            {!signedIn ? <a className="eo-key-btn" data-primary="" href={"/login?redirect_uri=" + encodeURIComponent(here)}>Log in</a> : null}
-            <button type="button" className="eo-key-btn" onClick={() => setDemo(true)}>Preview with a demo key</button>
+            {!signedIn ? <a className="eo-key-btn" data-primary="" href={"/login?redirect_uri=" + encodeURIComponent(here)}>登录</a> : null}
+            <button type="button" className="eo-key-btn" onClick={() => setDemo(true)}>使用演示密钥预览</button>
           </div>
         )}
         <p className="eo-key-note">
@@ -83,7 +83,7 @@ export const ApiKeyCard = rawProps => {
             : signedIn
               ? "Your account has no Orbit key yet. When login data includes one, it shows up here and in Try It."
               : "Custom components can read the signed-in reader’s login data, so docs can show each developer their own key."}
-          {demo && !realKey ? <button type="button" className="eo-key-btn" style={{ marginLeft: "8px", padding: "2px 8px", fontSize: "12px" }} onClick={() => { setDemo(false); setReveal(false); }}>Reset</button> : null}
+          {demo && !realKey ? <button type="button" className="eo-key-btn" style={{ marginLeft: "8px", padding: "2px 8px", fontSize: "12px" }} onClick={() => { setDemo(false); setReveal(false); }}>重置</button> : null}
         </p>
       </div>
     </div>
