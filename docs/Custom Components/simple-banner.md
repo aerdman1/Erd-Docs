@@ -1,13 +1,13 @@
 ---
-title: Banners
-excerpt: Announcements on a page, or across the top of the site.
+title: 横幅
+excerpt: 页面内或网站顶部的公告。
 deprecated: false
 hidden: false
 icon: fad fa-flag
 metadata:
   robots: index
 ---
-Five styles for news, notices and warnings. Add a link, and let readers dismiss a banner for the rest of their visit.
+适用于新闻、通知和警告的五种样式。添加链接，并允许读者在本次访问的剩余时间内关闭横幅。
 
 <SimpleBanner variant="launch" message="Bulk cargo bookings are live." link="/changelog/bulk-cargo-bookings" linkText="See what’s new" />
 
@@ -19,28 +19,28 @@ Five styles for news, notices and warnings. Add a link, and let readers dismiss 
 
 <SimpleBanner variant="error" message="Legacy v0 booking endpoints are gone." link="/changelog/v0-bookings-removed" linkText="Details" />
 
-## In the site header
+## 在网站页眉中 {#in-the-site-header}
 
-With `placement="header"`, the banner runs across the top of the site while this page is open. Look up: it’s there now.
+使用 `placement="header"` 时，当此页面处于打开状态，横幅会横跨在网站顶部。抬头看看：它现在就在那里。
 
 <SimpleBanner placement="header" variant="launch" message="This banner lives in the site header while you’re on this page." dismissible="true" />
 
-## Use it
+## 使用方法 {#use-it}
 
 ```mdx
 <SimpleBanner variant="warn" message="Maintenance on Saturday." link="/page/status" linkText="Status" dismissible="true" />
 ```
 
-| Prop | Values | What it does |
-| :--- | :--- | :--- |
-| `message` | Text | What the banner says |
-| `variant` | `info`, `success`, `warn`, `error`, `launch` | The style |
-| `icon` | Emoji | Replaces the variant’s icon |
-| `link`, `linkText` | URL, text | An optional link at the end |
-| `placement` | `inline`, `header` | Where it shows. `header` puts it across the top of the site. |
-| `dismissible` | `true` | Adds a close button. It stays closed for the rest of the visit. |
+| 属性                 | 取值                                           | 说明                           |
+| :----------------- | :------------------------------------------- | :--------------------------- |
+| `message`          | 文本                                           | 横幅显示的内容                      |
+| `variant`          | `info`, `success`, `warn`, `error`, `launch` | 样式                           |
+| `icon`             | Emoji                                        | 替换变体的图标                      |
+| `link`, `linkText` | URL、文本                                       | 末尾的可选链接                      |
+| `placement`        | `inline`, `header`                           | 显示位置。`header` 会将其置于网站顶部横跨显示。 |
+| `dismissible`      | `true`                                       | 添加关闭按钮。在本次访问的剩余时间内它将保持关闭状态。  |
 
-<Accordion title="How it works" icon="fa-wand-magic-sparkles">
-  * A header banner is added when the page opens and removed when the reader leaves it.
-  * Older pages that pass `isHeader`, `bannerColor` and `bannerTextColor` still work.
+<Accordion title="工作原理" icon="fa-wand-magic-sparkles">
+  - 页眉横幅会在页面打开时添加，并在读者离开该页面时移除。
+  - 传递了 `isHeader`、`bannerColor` 和 `bannerTextColor` 的旧版页面仍可正常工作。
 </Accordion>
