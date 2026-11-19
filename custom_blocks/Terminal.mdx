@@ -70,7 +70,7 @@ export const Terminal = rawProps => {
   const renderLine = (l, i, partial) => {
     if (isCmd(l)) {
       const body = partial === undefined ? l.slice(2) : l.slice(2, Math.max(0, partial - 2));
-      return <div key={i}><span style={{ color: "#A78BFA" }}>❯</span> <span style={{ color: "#F8FAFC" }}>{body}</span>{partial !== undefined ? <span className="eo-term-caret" /> : null}</div>;
+      return <div key={i}><span style={{ color: "#A78BFA" }}>❯</span> <span style={{ color: "#F8FAFC" }}>{body}</span>{partial !== undefined ? <span className="eo-term-caret"></span> : null}</div>;
     }
     return <div key={i} style={{ color: tone(l) }}>{l || " "}</div>;
   };
@@ -90,15 +90,15 @@ export const Terminal = rawProps => {
     <div className="eo-term" ref={boxRef}>
       <style>{css}</style>
       <div className="eo-term-top">
-        <i style={{ background: "#FF5F57" }} /><i style={{ background: "#FEBC2E" }} /><i style={{ background: "#28C840" }} />
+        <i style={{ background: "#FF5F57" }}></i><i style={{ background: "#FEBC2E" }}></i><i style={{ background: "#28C840" }}></i>
         <span className="eo-term-title">{title}</span>
-        <button type="button" onClick={copy} aria-label="Copy commands">{copied ? "✓ Copied" : "Copy"}</button>
-        <button type="button" onClick={replay} aria-label="Replay">↻</button>
+        <button type="button" onClick={copy} aria-label="复制命令">{copied ? "✓ Copied" : "Copy"}</button>
+        <button type="button" onClick={replay} aria-label="回放">↻</button>
       </div>
       <div className="eo-term-body" aria-label={lines.join("\n")} role="log">
         {lines.slice(0, shown).map((l, i) => renderLine(l, i))}
         {!done && run ? (isCmd(lines[shown]) ? renderLine(lines[shown], shown, typed) : null) : null}
-        {done ? <div><span style={{ color: "#A78BFA" }}>❯</span> <span className="eo-term-caret" /></div> : null}
+        {done ? <div><span style={{ color: "#A78BFA" }}>❯</span> <span className="eo-term-caret"></span></div> : null}
       </div>
     </div>
   );
