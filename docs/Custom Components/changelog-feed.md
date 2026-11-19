@@ -1,23 +1,23 @@
 ---
-title: Changelog Feed
-excerpt: The latest changelog posts on any page.
+title: 更新日志动态
+excerpt: 在任意页面上展示最新的更新日志文章。
 deprecated: false
 hidden: false
 icon: fad fa-rss
 metadata:
   robots: index
 ---
-Pull changelog posts into any page. It reads the hub’s own RSS feed, so new posts appear here without editing this page. Filter by type or search.
+将更新日志文章拉取到任意页面。它会读取 Hub 自身的 RSS 源，因此无需编辑此页面，新文章就会显示在这里。支持按类型筛选或搜索。
 
 <RSS limit="10" />
 
-## Compact
+## 紧凑 {#compact}
 
-A short list fits on a landing or welcome page:
+简短列表适用于着陆页或欢迎页：
 
-<RSS compact="true" limit="3" title="Latest changes" />
+<RSS compact="true" limit="3" title="最新变更" />
 
-## Use it
+## 使用方法 {#use-it}
 
 ```mdx
 <RSS limit="10" />
@@ -25,16 +25,16 @@ A short list fits on a landing or welcome page:
 <RSS compact="true" limit="3" title="Latest changes" />
 ```
 
-| Prop | Values | What it does |
-| :--- | :--- | :--- |
-| `limit` | Number | How many posts to show. Defaults to 20. |
-| `compact` | `true` | A short list instead of the timeline |
-| `title` | Text | A heading for the compact list |
-| `filters` | `false` | Hide the type filters and search |
-| `type` | `added`, `improved`, `fixed`, `deprecated`, `removed` | Start filtered to one type |
-| `url` | Path | Another feed. Defaults to `/changelog.rss`. |
+| 属性        | 取值                                                    | 作用                          |
+| :-------- | :---------------------------------------------------- | :-------------------------- |
+| `limit`   | 数字                                                    | 要显示的文章数量。默认为 20。            |
+| `compact` | `true`                                                | 显示简短列表而非时间线                 |
+| `title`   | 文本                                                    | 紧凑列表的标题                     |
+| `filters` | `false`                                               | 隐藏类型筛选器和搜索                  |
+| `type`    | `added`, `improved`, `fixed`, `deprecated`, `removed` | 初始筛选为单一类型                   |
+| `url`     | 路径                                                    | 其他订阅源。默认为 `/changelog.rss`。 |
 
-<Accordion title="How it works" icon="fa-wand-magic-sparkles">
-  * The feed is cached for five minutes in the reader’s browser.
-  * Type labels come from each post’s type in the changelog.
+<Accordion title="工作原理" icon="fa-wand-magic-sparkles">
+  - 该订阅源会在读者的浏览器中缓存五分钟。
+  - 类型标签来自更新日志中每篇文章对应的类型。
 </Accordion>
