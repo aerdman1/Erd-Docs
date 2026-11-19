@@ -1,22 +1,22 @@
 ---
 title: Webhooks
-excerpt: Get an HTTP request the moment a booking or a launch changes.
+excerpt: 在预订或发布发生变更时立即接收 HTTP 请求。
 deprecated: false
 hidden: false
 icon: fad fa-satellite-dish
 metadata:
   robots: index
 ---
-Orbit sends a `POST` to your endpoint whenever something you care about changes. Set a default URL under **Account → Webhooks**, or set `notify_url` on a single booking.
+每当您关注的内容发生变动时，Orbit 都会向您的端点发送一个 `POST` 请求。您可以在 **Account → Webhooks** 下设置默认 URL，或在单个预订中设置 `notify_url`。
 
-## Events
+## 事件 {#events}
 
-| Event                                                    | Sent when                                              |
-| :------------------------------------------------------- | :----------------------------------------------------- |
-| [`booking.confirmed`](/reference/bookingconfirmed)       | Orbit approves your manifest and the booking is final  |
-| [`launch.status_changed`](/reference/launchstatuschanged) | A launch you’re booked on changes state, such as `go` to `scrubbed` |
+| 事件                                                        | 触发时机                                |
+| :-------------------------------------------------------- | :---------------------------------- |
+| [`booking.confirmed`](/reference/bookingconfirmed)        | Orbit 批准了您的清单且预订已最终确认               |
+| [`launch.status_changed`](/reference/launchstatuschanged) | 您预订的发射状态发生变更，例如从 `go` 变为 `scrubbed` |
 
-Every event has the same envelope:
+每个事件都具有相同的信封结构：
 
 ```json
 {
@@ -27,13 +27,13 @@ Every event has the same envelope:
 }
 ```
 
-## Check the signature
+## 验证签名 {#check-the-signature}
 
-Each request carries an `Orbit-Signature` header: a timestamp and an HMAC-SHA256 of `timestamp.body`, signed with your webhook secret. Reject anything that doesn’t match, or that is more than five minutes old.
+每个请求都带有一个 `Orbit-Signature` 请求头：包含时间戳以及使用您的 Webhook 密钥对 `timestamp.body` 计算的 HMAC-SHA256 签名。请拒绝任何不匹配或超过五分钟的请求。
 
-The recipe walks through a complete Express handler line by line:
+该操作指南逐行演示了一个完整的 Express 处理程序：
 
-<Recipe slug="verify-webhook-signatures" title="Verify webhook signatures" />
+<Recipe slug="verify-webhook-signatures" title="验证 Webhook 签名" />
 
 ```javascript Node.js
 import crypto from 'node:crypto';
@@ -75,12 +75,12 @@ func Verify(rawBody []byte, header, secret string) bool {
 ```
 
 <Callout icon="⚠️" theme="warn">
-  Verify against the **raw** request body. Parsing the JSON and serializing it again changes the bytes, so the signature won’t match.
+  请针对**原始**请求体进行验证。解析 JSON 并再次序列化会改变字节，从而导致签名不匹配。
 </Callout>
 
-## Retries
+## 重试机制 {#retries}
 
-Respond with any `2xx` within ten seconds. Otherwise Orbit retries with backoff:
+请在十秒内返回任意 `2xx` 状态码。否则 Orbit 将采用退避策略进行重试：
 
 ```mermaid
 sequenceDiagram
@@ -96,12 +96,12 @@ sequenceDiagram
   You-->>Orbit: 200 OK
 ```
 
-After five failed retries the event is marked failed. You can resend it from **Account → Webhooks**.
+在五次重试失败后，该事件将被标记为失败。您可以从 **Account → Webhooks** 重新发送。
 
-<Accordion title="How this page is built" icon="fa-wand-magic-sparkles">
-  * A **table** whose cells link to webhook pages in the API Reference. Those pages come from the `webhooks` section of the OpenAPI 3.1 file.
-  * **Code tabs** in three languages
-  * A **Recipe** embed for the full handler
-  * A **warning** Callout
-  * A **Mermaid** sequence diagram with notes and failed calls
+<Accordion title="本页面的构建方式" icon="fa-wand-magic-sparkles">
+  - 一个**表格**，其单元格链接到 API 参考中的 Webhook 页面。这些页面来自 OpenAPI 3.1 文件的 `webhooks` 部分。
+  - 三种语言的**代码选项卡**
+  - 用于完整处理程序的 **Recipe** 嵌入组件
+  - 一个**警告**提示框
+  - 包含备注和失败调用的 **Mermaid** 时序图
 </Accordion>
