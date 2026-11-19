@@ -1,6 +1,6 @@
 ---
-title: Verify webhook signatures
-description: Check that a webhook really came from Orbit before you act on it.
+title: 验证 Webhook 签名
+description: 在对其进行处理之前，请先确认 Webhook 确实来自 Orbit。
 hidden: false
 recipe:
   color: '#7B3FF2'
@@ -34,32 +34,32 @@ app.post('/hooks/orbit', express.raw({ type: 'application/json' }), (req, res) =
 app.listen(3000);
 ```
 
-# Read the raw body
+# 读取原始请求体
 
 <!-- javascript@6-7 -->
 
-The signature covers the request body byte for byte, so take it raw. Parsing JSON and serializing it again changes the bytes.
+签名逐字节覆盖请求体，因此请直接获取原始请求体。解析 JSON 并重新序列化会改变字节。
 
-# Split the header
+# 拆分请求头
 
 <!-- javascript@8-9 -->
 
-`Orbit-Signature` holds a Unix timestamp `t` and the signature `v1`.
+`Orbit-Signature` 包含 Unix 时间戳 `t` 和签名 `v1`。
 
-# Check the timestamp
+# 检查时间戳
 
 <!-- javascript@11-12 -->
 
-Refuse events more than five minutes old, so an old request can’t be replayed.
+拒绝超过五分钟的事件，以防旧请求被重放。
 
-# Compare signatures
+# 比对签名
 
 <!-- javascript@14-18 -->
 
-Sign `t.body` with your webhook secret and compare in constant time.
+使用您的 Webhook 密钥对 `t.body` 进行签名，并在恒定时间内进行比对。
 
-# Handle the event
+# 处理事件
 
 <!-- javascript@20-22 -->
 
-Reply with any `2xx` within ten seconds. Otherwise Orbit retries with backoff, up to five times.
+在十秒内返回任意 `2xx`。否则 Orbit 将进行退避重试，最多重试五次。
