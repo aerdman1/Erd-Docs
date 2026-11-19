@@ -1,80 +1,79 @@
 ---
-title: All Components
-excerpt: Every block ReadMe’s editor can make, on one page.
+title: 所有组件
+excerpt: ReadMe 编辑器支持创建的所有区块，尽在这一页。
 deprecated: false
 hidden: false
 icon: fad fa-shapes
 metadata:
   robots: index
 ---
-This page shows every native block in ReadMe’s editor, in the order of the `/` menu. Open it in the editor to see how each one is written.
+本页面展示了 ReadMe 编辑器中的所有原生区块，按 `/` 菜单的顺序排列。在编辑器中打开它即可查看每个区块的编写方式。
 
-## Text
+## 文本 {#text}
 
-Paragraphs support **bold**, *italic*, ~~strikethrough~~, `inline code`, [internal links](/docs/quickstart), [external links](https://readme.com) and emoji 🚀🛰️🌍. A line can end with a hard break  
-like this one.
+段落支持**粗体**、_斜体_、~~删除线~~、`inline code`、[内部链接](/docs/quickstart)、[外部链接](https://readme.com)以及表情符号 🚀🛰️🌍。行尾可以添加硬换行<br />就像这样。
 
-### A level-3 heading
+### 三级标题 {#a-level-3-heading}
 
-#### A level-4 heading
+#### 四级标题 {#a-level-4-heading}
 
-Every heading gets an anchor link and an entry in the table of contents on the right.
+每个标题都会获得一个锚点链接，并在右侧的目录中生成一个对应条目。
 
 ***
 
-## Lists
+## 列表 {#lists}
 
-* Bulleted lists
-  * can nest
-    * as deep as you need
-* and mix in `code` or **bold**
+- 无序列表
+  - 可以嵌套
+    - 按需深入多层
+- 并混入 `code` 或**粗体**
 
-1. Numbered lists
-2. count for you
-   1. and nest too
+1. 有序列表
+2. 自动为您编号
+   1. 同样支持嵌套
 
-* [x] Checklists show what’s done
-* [ ] and what isn’t
+- [x] 任务清单可展示已完成的事项
+- [ ] 以及未完成的事项
 
-## Blockquote
+## 块引用 {#blockquote}
 
-> The Earth is the cradle of humanity, but one cannot live in the cradle forever.
+> 地球是人类的摇篮，但人类不可能永远生活在摇篮中。
 >
-> — Konstantin Tsiolkovsky
+> — 康斯坦丁·齐奥尔科夫斯基
 
-## Callouts
+## 提示框 {#callouts}
 
 <Callout icon="📘" theme="info">
-  ### Info
+  ### 信息 {#info}
 
-  For context and tips.
+  用于背景信息和操作技巧。
 </Callout>
 
 <Callout icon="👍" theme="okay">
-  ### Success
+  ### 成功 {#success}
 
-  For good news and confirmations.
+  用于好消息和确认操作。
 </Callout>
 
 <Callout icon="⚠️" theme="warn">
-  ### Warning
+  ### 警告 {#warning}
 
-  For things that can go wrong.
+  用于提示可能出现的问题。
 </Callout>
 
 <Callout icon="❗️" theme="error">
-  ### Error
+  ### 错误 {#error}
 
-  For things that will go wrong.
+  用于提示必然会导致错误的情况。
 </Callout>
 
 <Callout icon="🪐" theme="default">
-  The default theme takes any emoji as its icon, and the title is optional.
+  默认主题支持使用任何表情符号作为图标，且标题为可选。
 </Callout>
 
-## Code
+## 代码 {#code}
 
-A single block with a language and a title:
+包含语言和标题的单个代码块：
 
 ```yaml orbit.config.yaml
 region: us-east
@@ -84,7 +83,7 @@ webhooks:
   events: [booking.confirmed, launch.status_changed]
 ```
 
-Back-to-back blocks become tabs:
+连续的代码块会转换为标签页：
 
 ```shell cURL
 curl "https://api.us-east.orbit.erdman.example/v1/launches" -H "X-Orbit-Key: $ORBIT_KEY"
@@ -99,19 +98,19 @@ launches = orbit.launches.list(min_capacity_kg=4)
 launches = Orbit::Launch.list(min_capacity_kg: 4)
 ```
 
-## Tables
+## 表格 {#tables}
 
-| Vehicle         | Stages | Reusable | Payload to LEO |
-| :-------------- | :----: | :------: | -------------: |
-| `wren`          |   2    |    ✅    |         900 kg |
-| `kestrel`       |   2    |    ✅    |       4,000 kg |
-| `kestrel-heavy` |   3    |    ✅    |       6,400 kg |
+| 运载工具            |  级数 | 可重复使用 | LEO 有效载荷 |
+| :-------------- | :-: | :---: | -------: |
+| `wren`          |  2  |   ✅   |   900 kg |
+| `kestrel`       |  2  |   ✅   | 4,000 kg |
+| `kestrel-heavy` |  3  |   ✅   | 6,400 kg |
 
-## Images
+## 图片 {#images}
 
-<Image align="center" width="240px" border="true" src="https://files.readme.io/9abb7424e8472cd8547d1c7bc15f856dedbef1124b8beec31e5ced61914c9659-erdman-mark.png" alt="The Erdman Industries swoosh" caption="Images can be aligned, resized, bordered and captioned. Click to zoom." />
+<Image align="center" width="240px" border="true" src="https://files.readme.io/9abb7424e8472cd8547d1c7bc15f856dedbef1124b8beec31e5ced61914c9659-erdman-mark.png" alt="Erdman Industries 的 Swoosh 标志" caption="图片可以设置对齐方式、调整大小、添加边框和说明文字。点击即可缩放。" />
 
-## Mermaid diagrams
+## Mermaid 图表 {#mermaid-diagrams}
 
 ```mermaid
 flowchart LR
@@ -130,114 +129,114 @@ pie title Mass booked by orbit
   "GEO" : 6
 ```
 
-## Accordion
+## 折叠面板 {#accordion}
 
-<Accordion title="Click to expand" icon="fa-circle-info">
-  Accordions hide detail until a reader wants it. They can hold any Markdown, including code:
+<Accordion title="点击展开" icon="fa-circle-info">
+  折叠面板可以隐藏细节，直到读者需要时再展示。它们可以容纳任何 Markdown 内容，包括代码：
 
   ```json
   { "status": "go" }
   ```
 </Accordion>
 
-## Tabs
+## 标签页 {#tabs}
 
 <Tabs>
   <Tab title="Wren" icon="fa-feather">
-    Small and quick. Up to 900 kg to low Earth orbit.
+    小巧迅捷。送入近地轨道的运载能力高达 900 kg。
   </Tab>
 
   <Tab title="Kestrel" icon="fa-rocket">
-    The workhorse. Up to 4,000 kg.
+    主力型号。运载能力高达 4,000 kg。
   </Tab>
 
   <Tab title="Kestrel Heavy" icon="fa-rocket-launch">
-    Three cores and 6,400 kg to LEO.
+    三箭芯配置，近地轨道运力达 6,400 kg。
   </Tab>
 </Tabs>
 
-## Columns
+## 分栏 {#columns}
 
 <Columns layout="auto">
   <Column>
-    **Plan**
+    **规划**
 
-    Pick a launch window and a vehicle.
+    选择发射窗口和运载工具。
   </Column>
 
   <Column>
-    **Book**
+    **预订**
 
-    Reserve space and upload the manifest.
+    预留舱位并上传舱单。
   </Column>
 
   <Column>
-    **Fly**
+    **飞行**
 
-    Follow telemetry all the way to orbit.
+    全程追踪遥测数据直达入轨。
   </Column>
 </Columns>
 
-## Cards
+## 卡片 {#cards}
 
 <Cards columns="3">
-  <Card title="Card" href="/docs/quickstart" icon="fa-rocket" iconColor="#2F7BF5">
-    A card with a link, an icon and an icon color.
+  <Card title="卡片" href="/docs/quickstart" icon="fa-rocket" iconColor="#2F7BF5">
+    包含链接、图标和图标颜色的卡片。
   </Card>
 
-  <Card title="With a badge" href="/docs/webhooks" icon="fa-satellite-dish" badge="New">
-    Badges call out something fresh.
+  <Card title="带徽章" href="/docs/webhooks" icon="fa-satellite-dish" badge="最新">
+    徽章用于醒目提示最新内容。
   </Card>
 
-  <Card title="Tile" href="/reference/listlaunches" icon="fa-code" kind="tile">
-    The tile style is more compact.
+  <Card title="磁贴" href="/reference/listlaunches" icon="fa-code" kind="tile">
+    磁贴样式更为紧凑。
   </Card>
 </Cards>
 
-## Embeds
+## 嵌入组件 {#embeds}
 
-A YouTube video:
+YouTube 视频：
 
-<Embed url="https://www.youtube.com/watch?v=wbSwFU6tY1c" title="Falcon Heavy Test Flight" typeOfEmbed="youtube" />
+<Embed url="https://www.youtube.com/watch?v=wbSwFU6tY1c" title="Falcon Heavy 测试飞行" typeOfEmbed="youtube" />
 
-Any page in an iframe, like a map of the launch coast:
+iframe 中的任意页面，例如发射海岸的地图：
 
-<Embed url="https://www.openstreetmap.org/export/embed.html?bbox=-80.70%2C28.40%2C-80.50%2C28.65&layer=mapnik" title="Launch coast map" typeOfEmbed="iframe" height="360" />
+<Embed url="https://www.openstreetmap.org/export/embed.html?bbox=-80.70%2C28.40%2C-80.50%2C28.65&layer=mapnik" title="发射海岸地图" typeOfEmbed="iframe" height="360" />
 
-A link preview:
+链接预览：
 
-<Embed url="https://readme.com" title="ReadMe: beautiful documentation made easy" />
+<Embed url="https://readme.com" title="ReadMe：轻松打造精美文档" />
 
-## Custom HTML
+## 自定义 HTML {#custom-html}
 
 <HTMLBlock>{`
 <div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:12px;background:linear-gradient(90deg,#19C3F5,#2F7BF5 50%,#7B3FF2);color:#fff;font-family:inherit">
   <span style="font-size:32px">🚀</span>
   <div>
-    <div style="font-weight:700;font-size:16px">Mission patch: Polaris Run</div>
-    <div style="opacity:.9;font-size:13px">Raw HTML and CSS work too, for anything Markdown can’t do.</div>
+    <div style="font-weight:700;font-size:16px">任务徽章：Polaris Run</div>
+    <div style="opacity:.9;font-size:13px">原生 HTML 和 CSS 同样支持，可实现 Markdown 无法完成的任何效果。</div>
   </div>
 </div>
 `}</HTMLBlock>
 
-## Recipes
+## 分步指南 {#recipes}
 
-A Recipe is a step-by-step code walkthrough. Embed one and it opens in place:
+Recipe 是一种分步代码演示教程。嵌入一个 Recipe 即可在当前位置展开：
 
-<Recipe slug="book-your-first-launch-slot" title="Book your first launch slot" />
+<Recipe slug="book-your-first-launch-slot" title="预订您的首次发射席位" />
 
-## Glossary
+## 术语表 {#glossary}
 
-Terms from the project glossary show their definition on hover: <Glossary>LEO</Glossary>, <Glossary>delta-v</Glossary> and <Glossary>idempotency key</Glossary>.
+悬停在项目术语表中的术语上即可显示其定义：<Glossary>LEO</Glossary>、<Glossary>delta-v</Glossary> 和 <Glossary>idempotency key</Glossary>。
 
-## Reusable content
+## 可复用内容 {#reusable-content}
 
-The box below is one snippet shared by several pages. Edit it once and every page updates:
+下方的选框是多个页面共享的内容片段。只需编辑一次，所有页面都会同步更新：
 
 <OrbitHelp />
 
-## Fine print
+## 补充说明 {#fine-print}
 
-Orbital velocity in low Earth orbit is about 7.8 km/s[^1].
+近地轨道上的轨道速度约为 7.8 km/s\[^1]。
 
-[^1]: Fast enough to go around the planet in roughly 90 minutes.
+[^1]: 速度之快，大约 90 分钟即可绕地球一周。
