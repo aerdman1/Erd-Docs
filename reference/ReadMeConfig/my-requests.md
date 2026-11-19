@@ -1,6 +1,6 @@
 ---
-title: My Requests
-excerpt: Every request you’ve sent to Orbit, with the full request and response.
+title: 我的请求
+excerpt: 您发送给 Orbit 的每个请求，包含完整的请求与响应。
 api_config: my-requests
 hidden: false
 ---
